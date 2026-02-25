@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const title = currentRoute ? t(currentRoute.labelKey) : 'الرئيسية';
 
   return (
-    <header className="flex h-14 md:h-[72px] items-center justify-between px-4 md:px-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 flex-shrink-0 z-10 sticky top-0 transition-colors">
+    <header className="flex h-14 md:h-[72px] items-center justify-between px-4 md:px-8 bg-[var(--app-surface)]/80 backdrop-blur-md border-b border-[var(--app-border)] flex-shrink-0 z-10 sticky top-0 transition-colors">
       {/* Left side: Logo/Title (Mobile) / Page Title (Desktop) */}
       <div className="flex items-center gap-3 flex-1 md:flex-none">
         {/* Mobile Menu Button */}

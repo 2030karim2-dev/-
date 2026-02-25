@@ -43,7 +43,7 @@ export const useLogin = () => {
                     throw new Error("حسابك موجود ولكن ملف التعريف غير مكتمل. يرجى التواصل مع الدعم.");
                 }
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             const parsed = parseError(err);
             setError(parsed.message);
         } finally {
@@ -69,8 +69,14 @@ export const useRegister = () => {
             if (!email || !pass || !companyName || !fullName) {
                 throw new Error("جميع الحقول مطلوبة");
             }
-            if (pass.length < 6) {
-                throw new Error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+            if (pass.length < 8) {
+                throw new Error("كلمة المرور يجب أن تكون 8 أحرف على الأقل");
+            }
+            if (!/[A-Z]/.test(pass)) {
+                throw new Error("كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل");
+            }
+            if (!/[0-9]/.test(pass)) {
+                throw new Error("كلمة المرور يجب أن تحتوي على رقم واحد على الأقل");
             }
 
             // 2. Call Supabase API
@@ -88,7 +94,7 @@ export const useRegister = () => {
                     setIsSuccess(true);
                 }
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             const parsed = parseError(err);
             setError(parsed.message);
         } finally {
@@ -112,7 +118,7 @@ export const usePasswordReset = () => {
             const { error } = await authApi.resetPasswordForEmail(email);
             if (error) throw error;
             setSuccess(true);
-        } catch (err: any) {
+        } catch (err: unknown) {
             const parsed = parseError(err);
             setError(parsed.message);
         } finally {
@@ -127,7 +133,7 @@ export const usePasswordReset = () => {
             const { error } = await authApi.updateUserPassword(newPassword);
             if (error) throw error;
             navigate(ROUTES.AUTH.LOGIN);
-        } catch (err: any) {
+        } catch (err: unknown) {
             const parsed = parseError(err);
             setError(parsed.message);
         } finally {
@@ -149,7 +155,7 @@ export const usePasswordChange = () => {
             const { error } = await authApi.updateUserPassword(newPassword);
             if (error) throw error;
             return true;
-        } catch (err: any) {
+        } catch (err: unknown) {
             const parsed = parseError(err);
             setError(parsed.message);
             return false;

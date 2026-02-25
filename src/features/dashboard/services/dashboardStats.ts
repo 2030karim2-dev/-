@@ -1,4 +1,4 @@
-import { formatCurrency } from '../../../core/utils';
+import { formatCurrency, toBaseCurrency } from '../../../core/utils/currencyUtils';
 
 export const calculateDashboardStats = (data: {
     receiptBonds: number;
@@ -15,20 +15,6 @@ export const calculateDashboardStats = (data: {
 }) => {
     const { invoicesData, expensesData, invoiceItemsData } = data;
 
-    // تحويل مبلغ الفاتورة إلى العملة الأساسية (SAR)
-    const toBase = (inv: any): number => {
-        const amount = Number(inv.total_amount) || 0;
-        const rate = Number(inv.exchange_rate) || 1;
-        if (!inv.currency_code || inv.currency_code === 'SAR') return amount;
-        return amount * rate;
-    };
-
-    const expToBase = (exp: any): number => {
-        const amount = Number(exp.amount) || 0;
-        const rate = Number(exp.exchange_rate) || 1;
-        if (!exp.currency_code || exp.currency_code === 'SAR') return amount;
-        return amount * rate;
-    };
 
 
     const chartDataMap: Record<string, { sales: number; purchases: number; expenses: number }> = {};
@@ -36,19 +22,19 @@ export const calculateDashboardStats = (data: {
     (invoicesData || []).filter((i: any) => i.type === 'sale').forEach((inv: any) => {
         const date = new Date(inv.issue_date).toLocaleDateString('en-CA');
         if (!chartDataMap[date]) chartDataMap[date] = { sales: 0, purchases: 0, expenses: 0 };
-        chartDataMap[date].sales += toBase(inv);
+        chartDataMap[date].sales += toBaseCurrency(inv);
     });
 
     (invoicesData || []).filter((i: any) => i.type === 'purchase').forEach((inv: any) => {
         const date = new Date(inv.issue_date).toLocaleDateString('en-CA');
         if (!chartDataMap[date]) chartDataMap[date] = { sales: 0, purchases: 0, expenses: 0 };
-        chartDataMap[date].purchases += toBase(inv);
+        chartDataMap[date].purchases += toBaseCurrency(inv);
     });
 
     (expensesData || []).forEach((exp: any) => {
         const date = new Date(exp.expense_date).toLocaleDateString('en-CA');
         if (!chartDataMap[date]) chartDataMap[date] = { sales: 0, purchases: 0, expenses: 0 };
-        chartDataMap[date].expenses += expToBase(exp);
+        chartDataMap[date].expenses += toBaseCurrency(exp);
     });
 
     const salesData = Object.entries(chartDataMap)
@@ -85,7 +71,7 @@ export const calculateDashboardStats = (data: {
         if (!customerPurchases[customerId]) {
             customerPurchases[customerId] = { name: customerName, total: 0, invoices: 0 };
         }
-        customerPurchases[customerId].total += toBase(inv);
+        customerPurchases[customerId].total += toBaseCurrency(inv);
         customerPurchases[customerId].invoices += 1;
     });
 
@@ -98,7 +84,7 @@ export const calculateDashboardStats = (data: {
     const expenseByCategory: Record<string, number> = {};
     (expensesData || []).forEach((exp: any) => {
         const categoryName = exp.expense_categories?.name || 'غير مصنف';
-        expenseByCategory[categoryName] = (expenseByCategory[categoryName] || 0) + expToBase(exp);
+        expenseByCategory[categoryName] = (expenseByCategory[categoryName] || 0) + toBaseCurrency(exp);
     });
 
     const categoryData = Object.entries(expenseByCategory)

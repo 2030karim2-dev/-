@@ -31,7 +31,7 @@ const InventoryOverview: React.FC<InventoryOverviewProps> = ({ lowStockProducts,
 
     return (
         <div className={cn(
-            "bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 relative overflow-hidden group",
+            "bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] rounded-2xl p-4 relative overflow-hidden group",
             className
         )}>
             {/* Ambient glow */}
@@ -43,8 +43,8 @@ const InventoryOverview: React.FC<InventoryOverviewProps> = ({ lowStockProducts,
                     <Package size={16} className="text-cyan-400 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-black text-white">نظرة عامة على المخزون</h3>
-                    <p className="text-[9px] text-slate-500">Inventory Snapshot</p>
+                    <h3 className="text-sm font-black text-[var(--app-text)]">نظرة عامة على المخزون</h3>
+                    <p className="text-[9px] text-[var(--app-text-secondary)]">Inventory Snapshot</p>
                 </div>
             </div>
 
@@ -53,7 +53,7 @@ const InventoryOverview: React.FC<InventoryOverviewProps> = ({ lowStockProducts,
                 {metrics.map((m) => (
                     <div key={m.label} className={cn(
                         "p-3 rounded-xl border bg-white/5 hover:bg-white/10 transition-all duration-300",
-                        "border-white/5"
+                        "border-[var(--app-border)]"
                     )}>
                         <div className="flex items-center gap-2 mb-2">
                             <div className={cn("p-1.5 rounded-lg border", m.bg)}>
@@ -61,7 +61,7 @@ const InventoryOverview: React.FC<InventoryOverviewProps> = ({ lowStockProducts,
                             </div>
                             <span className="text-[10px] font-bold text-slate-400">{m.label}</span>
                         </div>
-                        <p className="text-lg font-black text-white font-mono">{m.value}</p>
+                        <p className="text-lg font-black text-[var(--app-text)] font-mono">{m.value}</p>
                     </div>
                 ))}
             </div>

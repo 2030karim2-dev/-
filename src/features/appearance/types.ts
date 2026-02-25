@@ -19,7 +19,7 @@ export interface ThemePreset {
   previewColor: string; // اللون الرئيسي للمعاينة
   isDark: boolean; // هل الثيم مخصص للوضع الليلي؟
   accent?: string; // لون التمييز الرئيسي
-  category?: 'classic' | 'beige' | 'royal' | 'accounting' | 'nature' | 'bold'; // تصنيف الثيم
+  category?: 'classic' | 'beige' | 'royal' | 'accounting' | 'nature' | 'bold' | 'corporate' | 'night' | 'seasonal' | 'artistic' | 'industry'; // تصنيف الثيم
   emoji?: string; // رمز تعبيري للثيم
   cssVars: ThemeCSSVars; // متغيرات CSS التي تُطبق فعلياً
 }

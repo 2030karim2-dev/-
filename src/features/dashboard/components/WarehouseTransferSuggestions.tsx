@@ -63,7 +63,7 @@ const WarehouseTransferSuggestions: React.FC<{ className?: string }> = ({ classN
 
     return (
         <div className={cn(
-            "bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 relative overflow-hidden group",
+            "bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] rounded-2xl p-4 relative overflow-hidden group",
             className
         )}>
             {/* Ambient glow */}
@@ -76,8 +76,8 @@ const WarehouseTransferSuggestions: React.FC<{ className?: string }> = ({ classN
                         <ArrowRightLeft size={16} className="text-violet-400 drop-shadow-[0_0_6px_rgba(139,92,246,0.6)]" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-white">اقتراحات المناقلات</h3>
-                        <p className="text-[9px] text-slate-500">منتجات متوفرة بالفروع وغير موجودة بالمتجر</p>
+                        <h3 className="text-sm font-black text-[var(--app-text)]">اقتراحات المناقلات</h3>
+                        <p className="text-[9px] text-[var(--app-text-secondary)]">منتجات متوفرة بالفروع وغير موجودة بالمتجر</p>
                     </div>
                 </div>
                 {hasSuggestions && (
@@ -91,9 +91,9 @@ const WarehouseTransferSuggestions: React.FC<{ className?: string }> = ({ classN
             <div className="relative z-10 space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
                 {!hasSuggestions ? (
                     <div className="text-center py-6">
-                        <Package size={32} className="mx-auto text-slate-700 mb-2" />
-                        <p className="text-xs font-bold text-slate-500">لا توجد اقتراحات حالياً</p>
-                        <p className="text-[10px] text-slate-600 mt-1">جميع المنتجات متوفرة في المتجر الرئيسي</p>
+                        <Package size={32} className="mx-auto text-[var(--app-text-secondary)] mb-2" />
+                        <p className="text-xs font-bold text-[var(--app-text-secondary)]">لا توجد اقتراحات حالياً</p>
+                        <p className="text-[10px] text-[var(--app-text-secondary)] mt-1 opacity-60">جميع المنتجات متوفرة في المتجر الرئيسي</p>
                     </div>
                 ) : (
                     suggestions.map((s, i) => (
@@ -106,16 +106,16 @@ const WarehouseTransferSuggestions: React.FC<{ className?: string }> = ({ classN
                                     <AlertTriangle size={12} className="text-amber-400" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold text-white truncate">{s.product.name}</p>
+                                    <p className="text-xs font-bold text-[var(--app-text)] truncate">{s.product.name}</p>
                                     {s.product.part_number && (
-                                        <p className="text-[9px] text-slate-500 font-mono">{s.product.part_number}</p>
+                                        <p className="text-[9px] text-[var(--app-text-secondary)] font-mono">{s.product.part_number}</p>
                                     )}
                                     <div className="flex items-center gap-2 mt-2 text-[10px]">
                                         <div className="flex items-center gap-1 text-emerald-400">
                                             <MapPin size={10} />
                                             <span className="font-bold">{s.fromWarehouse.name_ar}</span>
                                         </div>
-                                        <Truck size={10} className="text-slate-600" />
+                                        <Truck size={10} className="text-[var(--app-text-secondary)]" />
                                         <div className="flex items-center gap-1 text-blue-400">
                                             <MapPin size={10} />
                                             <span className="font-bold">{s.toWarehouse.name_ar}</span>
@@ -123,8 +123,8 @@ const WarehouseTransferSuggestions: React.FC<{ className?: string }> = ({ classN
                                     </div>
                                 </div>
                                 <div className="text-left flex-shrink-0">
-                                    <span className="text-sm font-black text-white font-mono">{s.availableQty}</span>
-                                    <p className="text-[8px] text-slate-500 font-bold">متوفر</p>
+                                    <span className="text-sm font-black text-[var(--app-text)] font-mono">{s.availableQty}</span>
+                                    <p className="text-[8px] text-[var(--app-text-secondary)] font-bold">متوفر</p>
                                 </div>
                             </div>
                         </div>

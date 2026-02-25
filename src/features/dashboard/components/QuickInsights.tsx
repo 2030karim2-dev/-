@@ -48,7 +48,7 @@ const QuickInsights: React.FC<QuickInsightsProps> = ({
 
     return (
         <div className={cn(
-            "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl",
+            "bg-[var(--app-surface)] border border-[var(--app-border)] p-5 rounded-2xl",
             className
         )}>
             {/* Header */}
@@ -56,7 +56,7 @@ const QuickInsights: React.FC<QuickInsightsProps> = ({
                 <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
                     <Lightbulb size={16} className="text-amber-500" />
                 </div>
-                <h3 className="text-sm font-black text-slate-800 dark:text-white">
+                <h3 className="text-sm font-black text-[var(--app-text)]">
                     رؤى ذكية
                 </h3>
             </div>
@@ -82,7 +82,7 @@ const QuickInsights: React.FC<QuickInsightsProps> = ({
                                 {getIcon(insight.type)}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-slate-700 dark:text-slate-200 leading-relaxed">
+                                <p className="text-xs font-bold text-[var(--app-text)] leading-relaxed">
                                     {insight.message}
                                 </p>
                                 {insight.detail && (

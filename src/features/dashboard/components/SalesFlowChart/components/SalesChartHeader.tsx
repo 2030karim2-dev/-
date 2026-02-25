@@ -69,8 +69,8 @@ export const SalesChartHeader: React.FC<SalesChartHeaderProps> = ({
                                 className={cn(
                                     "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
                                     period === p
-                                        ? "bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm scale-105"
-                                        : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                                        ? "bg-[var(--app-surface)] text-[var(--app-text)] shadow-sm scale-105"
+                                        : "text-[var(--app-text-secondary)] hover:text-[var(--app-text)]"
                                 )}
                             >
                                 {periodLabels[p]}

@@ -21,9 +21,9 @@ const TopCustomersTable: React.FC<TopCustomersTableProps> = ({ customers }) => {
         </thead>
         <tbody>
           {customers.map((c, index) => (
-            <tr key={index} className="border-b border-gray-100 dark:border-slate-800 last:border-0">
-              <td className="p-3 font-medium text-gray-800 dark:text-slate-200">{c.name}</td>
-              <td className="p-3 text-gray-600 dark:text-slate-400">{c.inv}</td>
+            <tr key={index} className="border-b border-[var(--app-border)] last:border-0">
+              <td className="p-3 font-medium text-[var(--app-text)]">{c.name}</td>
+              <td className="p-3 text-[var(--app-text-secondary)]">{c.inv}</td>
               <td className="p-3 font-bold text-brand-green">{c.amt}</td>
             </tr>
           ))}

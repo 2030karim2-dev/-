@@ -1,6 +1,8 @@
 
 import { supabase } from '../../lib/supabaseClient';
+import { toBaseCurrency } from '../../core/utils/currencyUtils';
 import { formatCurrency } from '../../core/utils';
+import type { JournalEntryWithLines, ProductWithStock, InvoiceItemWithDetails } from './types';
 
 export const dashboardService = {
   getDashboardData: async (companyId: string) => {
@@ -43,8 +45,11 @@ export const dashboardService = {
         .eq('type', 'supplier')
         .is('deleted_at', null),
       // 5. السندات
-      (supabase.from('journal_entries') as any)
-        .select(`
+      supabase
+        .from('journal_entries')
+        .select<`*,
+          journal_entry_lines(debit_amount, credit_amount)
+        `>(`
           id,
           entry_date,
           reference_type,
@@ -52,25 +57,32 @@ export const dashboardService = {
         `)
         .eq('company_id', companyId)
         .in('reference_type', ['receipt_bond', 'payment_bond'])
-        .eq('status', 'posted'),
+        .eq('status', 'posted') as any,
       // 6. المنتجات مع المخزون
-      (supabase.from('products') as any)
-        .select(`
+      supabase
+        .from('products')
+        .select<`*,
+          product_stock(quantity, warehouse_id)
+        `>(`
           id,
           name_ar,
           min_stock_level,
           product_stock(quantity, warehouse_id)
         `)
         .eq('company_id', companyId)
-        .eq('status', 'active'),
+        .eq('status', 'active') as any,
       // 7. أصناف المصروفات
       supabase
         .from('expense_categories')
         .select('id, name')
         .eq('company_id', companyId),
       // 8. عناصر الفواتير
-      (supabase.from('invoice_items') as any)
-        .select(`
+      supabase
+        .from('invoice_items')
+        .select<`*,
+          product_id(name_ar),
+          invoices:invoice_id!inner(company_id, type, status)
+        `>(`
           product_id,
           quantity,
           total,
@@ -79,7 +91,7 @@ export const dashboardService = {
         `)
         .eq('invoices.company_id', companyId)
         .eq('invoices.type', 'sale')
-        .neq('invoices.status', 'void'),
+        .neq('invoices.status', 'void') as any,
     ]);
 
     // التحقق من الأخطاء
@@ -123,39 +135,17 @@ export const dashboardService = {
       min_quantity: p.min_stock_level || 5
     }));
 
-    // --- معالجة البيانات (Aggregation) ---
-    // تحويل المبلغ من عملة الفاتورة إلى العملة الأساسية (SAR)
-    // exchange_rate = كم ريال سعودي يساوي 1 وحدة من العملة الأجنبية
-    // مثال: 1 YER = 0.02 SAR → exchange_rate = 0.02
-    // لذا: total_in_SAR = total_amount * exchange_rate
-    const toBase = (inv: any): number => {
-      const amount = Number(inv.total_amount) || 0;
-      const rate = Number(inv.exchange_rate) || 1;
-      // إذا كانت العملة هي الأساسية أو لم تُحدد عملة، لا تحوّل
-      if (!inv.currency_code || inv.currency_code === 'SAR') return amount;
-      return amount * rate;
-    };
 
     const totalSales = (invoices || [])
       .filter((i: any) => i.type === 'sale')
-      .reduce((sum: number, i: any) => sum + toBase(i), 0);
+      .reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
 
     const totalPurchases = (invoices || [])
       .filter((i: any) => i.type === 'purchase')
-      .reduce((sum: number, i: any) => sum + toBase(i), 0);
-
-    // تحويل مبالغ المصروفات أيضاً إلى العملة الأساسية
-    const expenseToBase = (exp: any): number => {
-      const amount = Number(exp.amount) || 0;
-      const rate = Number(exp.exchange_rate) || 1;
-      const currencyCode = exp.currency_code;
-      // إذا كانت العملة هي الأساسية، لا تحوّل (أو إذا كان السعر 1)
-      if (!currencyCode || currencyCode === 'SAR') return amount;
-      return amount * rate;
-    };
+      .reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
 
     const totalExpenses = (expenses || [])
-      .reduce((sum: number, e: any) => sum + expenseToBase(e), 0);
+      .reduce((sum: number, e: any) => sum + toBaseCurrency(e), 0);
 
     const totalDebts = (customers || [])
       .reduce((sum: number, c: any) => sum + (Number(c.balance) > 0 ? Number(c.balance) : 0), 0);

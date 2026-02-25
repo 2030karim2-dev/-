@@ -15,7 +15,7 @@ const SmartTargets: React.FC<Props> = ({ targets }) => {
     const { t } = useTranslation();
 
     return (
-        <div className="bg-slate-900 p-5 rounded-2xl text-white shadow-2xl relative overflow-hidden group">
+        <div className="bg-[var(--app-surface)] p-5 rounded-2xl text-[var(--app-text)] shadow-2xl relative overflow-hidden group">
             <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-5">
                     <Target size={18} className="text-amber-400 animate-pulse" />
@@ -24,7 +24,7 @@ const SmartTargets: React.FC<Props> = ({ targets }) => {
                 <div className="space-y-5">
                     <div>
                         <div className="flex justify-between items-center mb-1.5">
-                            <span className="text-[9px] font-black text-slate-400 uppercase">{t('sales_target')}</span>
+                            <span className="text-[9px] font-black text-[var(--app-text-secondary)] uppercase">{t('sales_target')}</span>
                             <span className="text-[10px] font-black font-mono">{targets?.salesProgress || 0}%</span>
                         </div>
                         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
@@ -36,7 +36,7 @@ const SmartTargets: React.FC<Props> = ({ targets }) => {
                     </div>
                     <div>
                         <div className="flex justify-between items-center mb-1.5">
-                            <span className="text-[9px] font-black text-slate-400 uppercase">{t('collection_rate')}</span>
+                            <span className="text-[9px] font-black text-[var(--app-text-secondary)] uppercase">{t('collection_rate')}</span>
                             <span className="text-[10px] font-black font-mono">{targets?.collectionRate || 0}%</span>
                         </div>
                         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
@@ -49,11 +49,11 @@ const SmartTargets: React.FC<Props> = ({ targets }) => {
                 </div>
             </div>
 
-            <div className="mt-5 bg-white/5 p-3 border border-white/10 relative z-10 rounded-xl">
+            <div className="mt-5 bg-white/5 p-3 border border-[var(--app-border)] relative z-10 rounded-xl">
                 <p className="text-[9px] font-black text-blue-400 mb-1 uppercase tracking-wider">
                     {t('financial_intelligence_alert')}
                 </p>
-                <p className="text-[9px] font-medium text-slate-300 leading-relaxed">
+                <p className="text-[9px] font-medium text-[var(--app-text)] leading-relaxed">
                     {(targets?.salesProgress || 0) > 80
                         ? "أداء ممتاز! أنت قريب من تحقيق الهدف الشهري."
                         : "معدل المبيعات الحالي يتطلب تكثيف الجهود للوصول للهدف."}

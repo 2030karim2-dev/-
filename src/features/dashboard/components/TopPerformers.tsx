@@ -39,7 +39,7 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
     return (
         <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-6", className)}>
             {/* Top Auto Parts */}
-            <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-5 rounded-3xl relative overflow-hidden group hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-500">
+            <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-5 rounded-3xl relative overflow-hidden group hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-500">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-[60px] group-hover:bg-amber-400/20 transition-all duration-700 pointer-events-none"></div>
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -47,10 +47,10 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
                         <Box size={18} className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-slate-100 tracking-wide">
+                        <h3 className="text-sm font-black text-[var(--app-text)] tracking-wide">
                             قطع الغيار الأسرع حركة
                         </h3>
-                        <p className="text-[10px] font-bold text-slate-500">القطع الأكثر مبيعاً وإيراداً</p>
+                        <p className="text-[10px] font-bold text-[var(--app-text-secondary)]">القطع الأكثر مبيعاً وإيراداً</p>
                     </div>
                 </div>
 
@@ -80,10 +80,10 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
                                             {index + 1}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-bold text-slate-200 truncate">
+                                            <p className="text-xs font-bold text-[var(--app-text)] truncate">
                                                 {product.name}
                                             </p>
-                                            <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                            <p className="text-[10px] text-[var(--app-text-secondary)] font-mono mt-0.5">
                                                 {product.quantity} <span className="font-sans text-[8px]">قطعة مباعة</span>
                                             </p>
                                         </div>
@@ -96,15 +96,15 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
                         })
                     ) : (
                         <div className="text-center py-8">
-                            <Box size={32} className="mx-auto text-slate-700 mb-3" />
-                            <p className="text-xs font-bold text-slate-500">لا توجد حركات بيع لقطع الغيار</p>
+                            <Box size={32} className="mx-auto text-[var(--app-text-secondary)] mb-3" />
+                            <p className="text-xs font-bold text-[var(--app-text-secondary)]">لا توجد حركات بيع لقطع الغيار</p>
                         </div>
                     )}
                 </div>
             </div>
 
             {/* Top Customers (Workshops/Individuals) */}
-            <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-5 rounded-3xl relative overflow-hidden group hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-500">
+            <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-5 rounded-3xl relative overflow-hidden group hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-500">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[60px] group-hover:bg-blue-400/20 transition-all duration-700 pointer-events-none"></div>
 
                 <div className="flex items-center gap-3 mb-6 relative z-10">
@@ -112,10 +112,10 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
                         <Wrench size={18} className="text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-slate-100 tracking-wide">
+                        <h3 className="text-sm font-black text-[var(--app-text)] tracking-wide">
                             أفضل العملاء والورش
                         </h3>
-                        <p className="text-[10px] font-bold text-slate-500">العملاء ذوي المسحوبات الأعلى</p>
+                        <p className="text-[10px] font-bold text-[var(--app-text-secondary)]">العملاء ذوي المسحوبات الأعلى</p>
                     </div>
                 </div>
 
@@ -145,10 +145,10 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
                                             {index + 1}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-bold text-slate-200 truncate">
+                                            <p className="text-xs font-bold text-[var(--app-text)] truncate">
                                                 {customer.name}
                                             </p>
-                                            <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                            <p className="text-[10px] text-[var(--app-text-secondary)] font-mono mt-0.5">
                                                 {customer.invoices} <span className="font-sans text-[8px]">فاتورة/طلبية</span>
                                             </p>
                                         </div>
@@ -161,8 +161,8 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
                         })
                     ) : (
                         <div className="text-center py-8">
-                            <Wrench size={32} className="mx-auto text-slate-700 mb-3" />
-                            <p className="text-xs font-bold text-slate-500">لا توجد بيانات عملاء</p>
+                            <Wrench size={32} className="mx-auto text-[var(--app-text-secondary)] mb-3" />
+                            <p className="text-xs font-bold text-[var(--app-text-secondary)]">لا توجد بيانات عملاء</p>
                         </div>
                     )}
                 </div>

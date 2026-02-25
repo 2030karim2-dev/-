@@ -251,16 +251,9 @@ export const DEFAULT_ALERTS: Alert[] = [
 ];
 
 // ------------------------------------------
-// Currency Formatter
+// Currency Formatter — Use the canonical version from core/utils/currencyUtils
+// import { formatCurrency } from '../core/utils/currencyUtils';
 // ------------------------------------------
-export const formatCurrency = (amount: number, currency: string = 'SAR'): string => {
-    return new Intl.NumberFormat('ar-SA', {
-        style: 'currency',
-        currency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    }).format(amount);
-};
 
 // ------------------------------------------
 // Percentage Calculator

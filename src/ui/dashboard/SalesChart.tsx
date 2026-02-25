@@ -70,8 +70,8 @@ const SalesChart: React.FC<SalesChartProps> = ({
               className={cn(
                 "px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-300",
                 period === p
-                  ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                  ? "bg-[var(--app-surface)] text-[var(--app-text)] shadow-sm"
+                  : "text-[var(--app-text-secondary)] hover:text-[var(--app-text)]"
               )}
             >
               {periodLabels[p]}
@@ -140,7 +140,7 @@ const SalesChart: React.FC<SalesChartProps> = ({
                 <span className="font-mono tracking-tight text-sm font-black mx-2" style={{ color: accentColor }}>
                   {formatNumber(Number(value) || 0)}
                 </span>,
-                <span className="text-xs font-bold text-slate-500">المبيعات</span>
+                <span className="text-xs font-bold text-[var(--app-text-secondary)]">المبيعات</span>
               ]}
               labelStyle={{ fontWeight: 'black', marginBottom: '8px', borderBottom: '1px solid rgba(148, 163, 184, 0.2)', paddingBottom: '4px', fontSize: '11px', color: isDark ? '#94a3b8' : '#64748b' }}
               cursor={{ stroke: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', strokeWidth: 2, strokeDasharray: '4 4' }}
@@ -161,20 +161,20 @@ const SalesChart: React.FC<SalesChartProps> = ({
       {/* Summary Stats */}
       <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
         <div className="text-center">
-          <p className="text-[8px] font-black text-slate-400 uppercase">الإجمالي</p>
-          <p className="text-sm font-black text-slate-800 dark:text-white font-mono">
+          <p className="text-[8px] font-black text-[var(--app-text-secondary)] uppercase">الإجمالي</p>
+          <p className="text-sm font-black text-[var(--app-text)] font-mono">
             {formatNumber(stats.total)}
           </p>
         </div>
         <div className="text-center">
-          <p className="text-[8px] font-black text-slate-400 uppercase">المتوسط</p>
-          <p className="text-sm font-black text-slate-800 dark:text-white font-mono">
+          <p className="text-[8px] font-black text-[var(--app-text-secondary)] uppercase">المتوسط</p>
+          <p className="text-sm font-black text-[var(--app-text)] font-mono">
             {formatNumber(stats.average)}
           </p>
         </div>
         <div className="text-center">
-          <p className="text-[8px] font-black text-slate-400 uppercase">الأعلى</p>
-          <p className="text-sm font-black text-slate-800 dark:text-white font-mono">
+          <p className="text-[8px] font-black text-[var(--app-text-secondary)] uppercase">الأعلى</p>
+          <p className="text-sm font-black text-[var(--app-text)] font-mono">
             {formatNumber(stats.highest)}
           </p>
         </div>

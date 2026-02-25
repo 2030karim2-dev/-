@@ -108,17 +108,17 @@ const AISmartNotifications: React.FC<AISmartNotificationsProps> = ({ stats, lowS
         <div className={`bg-gradient-to-r ${colorMap[current.type]} border rounded-2xl p-3 flex items-center gap-3 transition-all`}>
             <span className="text-xl flex-shrink-0">{current.icon}</span>
             <div className="flex-1 min-w-0">
-                <p className="text-xs font-black text-gray-800 dark:text-white truncate">{current.title}</p>
-                <p className="text-[10px] text-gray-500 dark:text-slate-400 truncate">{current.description}</p>
+                <p className="text-xs font-black text-[var(--app-text)] truncate">{current.title}</p>
+                <p className="text-[10px] text-[var(--app-text-secondary)] truncate">{current.description}</p>
             </div>
             {smartAlerts.length > 1 && (
                 <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => setCurrentIndex(i => i > 0 ? i - 1 : smartAlerts.length - 1)} className="p-1 rounded-lg hover:bg-white/50 dark:hover:bg-slate-800 transition-colors">
-                        <ChevronRight size={12} className="text-gray-400" />
+                    <button onClick={() => setCurrentIndex(i => i > 0 ? i - 1 : smartAlerts.length - 1)} className="p-1 rounded-lg hover:bg-[var(--app-surface-hover)] transition-colors">
+                        <ChevronRight size={12} className="text-[var(--app-text-secondary)]" />
                     </button>
-                    <span className="text-[9px] font-bold text-gray-400">{currentIndex + 1}/{smartAlerts.length}</span>
-                    <button onClick={() => setCurrentIndex(i => i < smartAlerts.length - 1 ? i + 1 : 0)} className="p-1 rounded-lg hover:bg-white/50 dark:hover:bg-slate-800 transition-colors">
-                        <ChevronLeft size={12} className="text-gray-400" />
+                    <span className="text-[9px] font-bold text-[var(--app-text-secondary)]">{currentIndex + 1}/{smartAlerts.length}</span>
+                    <button onClick={() => setCurrentIndex(i => i < smartAlerts.length - 1 ? i + 1 : 0)} className="p-1 rounded-lg hover:bg-[var(--app-surface-hover)] transition-colors">
+                        <ChevronLeft size={12} className="text-[var(--app-text-secondary)]" />
                     </button>
                 </div>
             )}

@@ -51,12 +51,12 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
     if (value === 0 && target === 0) {
         return (
             <div className={cn(
-                "bg-slate-900/80 backdrop-blur-xl border border-white/10 p-5 rounded-2xl flex items-center justify-center h-64",
+                "bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-5 rounded-2xl flex items-center justify-center h-64",
                 className
             )}>
                 <div className="text-center">
-                    <Target size={32} className="mx-auto text-slate-700 mb-2" />
-                    <p className="text-sm font-bold text-slate-500">لا توجد بيانات</p>
+                    <Target size={32} className="mx-auto text-[var(--app-text-secondary)] mb-2" />
+                    <p className="text-sm font-bold text-[var(--app-text-secondary)]">لا توجد بيانات</p>
                 </div>
             </div>
         );
@@ -64,7 +64,7 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
 
     return (
         <div className={cn(
-            "bg-slate-900/80 backdrop-blur-xl border border-white/10 p-5 rounded-2xl relative overflow-hidden group",
+            "bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-5 rounded-2xl relative overflow-hidden group",
             className
         )}>
             {/* Header */}
@@ -73,7 +73,7 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
                     <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
                         <Target size={16} className="text-blue-400" />
                     </div>
-                    <h3 className="text-sm font-black text-white">
+                    <h3 className="text-sm font-black text-[var(--app-text)]">
                         {title}
                     </h3>
                 </div>
@@ -130,7 +130,7 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
                 {/* Center Text */}
                 <div className="absolute inset-0 flex items-center justify-center pt-10">
                     <div className="text-center">
-                        <p className="text-4xl font-black text-slate-800 dark:text-white font-mono tracking-tighter" style={{ textShadow: `0 2px 10px ${color}30` }}>
+                        <p className="text-4xl font-black text-[var(--app-text)] font-mono tracking-tighter" style={{ textShadow: `0 2px 10px ${color}30` }}>
                             {percentage.toFixed(0)}%
                         </p>
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">من الهدف</p>
@@ -141,14 +141,14 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3 mt-4">
                 <div className="text-center p-2 bg-white/5 border border-white/5 rounded-xl">
-                    <p className="text-[8px] font-black text-slate-500 uppercase">المحقق</p>
-                    <p className="text-sm font-black text-white font-mono">
+                    <p className="text-[8px] font-black text-[var(--app-text-secondary)] uppercase">المحقق</p>
+                    <p className="text-sm font-black text-[var(--app-text)] font-mono">
                         {value.toLocaleString('en-US')}
                     </p>
                 </div>
                 <div className="text-center p-2 bg-white/5 border border-white/5 rounded-xl">
-                    <p className="text-[8px] font-black text-slate-500 uppercase">الهدف</p>
-                    <p className="text-sm font-black text-white font-mono">
+                    <p className="text-[8px] font-black text-[var(--app-text-secondary)] uppercase">الهدف</p>
+                    <p className="text-sm font-black text-[var(--app-text)] font-mono">
                         {target.toLocaleString('en-US')}
                     </p>
                 </div>

@@ -32,8 +32,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         className={cn(`
           hidden md:flex flex-col
           fixed inset-y-0 z-20
-          bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl h-screen border-gray-200 dark:border-slate-800
-          transition-all duration-300 ease-in-out shadow-2xl shadow-gray-200/50 dark:shadow-slate-900/50`,
+          bg-[var(--app-surface)]/80 backdrop-blur-xl h-screen border-[var(--app-border)]
+          transition-all duration-300 ease-in-out shadow-2xl`,
           dir === 'rtl' ? 'right-0 border-l' : 'left-0 border-r',
           isCollapsed ? 'w-20' : 'w-64'
         )}
@@ -62,7 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Mobile Drawer */}
       <aside
         className={cn(
-          `fixed inset-y-0 w-48 bg-white dark:bg-slate-900 h-screen flex flex-col border-gray-200 dark:border-slate-800 z-[100] 
+          `fixed inset-y-0 w-48 bg-[var(--app-surface)] h-screen flex flex-col border-[var(--app-border)] z-[100] 
           transform transition-transform duration-300 ease-out md:hidden shadow-2xl`,
           // Fix: In RTL, anchor to Right. In LTR, anchor to Left.
           dir === 'rtl' ? 'right-0 border-l' : 'left-0 border-r',
@@ -70,7 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           isMobileOpen ? 'translate-x-0' : (dir === 'rtl' ? 'translate-x-full' : '-translate-x-full')
         )}
       >
-        <div className="p-5 border-b dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-950/50">
+        <div className="p-5 border-b border-[var(--app-border)] flex justify-between items-center bg-[var(--app-surface-hover)]/50">
           <div className="flex flex-col">
             <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">AL-ZAHRA ERP</span>
             <span className="text-[8px] font-bold text-gray-400 uppercase">Main Menu</span>
@@ -87,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <SidebarNav isCollapsed={false} />
         </div>
 
-        <div className="bg-gray-50/50 dark:bg-slate-950/30">
+        <div className="bg-[var(--app-surface-hover)]/30">
           <SidebarFooter isCollapsed={false} />
         </div>
       </aside>

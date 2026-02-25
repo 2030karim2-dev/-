@@ -465,6 +465,406 @@ export const THEME_PRESETS: ThemePreset[] = [
       '--accent': '#ea6c0c',
     }
   },
+
+  // ═══════════════════════════════════════════════════════════
+  // 🏢 شركة — Corporate & Modern
+  // ═══════════════════════════════════════════════════════════
+  {
+    id: 'corporate-slate',
+    name: 'شركة رمادية',
+    description: 'رمادي حديث أنيق للشركات الناشئة والتقنية.',
+    colors: ['#6366f1', '#818cf8', '#eef2ff'],
+    previewColor: '#eef2ff',
+    accent: '#6366f1',
+    isDark: false,
+    category: 'corporate',
+    emoji: '🏢',
+    cssVars: {
+      '--app-bg': '#eef2ff',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#e0e7ff',
+      '--app-border': '#c7d2fe',
+      '--app-text': '#1e1b4b',
+      '--app-text-secondary': '#4338ca',
+      '--accent': '#6366f1',
+    }
+  },
+  {
+    id: 'corporate-slate-dark',
+    name: 'ليل الشركة',
+    description: 'وضع مظلم أنيق للشركات التقنية الحديثة.',
+    colors: ['#818cf8', '#6366f1', '#1e1b4b'],
+    previewColor: '#1e1b4b',
+    accent: '#818cf8',
+    isDark: true,
+    category: 'corporate',
+    emoji: '💻',
+    cssVars: {
+      '--app-bg': '#0f0f1a',
+      '--app-surface': '#1a1a2e',
+      '--app-surface-hover': '#252542',
+      '--app-border': '#363654',
+      '--app-text': '#e0e7ff',
+      '--app-text-secondary': '#818cf8',
+      '--accent': '#818cf8',
+    }
+  },
+  {
+    id: 'modern-teal',
+    name: 'تركواز عصري',
+    description: 'تركواز حداثي نظيف للتطبيقات المالية.',
+    colors: ['#14b8a6', '#2dd4bf', '#f0fdfa'],
+    previewColor: '#f0fdfa',
+    accent: '#0d9488',
+    isDark: false,
+    category: 'corporate',
+    emoji: '🎯',
+    cssVars: {
+      '--app-bg': '#f0fdfa',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#ccfbf1',
+      '--app-border': '#99f6e4',
+      '--app-text': '#042f2e',
+      '--app-text-secondary': '#115e59',
+      '--accent': '#0d9488',
+    }
+  },
+  {
+    id: 'modern-cyan',
+    name: 'سيان حديث',
+    description: 'أزرق سيان نابض بالحياة للتطبيقات الحيوية.',
+    colors: ['#06b6d4', '#22d3ee', '#ecfeff'],
+    previewColor: '#ecfeff',
+    accent: '#0891b2',
+    isDark: false,
+    category: 'corporate',
+    emoji: '💠',
+    cssVars: {
+      '--app-bg': '#ecfeff',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#cffafe',
+      '--app-border': '#a5f3fc',
+      '--app-text': '#083344',
+      '--app-text-secondary': '#155e75',
+      '--accent': '#0891b2',
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // 🌙 ليلي — Night Themes
+  // ═══════════════════════════════════════════════════════════
+  {
+    id: 'night-amethyst',
+    name: 'ليلي ياقوتي',
+    description: 'ياقوت أرجواني داكن مع بريق星光.',
+    colors: ['#a855f7', '#c084fc', '#2e1065'],
+    previewColor: '#2e1065',
+    accent: '#a855f7',
+    isDark: true,
+    category: 'night',
+    emoji: '✨',
+    cssVars: {
+      '--app-bg': '#0f0a1f',
+      '--app-surface': '#1a1229',
+      '--app-surface-hover': '#251a38',
+      '--app-border': '#3d2a52',
+      '--app-text': '#f3e8ff',
+      '--app-text-secondary': '#c084fc',
+      '--accent': '#a855f7',
+    }
+  },
+  {
+    id: 'night-sapphire',
+    name: 'ليلي ياقوت أزرق',
+    description: 'ياقوت أزرق داكن مع لمسات فيروزية.',
+    colors: ['#38bdf8', '#7dd3fc', '#0c4a6e'],
+    previewColor: '#0c4a6e',
+    accent: '#38bdf8',
+    isDark: true,
+    category: 'night',
+    emoji: '💎',
+    cssVars: {
+      '--app-bg': '#071a2e',
+      '--app-surface': '#0f2847',
+      '--app-surface-hover': '#163660',
+      '--app-border': '#1e4976',
+      '--app-text': '#e0f2fe',
+      '--app-text-secondary': '#7dd3fc',
+      '--accent': '#38bdf8',
+    }
+  },
+  {
+    id: 'night-gold',
+    name: 'ليل ذهبي',
+    description: 'ذهب داكن مع لمسات برتقالية ليلية.',
+    colors: ['#fbbf24', '#fcd34d', '#451a03'],
+    previewColor: '#451a03',
+    accent: '#fbbf24',
+    isDark: true,
+    category: 'night',
+    emoji: '🌟',
+    cssVars: {
+      '--app-bg': '#1a1205',
+      '--app-surface': '#2a1c08',
+      '--app-surface-hover': '#3d2810',
+      '--app-border': '#5c3d18',
+      '--app-text': '#fef3c7',
+      '--app-text-secondary': '#fbbf24',
+      '--accent': '#fbbf24',
+    }
+  },
+  {
+    id: 'night-rose',
+    name: 'ليلي وردي',
+    description: 'وردي داكن أنيق مع تدرجات أرجوانية.',
+    colors: ['#fb7185', '#fb923c', '#881337'],
+    previewColor: '#881337',
+    accent: '#fb7185',
+    isDark: true,
+    category: 'night',
+    emoji: '🌹',
+    cssVars: {
+      '--app-bg': '#1a0812',
+      '--app-surface': '#2d101c',
+      '--app-surface-hover': '#401828',
+      '--app-border': '#5c2036',
+      '--app-text': '#ffe4e6',
+      '--app-text-secondary': '#fb7185',
+      '--accent': '#fb7185',
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // 🌸 موسمي — Seasonal
+  // ═══════════════════════════════════════════════════════════
+  {
+    id: 'spring-pink',
+    name: 'وردي ربيعي',
+    description: 'وردي primaveral نابض بالحياة والأمل.',
+    colors: ['#ec4899', '#f472b6', '#fdf2f8'],
+    previewColor: '#fdf2f8',
+    accent: '#db2777',
+    isDark: false,
+    category: 'seasonal',
+    emoji: '🌸',
+    cssVars: {
+      '--app-bg': '#fdf2f8',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#fce7f3',
+      '--app-border': '#fbcfe8',
+      '--app-text': '#831843',
+      '--app-text-secondary': '#be185d',
+      '--accent': '#db2777',
+    }
+  },
+  {
+    id: 'summer-cyan',
+    name: 'سيان صيفي',
+    description: 'أزرق صيفي منعش مع لمسات فيروزية.',
+    colors: ['#06b6d4', '#22d3ee', '#ecfeff'],
+    previewColor: '#ecfeff',
+    accent: '#0891b2',
+    isDark: false,
+    category: 'seasonal',
+    emoji: '☀️',
+    cssVars: {
+      '--app-bg': '#ecfeff',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#cffafe',
+      '--app-border': '#a5f3fc',
+      '--app-text': '#083344',
+      '--app-text-secondary': '#155e75',
+      '--accent': '#0891b2',
+    }
+  },
+  {
+    id: 'autumn-orange',
+    name: 'برتقالي خريفي',
+    description: 'برتقالي دافئ بألوان أوراق الخريف.',
+    colors: ['#ea580c', '#f97316', '#fff7ed'],
+    previewColor: '#fff7ed',
+    accent: '#c2410c',
+    isDark: false,
+    category: 'seasonal',
+    emoji: '🍂',
+    cssVars: {
+      '--app-bg': '#fff7ed',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#ffedd5',
+      '--app-border': '#fed7aa',
+      '--app-text': '#7c2d12',
+      '--app-text-secondary': '#c2410c',
+      '--accent': '#c2410c',
+    }
+  },
+  {
+    id: 'winter-blue',
+    name: 'أزرق شتوي',
+    description: 'أزرق بارد مع لمسات ثلجية.',
+    colors: ['#3b82f6', '#60a5fa', '#eff6ff'],
+    previewColor: '#eff6ff',
+    accent: '#2563eb',
+    isDark: false,
+    category: 'seasonal',
+    emoji: '❄️',
+    cssVars: {
+      '--app-bg': '#eff6ff',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#dbeafe',
+      '--app-border': '#bfdbfe',
+      '--app-text': '#1e3a8a',
+      '--app-text-secondary': '#1d4ed8',
+      '--accent': '#2563eb',
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // 🎨 فني — Artistic
+  // ═══════════════════════════════════════════════════════════
+  {
+    id: 'artist-indigo',
+    name: 'أنديغو فني',
+    description: 'أنديغو عميق مع لمسات بنفسجية.',
+    colors: ['#6366f1', '#818cf8', '#e0e7ff'],
+    previewColor: '#e0e7ff',
+    accent: '#4f46e5',
+    isDark: false,
+    category: 'artistic',
+    emoji: '🎨',
+    cssVars: {
+      '--app-bg': '#e0e7ff',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#c7d2fe',
+      '--app-border': '#a5b4fc',
+      '--app-text': '#312e81',
+      '--app-text-secondary': '#4f46e5',
+      '--accent': '#4f46e5',
+    }
+  },
+  {
+    id: 'artist-lavender',
+    name: 'لافندر فني',
+    description: 'خزامي ناعم مع لمسات فيروزية.',
+    colors: ['#a78bfa', '#c4b5fd', '#f5f3ff'],
+    previewColor: '#f5f3ff',
+    accent: '#8b5cf6',
+    isDark: false,
+    category: 'artistic',
+    emoji: '🖌️',
+    cssVars: {
+      '--app-bg': '#f5f3ff',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#ede9fe',
+      '--app-border': '#ddd6fe',
+      '--app-text': '#4c1d95',
+      '--app-text-secondary': '#7c3aed',
+      '--accent': '#8b5cf6',
+    }
+  },
+  {
+    id: 'minimal-gray',
+    name: 'رمادي بسيط',
+    description: 'بسيط ونظيف مع لمسات أرجوانية خفيفة.',
+    colors: ['#a1a1aa', '#71717a', '#fafafa'],
+    previewColor: '#fafafa',
+    accent: '#71717a',
+    isDark: false,
+    category: 'artistic',
+    emoji: '⬜',
+    cssVars: {
+      '--app-bg': '#fafafa',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#f4f4f5',
+      '--app-border': '#e4e4e7',
+      '--app-text': '#27272a',
+      '--app-text-secondary': '#52525b',
+      '--accent': '#71717a',
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // 💼 قطاعي — Industry-Specific
+  // ═══════════════════════════════════════════════════════════
+  {
+    id: 'health-medical',
+    name: 'طبي صحي',
+    description: 'أخضر طبي هادئ للمنشآت الصحية.',
+    colors: ['#10b981', '#34d399', '#ecfdf5'],
+    previewColor: '#ecfdf5',
+    accent: '#059669',
+    isDark: false,
+    category: 'industry',
+    emoji: '🏥',
+    cssVars: {
+      '--app-bg': '#ecfdf5',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#d1fae5',
+      '--app-border': '#a7f3d0',
+      '--app-text': '#064e3b',
+      '--app-text-secondary': '#047857',
+      '--accent': '#059669',
+    }
+  },
+  {
+    id: 'food-restaurant',
+    name: 'مطاعم وطعام',
+    description: 'برتقالي دافئ للمطاعم والوجبات.',
+    colors: ['#f59e0b', '#fbbf24', '#fffbeb'],
+    previewColor: '#fffbeb',
+    accent: '#d97706',
+    isDark: false,
+    category: 'industry',
+    emoji: '🍽️',
+    cssVars: {
+      '--app-bg': '#fffbeb',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#fef3c7',
+      '--app-border': '#fde68a',
+      '--app-text': '#78350f',
+      '--app-text-secondary': '#b45309',
+      '--accent': '#d97706',
+    }
+  },
+  {
+    id: 'education-school',
+    name: 'تعليم ومدرسة',
+    description: 'أزرق تعليمي هادئ للمدارس.',
+    colors: ['#3b82f6', '#60a5fa', '#eff6ff'],
+    previewColor: '#eff6ff',
+    accent: '#2563eb',
+    isDark: false,
+    category: 'industry',
+    emoji: '📚',
+    cssVars: {
+      '--app-bg': '#eff6ff',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#dbeafe',
+      '--app-border': '#bfdbfe',
+      '--app-text': '#1e3a8a',
+      '--app-text-secondary': '#1d4ed8',
+      '--accent': '#2563eb',
+    }
+  },
+  {
+    id: 'automotive-car',
+    name: 'سيارات و قطع غيار',
+    description: 'أزرق داكن احترافي لصناعة السيارات.',
+    colors: ['#1d4ed8', '#3b82f6', '#dbeafe'],
+    previewColor: '#dbeafe',
+    accent: '#1e40af',
+    isDark: false,
+    category: 'industry',
+    emoji: '🚗',
+    cssVars: {
+      '--app-bg': '#dbeafe',
+      '--app-surface': '#ffffff',
+      '--app-surface-hover': '#bfdbfe',
+      '--app-border': '#93c5fd',
+      '--app-text': '#1e3a8a',
+      '--app-text-secondary': '#1d4ed8',
+      '--accent': '#1e40af',
+    }
+  },
 ];
 
 // تصنيفات الثيمات مع الأسماء العربية
@@ -475,4 +875,9 @@ export const THEME_CATEGORIES = {
   accounting: { label: 'محاسبي', emoji: '📊', description: 'ألوان احترافية للأنظمة المالية' },
   nature: { label: 'طبيعي', emoji: '🌿', description: 'ألوان الطبيعة والغابات' },
   bold: { label: 'جريء', emoji: '🔥', description: 'ألوان قوية ومميزة' },
+  corporate: { label: 'شركة حديث', emoji: '🏢', description: 'ألوان للشركات الناشئة والتقنية' },
+  night: { label: 'ليلي', emoji: '🌙', description: 'ثيمات ليلية داكنة وأنيقة' },
+  seasonal: { label: 'موسيقي', emoji: '🌸', description: 'ألوان موسمية متغيرة' },
+  artistic: { label: 'فني', emoji: '🎨', description: 'ألوان فنية وإبداعية' },
+  industry: { label: 'قطاعي', emoji: '🏭', description: 'ألوان متخصصة للصناعات المختلفة' },
 } as const;

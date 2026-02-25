@@ -13,7 +13,7 @@ import FontSelector from './components/FontSelector';
 import EffectsCustomizer from './components/EffectsCustomizer';
 import { cn } from '../../core/utils';
 
-type CategoryFilter = 'all' | 'classic' | 'beige' | 'royal' | 'accounting' | 'nature' | 'bold';
+type CategoryFilter = 'all' | 'classic' | 'beige' | 'royal' | 'accounting' | 'nature' | 'bold' | 'corporate' | 'night' | 'seasonal' | 'artistic' | 'industry';
 
 const AppearancePage: React.FC = () => {
   const {
@@ -78,7 +78,7 @@ const AppearancePage: React.FC = () => {
     if (categoryFilter !== 'all') return null; // Don't group when a specific category is selected
 
     const groups: { category: string; presets: typeof THEME_PRESETS }[] = [];
-    const categories = ['royal', 'accounting', 'beige', 'classic', 'nature', 'bold'] as const;
+    const categories = ['royal', 'accounting', 'beige', 'classic', 'nature', 'bold', 'corporate', 'night', 'seasonal', 'artistic', 'industry'] as const;
 
     for (const cat of categories) {
       const catPresets = filteredPresets.filter(p => p.category === cat);
@@ -104,6 +104,11 @@ const AppearancePage: React.FC = () => {
     { id: 'classic', label: 'كلاسيكي', emoji: '🏛️' },
     { id: 'nature', label: 'طبيعي', emoji: '🌿' },
     { id: 'bold', label: 'جريء', emoji: '🔥' },
+    { id: 'corporate', label: 'شركة', emoji: '🏢' },
+    { id: 'night', label: 'ليلي', emoji: '🌙' },
+    { id: 'seasonal', label: 'موسيقي', emoji: '🌸' },
+    { id: 'artistic', label: 'فني', emoji: '🎨' },
+    { id: 'industry', label: 'قطاعي', emoji: '🏭' },
   ];
 
   const renderContent = () => {

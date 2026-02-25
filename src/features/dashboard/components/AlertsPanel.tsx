@@ -81,7 +81,7 @@ const AlertsPanel: React.FC<AlertsPanelProps> = ({
                             </span>
                         )}
                     </div>
-                    <h3 className="text-xs font-black text-slate-800 dark:text-white">
+                    <h3 className="text-xs font-black text-[var(--app-text)]">
                         التنبيهات
                     </h3>
                 </div>
@@ -99,8 +99,8 @@ const AlertsPanel: React.FC<AlertsPanelProps> = ({
                                 className={cn(
                                     "px-2 py-1 text-[9px] font-bold rounded-md transition-all",
                                     filter === f
-                                        ? "bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm"
-                                        : "text-slate-500"
+                                        ? "bg-[var(--app-surface)] text-[var(--app-text)] shadow-sm"
+                                        : "text-[var(--app-text-secondary)]"
                                 )}
                             >
                                 {f === 'all' ? 'الكل' : f === 'urgent' ? 'عاجل' : 'معلومات'}
@@ -144,7 +144,7 @@ const AlertsPanel: React.FC<AlertsPanelProps> = ({
                                     {getIcon(alert.type)}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200 leading-relaxed">
+                                    <p className="text-xs font-bold text-[var(--app-text)] leading-relaxed">
                                         {alert.message}
                                     </p>
                                     {alert.time && (

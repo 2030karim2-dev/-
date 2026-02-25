@@ -87,7 +87,7 @@ const AccountingPage: React.FC = () => {
             <input
               type="date"
               value={dateRange.to}
-              onChange={(e) => setDateRange(prev => ({ ...prev, from: e.target.value }))}
+              onChange={(e) => setDateRange(prev => ({ ...prev, to: e.target.value }))}
               className="bg-white dark:bg-slate-800 border-none rounded p-1 outline-none font-mono text-blue-600 dark:text-blue-400"
             />
           </div>

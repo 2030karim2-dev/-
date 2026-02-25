@@ -3,4 +3,5 @@
 // Inventory Chart Component
 // ============================================
 
-export { default } from '../../../ui/dashboard/CategoriesChart';
+// Re-export from the unified UI component
+export { default } from '../../../ui/dashboard/SalesChart';

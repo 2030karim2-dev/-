@@ -35,19 +35,19 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
     if (!hasData) {
         return (
             <div className={cn(
-                "bg-slate-900/80 backdrop-blur-xl border border-white/10 p-5 rounded-2xl",
+                "bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-5 rounded-2xl",
                 className
             )}>
                 <div className="flex items-center gap-2 mb-5">
                     <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
                         <Wallet size={16} className="text-blue-400" />
                     </div>
-                    <h3 className="text-sm font-black text-white">التدفق النقدي</h3>
+                    <h3 className="text-sm font-black text-[var(--app-text)]">التدفق النقدي</h3>
                 </div>
                 <div className="text-center py-8">
-                    <Wallet size={40} className="mx-auto text-slate-700 mb-3" />
-                    <p className="text-xs font-bold text-slate-500">لا توجد بيانات</p>
-                    <p className="text-[10px] text-slate-600 mt-1">أضف سندات قبض وصرف لمشاهدة التدفق</p>
+                    <Wallet size={40} className="mx-auto text-[var(--app-text-secondary)] mb-3" />
+                    <p className="text-xs font-bold text-[var(--app-text-secondary)]">لا توجد بيانات</p>
+                    <p className="text-[10px] text-[var(--app-text-secondary)] mt-1 opacity-60">أضف سندات قبض وصرف لمشاهدة التدفق</p>
                 </div>
             </div>
         );
@@ -55,7 +55,7 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
 
     return (
         <div className={cn(
-            "bg-slate-900/80 backdrop-blur-xl border border-white/10 p-5 rounded-2xl relative overflow-hidden group",
+            "bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-5 rounded-2xl relative overflow-hidden group",
             className
         )}>
             {/* Ambient glow */}
@@ -65,7 +65,7 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
                 <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
                     <Wallet size={16} className="text-blue-400 drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]" />
                 </div>
-                <h3 className="text-sm font-black text-white">التدفق النقدي</h3>
+                <h3 className="text-sm font-black text-[var(--app-text)]">التدفق النقدي</h3>
             </div>
 
             {/* Flow Bars */}
@@ -75,7 +75,7 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <ArrowDownCircle size={14} className="text-emerald-500" />
-                            <span className="text-xs font-bold text-slate-300">القبض</span>
+                            <span className="text-xs font-bold text-[var(--app-text)]">القبض</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="text-sm font-black text-emerald-400 font-mono">
@@ -106,7 +106,7 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <ArrowUpCircle size={14} className="text-rose-500" />
-                            <span className="text-xs font-bold text-slate-300">الصرف</span>
+                            <span className="text-xs font-bold text-[var(--app-text)]">الصرف</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="text-sm font-black text-rose-400 font-mono">

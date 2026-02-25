@@ -85,7 +85,7 @@ const FinancialHealthScore: React.FC<FinancialHealthProps> = ({
 
     return (
         <div className={cn(
-            "relative bg-slate-900/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 overflow-hidden",
+            "relative bg-[var(--app-surface)]/90 backdrop-blur-2xl border border-[var(--app-border)] rounded-2xl p-4 overflow-hidden",
             className
         )}>
             <div
@@ -120,7 +120,7 @@ const FinancialHealthScore: React.FC<FinancialHealthProps> = ({
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <Heart size={12} style={{ color: scoreColor.main, filter: `drop-shadow(0 0 4px ${scoreColor.glow})` }} />
-                        <span className="text-2xl font-black font-mono tracking-tighter text-white" style={{ textShadow: `0 0 16px ${scoreColor.glow}` }}>
+                        <span className="text-2xl font-black font-mono tracking-tighter text-[var(--app-text)]" style={{ textShadow: `0 0 16px ${scoreColor.glow}` }}>
                             {animatedScore}
                         </span>
                         <span className="text-[8px] font-black uppercase tracking-widest" style={{ color: scoreColor.main }}>
@@ -133,7 +133,7 @@ const FinancialHealthScore: React.FC<FinancialHealthProps> = ({
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-3">
                         <Heart size={12} className="text-rose-400" />
-                        <h3 className="text-xs font-black text-white">صحة النشاط المالي</h3>
+                        <h3 className="text-xs font-black text-[var(--app-text)]">صحة النشاط المالي</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-1.5">
                         {factors.map((f) => (
@@ -143,7 +143,7 @@ const FinancialHealthScore: React.FC<FinancialHealthProps> = ({
                                         <f.icon size={10} className={f.color} />
                                         <span className="text-[9px] font-bold text-slate-400">{f.label}</span>
                                     </div>
-                                    <span className="text-[10px] font-black text-white font-mono">{Math.round(f.score)}<span className="text-slate-600">/{f.max}</span></span>
+                                    <span className="text-[10px] font-black text-[var(--app-text)] font-mono">{Math.round(f.score)}<span className="text-[var(--app-text-secondary)]">/{f.max}</span></span>
                                 </div>
                                 <div className="h-1 bg-white/5 rounded-full overflow-hidden">
                                     <div className="h-full rounded-full transition-all duration-1000"

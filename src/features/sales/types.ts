@@ -1,11 +1,8 @@
 
-import { DbInvoice, DbInvoiceItem, DbParty, DbProduct } from '../../types/database';
+import type { Database } from '../../core/database.types';
 
 export type InvoiceStatus = 'draft' | 'posted' | 'paid' | 'void';
 export type InvoiceType = 'sale' | 'return_sale';
-
-// Re-export shared Db types for backwards compatibility
-export type { DbInvoice, DbInvoiceItem, DbParty, DbProduct };
 
 export interface CartItem {
   productId: string;

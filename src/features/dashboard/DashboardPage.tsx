@@ -72,7 +72,7 @@ const DashboardPage: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col h-full bg-slate-950 font-cairo relative">
+        <div className="flex flex-col h-full bg-[var(--app-bg)] font-cairo relative">
             {/* Cinematic Grain Texture */}
             <div className="fixed inset-0 opacity-[0.03] pointer-events-none z-50" style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E")`,
@@ -87,7 +87,7 @@ const DashboardPage: React.FC = () => {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => refetch()}
-                            className="p-2 text-gray-400 hover:text-blue-500 active:scale-90 transition-all rounded-lg hover:bg-slate-800"
+                            className="p-2 text-[var(--app-text-secondary)] hover:text-[var(--accent)] active:scale-90 transition-all rounded-lg hover:bg-[var(--app-surface-hover)]"
                         >
                             <RefreshCw size={14} className={isRefetching ? 'animate-spin' : ''} />
                         </button>
@@ -121,7 +121,7 @@ const DashboardPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
 
                     {/* 📈 Sales Flow Chart */}
-                    <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-4 rounded-2xl relative overflow-hidden group hover:border-white/20 transition-all duration-500">
+                    <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-4 rounded-2xl relative overflow-hidden group hover:border-[var(--accent)]/30 transition-all duration-500">
                         <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-[60px] group-hover:bg-emerald-400/20 transition-all duration-700 pointer-events-none"></div>
                         <div className="flex justify-between items-center mb-3 relative z-10">
                             <div className="flex items-center gap-2">
@@ -129,10 +129,10 @@ const DashboardPage: React.FC = () => {
                                     <TrendingUp size={16} />
                                 </div>
                                 <div>
-                                    <h3 className="text-xs font-black text-white">
+                                    <h3 className="text-xs font-black text-[var(--app-text)]">
                                         {t('sales_flow_analysis')} <span className="text-emerald-400 text-[9px]">(قطع الغيار)</span>
                                     </h3>
-                                    <p className="text-[9px] font-bold text-slate-500">تدفق المبيعات اليومية</p>
+                                    <p className="text-[9px] font-bold text-[var(--app-text-secondary)]">تدفق المبيعات اليومية</p>
                                 </div>
                             </div>
                             <div className="text-left bg-black/20 px-2 py-1 rounded-lg border border-white/5">
@@ -163,7 +163,7 @@ const DashboardPage: React.FC = () => {
                     <InventoryOverview lowStockProducts={lowStockProducts} />
 
                     {/* 📊 Categories */}
-                    <ChartBox title="التصنيفات الأكثر حركة" className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl">
+                    <ChartBox title="التصنيفات الأكثر حركة" className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] rounded-2xl">
                         <div className="flex flex-col h-full items-center p-2">
                             <Suspense fallback={<ChartSkeleton />}>
                                 <CategoriesChart data={categoryData || []} />

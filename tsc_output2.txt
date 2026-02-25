@@ -1,0 +1,2 @@
+﻿src/features/purchases/types.ts(2,47): error TS2307: Cannot find module '../../types/database' or its corresponding type declarations.
+src/features/sales/types.ts(2,62): error TS2307: Cannot find module '../../types/database' or its corresponding type declarations.

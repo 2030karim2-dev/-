@@ -1,4 +1,4 @@
-import { formatCurrency } from '../../../core/utils';
+import { toBaseCurrency, formatCurrency } from '../../../core/utils/currencyUtils';
 
 export const calculateDashboardInsights = (data: {
     receiptBonds: number;
@@ -16,20 +16,7 @@ export const calculateDashboardInsights = (data: {
 }) => {
     const { totalSales, totalPurchases, totalExpenses, invoicesData, expensesData, lowStockProducts, overdueInvoices, totalDebts } = data;
 
-    // تحويل مبلغ الفاتورة إلى العملة الأساسية (SAR)
-    const toBase = (inv: any): number => {
-        const amount = Number(inv.total_amount) || 0;
-        const rate = Number(inv.exchange_rate) || 1;
-        if (!inv.currency_code || inv.currency_code === 'SAR') return amount;
-        return amount * rate;
-    };
-
-    const expToBase = (exp: any): number => {
-        const amount = Number(exp.amount) || 0;
-        const rate = Number(exp.exchange_rate) || 1;
-        if (!exp.currency_code || exp.currency_code === 'SAR') return amount;
-        return amount * rate;
-    };
+    // Use unified currency utility directly
 
 
     const allInvoices = invoicesData || [];
@@ -37,16 +24,16 @@ export const calculateDashboardInsights = (data: {
     const olderHalf = allInvoices.slice(0, midpoint);
     const newerHalf = allInvoices.slice(midpoint);
 
-    const olderSales = olderHalf.filter((i: any) => i.type === 'sale').reduce((s: number, i: any) => s + toBase(i), 0);
-    const newerSales = newerHalf.filter((i: any) => i.type === 'sale').reduce((s: number, i: any) => s + toBase(i), 0);
+    const olderSales = olderHalf.filter((i: any) => i.type === 'sale').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
+    const newerSales = newerHalf.filter((i: any) => i.type === 'sale').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
     const salesTrend = olderSales > 0 ? ((newerSales - olderSales) / olderSales) * 100 : 0;
 
-    const olderPurchases = olderHalf.filter((i: any) => i.type === 'purchase').reduce((s: number, i: any) => s + toBase(i), 0);
-    const newerPurchases = newerHalf.filter((i: any) => i.type === 'purchase').reduce((s: number, i: any) => s + toBase(i), 0);
+    const olderPurchases = olderHalf.filter((i: any) => i.type === 'purchase').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
+    const newerPurchases = newerHalf.filter((i: any) => i.type === 'purchase').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
     const purchasesTrend = olderPurchases > 0 ? ((newerPurchases - olderPurchases) / olderPurchases) * 100 : 0;
 
-    const olderExpenses = (expensesData || []).slice(0, Math.floor((expensesData || []).length / 2)).reduce((s: number, e: any) => s + expToBase(e), 0);
-    const newerExpenses = (expensesData || []).slice(Math.floor((expensesData || []).length / 2)).reduce((s: number, e: any) => s + expToBase(e), 0);
+    const olderExpenses = (expensesData || []).slice(0, Math.floor((expensesData || []).length / 2)).reduce((s: number, e: any) => s + toBaseCurrency(e), 0);
+    const newerExpenses = (expensesData || []).slice(Math.floor((expensesData || []).length / 2)).reduce((s: number, e: any) => s + toBaseCurrency(e), 0);
     const expensesTrend = olderExpenses > 0 ? ((newerExpenses - olderExpenses) / olderExpenses) * 100 : 0;
 
     const alerts = [];

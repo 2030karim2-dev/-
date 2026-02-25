@@ -52,8 +52,8 @@ const SmartDailySummary: React.FC = () => {
                             <Brain size={16} className="text-white" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-black text-white">ملخص اليوم الذكي</h3>
-                            <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">AI Daily Brief</p>
+                            <h3 className="text-sm font-black text-[var(--app-text)]">ملخص اليوم الذكي</h3>
+                            <p className="text-[8px] font-bold text-[var(--app-text-secondary)] uppercase tracking-widest">AI Daily Brief</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
@@ -69,7 +69,7 @@ const SmartDailySummary: React.FC = () => {
                         <button
                             onClick={generateSummary}
                             disabled={isLoading}
-                            className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                            className="p-2 text-[var(--app-text-secondary)] hover:text-[var(--app-text)] hover:bg-[var(--app-surface-hover)] rounded-xl transition-all"
                             title="تحديث الملخص"
                         >
                             {isLoading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
@@ -85,7 +85,7 @@ const SmartDailySummary: React.FC = () => {
                     <button
                         onClick={generateSummary}
                         disabled={isLoading}
-                        className="w-full py-4 rounded-xl border border-dashed border-slate-700 text-slate-500 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/5 transition-all flex items-center justify-center gap-2 text-xs font-bold"
+                        className="w-full py-4 rounded-xl border border-dashed border-[var(--app-border)] text-[var(--app-text-secondary)] hover:text-[var(--app-text)] hover:border-blue-500/50 hover:bg-blue-500/5 transition-all flex items-center justify-center gap-2 text-xs font-bold"
                     >
                         {isLoading ? (
                             <>

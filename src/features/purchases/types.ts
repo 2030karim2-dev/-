@@ -1,9 +1,4 @@
 
-import { DbInvoice, DbParty, DbProduct } from '../../types/database';
-
-// Re-export shared Db types for backwards compatibility
-export type { DbInvoice, DbParty, DbProduct };
-
 export interface PurchaseStats {
   invoiceCount: number;
   totalPurchases: number;

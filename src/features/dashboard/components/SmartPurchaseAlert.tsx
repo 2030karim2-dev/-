@@ -39,7 +39,7 @@ const SmartPurchaseAlert: React.FC<Props> = ({ lowStockItems }) => {
                         <ShoppingCart size={16} />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-gray-800 dark:text-white">اقتراح شراء ذكي</h3>
+                        <h3 className="text-sm font-black text-[var(--app-text)]">اقتراح شراء ذكي</h3>
                         <p className="text-[9px] font-bold text-amber-600/60">{lowStockItems.length} منتج منخفض المخزون</p>
                     </div>
                 </div>
@@ -66,8 +66,8 @@ const SmartPurchaseAlert: React.FC<Props> = ({ lowStockItems }) => {
                         {result.items.map((item, i) => (
                             <div key={i} className="flex items-center gap-2 bg-white/70 dark:bg-slate-900/50 rounded-xl p-2.5 text-xs">
                                 <Package size={12} className="text-gray-400 flex-shrink-0" />
-                                <span className="font-bold text-gray-800 dark:text-white flex-1">{item.name}</span>
-                                <span className="font-black font-mono text-gray-900 dark:text-white">{item.suggestedQty} وحدة</span>
+                                <span className="font-bold text-[var(--app-text)] flex-1">{item.name}</span>
+                                <span className="font-black font-mono text-[var(--app-text)]">{item.suggestedQty} وحدة</span>
                                 <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${priorityColors[item.priority] || priorityColors['منخفض']}`}>
                                     {item.priority}
                                 </span>

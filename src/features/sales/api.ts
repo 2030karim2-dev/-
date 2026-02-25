@@ -1,6 +1,7 @@
 
 import { supabase } from '../../lib/supabaseClient';
 import { CreateInvoicePayload, InvoiceResponse } from './types';
+import { toBaseCurrency } from '../../core/utils/currencyUtils';
 
 export const salesApi = {
   getInvoices: async (companyId: string) => {
@@ -125,20 +126,14 @@ export const salesApi = {
 
     if (error) return { data: null, error };
 
-    // تحويل المبلغ للعملة الأساسية
-    const toBase = (inv: any): number => {
-      const amount = Number(inv.total_amount) || 0;
-      const rate = Number(inv.exchange_rate) || 1;
-      if (!inv.currency_code || inv.currency_code === 'SAR') return amount;
-      return amount * rate;
-    };
+    // Use centralized currency conversion
 
     // Calculate analytics
     const sales = (data as any[])?.filter((i) => i.type === 'sale' && i.status !== 'cancelled') || [];
     const returns = (data as any[])?.filter((i) => i.type === 'return_sale') || [];
 
-    const totalSales = sales.reduce((sum: number, i) => sum + toBase(i), 0);
-    const totalReturns = returns.reduce((sum: number, i) => sum + toBase(i), 0);
+    const totalSales = sales.reduce((sum: number, i) => sum + toBaseCurrency(i), 0);
+    const totalReturns = returns.reduce((sum: number, i) => sum + toBaseCurrency(i), 0);
 
     // Group sales by day
     const salesByDayMap: Record<string, { date: string; sales: number; returns: number }> = {};
@@ -152,7 +147,7 @@ export const salesApi = {
       if (!salesByDayMap[date]) {
         salesByDayMap[date] = { date, sales: 0, returns: 0 };
       }
-      const amount = toBase(inv);
+      const amount = toBaseCurrency(inv);
       salesByDayMap[date].sales += amount;
 
       // Aggregates for Top Lists
@@ -184,7 +179,7 @@ export const salesApi = {
       if (!salesByDayMap[date]) {
         salesByDayMap[date] = { date, sales: 0, returns: 0 };
       }
-      salesByDayMap[date].returns += toBase(inv);
+      salesByDayMap[date].returns += toBaseCurrency(inv);
     });
 
     const salesByDay = Object.values(salesByDayMap).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -193,7 +188,7 @@ export const salesApi = {
     const paymentMethodsMap: Record<string, number> = {};
     sales.forEach((inv: any) => {
       const method = inv.payment_method || 'other';
-      paymentMethodsMap[method] = (paymentMethodsMap[method] || 0) + toBase(inv);
+      paymentMethodsMap[method] = (paymentMethodsMap[method] || 0) + toBaseCurrency(inv);
     });
 
     const salesByPaymentMethod = Object.entries(paymentMethodsMap).map(([method, amount]) => ({

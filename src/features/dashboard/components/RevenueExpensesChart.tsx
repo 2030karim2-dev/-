@@ -30,18 +30,16 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         return (
             <div className={cn(
                 "p-4 rounded-2xl border shadow-xl backdrop-blur-xl transition-all duration-200",
-                isDark
-                    ? "bg-slate-900/80 border-slate-700/50 shadow-black/50"
-                    : "bg-white/90 border-slate-200/50 shadow-slate-200/50"
+                "bg-[var(--app-surface)]/80 border-[var(--app-border)] shadow-black/50"
             )}>
-                <p className="text-xs font-black text-slate-500 mb-3 border-b border-slate-200/20 dark:border-slate-700/50 pb-2">
+                <p className="text-xs font-black text-[var(--app-text-secondary)] mb-3 border-b border-[var(--app-border)] pb-2">
                     {label}
                 </p>
                 <div className="space-y-3">
                     <div className="flex items-center justify-between gap-6">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                            <span className="text-xs text-slate-600 dark:text-slate-300 font-bold">الإيرادات</span>
+                            <span className="text-xs text-[var(--app-text)] font-bold">الإيرادات</span>
                         </div>
                         <span className="text-sm font-black text-slate-700 dark:text-slate-100 font-mono tracking-tight">
                             {formatNumber(revenue)}
@@ -50,7 +48,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                     <div className="flex items-center justify-between gap-6">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" />
-                            <span className="text-xs text-slate-600 dark:text-slate-300 font-bold">المصروفات</span>
+                            <span className="text-xs text-[var(--app-text)] font-bold">المصروفات</span>
                         </div>
                         <span className="text-sm font-black text-slate-700 dark:text-slate-100 font-mono tracking-tight">
                             {formatNumber(expenses)}
@@ -114,7 +112,7 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
                         <Scale size={16} className="text-violet-500" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-slate-800 dark:text-white">
+                        <h3 className="text-sm font-black text-[var(--app-text)]">
                             الإيرادات vs المصروفات
                         </h3>
                         <p className="text-[9px] text-slate-400">مقارنة شهرية</p>

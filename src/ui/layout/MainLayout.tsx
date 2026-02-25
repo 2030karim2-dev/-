@@ -46,7 +46,7 @@ const MainLayout: React.FC = () => {
   ];
 
   return (
-    <div className="h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-50/50 via-gray-50 to-gray-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 overflow-hidden font-sans" dir={dir}>
+    <div className="h-screen bg-[var(--app-bg)] overflow-hidden font-sans" dir={dir}>
       {/* Network Alert Overlay */}
       {!isOnline && (
         <div className="fixed top-0 left-0 right-0 h-1 bg-rose-600 z-[300] animate-pulse"></div>
@@ -92,7 +92,7 @@ const MainLayout: React.FC = () => {
         </main>
 
         {/* Tactical Mobile Navigation */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t-2 border-gray-100 dark:border-slate-800 h-16 flex items-center justify-around z-[80] px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--app-surface)]/95 backdrop-blur-md border-t-2 border-[var(--app-border)] h-16 flex items-center justify-around z-[80] px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -101,12 +101,12 @@ const MainLayout: React.FC = () => {
                 onClick={() => navigate(item.path)}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 active:scale-90",
-                  isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-slate-500"
+                  isActive ? "text-[var(--accent)]" : "text-[var(--app-text-secondary)]"
                 )}
               >
                 <div className={cn(
                   "p-2 rounded-xl transition-all duration-500",
-                  isActive ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "hover:bg-gray-100 dark:hover:bg-slate-800"
+                  isActive ? "bg-[var(--accent)] text-white shadow-lg" : "hover:bg-[var(--app-surface-hover)]"
                 )}>
                   <item.icon size={20} strokeWidth={isActive ? 3 : 2} />
                 </div>

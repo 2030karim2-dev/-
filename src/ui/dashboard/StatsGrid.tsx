@@ -179,8 +179,8 @@ const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
             )}></div>
 
             <div className={cn(
-              "relative overflow-hidden bg-slate-900/80 backdrop-blur-xl border border-white/10 p-5 rounded-3xl transition-all duration-500",
-              "hover:shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:border-white/20"
+              "relative overflow-hidden bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-5 rounded-3xl transition-all duration-500",
+              "hover:shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:border-[var(--accent)]/30"
             )}>
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none">
@@ -196,7 +196,7 @@ const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
                       {item.title}
                     </span>
                     {item.subtitle && (
-                      <span className="text-[9px] font-bold text-slate-500">
+                      <span className="text-[9px] font-bold text-[var(--app-text-secondary)]">
                         {item.subtitle}
                       </span>
                     )}
@@ -212,7 +212,7 @@ const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
 
                 {/* Value + Sparkline Row */}
                 <div className="flex items-end justify-between mt-2">
-                  <h3 className="text-xl font-black text-white font-mono tracking-tighter leading-none drop-shadow-md">
+                  <h3 className="text-xl font-black text-[var(--app-text)] font-mono tracking-tighter leading-none drop-shadow-md">
                     {item.value}
                   </h3>
                   <MiniSparkline color={sparkColor} />

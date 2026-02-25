@@ -3,16 +3,25 @@ import { create } from 'zustand';
 import { Product } from '../inventory/types';
 import { useTaxDiscountStore } from '../settings/taxDiscountStore';
 
-export interface InvoiceItem {
+/**
+ * SalesCartItem - Used for the sales cart/UI state
+ * Different from InvoiceItem in types.ts which represents database records
+ */
+export interface SalesCartItem {
   id: string;
   productId: string;
   sku: string;
   name: string;
+  partNumber?: string;    // OEM part number - matches purchases
+  brand?: string;        // Brand/manufacturer - matches purchases
   quantity: number;
   price: number;
   discount: number;
   tax: number;
 }
+
+/** @deprecated Use SalesCartItem instead */
+export type InvoiceItem = SalesCartItem;
 
 export interface SalesSummary {
   subtotal: number;
@@ -54,6 +63,8 @@ const createNewItem = (): InvoiceItem => ({
   productId: '',
   sku: '',
   name: '',
+  partNumber: '',
+  brand: '',
   quantity: 0,
   price: 0,
   discount: 0,
@@ -101,6 +112,8 @@ export const useSalesStore = create<SalesState>((set, get) => ({
           productId: product.id,
           name: product.name,
           sku: product.sku,
+          partNumber: product.part_number || '',
+          brand: product.brand || '',
           price: product.selling_price || 0,
           quantity: 1
         };
@@ -130,6 +143,8 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         productId: product.id,
         sku: product.sku,
         name: product.name,
+        partNumber: product.part_number || '',
+        brand: product.brand || '',
         quantity: 1,
         price: product.selling_price || 0,
         discount: 0,
