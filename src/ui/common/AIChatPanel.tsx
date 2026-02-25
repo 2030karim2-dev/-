@@ -30,7 +30,7 @@ const SLASH_COMMANDS = [
 ];
 
 const AIChatPanel: React.FC<Props> = ({ isOpen, onClose }) => {
-    const { messages, isLoading, error, sendMessage, clearChat } = useAIChat();
+    const { messages, isLoading, error, sendMessage, clearChat } = useAIChat({ enabled: isOpen });
     const [input, setInput] = useState('');
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);

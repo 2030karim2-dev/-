@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { usePurchaseStore, PurchaseInvoiceItem } from '../../store';
-import { useTaxDiscountStore } from '../../settings/taxDiscountStore';
+import { useTaxDiscountStore } from '../../../settings/taxDiscountStore';
 import { Product } from '../../../inventory/types';
 import { Plus, Trash2, Settings, Search, FileCode, Award } from 'lucide-react';
 import { cn } from '../../../../core/utils';

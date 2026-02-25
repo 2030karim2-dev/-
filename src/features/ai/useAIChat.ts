@@ -7,16 +7,17 @@ import { useProducts } from '../inventory/hooks';
 import { useAuthStore } from '../auth/store';
 import { formatCurrency } from '../../core/utils';
 
-export const useAIChat = () => {
+export const useAIChat = (options: { enabled?: boolean } = {}) => {
+    const isEnabled = options.enabled !== false;
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const { user } = useAuthStore();
-    const { data: pl } = useProfitAndLoss();
-    const { data: debt } = useDebtReport();
-    const { data: cashFlow } = useCashFlow();
-    const { stats } = useProducts('');
+    const { data: pl } = useProfitAndLoss({ enabled: isEnabled });
+    const { data: debt } = useDebtReport({ enabled: isEnabled });
+    const { data: cashFlow } = useCashFlow({ enabled: isEnabled });
+    const { stats } = useProducts('', { enabled: isEnabled });
 
     const buildContext = useCallback(() => {
         const parts: string[] = [];

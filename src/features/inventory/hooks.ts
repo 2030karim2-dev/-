@@ -84,14 +84,14 @@ export const useInventoryCategoryMutations = () => {
     return { createCategory: create.mutate, deleteCategory: remove.mutate, isCreating: create.isPending };
 };
 
-export const useProducts = (searchTerm: string = '') => {
+export const useProducts = (searchTerm: string = '', options: { enabled?: boolean } = {}) => {
     const { user } = useAuthStore();
     const companyId = user?.company_id;
 
     const query = useQuery({
         queryKey: ['products', companyId],
         queryFn: () => companyId ? inventoryService.getProducts(companyId) : Promise.resolve([]),
-        enabled: !!companyId,
+        enabled: (options.enabled !== false) && !!companyId,
         staleTime: 60000 // 1 minute
     });
 
