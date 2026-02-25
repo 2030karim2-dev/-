@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   CSS Custom Properties — Theme System
+   تُستخدم هذه المتغيرات بواسطة الثيمات لتغيير ألوان التطبيق
+   ============================================================ */
+@layer base {
+  :root {
+    --app-bg: #f8fafc;
+    --app-surface: #ffffff;
+    --app-surface-hover: #f1f5f9;
+    --app-border: #e2e8f0;
+    --app-text: #1e293b;
+    --app-text-secondary: #64748b;
+    --accent: #3b82f6;
+  }
+
+  /* تطبيق ألوان الثيم على الخلفية الأساسية */
+  body {
+    background-color: var(--app-bg);
+    color: var(--app-text);
+  }
+}
+
+/* ============================================================
+   Theme-aware overrides 
+   تظليل Tailwind الافتراضي بمتغيرات الثيم
+   ============================================================ */
+@layer utilities {
+
+  /* خلفية الصفحات الرئيسية */
+  .theme-bg {
+    background-color: var(--app-bg) !important;
+  }
+
+  .theme-surface {
+    background-color: var(--app-surface) !important;
+  }
+
+  .theme-surface-hover:hover {
+    background-color: var(--app-surface-hover) !important;
+  }
+
+  .theme-border {
+    border-color: var(--app-border) !important;
+  }
+
+  .theme-text {
+    color: var(--app-text) !important;
+  }
+
+  .theme-text-secondary {
+    color: var(--app-text-secondary) !important;
+  }
+
+  .theme-accent {
+    color: var(--accent) !important;
+  }
+
+  .theme-accent-bg {
+    background-color: var(--accent) !important;
+  }
+}
+
+/* ============================================================
+   Global Theme Application
+   تطبيق عام — يُغيّر ألوان خلفية التطبيق حسب الثيم المختار
+   ============================================================ */
+
+/* خلفيات الصفحات */
+.bg-gray-50,
+.bg-\[\#f8fafc\] {
+  background-color: var(--app-bg) !important;
+}
+
+.dark .dark\:bg-slate-950 {
+  background-color: var(--app-bg) !important;
+}
+
+/* خلفيات الأسطح (كروت، سايدبار، هيدر) */
+.bg-white\/80,
+.bg-white\/40 {
+  background-color: color-mix(in srgb, var(--app-surface) 80%, transparent) !important;
+}
+
+.dark .dark\:bg-slate-900\/80 {
+  background-color: color-mix(in srgb, var(--app-surface) 80%, transparent) !important;
+}
+
+.dark .dark\:bg-slate-950\/40 {
+  background-color: color-mix(in srgb, var(--app-surface) 40%, transparent) !important;
+}
+
+/* أسطح بيضاء صافية */
+.bg-white {
+  background-color: var(--app-surface) !important;
+}
+
+.dark .dark\:bg-slate-900 {
+  background-color: var(--app-surface) !important;
+}
+
+/* حدود */
+.border-gray-100,
+.border-gray-200 {
+  border-color: var(--app-border) !important;
+}
+
+.dark .dark\:border-slate-800 {
+  border-color: var(--app-border) !important;
+}
+
+/* خلفيات عناصر تفاعلية */
+.bg-gray-50\/50,
+.bg-\[\#f3f4f6\] {
+  background-color: var(--app-surface-hover) !important;
+}
+
+.dark .dark\:bg-slate-900\/50,
+.dark .dark\:bg-slate-900\/30,
+.dark .dark\:bg-slate-800 {
+  background-color: var(--app-surface-hover) !important;
+}
+
+/* نصوص */
+.text-gray-800 {
+  color: var(--app-text) !important;
+}
+
+.dark .dark\:text-slate-100 {
+  color: var(--app-text) !important;
+}
+
+.text-gray-500,
+.text-gray-400 {
+  color: var(--app-text-secondary) !important;
+}
+
+.dark .dark\:text-slate-400,
+.dark .dark\:text-slate-500 {
+  color: var(--app-text-secondary) !important;
+}
+
+/* ============================================================
+   Desktop Zoom — تكبير المحتوى على الكمبيوتر
+   ============================================================ */
+@media (min-width: 768px) {
+  main {
+    zoom: 1.12;
+  }
+}
+
+@media (min-width: 1440px) {
+  main {
+    zoom: 1.18;
+  }
+}
+
+/* Custom scrollbar */
+@media (min-width: 768px) {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--app-text-secondary) 30%, transparent);
+    border-radius: 999px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--app-text-secondary) 50%, transparent);
+    border-radius: 999px;
+  }
+}

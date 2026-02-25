@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#10b981" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="description" content="نظام الزهراء الذكي - الحل المتكامل لإدارة مراكز قطع الغيار والمحاسبة المالية" />
+  <title>الزهراء ERP | النظام المالي الذكي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Cairo:wght@200..1000&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap"
+    rel="stylesheet">
+  <script>
+    // Theme initialization to prevent flicker
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+  <style>
+    body {
+      background-color: #f3f4f6;
+    }
+
+    .dark body {
+      background-color: #0f172a;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+      background: #334155;
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+
+      body,
+      .print-area,
+      .print-area * {
+        background-color: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+
+      .print-area {
+        padding: 0;
+        margin: 0;
+      }
+    }
+  </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/client": "https://esm.sh/react-dom@^19.2.4/client",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
+    "zustand": "https://esm.sh/zustand@^5.0.10",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.93.2",
+    "@tanstack/react-query": "https://esm.sh/@tanstack/react-query@^5.90.20",
+    "@tanstack/react-query-persist-client": "https://esm.sh/@tanstack/react-query-persist-client@^5.90.20",
+    "idb-keyval": "https://esm.sh/idb-keyval@^6.2.1",
+    "clsx": "https://esm.sh/clsx@^2.1.1",
+    "tailwind-merge": "https://esm.sh/tailwind-merge@^3.4.0",
+    "zod": "https://esm.sh/zod@^3.22.4",
+    "react-hook-form": "https://esm.sh/react-hook-form@^7.51.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "@tanstack/query-async-storage-persister": "https://esm.sh/@tanstack/query-async-storage-persister@^5.90.22",
+    "zustand/": "https://esm.sh/zustand@^5.0.10/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "use-debounce": "https://esm.sh/use-debounce@^10.1.0",
+    "qrcode": "https://esm.sh/qrcode@^1.5.3",
+    "xlsx": "https://esm.sh/xlsx@0.18.5",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "date-fns": "https://esm.sh/date-fns@3.3.1",
+    "date-fns/": "https://esm.sh/date-fns@^4.1.0/",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "path": "https://esm.sh/path@^0.12.7",
+    "vitest": "https://esm.sh/vitest@^4.0.18",
+    "vitest/": "https://esm.sh/vitest@^4.0.18/",
+    "@testing-library/jest-dom": "https://esm.sh/@testing-library/jest-dom@^6.9.1",
+    "@testing-library/react": "https://esm.sh/@testing-library/react@^16.3.2"
+  }
+}
+</script>
+
+</head>
+
+<body class="font-sans antialiased">
+  <div id="root"></div>
+  <script type="module" src="/src/index.tsx"></script>
+</body>
+
+</html>

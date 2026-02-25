@@ -1,0 +1,37 @@
+
+import {
+  LayoutDashboard,
+  Calculator,
+  ShoppingBag,
+  Store,
+  ShoppingCart,
+  Receipt,
+  FileText,
+  Wrench,
+  Users,
+  UserCircle,
+  BarChart3,
+  Settings,
+  Car,
+  Package,
+  Brain
+} from 'lucide-react';
+import { MenuItem } from './types';
+import { ROUTES } from './routes/paths';
+
+export const MENU_ITEMS: MenuItem[] = [
+  { id: 'dashboard', labelKey: 'overview', icon: LayoutDashboard, path: ROUTES.DASHBOARD.ROOT, color: 'purple' },
+  { id: 'sales', labelKey: 'invoices', icon: ShoppingBag, path: ROUTES.DASHBOARD.SALES, color: 'green' },
+  { id: 'bonds', labelKey: 'receipts', icon: FileText, path: ROUTES.DASHBOARD.BONDS, color: 'yellow' },
+  { id: 'clients', labelKey: 'customers', icon: UserCircle, path: ROUTES.DASHBOARD.CLIENTS, color: 'sky' },
+  { id: 'suppliers', labelKey: 'suppliers', icon: Users, path: ROUTES.DASHBOARD.SUPPLIERS, color: 'blue' },
+  { id: 'inventory', labelKey: 'products', icon: Wrench, path: ROUTES.DASHBOARD.INVENTORY, color: 'orange' },
+  { id: 'expenses', labelKey: 'expenses', icon: Receipt, path: ROUTES.DASHBOARD.EXPENSES, color: 'red' },
+  { id: 'accounting', labelKey: 'accounting', icon: Calculator, path: ROUTES.DASHBOARD.ACCOUNTING, color: 'indigo' },
+  { id: 'pos', labelKey: 'pos', icon: Package, path: ROUTES.DASHBOARD.POS, color: 'pink' },
+
+  { id: 'purchases', labelKey: 'purchases', icon: ShoppingCart, path: ROUTES.DASHBOARD.PURCHASES, color: 'teal' },
+  { id: 'reports', labelKey: 'reports', icon: BarChart3, path: ROUTES.DASHBOARD.REPORTS, color: 'slate' },
+  { id: 'ai-brain', labelKey: 'ai_brain', icon: Brain, path: '/ai-brain', color: 'purple' },
+  { id: 'settings', labelKey: 'settings', icon: Settings, path: ROUTES.DASHBOARD.SETTINGS, isOwner: true, color: 'slate' },
+];

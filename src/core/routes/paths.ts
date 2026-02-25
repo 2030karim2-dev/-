@@ -1,0 +1,31 @@
+
+export const ROUTES = {
+  AUTH: {
+    LOGIN: '/login',
+    REGISTER: '/register',
+    FORGOT_PASSWORD: '/forgot-password',
+    UPDATE_PASSWORD: '/update-password',
+  },
+  DASHBOARD: {
+    ROOT: '/',
+    INVENTORY: '/inventory',
+    INVENTORY_AUDIT_SESSION: '/inventory/audit/:sessionId',
+    ACCOUNTING: '/accounting',
+    SALES: '/sales',
+    PURCHASES: '/purchases',
+    POS: '/pos',
+    EXPENSES: '/expenses',
+    SETTINGS: '/settings',
+    APPEARANCE: '/settings/appearance',
+    BONDS: '/bonds',
+    SUPPLIERS: '/suppliers',
+    CLIENTS: '/clients',
+    PARTIES: '/parties',
+    PARTIES_CUSTOMERS: '/parties/customers',
+    PARTIES_SUPPLIERS: '/parties/suppliers',
+    REPORTS: '/reports',
+    AI: '/ai',
+  },
+} as const;
+
+export type AppRoute = string;
