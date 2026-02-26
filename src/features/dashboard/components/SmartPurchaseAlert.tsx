@@ -61,11 +61,11 @@ const SmartPurchaseAlert: React.FC<Props> = ({ lowStockItems }) => {
 
             {result && isExpanded && (
                 <div className="mt-3 space-y-2">
-                    <p className="text-xs text-gray-600 dark:text-slate-400 font-medium">{result.summary}</p>
+                    <p className="text-xs text-[var(--app-text)] font-medium">{result.summary}</p>
                     <div className="space-y-1.5">
                         {result.items.map((item, i) => (
-                            <div key={i} className="flex items-center gap-2 bg-white/70 dark:bg-slate-900/50 rounded-xl p-2.5 text-xs">
-                                <Package size={12} className="text-gray-400 flex-shrink-0" />
+                            <div key={i} className="flex items-center gap-2 bg-[var(--app-surface-hover)] rounded-xl p-2.5 text-xs">
+                                <Package size={12} className="text-[var(--app-text-secondary)] flex-shrink-0" />
                                 <span className="font-bold text-[var(--app-text)] flex-1">{item.name}</span>
                                 <span className="font-black font-mono text-[var(--app-text)]">{item.suggestedQty} وحدة</span>
                                 <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${priorityColors[item.priority] || priorityColors['منخفض']}`}>

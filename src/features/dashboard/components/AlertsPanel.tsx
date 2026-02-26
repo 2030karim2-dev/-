@@ -62,7 +62,7 @@ const AlertsPanel: React.FC<AlertsPanelProps> = ({
 
     return (
         <div className={cn(
-            "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden",
+            "bg-[var(--app-surface)] border border-[var(--app-border)] rounded-2xl overflow-hidden",
             className
         )}>
             {/* Header */}
@@ -88,7 +88,7 @@ const AlertsPanel: React.FC<AlertsPanelProps> = ({
 
                 <div className="flex items-center gap-2">
                     {/* Filter Tabs */}
-                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5">
+                    <div className="flex bg-[var(--app-surface-hover)] rounded-lg p-0.5">
                         {(['all', 'urgent', 'info'] as FilterType[]).map(f => (
                             <button
                                 key={f}
@@ -111,7 +111,7 @@ const AlertsPanel: React.FC<AlertsPanelProps> = ({
                     <ChevronDown
                         size={14}
                         className={cn(
-                            "text-slate-400 transition-transform",
+                            "text-[var(--app-text-secondary)] transition-transform",
                             isExpanded ? "rotate-180" : ""
                         )}
                     />
@@ -124,12 +124,12 @@ const AlertsPanel: React.FC<AlertsPanelProps> = ({
                     {!hasAlerts ? (
                         <div className="text-center py-6">
                             <CheckCircle size={24} className="mx-auto text-emerald-500 mb-2" />
-                            <p className="text-xs font-bold text-slate-400">لا توجد تنبيهات</p>
+                            <p className="text-xs font-bold text-[var(--app-text-secondary)]">لا توجد تنبيهات</p>
                         </div>
                     ) : filteredAlerts.length === 0 ? (
                         <div className="text-center py-6">
-                            <Info size={24} className="mx-auto text-slate-300 mb-2" />
-                            <p className="text-xs font-bold text-slate-400">لا توجد تنبيهات من هذا النوع</p>
+                            <Info size={24} className="mx-auto text-[var(--app-text-secondary)] mb-2" />
+                            <p className="text-xs font-bold text-[var(--app-text-secondary)]">لا توجد تنبيهات من هذا النوع</p>
                         </div>
                     ) : (
                         filteredAlerts.map((alert) => (
@@ -148,13 +148,13 @@ const AlertsPanel: React.FC<AlertsPanelProps> = ({
                                         {alert.message}
                                     </p>
                                     {alert.time && (
-                                        <p className="text-[9px] text-slate-400 mt-0.5">{alert.time}</p>
+                                        <p className="text-[9px] text-[var(--app-text-secondary)] mt-0.5">{alert.time}</p>
                                     )}
                                 </div>
                                 {alert.action && (
                                     <button
                                         onClick={alert.action.onClick}
-                                        className="flex-shrink-0 px-2 py-1 text-[9px] font-bold bg-white dark:bg-slate-800 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"
+                                        className="flex-shrink-0 px-2 py-1 text-[9px] font-bold bg-[var(--app-surface-hover)] rounded-lg text-[var(--accent)] hover:bg-[var(--app-surface)] transition-colors"
                                     >
                                         {alert.action.label}
                                     </button>

@@ -37,8 +37,9 @@ export const useBackupManager = () => {
             const fileName = `AlZahra_Backup_${new Date().toISOString().split('T')[0]}`;
             await GoogleDriveService.uploadJSONFile(fileName, data, token);
             showToast("تم الرفع إلى حسابك في جوجل درايف بنجاح", "success");
-        } catch (error: any) {
-            showToast(error.message || "حدث خطأ أثناء الرفع إلى جوجل", "error");
+        } catch (error: unknown) {
+            const err = error as Error;
+            showToast(err.message || "حدث خطأ أثناء الرفع إلى جوجل", "error");
         } finally {
             setIsExportingToDrive(false);
         }

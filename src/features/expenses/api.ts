@@ -21,7 +21,8 @@ export const expensesApi = {
       .eq('company_id', companyId)
       .neq('status', 'void')
       .is('deleted_at', null)
-      .order('expense_date', { ascending: false });
+      .order('expense_date', { ascending: false })
+      .limit(1000);
 
     return { data, error };
   },

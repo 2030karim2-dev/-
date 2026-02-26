@@ -59,7 +59,7 @@ const InventoryOverview: React.FC<InventoryOverviewProps> = ({ lowStockProducts,
                             <div className={cn("p-1.5 rounded-lg border", m.bg)}>
                                 <m.icon size={12} className={m.color} />
                             </div>
-                            <span className="text-[10px] font-bold text-slate-400">{m.label}</span>
+                            <span className="text-[10px] font-bold text-[var(--app-text-secondary)]">{m.label}</span>
                         </div>
                         <p className="text-lg font-black text-[var(--app-text)] font-mono">{m.value}</p>
                     </div>

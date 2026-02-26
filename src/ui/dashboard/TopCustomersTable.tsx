@@ -14,9 +14,9 @@ const TopCustomersTable: React.FC<TopCustomersTableProps> = ({ customers }) => {
       <table className="w-full text-sm text-center">
         <thead className="border-b border-gray-200 dark:border-slate-700">
           <tr>
-            <th className="p-3 font-bold text-gray-500 dark:text-slate-400">{t('name')}</th>
-            <th className="p-3 font-bold text-gray-500 dark:text-slate-400">{t('invoices')}</th>
-            <th className="p-3 font-bold text-gray-500 dark:text-slate-400">{t('amount')}</th>
+            <th className="p-3 font-bold text-[var(--app-text-secondary)]">{t('name')}</th>
+            <th className="p-3 font-bold text-[var(--app-text-secondary)]">{t('invoices')}</th>
+            <th className="p-3 font-bold text-[var(--app-text-secondary)]">{t('amount')}</th>
           </tr>
         </thead>
         <tbody>

@@ -14,9 +14,10 @@ export const aiApi = {
       });
 
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as Error;
       console.error("AI API Error:", error);
-      throw error;
+      throw new Error(err.message || 'فشل في الاتصال بالذكاء الاصطناعي');
     }
   }
 };

@@ -144,7 +144,7 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
                     ) : (
                         <TrendingDown size={16} className="text-rose-500" />
                     )}
-                    <span className="text-xs font-bold text-slate-300">الصافي</span>
+                    <span className="text-xs font-bold text-[var(--app-text-secondary)]">الصافي</span>
                 </div>
                 <span className={cn(
                     "text-lg font-black font-mono",

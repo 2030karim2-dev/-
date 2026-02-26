@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useSalesStore } from '../../store';
 import { useCreateInvoice, useNextInvoiceNumber } from '../../hooks';
 import { useCompany, useCurrencies } from '../../../settings/hooks';
+import { useSettingsStore } from '../../../settings/settingsStore';
 import InvoiceHeader from './InvoiceHeader';
 import InvoiceMeta from './InvoiceMeta';
 import InteractiveInvoiceTable from './InteractiveInvoiceTable';
@@ -20,9 +21,39 @@ interface CreateInvoiceViewProps {
 const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
   const { data: company, isLoading: companyLoading, error: companyError } = useCompany();
   const { data: nextInvoiceNumber, isLoading: numberLoading, error: numberError } = useNextInvoiceNumber();
-  const { items, selectedCustomer, summary, resetCart, invoiceType, cashboxId, currency } = useSalesStore();
+  const {
+    items, selectedCustomer, summary, resetCart, invoiceType, cashboxId, currency,
+    setMetadata, setCustomer
+  } = useSalesStore();
   const { mutate: createInvoice, isPending } = useCreateInvoice();
   const { rates } = useCurrencies();
+  const { invoice: invoiceSettings } = useSettingsStore();
+
+  // Apply defaults on mount
+  React.useEffect(() => {
+    // 1. Set default currency and invoice type from settings
+    if (invoiceSettings.default_currency) {
+      setMetadata('currency', invoiceSettings.default_currency);
+    }
+    if (invoiceSettings.default_invoice_type) {
+      setMetadata('invoiceType', invoiceSettings.default_invoice_type);
+    }
+
+    // 2. Load "General Customer" if none selected
+    if (!selectedCustomer) {
+      import('../../../customers/service').then(({ customersService }) => {
+        if (company?.id) {
+          customersService.getOrCreateGeneralCustomer(company.id).then(customer => {
+            setCustomer({
+              id: customer.id,
+              name: customer.name,
+              phone: customer.phone || ''
+            });
+          });
+        }
+      });
+    }
+  }, [company?.id]);
 
   const getExchangeRate = (currCode: string) => {
     const history = (rates.data as any[])?.filter((r: any) => r.currency_code === currCode) || [];

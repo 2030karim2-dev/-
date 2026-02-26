@@ -61,8 +61,8 @@ const SalesChart: React.FC<SalesChartProps> = ({
     <div className="flex flex-col h-full">
       {/* Period Selector */}
       {showPeriodSelector && (
-        <div className="flex items-center gap-1.5 mb-5 bg-slate-50 dark:bg-slate-800/50 p-1 rounded-xl w-fit">
-          <Calendar size={14} className="text-slate-400 ml-2" />
+        <div className="flex items-center gap-1.5 mb-5 bg-[var(--app-surface)] dark:bg-slate-800/50 p-1 rounded-xl w-fit">
+          <Calendar size={14} className="text-[var(--app-text-secondary)] ml-2" />
           {(['today', 'week', 'month', 'year'] as PeriodType[]).map(p => (
             <button
               key={p}

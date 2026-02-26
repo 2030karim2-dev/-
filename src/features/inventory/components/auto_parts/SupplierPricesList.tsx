@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Product } from '../../types';
 import { useSupplierPrices, useSupplierPriceMutations } from '../../hooks';
+import { useFeedbackStore } from '../../../feedback/store';
 import { Plus, Building2, Truck, DollarSign, Calendar } from 'lucide-react';
 
 interface SupplierPricesListProps {
@@ -10,6 +11,7 @@ interface SupplierPricesListProps {
 export const SupplierPricesList: React.FC<SupplierPricesListProps> = ({ product }) => {
     const { data: prices, isLoading } = useSupplierPrices(product.id);
     const { addSupplierPrice, isAdding: isSaving } = useSupplierPriceMutations(product.id);
+    const { showToast } = useFeedbackStore();
 
     const [isAdding, setIsAdding] = useState(false);
     // Add form state
@@ -21,7 +23,7 @@ export const SupplierPricesList: React.FC<SupplierPricesListProps> = ({ product 
 
     const handleSave = async () => {
         if (!supplierId || costPrice <= 0) {
-            alert("الرجاء تحديد المورد وإدخال سعر التكلفة بشكل صحيح");
+            showToast("الرجاء تحديد المورد وإدخال سعر التكلفة بشكل صحيح", 'warning');
             return;
         }
 

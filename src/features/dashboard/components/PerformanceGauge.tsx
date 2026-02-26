@@ -133,7 +133,7 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
                         <p className="text-4xl font-black text-[var(--app-text)] font-mono tracking-tighter" style={{ textShadow: `0 2px 10px ${color}30` }}>
                             {percentage.toFixed(0)}%
                         </p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">من الهدف</p>
+                        <p className="text-[10px] text-[var(--app-text-secondary)] font-bold uppercase tracking-wider mt-1">من الهدف</p>
                     </div>
                 </div>
             </div>
@@ -162,7 +162,7 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
                         style={{ width: `${percentage}%`, backgroundColor: color }}
                     />
                 </div>
-                <p className="text-[9px] text-slate-400 text-center mt-1 font-medium">
+                <p className="text-[9px] text-[var(--app-text-secondary)] text-center mt-1 font-medium">
                     متبقي {(target - value).toLocaleString('en-US')} للوصول للهدف
                 </p>
             </div>

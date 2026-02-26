@@ -14,7 +14,8 @@ export const productsApi = {
       `)
             .eq('company_id', companyId)
             .is('deleted_at', null)
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: false })
+            .limit(1000);
     },
 
     createProduct: async (productData: any) => {

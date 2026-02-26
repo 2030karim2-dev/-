@@ -116,6 +116,9 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
   setProductForRow: (index, product) => {
     set(state => {
       const newItems = [...state.items];
+      const rate = state.currency === 'SAR' ? 1 : state.exchangeRate;
+      const convertedCost = (product.cost_price || 0) * rate;
+
       if (newItems[index]) {
         newItems[index] = {
           ...newItems[index],
@@ -124,7 +127,7 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
           sku: product.sku,
           partNumber: product.part_number || '',
           brand: product.brand || '',
-          costPrice: product.cost_price || 0,
+          costPrice: convertedCost,
           quantity: 1
         };
       }

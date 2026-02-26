@@ -63,7 +63,7 @@ export const useCreatePurchase = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       showToast(err.message || "فشل توريد الفاتورة", 'error');
     }
   });
@@ -87,7 +87,7 @@ export const useCreatePayment = () => {
       queryClient.invalidateQueries({ queryKey: ['suppliers'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
     },
-    onError: (err: any) => showToast(err.message || "فشل تسجيل السند", 'error')
+    onError: (err: Error) => showToast(err.message || "فشل تسجيل السند", 'error')
   });
 };
 

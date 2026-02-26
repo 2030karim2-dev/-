@@ -55,7 +55,7 @@ export const useJournalMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['financials'] });
       showToast('تم ترحيل القيد المحاسبي بنجاح وتحديث أرصدة الأستاذ العام', 'success');
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       showToast(error.message, 'error', error);
     }
   });

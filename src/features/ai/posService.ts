@@ -21,8 +21,9 @@ export const aiPosService = {
       });
 
       return text.split(',').map(s => s.trim()).filter(s => s.length > 0);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("AI Recommendation Error:", error);
+      // Silently fail for AI recommendations - return empty array
       return [];
     }
   }

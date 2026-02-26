@@ -101,8 +101,8 @@ export const useExpenseActions = () => {
       queryClient.invalidateQueries({ queryKey: ['financials'] });
       showToast('تم تسجيل المصروف وترحيله بنجاح', 'success');
     },
-    onError: (error: any) => {
-      showToast(error.message, 'error', error);
+    onError: (error: Error) => {
+      showToast(error.message, 'error', { error });
     }
   });
 
@@ -115,7 +115,7 @@ export const useExpenseActions = () => {
       queryClient.invalidateQueries({ queryKey: ['financials'] });
       showToast('تم إلغاء المصروف بنجاح', 'success');
     },
-    onError: (error: any) => showToast(error.message, 'error')
+    onError: (error: Error) => showToast(error.message, 'error')
   });
 
   return {

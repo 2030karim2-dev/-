@@ -6,6 +6,7 @@ import { cn } from '../../../core/utils';
 import ExcelTable, { Column } from '../../../ui/common/ExcelTable';
 import TableSkeleton from '../../../ui/base/TableSkeleton';
 import { useProductMutations } from '../hooks';
+import { useFeedbackStore } from '../../../features/feedback/store';
 
 interface Props {
   products: Product[];
@@ -17,6 +18,7 @@ interface Props {
 
 const ProductExcelGrid: React.FC<Props> = ({ products, isLoading, onDelete, onViewDetails, onEdit }) => {
   const { saveProduct, bulkDeleteProducts } = useProductMutations();
+  const { showToast } = useFeedbackStore();
   const [selectedRowIds, setSelectedRowIds] = React.useState<Set<string>>(new Set());
 
   const handleOrderChange = (reorderedProducts: Product[]) => {
@@ -57,7 +59,7 @@ const ProductExcelGrid: React.FC<Props> = ({ products, isLoading, onDelete, onVi
     const text = generateShareText();
     try {
       await navigator.clipboard.writeText(text);
-      alert('تم نسخ البيانات للحافظة');
+      showToast('تم نسخ البيانات للحافظة', 'success');
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }

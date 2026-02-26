@@ -2,7 +2,7 @@ import React from 'react';
 import { HashRouter } from 'react-router-dom';
 import { AppRoutes } from './app/routes';
 import FeedbackToast from './ui/base/FeedbackToast';
-import { ErrorBoundary } from './ui/base/ErrorBoundary';
+import { ErrorBoundary } from './core/components/ErrorBoundary';
 import { DebugConsole } from './ui/base/DebugConsole';
 import CommandPalette from './ui/base/CommandPalette';
 import { useSystemInitialization } from './core/hooks/useSystemInitialization';

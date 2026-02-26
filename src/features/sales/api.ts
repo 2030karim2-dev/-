@@ -23,7 +23,8 @@ export const salesApi = {
       .in('type', ['sale', 'return_sale'])
       .neq('status', 'void')
       .is('deleted_at', null)
-      .order('issue_date', { ascending: false });
+      .order('issue_date', { ascending: false })
+      .limit(1000);
   },
 
   commitInvoiceRPC: async (companyId: string, userId: string, payload: CreateInvoicePayload): Promise<InvoiceResponse> => {
@@ -113,7 +114,9 @@ export const salesApi = {
       `)
       .eq('company_id', params.company_id)
       .in('type', ['sale', 'return_sale'])
-      .neq('status', 'void');
+      .neq('status', 'void')
+      .order('issue_date', { ascending: false })
+      .limit(2000);
 
     if (params.start_date) {
       query = query.gte('issue_date', params.start_date);

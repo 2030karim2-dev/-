@@ -11,6 +11,7 @@ import Button from '../../../../ui/base/Button';
 import { cn } from '../../../../core/utils';
 // Fix: Corrected import path to point to the barrel file.
 import { Account } from '../../types/index';
+import { useFeedbackStore } from '../../../../features/feedback/store';
 
 // ==========================================
 // 1. Data Transformation: Flat List to Tree
@@ -38,7 +39,7 @@ const buildAccountTree = (accounts: Account[]): any[] => {
         return node.balance;
     };
     roots.forEach(calculateBalances);
-    
+
     return roots;
 };
 
@@ -101,129 +102,130 @@ const AccountTreeRow: React.FC<{ node: any; level: number; onToggle: (id: string
 // 3. Main AccountsTable Component
 // ==========================================
 const AccountsTable: React.FC = () => {
-  const { data: accounts, isLoading } = useAccounts();
-  const { seedAccounts, isSeeding, deleteAccount, createAccount, isCreating } = useAccountMutations();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isOpeningBalanceModalOpen, setIsOpeningBalanceModalOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+    const { data: accounts, isLoading } = useAccounts();
+    const { seedAccounts, isSeeding, deleteAccount, createAccount, isCreating } = useAccountMutations();
+    const { showToast } = useFeedbackStore();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isOpeningBalanceModalOpen, setIsOpeningBalanceModalOpen] = useState(false);
+    const [editingAccount, setEditingAccount] = useState<Account | null>(null);
 
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
-  const accountTree = useMemo(() => {
-      if (!accounts) return [];
-      return buildAccountTree(accounts);
-  }, [accounts]);
-  
-  const toggleNode = (id: string) => {
-      setExpandedNodes(prev => {
-          const newSet = new Set(prev);
-          if (newSet.has(id)) newSet.delete(id);
-          else newSet.add(id);
-          return newSet;
-      });
-  };
+    const accountTree = useMemo(() => {
+        if (!accounts) return [];
+        return buildAccountTree(accounts);
+    }, [accounts]);
 
-  const handleEdit = (account: Account) => {
-    setEditingAccount(account);
-    setIsModalOpen(true);
-  };
-  
-  const handleAddNew = () => {
-    setEditingAccount(null);
-    setIsModalOpen(true);
-  };
+    const toggleNode = (id: string) => {
+        setExpandedNodes(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) newSet.delete(id);
+            else newSet.add(id);
+            return newSet;
+        });
+    };
 
-  const handleCreate = (data: any) => {
-      createAccount(data, {
-          onSuccess: () => setIsModalOpen(false)
-      });
-  };
+    const handleEdit = (account: Account) => {
+        setEditingAccount(account);
+        setIsModalOpen(true);
+    };
 
-  const handleDelete = (id: string, isSystem: boolean) => {
-      if(isSystem) {
-          alert('لا يمكن حذف حساب نظام');
-          return;
-      }
-      if(window.confirm('تنبيه حرج: حذف الحساب سيؤدي لمسح كافة القيود المرتبطة به. هل تريد الاستمرار؟')) {
-          deleteAccount({ id, isSystem });
-      }
-  };
+    const handleAddNew = () => {
+        setEditingAccount(null);
+        setIsModalOpen(true);
+    };
 
-  if (isLoading) {
+    const handleCreate = (data: any) => {
+        createAccount(data, {
+            onSuccess: () => setIsModalOpen(false)
+        });
+    };
+
+    const handleDelete = (id: string, isSystem: boolean) => {
+        if (isSystem) {
+            showToast('لا يمكن حذف حساب نظام', 'warning');
+            return;
+        }
+        if (window.confirm('تنبيه حرج: حذف الحساب سيؤدي لمسح كافة القيود المرتبطة به. هل تريد الاستمرار؟')) {
+            deleteAccount({ id, isSystem });
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="bg-white dark:bg-slate-900 rounded-none min-h-[400px] flex items-center justify-center">
+                <Loader2 className="animate-spin text-accent" size={32} />
+            </div>
+        );
+    }
+
+    if (!accounts || accounts.length === 0) {
+        return (
+            <EmptyState
+                icon={Layers}
+                title="لا توجد حسابات مضافة"
+                description="لم يتم إعداد شجرة الحسابات بعد. يمكنك البدء بإضافة حسابات يدوياً أو إنشاء الدليل المحاسبي القياسي الموصى به."
+                action={
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <Button onClick={() => seedAccounts()} disabled={isSeeding} variant="success" isLoading={isSeeding} leftIcon={<ShieldCheck size={16} />}>
+                            إنشاء الدليل القياسي
+                        </Button>
+                        <Button onClick={handleAddNew} variant="secondary" leftIcon={<Plus size={16} />}>
+                            إضافة حساب يدوياً
+                        </Button>
+                    </div>
+                }
+            />
+        );
+    }
+
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-none min-h-[400px] flex items-center justify-center">
-        <Loader2 className="animate-spin text-accent" size={32} />
-      </div>
+        <div className="transition-colors duration-300">
+            <div className="flex justify-end gap-2 mb-2">
+                <Button onClick={() => setIsOpeningBalanceModalOpen(true)} variant="secondary" size="sm" leftIcon={<Scale size={12} />}>أرصدة افتتاحية</Button>
+                <Button onClick={handleAddNew} variant="primary" size="sm" leftIcon={<Plus size={12} />}>حساب جديد</Button>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-none border-2 border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-slate-800/80 border-b-2 border-gray-100 dark:border-slate-700">
+                        <tr className="text-[10px] font-black uppercase text-gray-500 dark:text-slate-400">
+                            <th className="p-2.5 text-right">اسم الحساب</th>
+                            <th className="p-2.5 text-right w-32">الرمز</th>
+                            <th className="p-2.5 text-right w-32">النوع</th>
+                            <th className="p-2.5 text-left w-48">الرصيد الإجمالي</th>
+                            <th className="p-2.5 text-center w-32">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {accountTree.map(node => (
+                            <AccountTreeRow
+                                key={node.id}
+                                node={node}
+                                level={0}
+                                onToggle={toggleNode}
+                                isExpanded={expandedNodes.has(node.id)}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                            />
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <AddAccountModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSubmit={handleCreate}
+                isSubmitting={isCreating}
+            />
+
+            <OpeningBalancesModal
+                isOpen={isOpeningBalanceModalOpen}
+                onClose={() => setIsOpeningBalanceModalOpen(false)}
+            />
+        </div>
     );
-  }
-
-  if (!accounts || accounts.length === 0) {
-      return (
-          <EmptyState 
-            icon={Layers}
-            title="لا توجد حسابات مضافة"
-            description="لم يتم إعداد شجرة الحسابات بعد. يمكنك البدء بإضافة حسابات يدوياً أو إنشاء الدليل المحاسبي القياسي الموصى به."
-            action={
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button onClick={() => seedAccounts()} disabled={isSeeding} variant="success" isLoading={isSeeding} leftIcon={<ShieldCheck size={16} />}>
-                    إنشاء الدليل القياسي
-                </Button>
-                <Button onClick={handleAddNew} variant="secondary" leftIcon={<Plus size={16} />}>
-                    إضافة حساب يدوياً
-                </Button>
-              </div>
-            }
-          />
-      );
-  }
-
-  return (
-    <div className="transition-colors duration-300">
-      <div className="flex justify-end gap-2 mb-2">
-         <Button onClick={() => setIsOpeningBalanceModalOpen(true)} variant="secondary" size="sm" leftIcon={<Scale size={12}/>}>أرصدة افتتاحية</Button>
-         <Button onClick={handleAddNew} variant="primary" size="sm" leftIcon={<Plus size={12}/>}>حساب جديد</Button>
-      </div>
-
-      <div className="bg-white dark:bg-slate-900 rounded-none border-2 border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
-        <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-slate-800/80 border-b-2 border-gray-100 dark:border-slate-700">
-                <tr className="text-[10px] font-black uppercase text-gray-500 dark:text-slate-400">
-                    <th className="p-2.5 text-right">اسم الحساب</th>
-                    <th className="p-2.5 text-right w-32">الرمز</th>
-                    <th className="p-2.5 text-right w-32">النوع</th>
-                    <th className="p-2.5 text-left w-48">الرصيد الإجمالي</th>
-                    <th className="p-2.5 text-center w-32">إجراءات</th>
-                </tr>
-            </thead>
-            <tbody>
-                {accountTree.map(node => (
-                    <AccountTreeRow 
-                        key={node.id} 
-                        node={node} 
-                        level={0} 
-                        onToggle={toggleNode} 
-                        isExpanded={expandedNodes.has(node.id)} 
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                    />
-                ))}
-            </tbody>
-        </table>
-      </div>
-
-      <AddAccountModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleCreate}
-        isSubmitting={isCreating}
-      />
-
-      <OpeningBalancesModal 
-        isOpen={isOpeningBalanceModalOpen}
-        onClose={() => setIsOpeningBalanceModalOpen(false)}
-      />
-    </div>
-  );
 };
 
 // ==========================================
@@ -238,7 +240,7 @@ function getTypeLabel(type: string) {
 }
 
 function getTypeColor(type: string) {
-    switch(type) {
+    switch (type) {
         case 'asset': return 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900';
         case 'liability': return 'bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-400 border-red-100 dark:border-red-900';
         case 'equity': return 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-900';

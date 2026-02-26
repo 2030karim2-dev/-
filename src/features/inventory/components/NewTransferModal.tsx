@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, ArrowLeftRight, Package, Search, Plus, Trash2, Database, AlertCircle, FileText } from 'lucide-react';
 import { useWarehouses, useInventoryMutations } from '../hooks/useInventoryManagement';
 import { useProducts } from '../hooks/useProducts';
+import { useFeedbackStore } from '../../../features/feedback/store';
 import Button from '../../../ui/base/Button';
 import Modal from '../../../ui/base/Modal';
 
@@ -13,6 +14,7 @@ interface NewTransferModalProps {
 const NewTransferModal: React.FC<NewTransferModalProps> = ({ isOpen, onClose }) => {
     const { data: warehouses } = useWarehouses();
     const { createTransfer, isTransferring } = useInventoryMutations();
+    const { showToast } = useFeedbackStore();
     const [productQuery, setProductQuery] = useState('');
     const { products } = useProducts(productQuery);
 
@@ -35,7 +37,7 @@ const NewTransferModal: React.FC<NewTransferModalProps> = ({ isOpen, onClose }) 
 
     const handleSubmit = () => {
         if (!fromWh || !toWh || selectedItems.length === 0 || fromWh === toWh) {
-            alert("يرجى التأكد من اختيار مستودعين مختلفين وإضافة أصناف.");
+            showToast("يرجى التأكد من اختيار مستودعين مختلفين وإضافة أصناف.", 'warning');
             return;
         }
         createTransfer({

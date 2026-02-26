@@ -54,7 +54,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                             {formatNumber(expenses)}
                         </span>
                     </div>
-                    <div className="pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
+                    <div className="pt-2 border-t border-[var(--app-border)]">
                         <div className="flex items-center justify-between gap-6">
                             <span className="text-xs text-blue-600 dark:text-blue-400 font-black">الصافي</span>
                             <span className={cn(
@@ -89,12 +89,12 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
     if (!data || data.length === 0) {
         return (
             <div className={cn(
-                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center justify-center h-64",
+                "bg-[var(--app-surface)] border border-[var(--app-border)] p-5 rounded-2xl flex items-center justify-center h-64",
                 className
             )}>
                 <div className="text-center">
-                    <Scale size={32} className="mx-auto text-slate-300 mb-2" />
-                    <p className="text-sm font-bold text-slate-400">لا توجد بيانات</p>
+                    <Scale size={32} className="mx-auto text-[var(--app-text-secondary)] mb-2" />
+                    <p className="text-sm font-bold text-[var(--app-text-secondary)]">لا توجد بيانات</p>
                 </div>
             </div>
         );
@@ -102,7 +102,7 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
 
     return (
         <div className={cn(
-            "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl",
+            "bg-[var(--app-surface)] border border-[var(--app-border)] p-5 rounded-2xl",
             className
         )}>
             {/* Header */}
@@ -115,7 +115,7 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
                         <h3 className="text-sm font-black text-[var(--app-text)]">
                             الإيرادات vs المصروفات
                         </h3>
-                        <p className="text-[9px] text-slate-400">مقارنة شهرية</p>
+                        <p className="text-[9px] text-[var(--app-text-secondary)]">مقارنة شهرية</p>
                     </div>
                 </div>
 
@@ -195,7 +195,7 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
                     ) : (
                         <TrendingDown size={16} className="text-rose-500" />
                     )}
-                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                    <span className="text-xs font-bold text-[var(--app-text-secondary)]">
                         صافي الربح
                     </span>
                 </div>

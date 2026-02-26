@@ -4,6 +4,7 @@ import LedgerView from '../reports/LedgerView';
 import TreasurySummaryStats from './TreasurySummaryStats';
 import TreasuryActions from './TreasuryActions';
 import EmptyState from '../../../../ui/base/EmptyState';
+import { useFeedbackStore } from '../../../../features/feedback/store';
 import { Wallet } from 'lucide-react';
 
 interface Props {
@@ -12,11 +13,12 @@ interface Props {
 
 const TreasuryView: React.FC<Props> = ({ dateRange }) => {
     const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+    const { showToast } = useFeedbackStore();
 
     const handleAction = (action: 'receipt' | 'payment' | 'transfer') => {
         // TODO: Open respective modals
         console.info('Action triggered:', action);
-        alert(`Coming soon: ${action} modal`);
+        showToast(`Coming soon: ${action} modal`, 'info');
     };
 
     const handlePrint = () => {

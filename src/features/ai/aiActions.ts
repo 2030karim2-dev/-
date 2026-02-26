@@ -123,8 +123,9 @@ export async function executeAIAction(action: AIAction, companyId: string, userI
             default:
                 return `⚠️ الإجراء "${action.action}" غير مدعوم حالياً`;
         }
-    } catch (error: any) {
-        return `❌ فشل تنفيذ الإجراء: ${error.message}`;
+    } catch (error: unknown) {
+        const err = error as Error;
+        return `❌ فشل تنفيذ الإجراء: ${err.message || 'خطأ غير معروف'}`;
     }
 }
 

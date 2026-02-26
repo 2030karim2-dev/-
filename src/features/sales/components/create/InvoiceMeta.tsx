@@ -55,6 +55,7 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
     const { currencies, rates } = useCurrencies();
 
     React.useEffect(() => {
+        // 1. Handle Exchange Rate
         if (currency === 'SAR') {
             setMetadata('exchangeRate', 1);
         } else if (rates.data) {
@@ -63,7 +64,24 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
                 setMetadata('exchangeRate', rateObj.rate_to_base);
             }
         }
-    }, [currency]);
+
+        // 2. Handle Auto-Treasury (Cashbox) Selection
+        if (paymentAccounts && paymentAccounts.length > 0) {
+            // Find account that matches currency code or contains currency name in Arabic
+            // For SAR: "سعودي" or "SAR"
+            // For YER: "يمني" or "YER"
+            const searchTerms = currency === 'SAR' ? ['SAR', 'سعودي', 'ريال سعودي'] : ['YER', 'يمني', 'ريال يمني'];
+
+            const matchingAccount = paymentAccounts.find(acc =>
+                acc.currency_code === currency ||
+                searchTerms.some(term => acc.name.toLowerCase().includes(term.toLowerCase()))
+            );
+
+            if (matchingAccount) {
+                setMetadata('cashboxId', matchingAccount.id);
+            }
+        }
+    }, [currency, paymentAccounts, rates.data]);
 
     const currencyObj = currencies.data?.find((c: any) => c.code === currency);
     const isDivide = currencyObj?.exchange_operator === 'divide';

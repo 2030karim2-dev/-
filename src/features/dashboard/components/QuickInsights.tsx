@@ -64,9 +64,9 @@ const QuickInsights: React.FC<QuickInsightsProps> = ({
             {/* Insights List */}
             {!hasInsights ? (
                 <div className="text-center py-6">
-                    <Lightbulb size={24} className="mx-auto text-slate-300 mb-2" />
-                    <p className="text-xs font-bold text-slate-400">لا توجد رؤى</p>
-                    <p className="text-[10px] text-slate-400 mt-1">أضف بيانات لمشاهدة التحليلات</p>
+                    <Lightbulb size={24} className="mx-auto text-[var(--app-text-secondary)] mb-2" />
+                    <p className="text-xs font-bold text-[var(--app-text-secondary)]">لا توجد رؤى</p>
+                    <p className="text-[10px] text-[var(--app-text-secondary)] mt-1">أضف بيانات لمشاهدة التحليلات</p>
                 </div>
             ) : (
                 <div className="space-y-2">
@@ -86,7 +86,7 @@ const QuickInsights: React.FC<QuickInsightsProps> = ({
                                     {insight.message}
                                 </p>
                                 {insight.detail && (
-                                    <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                                    <p className="text-[10px] font-medium text-[var(--app-text-secondary)] mt-0.5">
                                         {insight.detail}
                                     </p>
                                 )}
@@ -98,8 +98,8 @@ const QuickInsights: React.FC<QuickInsightsProps> = ({
 
             {/* Footer - Only show if there are insights */}
             {hasInsights && (
-                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <p className="text-[9px] text-slate-400 text-center font-medium">
+                <div className="mt-4 pt-3 border-t border-[var(--app-border)]">
+                    <p className="text-[9px] text-[var(--app-text-secondary)] text-center font-medium">
                         آخر تحديث: الآن
                     </p>
                 </div>

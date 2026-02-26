@@ -23,6 +23,7 @@ const PurchaseMeta: React.FC = () => {
     const { currencies, rates } = useCurrencies();
 
     React.useEffect(() => {
+        // 1. Handle Exchange Rate
         if (currency === 'SAR') {
             setMetadata('exchangeRate', 1);
         } else if (rates.data) {
@@ -31,7 +32,20 @@ const PurchaseMeta: React.FC = () => {
                 setMetadata('exchangeRate', rateObj.rate_to_base);
             }
         }
-    }, [currency]);
+
+        // 2. Handle Auto-Treasury (Cashbox) Selection
+        if (cashAccounts && cashAccounts.length > 0) {
+            const searchTerms = currency === 'SAR' ? ['SAR', 'سعودي', 'ريال سعودي'] : ['YER', 'يمني', 'ريال يمني'];
+            const matchingAccount = cashAccounts.find(acc =>
+                acc.currency_code === currency ||
+                searchTerms.some(term => acc.name.toLowerCase().includes(term.toLowerCase()))
+            );
+
+            if (matchingAccount) {
+                setMetadata('cashboxId', matchingAccount.id);
+            }
+        }
+    }, [currency, cashAccounts, rates.data]);
 
     const currencyObj = currencies.data?.find((c: any) => c.code === currency);
     const isDivide = currencyObj?.exchange_operator === 'divide';

@@ -113,7 +113,7 @@ const InvoiceListView: React.FC<InvoiceListViewProps> = ({ viewType, searchTerm,
 
     if (isLoading) return <PageLoader />;
 
-    if (error) return <ErrorDisplay error={error} onRetry={refetch} />;
+    if (error) return <ErrorDisplay error={error?.message || 'فشل في تحميل البيانات'} onRetry={refetch} />;
 
     if (!isLoading && filteredData.length === 0) {
         return <EmptyState title="لا توجد فواتير" description="لم يتم العثور على سجلات مطابقة لمعايير البحث." />;

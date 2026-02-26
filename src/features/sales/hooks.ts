@@ -59,7 +59,7 @@ export const useCreateInvoice = () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard_data'] });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       showToast(error.message || 'فشل في إصدار الفاتورة', 'error');
     }
   });

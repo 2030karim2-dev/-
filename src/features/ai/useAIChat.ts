@@ -91,8 +91,9 @@ export const useAIChat = (options: { enabled?: boolean } = {}) => {
             };
 
             setMessages(prev => [...prev, assistantMsg]);
-        } catch (e: any) {
-            setError(e.message || 'حدث خطأ في الاتصال بالذكاء الاصطناعي');
+        } catch (e: unknown) {
+            const error = e as Error;
+            setError(error.message || 'حدث خطأ في الاتصال بالذكاء الاصطناعي');
         } finally {
             setIsLoading(false);
         }

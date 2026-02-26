@@ -52,5 +52,28 @@ export const customersService = {
     const { data, error } = await customersApi.search(companyId, query);
     if (error) throw error;
     return data || [];
+  },
+
+  getOrCreateGeneralCustomer: async (companyId: string): Promise<Customer> => {
+    // 1. Try to find existing
+    const { data: searchResults, error: searchError } = await customersApi.search(companyId, 'الزبون العام');
+    if (searchError) throw searchError;
+
+    const existing = (searchResults || []).find((c: Customer) => c.name === 'الزبون العام');
+    if (existing) return existing;
+
+    // 2. Create if mismatch
+    const { data: created, error: createError } = await customersApi.createParty(companyId, {
+      name: 'الزبون العام',
+      phone: '',
+      email: '',
+      address: 'مشترك',
+      tax_number: '',
+      type: 'customer',
+      status: 'active'
+    });
+
+    if (createError) throw createError;
+    return created as Customer;
   }
 };

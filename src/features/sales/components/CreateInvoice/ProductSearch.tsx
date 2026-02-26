@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useTranslation } from '../../../../lib/hooks/useTranslation';
-import { useProductSearch } from '../../../sales/hooks/useProductSearch';
+import { useProductSearch, ProductSearchResult } from '../../../sales/hooks/useProductSearch';
 import { useAuthStore } from '../../../auth/store';
 import { CartItem } from '../../../sales/types';
 
@@ -26,7 +26,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onSelectProduct, onClose 
         enabled: !!user?.company_id && searchTerm.length >= 2,
     });
 
-    const handleSelect = (product: any) => {
+    const handleSelect = (product: ProductSearchResult) => {
         const cartItem: CartItem = {
             productId: product.id,
             name: product.name_ar,

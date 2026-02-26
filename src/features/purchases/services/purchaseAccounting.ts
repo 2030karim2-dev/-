@@ -132,10 +132,11 @@ export const purchaseAccountingService = {
             await journalService.createJournal(journalPayload, companyId, userId);
             console.info('✅ Cash payment entry created (Dr Supplier / Cr Cash) — supplier balance zeroed out');
 
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error as Error;
             console.error('❌ Error processing purchase accounting:', error);
             // Throw so the UI can notify the user — invoice saved but accounting failed
-            throw new Error(`تم حفظ الفاتورة لكن فشل إنشاء القيد المحاسبي: ${error.message || 'خطأ غير معروف'}. يرجى مراجعة القيود يدوياً.`);
+            throw new Error(`تم حفظ الفاتورة لكن فشل إنشاء القيد المحاسبي: ${err.message || 'خطأ غير معروف'}. يرجى مراجعة القيود يدوياً.`);
         }
     }
 };

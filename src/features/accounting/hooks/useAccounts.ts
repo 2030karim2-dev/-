@@ -47,8 +47,8 @@ export const useAccountMutations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
     },
-    onError: (err: any) => {
-      alert(err.message || 'لا يمكن حذف الحساب');
+    onError: (err: Error) => {
+      showToast(err.message || 'لا يمكن حذف الحساب', 'error');
     }
   });
 
@@ -61,7 +61,7 @@ export const useAccountMutations = () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       showToast("تمت إضافة حسابات الصرافة اليمنية بنجاح", 'success');
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       showToast(`فشل إضافة الحسابات: ${err.message}`, 'error');
     }
   });
@@ -75,7 +75,7 @@ export const useAccountMutations = () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       showToast("تم تقسيم صندوق الكاش للعملات بنجاح", 'success');
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       showToast(`فشل تقسيم الصندوق: ${err.message}`, 'error');
     }
   });
@@ -90,7 +90,7 @@ export const useAccountMutations = () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       showToast(data.message || "تم نقل الأرصدة السابقة بنجاح", 'success');
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       showToast(`فشل النقل: ${err.message}`, 'error');
     }
   });

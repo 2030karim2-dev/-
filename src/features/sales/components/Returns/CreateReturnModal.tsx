@@ -10,6 +10,7 @@ import Button from '../../../../ui/base/Button';
 import { cn } from '../../../../core/utils';
 import { AuthorizeActionUsecase } from '../../../../core/usecases/auth/AuthorizeActionUsecase';
 import { useAuthStore } from '../../../auth/store';
+import { useFeedbackStore } from '../../../feedback/store';
 
 interface Props {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface Props {
 
 const CreateReturnModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
   const { user } = useAuthStore();
+  const { showToast } = useFeedbackStore();
   const { mutate: createInvoice, isPending: isSaving } = useCreateInvoice();
 
   const [customerQuery, setCustomerQuery] = useState('');
@@ -66,8 +68,9 @@ const CreateReturnModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
         paymentMethod: 'cash',
       };
       createInvoice(finalData, { onSuccess });
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      const err = e as Error;
+      showToast(err.message, 'error');
     }
   };
 

@@ -192,7 +192,7 @@ const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
                 {/* Header */}
                 <div className="flex justify-between items-start">
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1.5 flex items-center gap-2">
+                    <span className="text-[10px] font-black text-[var(--app-text-secondary)] uppercase tracking-widest leading-none mb-1.5 flex items-center gap-2">
                       {item.title}
                     </span>
                     {item.subtitle && (

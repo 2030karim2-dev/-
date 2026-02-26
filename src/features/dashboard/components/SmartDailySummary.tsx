@@ -32,8 +32,9 @@ const SmartDailySummary: React.FC = () => {
             );
 
             setSummary(result);
-        } catch (e: any) {
-            setSummary('⚠️ تعذر إنشاء الملخص — تحقق من اتصال الذكاء الاصطناعي');
+        } catch (e: unknown) {
+            const error = e as Error;
+            setSummary('⚠️ تعذر إنشاء الملخص — تحقق من اتصال الذكاء الاصطناعي: ' + (error?.message || ''));
         } finally {
             setIsLoading(false);
         }
@@ -60,7 +61,7 @@ const SmartDailySummary: React.FC = () => {
                         {summary && (
                             <button
                                 onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(summary)}`, '_blank')}
-                                className="p-2 text-slate-400 hover:text-emerald-400 hover:bg-white/10 rounded-xl transition-all"
+                                className="p-2 text-[var(--app-text-secondary)] hover:text-emerald-400 hover:bg-white/10 rounded-xl transition-all"
                                 title="إرسال عبر واتساب"
                             >
                                 <Share2 size={14} />
@@ -78,7 +79,7 @@ const SmartDailySummary: React.FC = () => {
                 </div>
 
                 {summary ? (
-                    <div className="text-[13px] text-slate-300 leading-relaxed whitespace-pre-wrap font-medium">
+                    <div className="text-[13px] text-[var(--app-text-secondary)] leading-relaxed whitespace-pre-wrap font-medium">
                         {summary}
                     </div>
                 ) : (

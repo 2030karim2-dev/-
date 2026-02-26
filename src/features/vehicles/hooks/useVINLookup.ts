@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../../lib/supabaseClient';
 import { inventoryApi } from '../../inventory/api';
 import { useAuthStore } from '../../auth/store';
+import { useFeedbackStore } from '../../feedback/store';
 import { PartEntry } from '../types';
 import { decodeVinBasic } from '../constants';
 
@@ -18,6 +19,7 @@ export const useVINLookup = () => {
     const [savingStates, setSavingStates] = useState<Record<string, boolean>>({});
 
     const { user } = useAuthStore();
+    const { showToast } = useFeedbackStore();
     const companyId = user?.company_id;
     const queryClient = useQueryClient();
 
@@ -131,9 +133,10 @@ export const useVINLookup = () => {
             queryClient.invalidateQueries({ queryKey: ['vehicles'] });
 
             setParts(prev => prev.filter(p => p.id !== part.id));
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const e = err as Error;
             console.error('Error saving part:', err);
-            alert('خطأ في الحفظ: ' + (err?.message || 'غير معروف'));
+            showToast('خطأ في الحفظ: ' + (e?.message || 'غير معروف'), 'error');
         } finally {
             setSavingStates(prev => ({ ...prev, [part.id]: false }));
         }

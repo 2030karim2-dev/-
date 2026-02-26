@@ -23,33 +23,38 @@ export const dashboardService = {
         .select('id, total_amount, issue_date, status, type, party_id, currency_code, exchange_rate, parties:party_id(name)')
         .eq('company_id', companyId)
         .neq('status', 'void')
-        .order('issue_date', { ascending: true }),
+        .order('issue_date', { ascending: false })
+        .limit(5000),
       // 2. المصروفات
       supabase
         .from('expenses')
         .select('id, amount, expense_date, description, status, category_id, currency_code, exchange_rate, expense_categories(name)')
         .eq('company_id', companyId)
-        .neq('status', 'void'),
+        .neq('status', 'void')
+        .order('expense_date', { ascending: false })
+        .limit(5000),
       // 3. العملاء
       supabase
         .from('parties')
         .select('id, name, balance, type')
         .eq('company_id', companyId)
         .eq('type', 'customer')
-        .is('deleted_at', null),
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false })
+        .limit(2000),
       // 4. الموردين
       supabase
         .from('parties')
         .select('id, name, balance, type')
         .eq('company_id', companyId)
         .eq('type', 'supplier')
-        .is('deleted_at', null),
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false })
+        .limit(2000),
       // 5. السندات
       supabase
         .from('journal_entries')
-        .select<`*,
-          journal_entry_lines(debit_amount, credit_amount)
-        `>(`
+        .select(`
           id,
           entry_date,
           reference_type,
@@ -57,20 +62,22 @@ export const dashboardService = {
         `)
         .eq('company_id', companyId)
         .in('reference_type', ['receipt_bond', 'payment_bond'])
-        .eq('status', 'posted') as any,
+        .eq('status', 'posted')
+        .order('entry_date', { ascending: false })
+        .limit(5000) as any,
       // 6. المنتجات مع المخزون
       supabase
         .from('products')
-        .select<`*,
-          product_stock(quantity, warehouse_id)
-        `>(`
+        .select(`
           id,
           name_ar,
           min_stock_level,
           product_stock(quantity, warehouse_id)
         `)
         .eq('company_id', companyId)
-        .eq('status', 'active') as any,
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(3000) as any,
       // 7. أصناف المصروفات
       supabase
         .from('expense_categories')
@@ -79,10 +86,7 @@ export const dashboardService = {
       // 8. عناصر الفواتير
       supabase
         .from('invoice_items')
-        .select<`*,
-          product_id(name_ar),
-          invoices:invoice_id!inner(company_id, type, status)
-        `>(`
+        .select(`
           product_id,
           quantity,
           total,
@@ -91,7 +95,8 @@ export const dashboardService = {
         `)
         .eq('invoices.company_id', companyId)
         .eq('invoices.type', 'sale')
-        .neq('invoices.status', 'void') as any,
+        .neq('invoices.status', 'void')
+        .limit(5000) as any,
     ]);
 
     // التحقق من الأخطاء

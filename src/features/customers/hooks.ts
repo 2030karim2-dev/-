@@ -100,7 +100,7 @@ export const useCustomerMutations = () => {
       queryClient.invalidateQueries({ queryKey: ['customer_categories'] });
       showToast('تم حفظ بيانات العميل وتحديث السجلات بنجاح', 'success');
     },
-    onError: (err: any) => showToast("خطأ في حفظ البيانات: " + err.message, 'error', err)
+    onError: (err: Error) => showToast("خطأ في حفظ البيانات: " + err.message, 'error', err)
   });
 
   const deleteCustomer = useMutation({
@@ -113,7 +113,7 @@ export const useCustomerMutations = () => {
       queryClient.invalidateQueries({ queryKey: ['customer_categories'] });
       showToast('تم حذف السجل نهائياً من قاعدة البيانات', 'success');
     },
-    onError: (err: any) => showToast(err.message, 'error', err)
+    onError: (err: Error) => showToast(err.message, 'error', err)
   });
 
   return { saveCustomer: saveCustomer.mutate, deleteCustomer: deleteCustomer.mutate, isSaving: saveCustomer.isPending };

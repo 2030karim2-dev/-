@@ -141,7 +141,7 @@ const FinancialHealthScore: React.FC<FinancialHealthProps> = ({
                                 <div className="flex items-center justify-between mb-1">
                                     <div className="flex items-center gap-1">
                                         <f.icon size={10} className={f.color} />
-                                        <span className="text-[9px] font-bold text-slate-400">{f.label}</span>
+                                        <span className="text-[9px] font-bold text-[var(--app-text-secondary)]">{f.label}</span>
                                     </div>
                                     <span className="text-[10px] font-black text-[var(--app-text)] font-mono">{Math.round(f.score)}<span className="text-[var(--app-text-secondary)]">/{f.max}</span></span>
                                 </div>

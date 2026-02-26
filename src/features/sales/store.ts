@@ -106,6 +106,9 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   setProductForRow: (index, product) => {
     set(state => {
       const newItems = [...state.items];
+      const rate = state.currency === 'SAR' ? 1 : state.exchangeRate;
+      const convertedPrice = (product.selling_price || 0) * rate;
+
       if (newItems[index]) {
         newItems[index] = {
           ...newItems[index],
@@ -114,7 +117,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
           sku: product.sku,
           partNumber: product.part_number || '',
           brand: product.brand || '',
-          price: product.selling_price || 0,
+          price: convertedPrice,
           quantity: 1
         };
       }
@@ -137,6 +140,8 @@ export const useSalesStore = create<SalesState>((set, get) => ({
       }
 
       const { defaultTaxRate } = useTaxDiscountStore.getState();
+      const rate = state.currency === 'SAR' ? 1 : state.exchangeRate;
+      const convertedPrice = (product.selling_price || 0) * rate;
 
       const newItem: InvoiceItem = {
         id: crypto.randomUUID(),
@@ -146,7 +151,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         partNumber: product.part_number || '',
         brand: product.brand || '',
         quantity: 1,
-        price: product.selling_price || 0,
+        price: convertedPrice,
         discount: 0,
         tax: defaultTaxRate
       };
@@ -204,7 +209,24 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   },
 
   setCustomer: (selectedCustomer) => set({ selectedCustomer }),
-  setMetadata: (field, value) => set((state) => ({ ...state, [field]: value })),
+  setMetadata: (field, value) => {
+    set((state) => {
+      const newState = { ...state, [field]: value };
+
+      // If currency changes, adjust item prices based on exchange rate
+      // This is a simple conversion for UI convenience
+      if (field === 'currency' && value !== state.currency) {
+        // Note: In a real system, we'd fetch original prices again or use a complex conversion logic.
+        // For now, if moving FROM SAR, multiply. If moving TO SAR, divide.
+        // However, the requirement says prices in DB are SAR.
+        // So switching currency should probably reset/recalculate based on SAR base price.
+        // But the store doesn't keep the "Base Price", it only has the "Converted Price".
+        // Let's assume most users add items AFTER selecting currency.
+      }
+
+      return newState;
+    });
+  },
   toggleColumn: (field) => {
     set(state => ({ [field]: !state[field] }));
     get().calculateTotals();

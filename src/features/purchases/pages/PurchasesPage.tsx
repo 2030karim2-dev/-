@@ -16,6 +16,7 @@ import { usePurchaseStore } from '../store';
 import { purchaseAccountingService } from '../services/purchaseAccounting';
 import { purchaseFixesService } from '../services/maintenance/purchaseFixes';
 import { useAuthStore } from '../../auth/store';
+import { useFeedbackStore } from '../../feedback/store';
 
 const PurchasesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'create' | 'list' | 'returns' | 'analytics' | 'smart_import'>('list');
@@ -26,6 +27,7 @@ const PurchasesPage: React.FC = () => {
   const [isRepairing, setIsRepairing] = useState(false);
   const { t } = useTranslation();
   const { user } = useAuthStore();
+  const { showToast } = useFeedbackStore();
 
   const { data: allPurchases, isLoading } = usePurchases();
 
@@ -68,9 +70,10 @@ const PurchasesPage: React.FC = () => {
     setIsRepairing(true);
     try {
       const result = await purchaseFixesService.fixMissingCashPayments(user.company_id, user.id);
-      alert(`✅ ${result.message}`);
-    } catch (err: any) {
-      alert(`❌ خطأ في التصحيح: ${err.message}`);
+      showToast(result.message, 'success');
+    } catch (err: unknown) {
+      const e = err as Error;
+      showToast(`❌ خطأ في التصحيح: ${e.message}`, 'error');
     } finally {
       setIsRepairing(false);
     }
@@ -86,9 +89,10 @@ const PurchasesPage: React.FC = () => {
           setIsRepairing(true);
           try {
             const result = await purchaseFixesService.removeDuplicatePurchaseEntries(user.company_id);
-            alert(result.message);
-          } catch (e: any) {
-            alert('Error: ' + e.message);
+            showToast(result.message, 'success');
+          } catch (e: unknown) {
+            const err = e as Error;
+            showToast(`Error: ${err.message}`, 'error');
           } finally {
             setIsRepairing(false);
           }

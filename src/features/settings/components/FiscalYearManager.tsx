@@ -4,6 +4,7 @@ import { Calendar, Plus, Lock, ShieldAlert } from 'lucide-react';
 import { useFiscalYears, useFiscalYearMutations } from '../hooks';
 import { useAuthStore } from '../../auth/store';
 import { AuthorizeActionUsecase } from '../../../core/usecases/auth/AuthorizeActionUsecase';
+import { useFeedbackStore } from '../../feedback/store';
 import MicroListItem from '../../../ui/common/MicroListItem';
 import Button from '../../../ui/base/Button';
 import FiscalYearModal from './financial/FiscalYearModal';
@@ -12,20 +13,22 @@ const FiscalYearManager: React.FC = () => {
   const { data: years, isLoading } = useFiscalYears();
   const { addFiscalYear, closeFiscalYear, isAdding } = useFiscalYearMutations();
   const { user } = useAuthStore();
+  const { showToast } = useFeedbackStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAdd = (data: any) => {
     addFiscalYear(data, { onSuccess: () => setIsModalOpen(false) });
   };
-  
+
   const handleClose = (id: string) => {
     try {
       AuthorizeActionUsecase.requireAdmin(user as any);
       if (window.confirm('تحذير: إغلاق السنة المالية عملية لا يمكن التراجع عنها. هل تريد المتابعة؟')) {
         closeFiscalYear(id);
       }
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const err = error as Error;
+      showToast(err.message || 'فشل إغلاق السنة المالية', 'error');
     }
   };
 
@@ -35,7 +38,7 @@ const FiscalYearManager: React.FC = () => {
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden p-4 space-y-3">
       <div className="flex justify-between items-center px-1">
         <h3 className="text-sm font-black text-gray-700 dark:text-slate-300">السنوات المالية</h3>
-        <Button onClick={() => setIsModalOpen(true)} size="sm" leftIcon={<Plus size={12}/>}>سنة جديدة</Button>
+        <Button onClick={() => setIsModalOpen(true)} size="sm" leftIcon={<Plus size={12} />}>سنة جديدة</Button>
       </div>
 
       <div className="space-y-2">

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { X, ShieldCheck, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import { formatCurrency } from '../../../core/utils';
 import { useAuditJournals } from '../hooks/useReports';
+import { useFeedbackStore } from '../../../features/feedback/store';
 
 interface AuditResult {
     id: string;
@@ -21,6 +22,7 @@ interface Props {
 export const AuditModal: React.FC<Props> = ({ onClose }) => {
     const [isAuditing, setIsAuditing] = useState(false);
     const { data: entries, isLoading, error: fetchError } = useAuditJournals(isAuditing);
+    const { showToast } = useFeedbackStore();
 
     const [results, setResults] = useState<AuditResult[]>([]);
     const [summary, setSummary] = useState({ total: 0, unbalanced: 0, errors: 0 });
@@ -30,7 +32,8 @@ export const AuditModal: React.FC<Props> = ({ onClose }) => {
 
         if (fetchError) {
             console.error('Audit failed:', fetchError);
-            alert('Audit Failed: ' + (fetchError as any).message);
+            const err = fetchError as Error;
+            showToast('Audit Failed: ' + err.message, 'error');
             setIsAuditing(false);
             return;
         }

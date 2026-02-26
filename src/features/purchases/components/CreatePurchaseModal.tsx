@@ -4,6 +4,8 @@ import { usePurchaseStore } from '../store';
 import { useTaxDiscountStore } from '../../settings/taxDiscountStore';
 import { useCreatePurchase } from '../hooks';
 import { useCompany } from '../../settings/hooks';
+import { useSettingsStore } from '../../settings/settingsStore';
+import { useFeedbackStore } from '../../feedback/store';
 import InvoiceHeader from '../../sales/components/create/InvoiceHeader';
 import PurchaseMeta from './create/PurchaseMeta';
 import InteractivePurchaseTable from './create/InteractivePurchaseTable';
@@ -17,12 +19,26 @@ interface Props {
 
 const CreatePurchaseModal: React.FC<Props> = ({ onSuccess }) => {
   const { data: company } = useCompany();
-  const { items, supplier, totals, resetCart, initializeItems, invoiceNumber, issueDate, invoiceType, cashboxId, currency, exchangeRate } = usePurchaseStore();
+  const {
+    items, supplier, totals, resetCart, initializeItems,
+    invoiceNumber, issueDate, invoiceType, cashboxId, currency, exchangeRate,
+    setMetadata
+  } = usePurchaseStore();
   const { mutate: createPurchase, isPending } = useCreatePurchase();
+  const { invoice: invoiceSettings } = useSettingsStore();
+  const { showToast } = useFeedbackStore();
 
   useEffect(() => {
     initializeItems(6);
-  }, [initializeItems]);
+
+    // Apply defaults from settings
+    if (invoiceSettings.default_currency) {
+      setMetadata('currency', invoiceSettings.default_currency);
+    }
+    if (invoiceSettings.default_invoice_type) {
+      setMetadata('invoiceType', invoiceSettings.default_invoice_type);
+    }
+  }, [initializeItems, invoiceSettings]);
 
   const handleSave = () => {
     const validItems = items.filter(i => i.productId && i.quantity > 0);
@@ -30,7 +46,7 @@ const CreatePurchaseModal: React.FC<Props> = ({ onSuccess }) => {
 
     // Validate: Cash purchases require a real cashbox account
     if (invoiceType === 'cash' && !cashboxId) {
-      alert('يرجى اختيار الصندوق / البنك للفاتورة النقدية');
+      showToast('يرجى اختيار الصندوق / البنك للفاتورة النقدية', 'warning');
       return;
     }
 

@@ -7,6 +7,7 @@ import { usePurchaseDetails } from '../hooks';
 import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
 import { useReactToPrint } from 'react-to-print';
 import { useAuth } from '../../../features/auth';
+import { useFeedbackStore } from '../../../features/feedback/store';
 import PurchaseInvoicePrintTemplate from './PurchaseInvoicePrintTemplate';
 interface PurchaseDetailsModalProps {
     invoiceId: string | null;
@@ -16,6 +17,7 @@ interface PurchaseDetailsModalProps {
 const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, onClose }) => {
     const { data: invoice, isLoading } = usePurchaseDetails(invoiceId);
     const { user } = useAuth();
+    const { showToast } = useFeedbackStore();
     const printRef = useRef<HTMLDivElement>(null);
 
 
@@ -99,7 +101,7 @@ const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, 
                     <button
                         onClick={async () => {
                             if (!user) {
-                                alert('Please login first to use debug features');
+                                showToast('Please login first to use debug features', 'warning');
                                 return;
                             }
                             try {
@@ -120,9 +122,10 @@ const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, 
                                     user.id,
                                     invoice.total_amount
                                 );
-                                alert('Accounting Run Successfully! Check Ledger.');
-                            } catch (err: any) {
-                                alert('Error: ' + err.message);
+                                showToast('Accounting Run Successfully! Check Ledger.', 'success');
+                            } catch (err: unknown) {
+                                const e = err as Error;
+                                showToast(`Error: ${e.message}`, 'error');
                                 console.error(err);
                             }
                         }}

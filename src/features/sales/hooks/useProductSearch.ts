@@ -3,7 +3,7 @@
 // Hook for searching products
 // ============================================
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { inventoryApi } from '../../inventory/api';
 
@@ -13,7 +13,7 @@ interface UseProductSearchOptions {
     enabled?: boolean;
 }
 
-interface ProductSearchResult {
+export interface ProductSearchResult {
     id: string;
     name_ar: string;
     sku: string;
@@ -22,6 +22,7 @@ interface ProductSearchResult {
     quantity: number;
     category?: string;
     alternative_numbers?: string;
+    is_core?: boolean;
 }
 
 export const useProductSearch = (searchTerm: string, options?: UseProductSearchOptions) => {
@@ -29,14 +30,14 @@ export const useProductSearch = (searchTerm: string, options?: UseProductSearchO
 
     const [debouncedTerm, setDebouncedTerm] = useState(searchTerm);
 
-    // Debounce the search term
-    useState(() => {
+    // Debounce the search term using useEffect
+    useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedTerm(searchTerm);
         }, debounceMs);
 
         return () => clearTimeout(timer);
-    });
+    }, [searchTerm, debounceMs]);
 
     const queryKey = useMemo(() =>
         ['product_search', companyId, debouncedTerm] as const,

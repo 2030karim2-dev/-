@@ -90,9 +90,10 @@ export const documentAiService = {
         supplierName: result.supplierName || ''
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as Error;
       console.error("AI Parsing Error:", error);
-      throw new Error("فشل في تحليل المستند. يرجى التأكد من وضوح الصورة.");
+      throw new Error(`فشل في تحليل المستند: ${err.message}. يرجى التأكد من وضوح الصورة.`);
     }
   }
 };

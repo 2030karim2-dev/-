@@ -24,6 +24,8 @@ export interface InvoiceSettings {
     default_notes_en: string;
     default_terms_ar: string;
     default_terms_en: string;
+    default_currency: string;
+    default_invoice_type: 'cash' | 'credit';
 }
 
 export const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
@@ -44,4 +46,6 @@ export const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
     default_notes_en: '',
     default_terms_ar: '',
     default_terms_en: '',
+    default_currency: 'YER',
+    default_invoice_type: 'cash',
 };

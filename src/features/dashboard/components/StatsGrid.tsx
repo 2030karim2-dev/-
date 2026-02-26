@@ -20,7 +20,7 @@ const StatsGrid: React.FC = () => {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
                 {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="h-32 bg-slate-100 dark:bg-slate-800 rounded-3xl"></div>
+                    <div key={i} className="h-32 bg-[var(--app-surface-hover)] rounded-3xl"></div>
                 ))}
             </div>
         );

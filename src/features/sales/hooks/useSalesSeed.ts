@@ -61,7 +61,7 @@ export const useSalesSeed = () => {
             queryClient.invalidateQueries({ queryKey: ['invoices'] });
             queryClient.invalidateQueries({ queryKey: ['sales'] });
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
             showToast(error.message || 'فشل في إضافة البيانات', 'error');
         },
     });
