@@ -80,7 +80,9 @@ export const purchasesApi = {
       })),
       p_notes: data.notes,
       p_currency: data.currency || 'SAR',
-      p_exchange_rate: rate
+      p_exchange_rate: rate,
+      p_reference_invoice_id: data.referenceInvoiceId || null,
+      p_return_reason: data.returnReason || null
     };
 
     const { data: result, error } = await supabase.rpc('commit_purchase_return', rpcParams as any);
@@ -106,5 +108,34 @@ export const purchasesApi = {
       p_exchange_rate: paymentData.exchangeRate || 1,
       p_foreign_amount: paymentData.foreignAmount || paymentData.amount
     } as any);
+  },
+
+  // Get purchase invoices that can be used for returns
+  getPurchaseInvoicesForReturn: async (companyId: string, supplierId: string | null) => {
+    let query = (supabase.from('invoices') as any)
+      .select(`
+        id,
+        invoice_number,
+        issue_date,
+        total_amount,
+        status,
+        type,
+        payment_method,
+        currency_code,
+        exchange_rate,
+        party:party_id(name),
+        invoice_items(id)
+      `)
+      .eq('company_id', companyId)
+      .eq('type', 'purchase')
+      .eq('status', 'posted')
+      .is('deleted_at', null)
+      .order('issue_date', { ascending: false });
+
+    if (supplierId) {
+      query = query.eq('party_id', supplierId);
+    }
+
+    return await query;
   }
 };

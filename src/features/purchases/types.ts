@@ -30,6 +30,9 @@ export interface CreatePurchaseDTO {
   cashAccountId?: string;
   currency?: string;
   exchangeRate?: number;
+  // Return-specific fields
+  referenceInvoiceId?: string | null;
+  returnReason?: string | null;
 }
 
 export interface CreatePaymentDTO {

@@ -5,6 +5,7 @@ import { generateZatcaBase64 } from '../../../core/utils/zatca';
 import QRCode from 'qrcode';
 import { useInvoiceSettings, usePrintSettings } from '../../settings/settingsStore';
 import { useI18nStore } from '@/lib/i18nStore';
+import { useCompany } from '../../settings/hooks';
 
 // Helper to ensure we always have a minimum number of rows for layout purposes
 const padItems = (items: any[], minRows: number) => {
@@ -16,22 +17,54 @@ const padItems = (items: any[], minRows: number) => {
 };
 
 const PrintableInvoice = ({ invoice }: { invoice: any }) => {
-    const { company, invoice_number, issue_date, party_name, items, total_amount, tax_amount, issuedBy } = invoice;
-    const displayItems = padItems(items.filter((i: any) => i.name), 8);
-    const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
-
-    // Get settings
+    const { company: invoiceCompany, invoice_number, issue_date, party_name, items, total_amount, tax_amount, issuedBy } = invoice;
+    const { data: settingsCompany, isLoading: isCompanyLoading } = useCompany();
     const invoiceSettings = useInvoiceSettings();
     const printSettings = usePrintSettings();
     const { lang } = useI18nStore();
     const isArabic = lang === 'ar';
 
+    // Header State
+    const [header, setHeader] = useState({
+        nameAr: '',
+        nameEn: '',
+        address: '',
+        taxNumber: '',
+        specialization: '',
+        phone: '',
+        email: '',
+        headerText: '',
+        titleAr: 'فاتورة ضريبية',
+        titleEn: 'Tax Invoice'
+    });
+
+    // Effect to initialize header from settings and profile
     useEffect(() => {
-        if (company && invoice) {
-            // ZATCA TLV Encoding
+        const c = settingsCompany || invoiceCompany || {};
+
+        setHeader(prev => ({
+            ...prev,
+            // Settings take high priority, then profile data
+            nameAr: invoiceSettings.company_name_ar || c.name || c.name_ar || prev.nameAr || 'اسم المنشأة',
+            nameEn: invoiceSettings.company_name_en || c.english_name || c.name_en || prev.nameEn || 'Company Name',
+            address: invoiceSettings.company_address || c.address || prev.address || 'المملكة العربية السعودية',
+            taxNumber: c.tax_number || prev.taxNumber || '300000000000003',
+            specialization: invoiceSettings.company_specialization || prev.specialization,
+            phone: invoiceSettings.company_phone || prev.phone,
+            email: invoiceSettings.company_email || prev.email,
+            headerText: invoiceSettings.invoice_header_text || prev.headerText
+        }));
+    }, [settingsCompany, invoiceCompany, invoiceSettings]);
+
+    const displayItems = padItems(items.filter((i: any) => i.name), 8);
+    const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
+
+    useEffect(() => {
+        if (invoice) {
+            // ZATCA TLV Encoding using header state
             const base64TLV = generateZatcaBase64(
-                company.name || 'Al-Zahra',
-                company.tax_number || '300000000000003', // Demo VAT if missing
+                header.nameAr || 'Al-Zahra',
+                header.taxNumber || '300000000000003', // Demo VAT if missing
                 new Date(issue_date).toISOString(),
                 total_amount.toString(),
                 tax_amount.toString()
@@ -41,7 +74,7 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                 .then(url => setQrCodeDataUrl(url))
                 .catch(err => console.error("QR Gen Error", err));
         }
-    }, [invoice, company, issue_date, tax_amount, total_amount]);
+    }, [invoice, header.nameAr, header.taxNumber, issue_date, tax_amount, total_amount]);
 
     return (
         <div id="invoice-printable-content" className="printable-area bg-white text-black font-sans">
@@ -82,22 +115,127 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
         .totals-row.final { border-bottom: none; background: #f3f3f3; font-weight: 900; font-size: 16px; border-top: 1px solid #000; }
         .qr-section { margin-top: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
         .terms { font-size: 10px; color: #666; max-width: 60%; }
+        .editable-field:hover { background: #f0f7ff; cursor: text; border-radius: 4px; }
+        .edit-hint { 
+            background: #eff6ff; 
+            border: 1px solid #dbeafe; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            font-size: 11px; 
+            color: #1e40af; 
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
       `}</style>
 
             <div className="invoice-box" dir="rtl">
+                {/* Visual Hint - Screen Only */}
+                <div className="edit-hint no-print">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                    نصيحة: يمكنك النقر على أي نص في الترويسة (الاسم، العنوان، الرقم الضريبي، مسمى الفاتورة) لتعديله مباشرة قبل الطباعة.
+                </div>
+
                 <div className="inv-header">
                     <div className="text-right">
-                        <h1 className="inv-title">{company?.name}</h1>
-                        <p className="inv-subtitle">{company?.address}</p>
-                        <p className="inv-subtitle">الرقم الضريبي: <span dir="ltr">{company?.tax_number}</span></p>
+                        <h1
+                            className="inv-title editable-field outline-none"
+                            contentEditable
+                            suppressContentEditableWarning
+                            onBlur={(e) => setHeader(prev => ({ ...prev, nameAr: e.currentTarget.textContent || '' }))}
+                        >
+                            {header.nameAr || 'اسم الشركة'}
+                        </h1>
+                        <p
+                            className="text-xs font-bold editable-field outline-none text-blue-600 dark:text-blue-400"
+                            contentEditable
+                            suppressContentEditableWarning
+                            onBlur={(e) => setHeader(prev => ({ ...prev, specialization: e.currentTarget.textContent || '' }))}
+                        >
+                            {header.specialization}
+                        </p>
+                        <p
+                            className="inv-subtitle editable-field outline-none"
+                            contentEditable
+                            suppressContentEditableWarning
+                            onBlur={(e) => setHeader(prev => ({ ...prev, address: e.currentTarget.textContent || '' }))}
+                        >
+                            {header.address || 'العنوان غير مسجل'}
+                        </p>
+                        <div className="flex gap-4 text-[10px] font-bold text-gray-500">
+                            <span
+                                className="editable-field outline-none"
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => setHeader(prev => ({ ...prev, phone: e.currentTarget.textContent || '' }))}
+                            >
+                                {header.phone && `هاتف: ${header.phone}`}
+                            </span>
+                            <span
+                                className="editable-field outline-none"
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => setHeader(prev => ({ ...prev, email: e.currentTarget.textContent || '' }))}
+                            >
+                                {header.email && `إيميل: ${header.email}`}
+                            </span>
+                        </div>
+                        <p className="inv-subtitle">
+                            الرقم الضريبي:
+                            <span
+                                dir="ltr"
+                                className="editable-field outline-none px-1"
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => setHeader(prev => ({ ...prev, taxNumber: e.currentTarget.textContent || '' }))}
+                            >
+                                {header.taxNumber || '-'}
+                            </span>
+                        </p>
                     </div>
                     <div className="inv-logo-area">
+                        {header.headerText && (
+                            <p
+                                className="text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest editable-field"
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => setHeader(prev => ({ ...prev, headerText: e.currentTarget.textContent || '' }))}
+                            >
+                                {header.headerText}
+                            </p>
+                        )}
                         {qrCodeDataUrl && <img src={qrCodeDataUrl} alt="ZATCA QR" style={{ width: '110px', height: '110px' }} />}
                     </div>
                     <div className="text-left" dir="ltr">
-                        <h1 className="inv-title">{company?.english_name || 'Al-Zahra Auto'}</h1>
-                        <p className="inv-subtitle">Tax Invoice</p>
-                        <p className="inv-subtitle">VAT ID: {company?.tax_number}</p>
+                        <h1
+                            className="inv-title editable-field outline-none"
+                            contentEditable
+                            suppressContentEditableWarning
+                            onBlur={(e) => setHeader(prev => ({ ...prev, nameEn: e.currentTarget.textContent || '' }))}
+                        >
+                            {header.nameEn || 'Company Name'}
+                        </h1>
+                        <p
+                            className="inv-subtitle editable-field outline-none"
+                            contentEditable
+                            suppressContentEditableWarning
+                            onBlur={(e) => setHeader(prev => ({ ...prev, titleEn: e.currentTarget.textContent || '' }))}
+                        >
+                            {header.titleEn}
+                        </p>
+                        <p className="inv-subtitle">
+                            VAT ID:
+                            <span
+                                className="editable-field outline-none px-1"
+                                contentEditable
+                                suppressContentEditableWarning
+                                onBlur={(e) => setHeader(prev => ({ ...prev, taxNumber: e.currentTarget.textContent || '' }))}
+                            >
+                                {header.taxNumber || '-'}
+                            </span>
+                        </p>
                     </div>
                 </div>
 
@@ -129,8 +267,8 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                                 <td>{item.name ? i + 1 : ''}</td>
                                 <td className="desc">{item.name}</td>
                                 <td>{item.quantity}</td>
-                                <td>{item.price ? formatCurrency(item.price) : ''}</td>
-                                <td>{item.price ? formatCurrency(Number(item.price) * Number(item.quantity)) : ''}</td>
+                                <td>{item.price ? formatCurrency(item.price, invoice.currency_code || 'SAR') : ''}</td>
+                                <td>{item.price ? formatCurrency(Number(item.price) * Number(item.quantity), invoice.currency_code || 'SAR') : ''}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -140,15 +278,15 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                     <div className="totals-box">
                         <div className="totals-row">
                             <span>المجموع الخاضع للضريبة</span>
-                            <span dir="ltr">{formatCurrency(total_amount - tax_amount)}</span>
+                            <span dir="ltr">{formatCurrency(total_amount - (tax_amount || 0), invoice.currency_code || 'SAR')}</span>
                         </div>
                         <div className="totals-row">
                             <span>ضريبة القيمة المضافة (15%)</span>
-                            <span dir="ltr">{formatCurrency(tax_amount)}</span>
+                            <span dir="ltr">{formatCurrency(tax_amount || 0, invoice.currency_code || 'SAR')}</span>
                         </div>
                         <div className="totals-row final">
                             <span>الإجمالي المستحق</span>
-                            <span dir="ltr">{formatCurrency(total_amount)}</span>
+                            <span dir="ltr">{formatCurrency(total_amount, invoice.currency_code || 'SAR')}</span>
                         </div>
                     </div>
                 </div>

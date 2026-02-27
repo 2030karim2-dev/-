@@ -25,7 +25,18 @@ export const QUERY_CONFIG = {
 
     // Refetch on reconnect
     REFETCH_ON_RECONNECT: true,
+
+    // Timeout for queries
+    DEFAULT_QUERY_TIMEOUT: 15000, // 15 seconds
+
+    // Retry only on network errors
+    RETRY_ON_SERVER_ERROR: false,
+    RETRY_ON_CLIENT_ERROR: false,
 } as const;
+
+// ------------------------------------------
+// Query Keys
+// ------------------------------------------
 
 // ------------------------------------------
 // Query Keys
@@ -163,8 +174,8 @@ export const ReactQueryProvider: React.FC<ReactQueryProviderProps> = ({
     const [queryClient] = useState(() => client ?? createQueryClient());
 
     return (
-        <QueryClientProvider client= { queryClient } >
-        { children }
+        <QueryClientProvider client={queryClient} >
+            {children}
         </QueryClientProvider>
     );
 };

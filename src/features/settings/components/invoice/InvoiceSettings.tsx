@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Hash, Eye, MessageSquare, Save, CheckCircle, Settings2, Image, Printer, CreditCard, Layout, ReceiptText } from 'lucide-react';
+import { FileText, Hash, Eye, MessageSquare, Save, CheckCircle, Settings2, Image, Printer, CreditCard, Layout, ReceiptText, Building } from 'lucide-react';
 import { cn } from '../../../../core/utils';
 import { SettingToggle } from '../shared/SettingToggle';
 import { SettingSection } from '../shared/SettingSection';
@@ -204,7 +204,26 @@ export const InvoiceSettings: React.FC = () => {
                     </div>
                 </SettingSection>
 
-                {/* ═══════════════════════════ 4. الملاحظات والشروط ═══════════════════════════ */}
+                {/* ═══════════════════════════ 4. بيانات ترويسة الفاتورة ═══════════════════════════ */}
+                <SettingSection icon={<Building size={16} />} title="بيانات ترويسة الفاتورة" subtitle="المعلومات التي تظهر في أعلى الفاتورة المطبوعة" color="bg-blue-600 shadow-blue-500/20">
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <SettingField label="اسم الشركة (بالعربية)" value={invoice.company_name_ar} onChange={v => handleUpdate({ company_name_ar: v })} placeholder="شركة الزهراء لقطع الغيار" />
+                            <SettingField label="اسم الشركة (بالانجليزية)" value={invoice.company_name_en} onChange={v => handleUpdate({ company_name_en: v })} placeholder="Al Zahra Auto Parts" dir="ltr" />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <SettingField label="تخصص الشركة / النشاط" value={invoice.company_specialization} onChange={v => handleUpdate({ company_specialization: v })} placeholder="بيع قطع غيار السيارات وزيوت" />
+                            <SettingField label="نص الترويسة الإضافي" value={invoice.invoice_header_text} onChange={v => handleUpdate({ invoice_header_text: v })} placeholder="فاتورة ضريبية مبسطة" />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <SettingField label="رقم الهاتف" value={invoice.company_phone} onChange={v => handleUpdate({ company_phone: v })} placeholder="77XXXXXXX" dir="ltr" />
+                            <SettingField label="البريد الإلكتروني" value={invoice.company_email} onChange={v => handleUpdate({ company_email: v })} placeholder="info@example.com" dir="ltr" />
+                        </div>
+                        <SettingField label="العنوان التفصيلي" value={invoice.company_address} onChange={v => handleUpdate({ company_address: v })} placeholder="صنعاء - شارع الستين" />
+                    </div>
+                </SettingSection>
+
+                {/* ═══════════════════════════ 5. الملاحظات والشروط ═══════════════════════════ */}
                 <SettingSection icon={<MessageSquare size={16} />} title="الملاحظات والشروط" subtitle="نصوص افتراضية تُضاف تلقائياً للفواتير" color="bg-amber-500 shadow-amber-500/20" defaultOpen={false}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>

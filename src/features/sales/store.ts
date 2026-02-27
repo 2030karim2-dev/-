@@ -15,7 +15,8 @@ export interface SalesCartItem {
   partNumber?: string;    // OEM part number - matches purchases
   brand?: string;        // Brand/manufacturer - matches purchases
   quantity: number;
-  price: number;
+  basePrice: number; // Price in SAR (base currency)
+  price: number;     // Converted price based on current exchange rate
   discount: number;
   tax: number;
 }
@@ -37,6 +38,7 @@ interface SalesState {
   invoiceType: 'cash' | 'credit';
   currency: string;
   exchangeRate: number;
+  exchangeOperator: 'multiply' | 'divide';
   warehouseId: string;
   cashboxId: string;
 
@@ -66,6 +68,7 @@ const createNewItem = (): InvoiceItem => ({
   partNumber: '',
   brand: '',
   quantity: 0,
+  basePrice: 0,
   price: 0,
   discount: 0,
   tax: 0,
@@ -78,6 +81,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   invoiceType: 'cash',
   currency: 'SAR',
   exchangeRate: 1,
+  exchangeOperator: 'multiply',
   warehouseId: 'wh_main',
   cashboxId: 'box_1',
   showTax: false,
@@ -106,8 +110,10 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   setProductForRow: (index, product) => {
     set(state => {
       const newItems = [...state.items];
-      const rate = state.currency === 'SAR' ? 1 : state.exchangeRate;
-      const convertedPrice = (product.selling_price || 0) * rate;
+      const basePrice = product.selling_price || 0;
+      const convertedPrice = state.exchangeOperator === 'divide'
+        ? basePrice * state.exchangeRate
+        : basePrice / state.exchangeRate;
 
       if (newItems[index]) {
         newItems[index] = {
@@ -117,6 +123,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
           sku: product.sku,
           partNumber: product.part_number || '',
           brand: product.brand || '',
+          basePrice: basePrice,
           price: convertedPrice,
           quantity: 1
         };
@@ -139,9 +146,11 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         };
       }
 
-      const { defaultTaxRate } = useTaxDiscountStore.getState();
-      const rate = state.currency === 'SAR' ? 1 : state.exchangeRate;
-      const convertedPrice = (product.selling_price || 0) * rate;
+      const { taxEnabled, defaultTaxRate } = useTaxDiscountStore.getState();
+      const basePrice = product.selling_price || 0;
+      const convertedPrice = state.exchangeOperator === 'divide'
+        ? basePrice * state.exchangeRate
+        : basePrice / state.exchangeRate;
 
       const newItem: InvoiceItem = {
         id: crypto.randomUUID(),
@@ -151,9 +160,10 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         partNumber: product.part_number || '',
         brand: product.brand || '',
         quantity: 1,
+        basePrice: basePrice,
         price: convertedPrice,
         discount: 0,
-        tax: defaultTaxRate
+        tax: taxEnabled ? defaultTaxRate : 0
       };
 
       return { items: [newItem, ...state.items] };
@@ -209,24 +219,28 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   },
 
   setCustomer: (selectedCustomer) => set({ selectedCustomer }),
+
   setMetadata: (field, value) => {
     set((state) => {
       const newState = { ...state, [field]: value };
 
-      // If currency changes, adjust item prices based on exchange rate
-      // This is a simple conversion for UI convenience
-      if (field === 'currency' && value !== state.currency) {
-        // Note: In a real system, we'd fetch original prices again or use a complex conversion logic.
-        // For now, if moving FROM SAR, multiply. If moving TO SAR, divide.
-        // However, the requirement says prices in DB are SAR.
-        // So switching currency should probably reset/recalculate based on SAR base price.
-        // But the store doesn't keep the "Base Price", it only has the "Converted Price".
-        // Let's assume most users add items AFTER selecting currency.
+      // Re-calculate all prices if currency or rate or operator changes
+      if (['currency', 'exchangeRate', 'exchangeOperator'].includes(field as string)) {
+        const rate = (newState.currency === 'SAR') ? 1 : newState.exchangeRate;
+        const op = (newState.currency === 'SAR') ? 'multiply' : newState.exchangeOperator;
+
+        newState.items = newState.items.map(item => {
+          if (!item.productId) return item;
+          const newPrice = op === 'divide' ? item.basePrice * rate : item.basePrice / rate;
+          return { ...item, price: newPrice };
+        });
       }
 
       return newState;
     });
+    get().calculateTotals();
   },
+
   toggleColumn: (field) => {
     set(state => ({ [field]: !state[field] }));
     get().calculateTotals();
@@ -238,6 +252,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
     summary: { subtotal: 0, taxAmount: 0, discountAmount: 0, totalAmount: 0 },
     invoiceType: 'cash',
     currency: 'SAR',
-    exchangeRate: 1
+    exchangeRate: 1,
+    exchangeOperator: 'multiply'
   })
 }));

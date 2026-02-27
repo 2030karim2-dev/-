@@ -17,6 +17,8 @@ import { purchaseAccountingService } from '../services/purchaseAccounting';
 import { purchaseFixesService } from '../services/maintenance/purchaseFixes';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
+import PurchaseReturnsView from '../components/Returns/PurchaseReturnsView';
+import CreatePurchaseReturnModal from '../components/Returns/CreatePurchaseReturnModal';
 
 const PurchasesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'create' | 'list' | 'returns' | 'analytics' | 'smart_import'>('list');
@@ -25,6 +27,10 @@ const PurchasesPage: React.FC = () => {
   const [viewInvoiceId, setViewInvoiceId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isRepairing, setIsRepairing] = useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [returnItems, setReturnItems] = useState<any[]>([]);
+  const [returnSupplierInfo, setReturnSupplierInfo] = useState<{ partyId: string; partyName: string } | null>(null);
+  const [returnInvoiceNumber, setReturnInvoiceNumber] = useState<string>('');
   const { t } = useTranslation();
   const { user } = useAuthStore();
   const { showToast } = useFeedbackStore();
@@ -148,8 +154,9 @@ const PurchasesPage: React.FC = () => {
       case 'smart_import':
         return <SmartImportView mode="invoice" onConfirm={handleSmartImportConfirm} />;
       case 'list':
-      case 'returns':
         return <PurchasesTable data={filteredData} isLoading={isLoading} onView={setViewInvoiceId} />;
+      case 'returns':
+        return <PurchaseReturnsView searchTerm={searchTerm} onViewDetails={setViewInvoiceId} />;
       case 'analytics':
         return <PurchasesAnalytics />;
       default:
@@ -181,9 +188,46 @@ const PurchasesPage: React.FC = () => {
         </div>
       </div>
 
-      <PurchaseDetailsModal invoiceId={viewInvoiceId} onClose={() => setViewInvoiceId(null)} />
+      <PurchaseDetailsModal
+        invoiceId={viewInvoiceId}
+        onClose={() => setViewInvoiceId(null)}
+        onReturn={(invoiceId, items) => {
+          // Get supplier info from the invoice
+          const invoice = allPurchases?.find((p: any) => p.id === invoiceId);
+          if (invoice) {
+            setReturnItems(items);
+            setReturnSupplierInfo({
+              partyId: invoice.party_id,
+              partyName: invoice.party?.name || ''
+            });
+            setReturnInvoiceNumber(invoice.invoice_number);
+            setIsReturnModalOpen(true);
+          }
+        }}
+      />
       <CreatePaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} />
       {isAuditOpen && <AuditModal onClose={() => setIsAuditOpen(false)} />}
+      {isReturnModalOpen && (
+        <CreatePurchaseReturnModal
+          isOpen={isReturnModalOpen}
+          onClose={() => {
+            setIsReturnModalOpen(false);
+            setReturnItems([]);
+            setReturnSupplierInfo(null);
+            setReturnInvoiceNumber('');
+          }}
+          onSuccess={() => {
+            setIsReturnModalOpen(false);
+            setReturnItems([]);
+            setReturnSupplierInfo(null);
+            setReturnInvoiceNumber('');
+            setActiveTab('returns');
+          }}
+          preloadedItems={returnItems}
+          supplierInfo={returnSupplierInfo || undefined}
+          originalInvoiceNumber={returnInvoiceNumber}
+        />
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart3, Scale, Users, RefreshCw, PieChart, Landmark, Wallet, History, FileText, Activity, BrainCircuit, Package } from 'lucide-react';
+import { BarChart3, Scale, Users, RefreshCw, PieChart, Landmark, Wallet, History, FileText, Activity, BrainCircuit, Package, RotateCcw } from 'lucide-react';
 import MicroHeader from '../../ui/base/MicroHeader';
 import { ReportTab } from './types';
 import DebtReportView from './components/DebtReportView';
@@ -11,6 +11,7 @@ import InventoryMovementView from './components/InventoryMovementView';
 import TaxReportView from './components/TaxReportView';
 import AIInsightsView from './components/AIInsightsView';
 import DeadStockReport from './components/DeadStockReport';
+import ReturnsReportView from './components/ReturnsReportView';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 
 const ReportsPage: React.FC = () => {
@@ -19,6 +20,7 @@ const ReportsPage: React.FC = () => {
 
   const tabs: { id: ReportTab; label: string; icon: any }[] = [
     { id: 'ai_insights', label: t('ai_auditor'), icon: BrainCircuit },
+    { id: 'returns_report', label: 'تقرير المرتجعات', icon: RotateCcw },
     { id: 'tax_report', label: t('tax_center'), icon: FileText },
     { id: 'dead_stock', label: 'المخزون الراكد', icon: Package },
     { id: 'trial_balance', label: t('trial_balance'), icon: Scale },
@@ -32,6 +34,7 @@ const ReportsPage: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'ai_insights': return <AIInsightsView />;
+      case 'returns_report': return <ReturnsReportView />;
       case 'tax_report': return <TaxReportView />;
       case 'dead_stock': return <DeadStockReport />;
       case 'debt_report': return <DebtReportView />;

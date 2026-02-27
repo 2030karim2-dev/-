@@ -108,6 +108,8 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
     party_name: selectedCustomer?.name || 'عميل نقدي',
     items: items.filter(i => i.name),
     total_amount: summary.totalAmount,
+    tax_amount: summary.taxAmount,
+    currency_code: currency || 'SAR',
   };
 
   if (companyLoading || numberLoading) return <PageLoader />;

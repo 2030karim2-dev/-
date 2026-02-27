@@ -55,7 +55,9 @@ export const salesApi = {
       p_items: payload.items.map(i => ({ product_id: i.productId, quantity: i.quantity, unit_price: i.unitPrice })),
       p_notes: payload.notes,
       p_currency: payload.currency || 'SAR',
-      p_exchange_rate: payload.exchangeRate || 1
+      p_exchange_rate: payload.exchangeRate || 1,
+      p_reference_invoice_id: payload.referenceInvoiceId || null,
+      p_return_reason: payload.returnReason || null
     };
 
     const { data, error } = await supabase.rpc('commit_sale_return', rpcParams as never);

@@ -6,7 +6,7 @@ import { formatCurrency, cn } from '../../../../core/utils';
 import { Wallet } from 'lucide-react';
 
 const InvoiceTotals: React.FC = () => {
-    const { summary } = useSalesStore();
+    const { summary, currency } = useSalesStore();
 
     return (
         <div className="p-2 md:p-3 bg-white dark:bg-slate-900 border-t-2 border-gray-100 dark:border-slate-800">
@@ -23,18 +23,18 @@ const InvoiceTotals: React.FC = () => {
                     <div className={cn("grid", (useTaxDiscountStore.getState().taxEnabled || useTaxDiscountStore.getState().discountEnabled) ? "grid-cols-2" : "grid-cols-1")}>
                         <div className="p-3 border-b dark:border-slate-800 text-right">
                             <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block">المجموع الفرعي</span>
-                            <span dir="ltr" className="text-sm font-black font-mono text-gray-700 dark:text-slate-300">{formatCurrency(summary.subtotal)}</span>
+                            <span dir="ltr" className="text-sm font-black font-mono text-gray-700 dark:text-slate-300">{formatCurrency(summary.subtotal, currency)}</span>
                         </div>
                         {useTaxDiscountStore.getState().discountEnabled && (
                             <div className="p-3 border-b border-l dark:border-slate-800 text-right">
                                 <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block">إجمالي الخصم</span>
-                                <span dir="ltr" className="text-sm font-black font-mono text-rose-500">{formatCurrency(summary.discountAmount)}</span>
+                                <span dir="ltr" className="text-sm font-black font-mono text-rose-500">{formatCurrency(summary.discountAmount, currency)}</span>
                             </div>
                         )}
                         {useTaxDiscountStore.getState().taxEnabled && (
                             <div className="p-3 border-b border-l dark:border-slate-800 text-right">
                                 <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block">الضريبة ({useTaxDiscountStore.getState().defaultTaxRate}%)</span>
-                                <span dir="ltr" className="text-sm font-black font-mono text-emerald-600">{formatCurrency(summary.taxAmount)}</span>
+                                <span dir="ltr" className="text-sm font-black font-mono text-emerald-600">{formatCurrency(summary.taxAmount, currency)}</span>
                             </div>
                         )}
                     </div>
@@ -43,7 +43,7 @@ const InvoiceTotals: React.FC = () => {
                         <div className="relative z-10">
                             <span className="text-[9px] font-black text-blue-400 uppercase tracking-[0.2em] block mb-1">صافي الفاتورة</span>
                             <h2 dir="ltr" className="text-4xl font-black font-mono tracking-tighter group-hover:scale-105 transition-transform duration-500 leading-none">
-                                {formatCurrency(summary.totalAmount)}
+                                {formatCurrency(summary.totalAmount, currency)}
                             </h2>
                         </div>
                         <div className="relative z-10 p-3 bg-blue-600 rounded-none shadow-lg shadow-blue-500/40">

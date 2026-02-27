@@ -19,15 +19,18 @@ export const useSystemInitialization = () => {
   const { showToast } = useFeedbackStore();
   const localizationSettings = useLocalizationSettings();
 
-  // 1. Initialize Auth & Language
+  // 1. Initialize Auth & Language once on mount
   useEffect(() => {
     initialize();
     initializeLang();
-    // Apply localization settings from settings store
+  }, [initialize, initializeLang]);
+
+  // 2. Apply localization settings when they change
+  useEffect(() => {
     if (localizationSettings?.default_language) {
       setLang(localizationSettings.default_language);
     }
-  }, [initialize, initializeLang, setLang, localizationSettings?.default_language]);
+  }, [localizationSettings?.default_language, setLang]);
 
   // 2. Smart Notifications & Health Check
   useEffect(() => {

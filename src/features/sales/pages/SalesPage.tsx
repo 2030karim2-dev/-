@@ -6,6 +6,7 @@ import InvoiceListView from '../components/list/InvoiceListView';
 import SalesReturnsView from '../components/Returns/SalesReturnsView';
 import SalesAnalyticsView from '../components/Analytics/SalesAnalyticsView';
 import InvoiceDetailsModal from '../components/details/InvoiceDetailsModal';
+import CreateReturnModal from '../components/Returns/CreateReturnModal';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 
 type SalesViewTab = 'create' | 'list' | 'returns' | 'analytics';
@@ -13,6 +14,9 @@ type SalesViewTab = 'create' | 'list' | 'returns' | 'analytics';
 const SalesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SalesViewTab>('list');
   const [viewInvoiceId, setViewInvoiceId] = useState<string | null>(null);
+  const [returnItems, setReturnItems] = useState<any[]>([]);
+  const [preloadInvoiceId, setPreloadInvoiceId] = useState<string>('');
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const { t } = useTranslation();
 
@@ -22,6 +26,19 @@ const SalesPage: React.FC = () => {
     { id: 'returns' as const, label: t('returns'), icon: RefreshCw },
     { id: 'analytics' as const, label: t('analytics'), icon: BarChart3 },
   ];
+
+  const handleReturn = (invoiceId: string, items: any[]) => {
+    setReturnItems(items);
+    setPreloadInvoiceId(invoiceId);
+    setIsReturnModalOpen(true);
+  };
+
+  const handleReturnSuccess = () => {
+    setIsReturnModalOpen(false);
+    setReturnItems([]);
+    setPreloadInvoiceId('');
+    setViewInvoiceId(null);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -66,6 +83,14 @@ const SalesPage: React.FC = () => {
       <InvoiceDetailsModal
         invoiceId={viewInvoiceId}
         onClose={() => setViewInvoiceId(null)}
+        onReturn={handleReturn}
+      />
+      <CreateReturnModal
+        isOpen={isReturnModalOpen}
+        onClose={() => setIsReturnModalOpen(false)}
+        onSuccess={handleReturnSuccess}
+        preloadedItems={returnItems}
+        preloadInvoiceId={preloadInvoiceId}
       />
     </div>
   );

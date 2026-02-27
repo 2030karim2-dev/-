@@ -5,6 +5,8 @@ import { CreatePurchaseDTO } from './types';
 import { purchaseAccountingService } from './services/purchaseAccounting';
 import { messagingService } from '../notifications/messagingService';
 
+export { purchasesApi };
+
 export const purchasesService = {
   getPurchases: async (companyId: string) => {
     const { data, error } = await purchasesApi.getPurchases(companyId);
@@ -130,5 +132,37 @@ export const purchasesService = {
       .slice(0, 5);
 
     return { topSuppliers, chartData };
+  },
+
+  // Get purchase returns for the returns view
+  getPurchaseReturns: async (companyId: string) => {
+    const { data, error } = await purchasesApi.getPurchases(companyId);
+    if (error) throw error;
+    const returns = (data as any[])?.filter(p => p.type === 'return_purchase') || [];
+    return returns;
+  },
+
+  // Get purchase returns statistics
+  getPurchaseReturnsStats: async (companyId: string) => {
+    const { data, error } = await purchasesApi.getPurchases(companyId);
+    if (error) {
+      console.error('[PurchaseReturnsStats] Error:', error);
+      throw error;
+    }
+    const returns = (data as any[])?.filter(p => p.type === 'return_purchase') || [];
+
+    // تحويل المبلغ للعملة الأساسية
+    const toBase = (inv: any): number => {
+      const amount = Number(inv.total_amount) || 0;
+      const rate = Number(inv.exchange_rate) || 1;
+      if (!inv.currency_code || inv.currency_code === 'SAR') return amount;
+      return amount * rate;
+    };
+
+    const totalReturns = returns.reduce((sum, r) => sum + toBase(r), 0);
+    return {
+      returnCount: returns.length,
+      totalReturns
+    };
   }
 };

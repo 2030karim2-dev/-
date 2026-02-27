@@ -33,9 +33,17 @@ const MetaBlock: React.FC<MetaBlockProps> = ({ label, value, icon: Icon, isSelec
             <select
                 value={value}
                 onChange={(e) => onChange(field, e.target.value)}
-                className="bg-transparent text-[11px] font-black outline-none appearance-none cursor-pointer text-gray-800 dark:text-slate-100 text-right w-full"
+                className="bg-transparent text-[11px] font-black outline-none cursor-pointer text-gray-800 dark:text-slate-100 text-right w-full py-0.5"
             >
-                {options.map((opt) => <option key={opt.id} value={opt.id}>{opt.label}</option>)}
+                {options.map((opt) => (
+                    <option
+                        key={opt.id}
+                        value={opt.id}
+                        className="bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-100"
+                    >
+                        {opt.label}
+                    </option>
+                ))}
             </select>
         ) : (
             <span className="text-sm font-black text-gray-800 dark:text-slate-100 font-mono leading-none">
@@ -47,31 +55,37 @@ const MetaBlock: React.FC<MetaBlockProps> = ({ label, value, icon: Icon, isSelec
 
 const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
     const {
-        invoiceType, currency, exchangeRate, warehouseId, cashboxId,
+        invoiceType, currency, exchangeRate, exchangeOperator, warehouseId, cashboxId,
         setMetadata
     } = useSalesStore();
     const { data: paymentAccounts } = usePaymentAccounts();
     const { data: warehouses } = useWarehouses();
     const { currencies, rates } = useCurrencies();
+    const prevCurrency = React.useRef(currency);
 
     React.useEffect(() => {
-        // 1. Handle Exchange Rate
-        if (currency === 'SAR') {
-            setMetadata('exchangeRate', 1);
-        } else if (rates.data) {
-            const rateObj = rates.data.find((r: any) => r.currency_code === currency);
-            if (rateObj) {
-                setMetadata('exchangeRate', rateObj.rate_to_base);
+        const currencyChanged = prevCurrency.current !== currency;
+
+        // 1. Handle Exchange Rate Sync (Only on currency change or initial load)
+        if (currencyChanged && rates.data) {
+            if (currency === 'SAR') {
+                setMetadata('exchangeRate', 1);
+                setMetadata('exchangeOperator', 'multiply');
+            } else {
+                const rateObj = rates.data.find((r: any) => r.currency_code === currency);
+                if (rateObj) {
+                    setMetadata('exchangeRate', rateObj.rate_to_base);
+                    const currencyConfig = currencies.data?.find((c: any) => c.code === currency);
+                    if (currencyConfig) {
+                        setMetadata('exchangeOperator', currencyConfig.exchange_operator);
+                    }
+                }
             }
         }
 
-        // 2. Handle Auto-Treasury (Cashbox) Selection
-        if (paymentAccounts && paymentAccounts.length > 0) {
-            // Find account that matches currency code or contains currency name in Arabic
-            // For SAR: "سعودي" or "SAR"
-            // For YER: "يمني" or "YER"
+        // 2. Handle Auto-Treasury (Cashbox) Selection (Only on currency change)
+        if (currencyChanged && paymentAccounts && paymentAccounts.length > 0) {
             const searchTerms = currency === 'SAR' ? ['SAR', 'سعودي', 'ريال سعودي'] : ['YER', 'يمني', 'ريال يمني'];
-
             const matchingAccount = paymentAccounts.find(acc =>
                 acc.currency_code === currency ||
                 searchTerms.some(term => acc.name.toLowerCase().includes(term.toLowerCase()))
@@ -81,7 +95,19 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
                 setMetadata('cashboxId', matchingAccount.id);
             }
         }
-    }, [currency, paymentAccounts, rates.data]);
+
+        // 3. Handle Auto-Warehouse Selection (Once on load or when at default)
+        if (warehouses && warehouses.length > 0 && (warehouseId === 'wh_main' || !warehouseId)) {
+            const castWarehouses = warehouses as any[];
+            const primary = castWarehouses.find((w: any) => w.is_primary);
+            const target = primary || castWarehouses[0];
+            if (target && warehouseId !== target.id) {
+                setMetadata('warehouseId', target.id);
+            }
+        }
+
+        prevCurrency.current = currency;
+    }, [currency, paymentAccounts, rates.data, warehouses, warehouseId, setMetadata]);
 
     const currencyObj = currencies.data?.find((c: any) => c.code === currency);
     const isDivide = currencyObj?.exchange_operator === 'divide';
@@ -112,17 +138,17 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
                             <div className="flex items-center gap-1.5 mb-1.5">
                                 <Coins size={12} className="text-amber-500" />
                                 <span className="text-[9px] font-black text-gray-500 dark:text-slate-400 uppercase tracking-widest">
-                                    سعر الصرف {isDivide ? '(القسمة ÷)' : '(الضرب ×)'}
+                                    سعر الصرف {exchangeOperator === 'divide' ? '(القسمة ÷)' : '(الضرب ×)'}
                                 </span>
                             </div>
                             <input
                                 type="number"
                                 step="0.00001"
-                                value={exchangeRate ? (isDivide ? parseFloat((1 / exchangeRate).toFixed(5)) : exchangeRate) : ''}
+                                value={exchangeRate || ''}
                                 onChange={(e) => {
                                     const val = parseFloat(e.target.value);
                                     if (!val) return;
-                                    setMetadata('exchangeRate', isDivide ? (1 / val) : val);
+                                    setMetadata('exchangeRate', val);
                                 }}
                                 className="bg-transparent text-sm font-black text-amber-600 dark:text-amber-400 font-mono outline-none w-full"
                             />
@@ -132,7 +158,7 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
                         options={paymentAccounts?.map(a => ({ id: a.id, label: a.name })) || []}
                         onChange={setMetadata} />
                     <MetaBlock label="الفرع / المخزن" field="warehouseId" value={warehouseId} icon={Warehouse} isSelect
-                        options={warehouses?.map((w: any) => ({ id: w.id, label: w.name })) || [{ id: 'wh_main', label: 'المستودع الرئيسي' }]}
+                        options={warehouses?.map((w: any) => ({ id: w.id, label: w.name_ar })) || [{ id: 'wh_main', label: 'المستودع الرئيسي' }]}
                         onChange={setMetadata} />
                 </div>
             </div>

@@ -14,3 +14,6 @@ export {
 export { useProductSearch } from './useProductSearch';
 export { useSalesAnalytics } from './useSalesAnalytics';
 export { useSalesSeed } from './useSalesSeed';
+
+// Sales Returns
+export { useSalesReturns, useSalesReturnsStats, useCreateSalesReturn, useSalesInvoicesForReturn } from './useSalesReturns';

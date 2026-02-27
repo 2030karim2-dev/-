@@ -1,24 +1,31 @@
 
-import React, { useRef } from 'react';
-import { X, Calendar, User, FileText, Printer, Download, Loader2, Package, ShieldCheck, Phone, MapPin, Building2, Wallet, Share2 } from 'lucide-react';
+import React, { useRef, useState, useMemo } from 'react';
+import { X, Calendar, User, FileText, Printer, Download, Loader2, Package, ShieldCheck, Phone, MapPin, Building2, Wallet, Share2, RotateCcw, AlertTriangle, CheckCircle, Clock, DollarSign, Maximize2, Minimize2, Expand, Shrink } from 'lucide-react';
 import ShareButton from '../../../ui/common/ShareButton';
 import { formatCurrency as shareFmtCur } from '../../../core/utils';
 import { usePurchaseDetails } from '../hooks';
-import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
+import { formatCurrency, formatNumberDisplay, cn } from '../../../core/utils';
 import { useReactToPrint } from 'react-to-print';
 import { useAuth } from '../../../features/auth';
 import { useFeedbackStore } from '../../../features/feedback/store';
 import PurchaseInvoicePrintTemplate from './PurchaseInvoicePrintTemplate';
+
 interface PurchaseDetailsModalProps {
     invoiceId: string | null;
     onClose: () => void;
+    onReturn?: (invoiceId: string, items: any[]) => void;
 }
 
-const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, onClose }) => {
+const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, onClose, onReturn }) => {
     const { data: invoice, isLoading } = usePurchaseDetails(invoiceId);
     const { user } = useAuth();
     const { showToast } = useFeedbackStore();
     const printRef = useRef<HTMLDivElement>(null);
+    const [isResizable, setIsResizable] = useState(true);
+    const [modalSize, setModalSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | 'full'>('3xl');
+    const [showReturnSection, setShowReturnSection] = useState(false);
+    const [returnItems, setReturnItems] = useState<{ [key: string]: number }>({});
+    const [showAlert, setShowAlert] = useState<{ type: 'success' | 'warning' | 'error'; message: string } | null>(null);
 
 
     const handlePrint = useReactToPrint({
@@ -27,17 +34,82 @@ const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, 
         onAfterPrint: () => console.info('Print success'),
     });
 
+    // Size controls
+    const sizeOrder: Array<'lg' | 'xl' | '2xl' | '3xl' | 'full'> = ['lg', 'xl', '2xl', '3xl', 'full'];
+    const sizeClasses: Record<string, string> = {
+        lg: 'max-w-lg',
+        xl: 'max-w-xl',
+        '2xl': 'max-w-2xl',
+        '3xl': 'max-w-5xl',
+        full: 'max-w-[98vw]'
+    };
+
+    const handleIncreaseSize = () => {
+        const currentIndex = sizeOrder.indexOf(modalSize);
+        if (currentIndex < sizeOrder.length - 1) setModalSize(sizeOrder[currentIndex + 1]);
+    };
+
+    const handleDecreaseSize = () => {
+        const currentIndex = sizeOrder.indexOf(modalSize);
+        if (currentIndex > 0) setModalSize(sizeOrder[currentIndex - 1]);
+    };
+
+    const toggleFullscreen = () => setModalSize(prev => prev === 'full' ? '3xl' : 'full');
+
+    // Payment info
+    const paymentInfo = useMemo(() => {
+        if (!invoice) return null;
+        const paidAmount = invoice.payments?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0;
+        const remainingAmount = invoice.total_amount - paidAmount;
+        return { total: invoice.total_amount, paid: paidAmount, remaining: remainingAmount };
+    }, [invoice]);
+
+    // Return handlers
+    const updateReturnQuantity = (itemId: string, qty: number) => {
+        const item = invoice?.invoice_items?.find((i: any) => i.id === itemId);
+        const maxQty = item?.quantity || 0;
+        setReturnItems(prev => ({ ...prev, [itemId]: Math.min(Math.max(0, qty), maxQty) }));
+    };
+
+    const totalReturnAmount = useMemo(() => {
+        if (!invoice) return 0;
+        return Object.entries(returnItems).reduce((sum, [itemId, qty]) => {
+            const item = invoice.invoice_items?.find((i: any) => i.id === itemId);
+            return sum + (item?.unit_price || 0) * qty;
+        }, 0);
+    }, [returnItems, invoice]);
+
+    const handleReturnSubmit = () => {
+        if (!invoice || !onReturn) return;
+        const itemsToReturn = Object.entries(returnItems)
+            .filter(([_, qty]) => qty > 0)
+            .map(([itemId, qty]) => {
+                const item = invoice.invoice_items?.find((i: any) => i.id === itemId);
+                return { ...item, quantity: qty, returnQuantity: qty, unitPrice: item?.unit_price || 0, total: (item?.unit_price || 0) * qty };
+            });
+        if (itemsToReturn.length === 0) {
+            setShowAlert({ type: 'warning', message: 'يرجى اختيار أصناف للإرجاع' });
+            setTimeout(() => setShowAlert(null), 3000);
+            return;
+        }
+        onReturn(invoice.id, itemsToReturn);
+    };
+
     if (!invoiceId) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 overflow-y-auto animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl w-full max-w-5xl my-auto flex flex-col max-h-[90vh] border border-gray-100 dark:border-slate-800 transition-colors">
+            <div className={cn(
+                "bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl w-full my-auto flex flex-col max-h-[90vh] border border-gray-100 dark:border-slate-800 transition-all duration-300",
+                sizeClasses[modalSize],
+                modalSize === 'full' && 'max-h-[98vh]'
+            )}>
 
                 {/* Header Actions - No Print */}
                 <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-t-[2rem] sticky top-0 z-10">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-blue-600 rounded-xl text-white shadow-lg shadow-blue-500/30">
-                            <FileText size={24} />
+                            <Building2 size={24} />
                         </div>
                         <div>
                             <h2 className="text-xl font-black text-gray-800 dark:text-slate-100 uppercase tracking-tight">تفاصيل فاتورة الشراء</h2>
@@ -50,6 +122,16 @@ const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, 
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
+                        {/* Resize Controls */}
+                        <button onClick={handleDecreaseSize} disabled={modalSize === 'lg'} className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg disabled:opacity-30" title="تصغير">
+                            <Minimize2 size={18} />
+                        </button>
+                        <button onClick={handleIncreaseSize} disabled={modalSize === 'full'} className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg disabled:opacity-30" title="تكبير">
+                            <Maximize2 size={18} />
+                        </button>
+                        <button onClick={toggleFullscreen} className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg" title={modalSize === 'full' ? 'خروج' : 'ملء الشاشة'}>
+                            {modalSize === 'full' ? <Shrink size={18} /> : <Expand size={18} />}
+                        </button>
                         <ShareButton
                             size="md"
                             elementRef={printRef as React.RefObject<HTMLElement>}
@@ -139,6 +221,15 @@ const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, 
                     >
                         إغلاق
                     </button>
+                    {onReturn && (
+                        <button
+                            onClick={() => setShowReturnSection(!showReturnSection)}
+                            className="px-6 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl transition-all flex items-center gap-2 shadow-lg"
+                        >
+                            <RotateCcw size={18} />
+                            إرجاع
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

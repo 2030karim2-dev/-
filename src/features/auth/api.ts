@@ -65,9 +65,14 @@ export const authApi = {
       };
 
       return { data: fallbackData, error: null };
-    } catch (err) {
+    } catch (err: any) {
+      // ⚡ Handle AbortError gracefully (common in concurrent auth checks)
+      if (err?.name === 'AbortError' || err?.message?.includes('aborted')) {
+        return { data: null, error: null }; // Quietly return null
+      }
+
       console.error('[Auth] Profile fetch exception:', err);
-      return { data: null, error: err as any };
+      return { data: null, error: err };
     }
   },
 

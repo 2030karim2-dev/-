@@ -1,4 +1,4 @@
-export type ReportTab = 'trial_balance' | 'debt_report' | 'customer_statement' | 'currency_diff' | 'p_and_l' | 'balance_sheet' | 'cash_flow' | 'item_movement' | 'tax_report' | 'ai_insights' | 'dead_stock';
+export type ReportTab = 'trial_balance' | 'debt_report' | 'customer_statement' | 'currency_diff' | 'p_and_l' | 'balance_sheet' | 'cash_flow' | 'item_movement' | 'tax_report' | 'ai_insights' | 'dead_stock' | 'returns_report';
 
 export interface DebtSummary {
   receivables: number;

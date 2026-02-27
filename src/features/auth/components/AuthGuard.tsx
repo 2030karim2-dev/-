@@ -10,9 +10,10 @@ interface AuthGuardProps {
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isReady } = useAuth();
 
-  if (isLoading) {
+  // Wait until auth initialization is complete before making any routing decisions
+  if (!isReady || isLoading) {
     return <PageLoader />;
   }
 

@@ -8,12 +8,13 @@ import { ROUTES } from '../../core/routes/paths';
 import { parseError } from '../../core/utils/errorUtils';
 
 export const useAuth = () => {
-    const { user, isAuthenticated, isLoading, initialize, logout } = useAuthStore();
+    const { user, isAuthenticated, isLoading, isReady, initialize, logout } = useAuthStore();
 
     return {
         user,
         isAuthenticated,
         isLoading,
+        isReady,
         initialize,
         logout
     };

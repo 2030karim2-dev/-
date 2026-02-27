@@ -49,6 +49,8 @@ export interface Database {
           p_notes: string | null
           p_currency: string
           p_exchange_rate: number
+          p_reference_invoice_id: string | null
+          p_return_reason: string | null
         }
         Returns: { id: string; invoice_number: string; total_amount: number; status: string }
       }
@@ -76,6 +78,8 @@ export interface Database {
           p_notes: string | null
           p_currency: string
           p_exchange_rate: number
+          p_reference_invoice_id: string | null
+          p_return_reason: string | null
         }
         Returns: Json
       }
@@ -544,6 +548,9 @@ export interface Database {
           currency_code: string
           exchange_rate: number
           deleted_at: string | null
+          // Return-specific fields
+          reference_invoice_id: string | null
+          return_reason: string | null
         }
         Insert: {
           id?: string
@@ -564,6 +571,9 @@ export interface Database {
           currency_code?: string
           exchange_rate?: number
           deleted_at?: string | null
+          // Return-specific fields
+          reference_invoice_id?: string | null
+          return_reason?: string | null
         }
         Update: Partial<Database['public']['Tables']['invoices']['Insert']>
       }

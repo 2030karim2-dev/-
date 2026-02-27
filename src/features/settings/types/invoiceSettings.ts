@@ -26,6 +26,15 @@ export interface InvoiceSettings {
     default_terms_en: string;
     default_currency: string;
     default_invoice_type: 'cash' | 'credit';
+
+    // Company Branding
+    company_name_ar: string;
+    company_name_en: string;
+    company_specialization: string;
+    company_phone: string;
+    company_email: string;
+    company_address: string;
+    invoice_header_text: string;
 }
 
 export const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
@@ -48,4 +57,13 @@ export const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
     default_terms_en: '',
     default_currency: 'YER',
     default_invoice_type: 'cash',
+
+    // Default Branding
+    company_name_ar: '',
+    company_name_en: '',
+    company_specialization: '',
+    company_phone: '',
+    company_email: '',
+    company_address: '',
+    invoice_header_text: '',
 };
