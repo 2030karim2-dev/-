@@ -3,6 +3,7 @@
 // Custom hooks for managing sales returns data
 // ============================================
 
+import { Package, Search, AlertCircle, ShoppingCart, RefreshCw } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../../lib/supabaseClient';
 import { useAuthStore } from '../../auth/store';
@@ -152,111 +153,26 @@ export const useCreateSalesReturn = () => {
                 throw new Error('Missing authentication context');
             }
 
-            // Get the next invoice number
-            const { data: countData } = await (supabase
-                .from('invoices') as any)
-                .select('id', { count: 'exact', head: true })
-                .eq('company_id', user.company_id)
-                .eq('type', 'return_sale');
+            const { data: result, error } = await (supabase.rpc as any)('process_sales_return', {
+                p_invoice_id: data.invoiceId,
+                p_party_id: data.partyId,
+                p_payment_method: data.paymentMethod || 'cash',
+                p_items: data.items,
+                p_return_reason: data.returnReason || null,
+                p_status: data.status || 'posted',
+                p_notes: data.notes || '',
+                p_issue_date: data.issueDate || new Date().toISOString().split('T')[0],
+                p_currency_code: data.currency || 'SAR',
+                p_exchange_rate: data.exchangeRate || 1,
+                p_company_id: user.company_id,
+                p_user_id: user.id
+            });
 
-            const invoiceNumber = `RET-${String((countData?.length || 0) + 1).padStart(5, '0')}`;
-
-            // Create the return invoice
-            const { data: invoice, error: invoiceError } = await (supabase
-                .from('invoices') as any)
-                .insert({
-                    company_id: user.company_id,
-                    invoice_number: invoiceNumber,
-                    type: 'return_sale',
-                    status: data.status || 'posted',
-                    party_id: data.partyId,
-                    issue_date: data.issueDate || new Date().toISOString().split('T')[0],
-                    due_date: data.issueDate || new Date().toISOString().split('T')[0],
-                    total_amount: data.items.reduce((sum: number, item: any) => sum + (item.quantity * (item.unitPrice || item.unitCost || 0)), 0),
-                    subtotal: data.items.reduce((sum: number, item: any) => sum + (item.quantity * (item.unitPrice || item.unitCost || 0)), 0),
-                    tax_amount: 0,
-                    discount_amount: 0,
-                    notes: data.notes,
-                    payment_method: data.paymentMethod || 'cash',
-                    currency: data.currency || 'SAR',
-                    exchange_rate: data.exchangeRate || 1,
-                    reference_invoice_id: data.referenceInvoiceId || null,
-                    return_reason: data.returnReason || null,
-                    created_by: user.id,
-                })
-                .select()
-                .single();
-
-            if (invoiceError) throw invoiceError;
-
-            // Create invoice items
-            const itemsToInsert = data.items.map((item: any) => ({
-                invoice_id: invoice.id,
-                product_id: item.productId || null,
-                description: item.name,
-                quantity: item.quantity,
-                unit_price: item.unitPrice || item.unitCost || 0,
-                total: item.quantity * (item.unitPrice || item.unitCost || 0),
-                cost_price: item.costPrice || 0,
-                tax_rate: item.taxRate || 0,
-            }));
-
-            const { error: itemsError } = await (supabase
-                .from('invoice_items') as any)
-                .insert(itemsToInsert);
-
-            if (itemsError) throw itemsError;
-
-            // If status is posted, process the return (reverse inventory)
-            if (data.status === 'posted') {
-                // Update inventory quantities
-                for (const item of data.items) {
-                    if (item.productId) {
-                        const { data: product } = await (supabase
-                            .from('products') as any)
-                            .select('quantity')
-                            .eq('id', item.productId)
-                            .single();
-
-                        if (product) {
-                            await (supabase
-                                .from('products') as any)
-                                .update({ quantity: (product.quantity || 0) + item.quantity })
-                                .eq('id', item.productId);
-                        }
-                    }
-                }
-
-                // Create journal entry for the return
-                const { data: company } = await (supabase
-                    .from('companies') as any)
-                    .select('default_currency')
-                    .eq('id', user.company_id)
-                    .single();
-
-                const journalEntry = {
-                    company_id: user.company_id,
-                    entry_number: `JE-${Date.now()}`,
-                    issue_date: new Date().toISOString().split('T')[0],
-                    description: `مرتجع مبيعات - ${invoiceNumber}`,
-                    debit_account_id: null, // Will be set by system
-                    credit_account_id: null, // Will be set by system
-                    amount: invoice.total_amount,
-                    currency: company?.default_currency || 'SAR',
-                    exchange_rate: 1,
-                    status: 'posted',
-                    reference_type: 'invoice',
-                    reference_id: invoice.id,
-                    created_by: user.id,
-                };
-
-                await (supabase.from('journal_entries') as any).insert(journalEntry);
-            }
-
-            return invoice;
+            if (error) throw error;
+            return result;
         },
         onSuccess: (invoice) => {
-            showToast(`تم إنشاء مرتجع المبيعات #${invoice.invoice_number} بنجاح`, 'success');
+            showToast(`تم إنشاء مرتجع المبيعات #${(invoice as any)?.invoice_number || 'الجديد'} بنجاح`, 'success');
             queryClient.invalidateQueries({ queryKey: ['sales-returns'] });
             queryClient.invalidateQueries({ queryKey: ['sales-returns-stats'] });
             queryClient.invalidateQueries({ queryKey: ['invoices'] });
@@ -285,6 +201,10 @@ export const useSalesInvoicesForReturn = (customerId?: string | null) => {
           invoice_number,
           issue_date,
           total_amount,
+          currency_code,
+          exchange_rate,
+          payment_method,
+          created_by,
           party:party_id(id, name),
           invoice_items(id, product_id, description, quantity, unit_price, total)
         `)

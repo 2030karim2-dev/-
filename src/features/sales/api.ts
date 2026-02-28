@@ -1,5 +1,6 @@
 
 import { supabase } from '../../lib/supabaseClient';
+import { parseError } from '../../core/utils/errorUtils';
 import { CreateInvoicePayload, InvoiceResponse } from './types';
 import { toBaseCurrency } from '../../core/utils/currencyUtils';
 
@@ -40,11 +41,9 @@ export const salesApi = {
       p_exchange_rate: payload.exchangeRate || 1
     };
 
-    const { data, error } = await supabase.rpc('commit_sales_invoice', rpcParams as never);
-
-    if (error) throw error;
-
-    return data as InvoiceResponse;
+    const { data: result, error } = await supabase.rpc('commit_sales_invoice', rpcParams as any);
+    if (error) throw parseError(error);
+    return result as InvoiceResponse;
   },
 
   commitReturnRPC: async (companyId: string, userId: string, payload: CreateInvoicePayload): Promise<InvoiceResponse> => {
@@ -60,9 +59,9 @@ export const salesApi = {
       p_return_reason: payload.returnReason || null
     };
 
-    const { data, error } = await supabase.rpc('commit_sale_return', rpcParams as never);
-    if (error) throw error;
-    return data as InvoiceResponse;
+    const { data: result, error } = await supabase.rpc('commit_sales_return', rpcParams as any);
+    if (error) throw parseError(error);
+    return result as InvoiceResponse;
   },
 
   getInvoiceDetails: async (invoiceId: string) => {
@@ -80,140 +79,28 @@ export const salesApi = {
   },
 
   getNextInvoiceNumber: async (companyId: string) => {
-    const { count, error } = await (supabase.from('invoices') as any)
-      .select('*', { count: 'exact', head: true })
-      .eq('company_id', companyId)
-      .eq('type', 'sale');
+    // H4: Use atomic RPC with advisory lock instead of COUNT(*)
+    const { data, error } = await (supabase.rpc as any)('get_next_invoice_number', {
+      p_company_id: companyId,
+      p_prefix: 'INV'
+    });
 
     if (error) return { data: null, error };
-
-    const nextNum = (count || 0) + 1;
-    return { data: `INV-${String(nextNum).padStart(5, '0')}`, error: null };
+    return { data: data as string, error: null };
   },
 
-  getSalesAnalytics: async (params: {
-    company_id: string;
-    start_date?: string;
-    end_date?: string;
-    period?: string;
-  }) => {
-    let query = (supabase.from('invoices') as any)
-      .select(`
-        id,
-        total_amount,
-        type,
-        status,
-        issue_date,
-        payment_method,
-        currency_code,
-        exchange_rate,
-        customer:party_id(name),
-        items:invoice_items(
-          quantity,
-          total,
-          product:product_id(name_ar, sku)
-        )
-      `)
-      .eq('company_id', params.company_id)
-      .in('type', ['sale', 'return_sale'])
-      .neq('status', 'void')
-      .order('issue_date', { ascending: false })
-      .limit(2000);
+  getSalesAnalytics: async (params: { company_id: string; start_date?: string; end_date?: string }) => {
+    const { data, error } = await supabase.rpc('get_sales_analytics', {
+      p_company_id: params.company_id,
+      p_start_date: params.start_date || null,
+      p_end_date: params.end_date || null
+    } as any);
 
-    if (params.start_date) {
-      query = query.gte('issue_date', params.start_date);
-    }
-    if (params.end_date) {
-      query = query.lte('issue_date', params.end_date);
+    if (error) {
+      console.error('Error fetching sales analytics:', error);
+      return { data: null, error };
     }
 
-    const { data, error } = await query;
-
-    if (error) return { data: null, error };
-
-    // Use centralized currency conversion
-
-    // Calculate analytics
-    const sales = (data as any[])?.filter((i) => i.type === 'sale' && i.status !== 'cancelled') || [];
-    const returns = (data as any[])?.filter((i) => i.type === 'return_sale') || [];
-
-    const totalSales = sales.reduce((sum: number, i) => sum + toBaseCurrency(i), 0);
-    const totalReturns = returns.reduce((sum: number, i) => sum + toBaseCurrency(i), 0);
-
-    // Group sales by day
-    const salesByDayMap: Record<string, { date: string; sales: number; returns: number }> = {};
-
-    // Top Items Aggregation
-    const productMap: Record<string, { productId: string, productName: string, quantity: number, revenue: number }> = {};
-    const customerMap: Record<string, { customerId: string, customerName: string, totalAmount: number, invoiceCount: number }> = {};
-
-    sales.forEach((inv: any) => {
-      const date = inv.issue_date;
-      if (!salesByDayMap[date]) {
-        salesByDayMap[date] = { date, sales: 0, returns: 0 };
-      }
-      const amount = toBaseCurrency(inv);
-      salesByDayMap[date].sales += amount;
-
-      // Aggregates for Top Lists
-      const custName = inv.customer?.name || 'عميل نقدي';
-      const custId = inv.party_id || 'cash';
-      if (!customerMap[custName]) customerMap[custName] = { customerId: custId, customerName: custName, totalAmount: 0, invoiceCount: 0 };
-      customerMap[custName].totalAmount += amount;
-      customerMap[custName].invoiceCount += 1;
-
-      inv.items?.forEach((item: any) => {
-        const prodName = item.product?.name_ar || item.product?.name || 'صنف غير معروف';
-        const prodId = item.product_id || 'unknown';
-        if (!productMap[prodName]) productMap[prodName] = { productId: prodId, productName: prodName, quantity: 0, revenue: 0 };
-        productMap[prodName].revenue += (Number(item.total || 0) * (Number(inv.exchange_rate) || 1));
-        productMap[prodName].quantity += Number(item.quantity || 0);
-      });
-    });
-
-    const topProducts = Object.values(productMap)
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, 5);
-
-    const topCustomers = Object.values(customerMap)
-      .sort((a, b) => b.totalAmount - a.totalAmount)
-      .slice(0, 5);
-
-    returns.forEach((inv: any) => {
-      const date = inv.issue_date;
-      if (!salesByDayMap[date]) {
-        salesByDayMap[date] = { date, sales: 0, returns: 0 };
-      }
-      salesByDayMap[date].returns += toBaseCurrency(inv);
-    });
-
-    const salesByDay = Object.values(salesByDayMap).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-    // Group sales by payment method
-    const paymentMethodsMap: Record<string, number> = {};
-    sales.forEach((inv: any) => {
-      const method = inv.payment_method || 'other';
-      paymentMethodsMap[method] = (paymentMethodsMap[method] || 0) + toBaseCurrency(inv);
-    });
-
-    const salesByPaymentMethod = Object.entries(paymentMethodsMap).map(([method, amount]) => ({
-      method,
-      amount
-    }));
-
-    return {
-      data: {
-        totalSales,
-        totalReturns,
-        netSales: totalSales - totalReturns,
-        invoiceCount: sales.length,
-        averageInvoiceValue: sales.length > 0 ? totalSales / sales.length : 0,
-        topProducts,
-        topCustomers,
-        salesByDay,
-        salesByPaymentMethod,
-      },
-      error: null,
-    };
+    return { data, error: null };
   }
 };

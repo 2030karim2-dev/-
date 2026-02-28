@@ -53,7 +53,7 @@ export const productsApi = {
         }
 
         return await supabase.from('products')
-            .delete()
+            .update({ deleted_at: new Date().toISOString() } as any)
             .eq('id', id);
     },
 
@@ -68,7 +68,7 @@ export const productsApi = {
         }
 
         return await supabase.from('products')
-            .delete()
+            .update({ deleted_at: new Date().toISOString() } as any)
             .in('id', ids);
     },
 
@@ -108,6 +108,6 @@ export const productsApi = {
     },
 
     deleteCategory: async (id: string) => {
-        return await (supabase.from('product_categories') as any).delete().eq('id', id);
+        return await (supabase.from('product_categories') as any).update({ deleted_at: new Date().toISOString() }).eq('id', id);
     },
 };

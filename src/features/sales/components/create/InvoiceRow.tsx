@@ -1,17 +1,17 @@
 
 import React from 'react';
 import { Search, Trash2 } from 'lucide-react';
-import { InvoiceItem } from '../../store';
+import { SalesCartItem } from '../../store';
 import { cn } from '../../../../core/utils';
 
 interface InvoiceRowProps {
-    item: InvoiceItem;
+    item: SalesCartItem;
     index: number;
     showDiscount: boolean;
     showTax: boolean;
-    onUpdate: (index: number, field: keyof InvoiceItem, value: string | number) => void;
+    onUpdate: (index: number, field: keyof SalesCartItem, value: string | number) => void;
     onRemove: (index: number) => void;
-    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>, rowIndex: number, field: keyof InvoiceItem) => void;
+    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>, rowIndex: number, field: keyof SalesCartItem) => void;
     onOpenSearch: (index: number, query: string) => void;
 }
 

@@ -2,19 +2,14 @@
 import { salesApi } from './api';
 import { CreateInvoiceDTO } from './types';
 import { messagingService } from '../notifications/messagingService';
+import { toBaseCurrency } from '../../core/utils/currencyUtils';
+import { validateSalePayload, assertValid } from '../../core/utils/validationUtils';
+import { routeToChildByCurrency } from '../../core/utils/accountRouting';
 
 export const salesService = {
   fetchSalesLog: async (companyId: string) => {
     const { data, error } = await salesApi.getInvoices(companyId);
     if (error) throw error;
-
-    // تحويل المبلغ للعملة الأساسية (SAR)
-    const toBase = (inv: Record<string, unknown>): number => {
-      const amount = Number(inv.total_amount) || 0;
-      const rate = Number(inv.exchange_rate) || 1;
-      if (!inv.currency_code || inv.currency_code === 'SAR') return amount;
-      return amount * rate;
-    };
 
     return (data || []).map((inv: Record<string, unknown>) => ({
       id: inv.id,
@@ -22,7 +17,7 @@ export const salesService = {
       customerName: (inv.party as { name?: string })?.name || 'عميل نقدي',
       date: new Date(inv.issue_date as string).toLocaleDateString('ar-SA'),
       total: Number(inv.total_amount) || 0,
-      baseTotal: toBase(inv),
+      baseTotal: toBaseCurrency(inv as any),
       status: inv.status,
       type: inv.type,
       paymentMethod: inv.payment_method,
@@ -33,30 +28,25 @@ export const salesService = {
   },
 
   processNewSale: async (companyId: string, userId: string, payload: CreateInvoiceDTO) => {
+    // H6: Validate items before sending to RPC
+    assertValid(validateSalePayload({
+      items: payload.items.map(i => ({ productId: i.productId, quantity: i.quantity, unitPrice: i.unitPrice })),
+      paymentMethod: payload.paymentMethod
+    }));
+
     if (payload.type === 'return_sale') {
       return await salesApi.commitReturnRPC(companyId, userId, payload);
     }
 
     let finalTreasuryAccountId = payload.treasuryAccountId;
 
-    // --- Smart Routing for Exchange Companies / Parent Accounts ---
+    // M1: Use shared smart routing utility
     if (finalTreasuryAccountId && payload.currency) {
       const { accountsService } = await import('../accounting/services/accountsService');
       const accounts = await accountsService.getAccounts(companyId);
-
-      // Look for children of the selected account
-      const childAccounts = accounts.filter(a => a.parent_id === finalTreasuryAccountId);
-
-      if (childAccounts.length > 0) {
-        // Find the child account that matches the requested currency
-        const matchedChild = childAccounts.find(a =>
-          (a.currency_code || 'SAR') === payload.currency
-        );
-
-        if (matchedChild) {
-          console.info(`Smart Routing: Redirected sale payment from parent ${finalTreasuryAccountId} to child ${matchedChild.id} matching currency ${payload.currency}`);
-          finalTreasuryAccountId = matchedChild.id;
-        }
+      const routed = routeToChildByCurrency(accounts, finalTreasuryAccountId, payload.currency);
+      if (routed) {
+        finalTreasuryAccountId = routed.id;
       }
     }
 
@@ -87,16 +77,8 @@ export const salesService = {
   getStats: async (companyId: string) => {
     const { data } = await salesApi.getInvoices(companyId);
 
-    // تحويل المبلغ للعملة الأساسية
-    const toBase = (inv: Record<string, unknown>): number => {
-      const amount = Number(inv.total_amount) || 0;
-      const rate = Number(inv.exchange_rate) || 1;
-      if (!inv.currency_code || inv.currency_code === 'SAR') return amount;
-      return amount * rate;
-    };
-
     const salesOnly = (data as Record<string, unknown>[])?.filter(i => i.type === 'sale') || [];
-    const total = salesOnly.reduce((sum, s) => sum + toBase(s), 0);
+    const total = salesOnly.reduce((sum, s) => sum + toBaseCurrency(s as any), 0);
     return {
       totalSales: total,
       invoiceCount: salesOnly.length,

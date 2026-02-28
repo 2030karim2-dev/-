@@ -5,29 +5,19 @@ import { inventoryApi } from '../api';
 export const analyticsService = {
     /**
      * Get inventory summary statistics
+     * Updated: Uses server-side RPC for efficiency
      */
     getInventorySummary: async (companyId: string) => {
-        const { data: products, error } = await supabase.from('products')
-            .select('id, cost_price, selling_price, product_stock(quantity)')
-            .eq('company_id', companyId);
+        const { data, error } = await (supabase.rpc as any)('get_stock_valuation', {
+            p_company_id: companyId
+        });
         if (error) throw error;
 
-        const totalProducts = products?.length || 0;
-        let totalValue = 0;
-        let totalStock = 0;
-
-        (products as Record<string, unknown>[])?.forEach((p) => {
-            const productStock = p.product_stock as { quantity?: number }[] | undefined;
-            const stock = productStock?.reduce((sum: number, s) => sum + (s.quantity || 0), 0) || 0;
-            totalStock += stock;
-            totalValue += stock * ((p.cost_price as number) || 0);
-        });
-
         return {
-            totalProducts,
-            totalStock,
-            totalValue,
-            lowStockProducts: 0
+            totalProducts: data.total_products || 0,
+            totalStock: data.total_stock || 0,
+            totalValue: data.total_value || 0,
+            lowStockProducts: 0 // Will be updated by getLowStockProducts if needed
         };
     },
 

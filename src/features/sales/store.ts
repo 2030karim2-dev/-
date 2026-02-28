@@ -21,8 +21,7 @@ export interface SalesCartItem {
   tax: number;
 }
 
-/** @deprecated Use SalesCartItem instead */
-export type InvoiceItem = SalesCartItem;
+
 
 export interface SalesSummary {
   subtotal: number;
@@ -32,7 +31,7 @@ export interface SalesSummary {
 }
 
 interface SalesState {
-  items: InvoiceItem[];
+  items: SalesCartItem[];
   selectedCustomer: { id: string, name: string, phone?: string } | null;
   summary: SalesSummary;
   invoiceType: 'cash' | 'credit';
@@ -47,7 +46,7 @@ interface SalesState {
 
   // Actions
   initializeItems: (count: number) => void;
-  updateItem: (index: number, field: keyof InvoiceItem, value: string | number) => void;
+  updateItem: (index: number, field: keyof SalesCartItem, value: string | number) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   setProductForRow: (index: number, product: Product) => void;
   addItem: () => void;
@@ -60,7 +59,7 @@ interface SalesState {
   resetCart: () => void;
 }
 
-const createNewItem = (): InvoiceItem => ({
+const createNewItem = (): SalesCartItem => ({
   id: crypto.randomUUID(),
   productId: '',
   sku: '',
@@ -152,7 +151,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         ? basePrice * state.exchangeRate
         : basePrice / state.exchangeRate;
 
-      const newItem: InvoiceItem = {
+      const newItem: SalesCartItem = {
         id: crypto.randomUUID(),
         productId: product.id,
         sku: product.sku,

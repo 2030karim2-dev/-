@@ -180,11 +180,13 @@ export const formatNumber = (value: number): string => {
  * parseCurrency('$1,234.56'); // 1234.56
  */
 export const parseCurrency = (currencyString: string): number => {
-    // Remove currency symbols and whitespace
-    const cleaned = currencyString
-        .replace(/[ر.سر.يع.م¥$]/g, '')
-        .replace(/\s/g, '')
-        .replace(/,/g, '');
+    // Remove all known currency symbols and whitespace
+    const symbolValues = Object.values(CURRENCY_SYMBOLS);
+    let cleaned = currencyString;
+    for (const sym of symbolValues) {
+        cleaned = cleaned.split(sym).join('');
+    }
+    cleaned = cleaned.replace(/\s/g, '').replace(/,/g, '');
 
     const parsed = parseFloat(cleaned);
     return Number.isFinite(parsed) ? parsed : 0;

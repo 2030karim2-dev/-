@@ -2,6 +2,7 @@
 import { expensesApi } from './api';
 import { Expense, ExpenseFormData, ExpenseCategorySummary, ExpenseStats } from './types';
 import { messagingService } from '../notifications/messagingService';
+import { toBaseCurrency } from '../../core/utils/currencyUtils';
 
 export const expensesService = {
   getExpensesList: async (companyId: string): Promise<Expense[]> => {
@@ -53,9 +54,9 @@ export const expensesService = {
   },
 
   calculateStats: (expenses: Expense[]): ExpenseStats => {
-    const totalExpenses = expenses.reduce((sum, e) => sum + (Number(e.amount) * (e.exchange_rate || 1)), 0);
-    const paidExpenses = expenses.filter(e => e.status === 'paid' || e.status === 'posted').reduce((sum, e) => sum + (Number(e.amount) * (e.exchange_rate || 1)), 0);
-    const pendingExpenses = expenses.filter(e => e.status === 'draft').reduce((sum, e) => sum + (Number(e.amount) * (e.exchange_rate || 1)), 0);
+    const totalExpenses = expenses.reduce((sum, e) => sum + toBaseCurrency({ amount: Number(e.amount), currency_code: e.currency_code, exchange_rate: e.exchange_rate }), 0);
+    const paidExpenses = expenses.filter(e => e.status === 'paid' || e.status === 'posted').reduce((sum, e) => sum + toBaseCurrency({ amount: Number(e.amount), currency_code: e.currency_code, exchange_rate: e.exchange_rate }), 0);
+    const pendingExpenses = expenses.filter(e => e.status === 'draft').reduce((sum, e) => sum + toBaseCurrency({ amount: Number(e.amount), currency_code: e.currency_code, exchange_rate: e.exchange_rate }), 0);
     const categoriesCount = new Set(expenses.map(e => e.category_id)).size;
 
     return {
@@ -72,7 +73,7 @@ export const expensesService = {
 
     expenses.forEach(exp => {
       const cat = exp.category_name || 'أخرى';
-      const baseAmount = Number(exp.amount) * (exp.exchange_rate || 1);
+      const baseAmount = toBaseCurrency({ amount: Number(exp.amount), currency_code: exp.currency_code, exchange_rate: exp.exchange_rate });
       map[cat] = (map[cat] || 0) + baseAmount;
     });
 

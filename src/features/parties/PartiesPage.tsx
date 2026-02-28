@@ -1,8 +1,7 @@
-
 import React from 'react';
-import { Users, UserPlus, FileText, LayoutGrid, Edit, Trash2, ShieldAlert, LucideIcon, Phone, CreditCard, ChevronLeft } from 'lucide-react';
-import { useParties, usePartyMutations } from './hooks';
-import { Party, PartyView, PartyType } from './types';
+import { Users, UserPlus, FileText, LayoutGrid, Edit, Trash2, ShieldAlert, LucideIcon } from 'lucide-react';
+import { useParties, usePartyMutations, usePartiesView } from './hooks';
+import { Party, PartyView, PartyType, PartyFormData } from './types';
 import MicroHeader from '../../ui/base/MicroHeader';
 import PartiesStats from './components/PartiesStats';
 import MicroListItem from '../../ui/common/MicroListItem';
@@ -11,18 +10,18 @@ import StatementView from './components/StatementView';
 import CategoriesView from './components/CategoriesView';
 import Button from '../../ui/base/Button';
 import { formatCurrency } from '../../core/utils';
-// Fix: Corrected import path.
-import { usePartiesView } from './hooks';
 import { cn } from '../../core/utils';
+import { useTranslation } from '../../lib/hooks/useTranslation';
 
 interface PartiesPageProps {
     partyType: PartyType;
-    title: string;
-    icon: LucideIcon;
-    iconColor: string;
+    title?: string;
+    icon?: LucideIcon;
+    iconColor?: string;
 }
 
 const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconColor }) => {
+    const { t } = useTranslation();
     const {
         activeView, setActiveView,
         searchTerm, setSearchTerm,
@@ -36,6 +35,11 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
     const { data: parties, isLoading, stats } = useParties(partyType, searchTerm);
     const { saveParty, deleteParty, isSaving } = usePartyMutations(partyType);
 
+    const defaultTitle = partyType === 'customer' ? t('customer_management') : t('supplier_management');
+    const displayTitle = title || defaultTitle;
+    const displayIcon = icon || Users;
+    const displayIconColor = iconColor || (partyType === 'customer' ? 'text-emerald-600' : 'text-blue-600');
+
     const headerActions = (
         <Button
             onClick={handleAddNew}
@@ -43,7 +47,7 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
             size="sm"
             leftIcon={<UserPlus size={14} />}
         >
-            إضافة {partyType === 'customer' ? 'عميل' : 'مورد'}
+            {partyType === 'customer' ? t('new_customer') : t('new_supplier')}
         </Button>
     );
 
@@ -55,7 +59,7 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                         <PartiesStats stats={stats} type={partyType} />
 
                         <div className="flex flex-col gap-1">
-                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1 mb-1">Neural Database Records</h3>
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1 mb-1">Database Records</h3>
                             {parties?.map((party) => (
                                 <MicroListItem
                                     key={party.id}
@@ -64,13 +68,13 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                                     title={party.name}
                                     subtitle={party.phone || "No Contact"}
                                     tags={[
-                                        { label: party.category || 'عام', color: 'slate' },
-                                        { label: party.status === 'active' ? 'نشط' : 'محظور', color: party.status === 'active' ? 'emerald' : 'rose' }
+                                        { label: party.category || t('general'), color: 'slate' },
+                                        { label: party.status === 'active' ? t('active') : t('blocked'), color: party.status === 'active' ? 'emerald' : 'rose' }
                                     ]}
                                     actions={
                                         <div className="flex flex-col items-end gap-1.5">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-[8px] font-black text-gray-400 uppercase leading-none mb-1">Balance</span>
+                                                <span className="text-[8px] font-black text-gray-400 uppercase leading-none mb-1">{t('balance')}</span>
                                                 <span dir="ltr" className={cn("text-[11px] font-black font-mono leading-none", Number(party.balance) >= 0 ? "text-emerald-600" : "text-rose-600")}>
                                                     {formatCurrency(Math.abs(Number(party.balance)))}
                                                 </span>
@@ -79,7 +83,7 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                                                 <button onClick={(e) => { e.stopPropagation(); handleEdit(party); }} className="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-800 rounded">
                                                     <Edit size={12} />
                                                 </button>
-                                                <button onClick={(e) => { e.stopPropagation(); if (confirm('حذف السجل؟')) deleteParty(party.id); }} className="p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-slate-800 rounded">
+                                                <button onClick={(e) => { e.stopPropagation(); if (confirm(t('confirm_delete'))) deleteParty(party.id); }} className="p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-slate-800 rounded">
                                                     <Trash2 size={12} />
                                                 </button>
                                             </div>
@@ -87,11 +91,11 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                                     }
                                 />
                             ))}
-                            {isLoading && <div className="p-20 text-center font-black text-[10px] text-gray-400 animate-pulse">Querying Neural Records...</div>}
+                            {isLoading && <div className="p-20 text-center font-black text-[10px] text-gray-400 animate-pulse">Querying Records...</div>}
                             {!isLoading && parties?.length === 0 && (
                                 <div className="p-20 text-center border-2 border-dashed dark:border-slate-800">
                                     <ShieldAlert size={32} className="mx-auto mb-2 text-gray-200" />
-                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">No active records in current scope</span>
+                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">No active records</span>
                                 </div>
                             )}
                         </div>
@@ -105,17 +109,17 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
     return (
         <div className="flex flex-col h-full bg-[#f8fafc] dark:bg-slate-950 font-cairo">
             <MicroHeader
-                title={title}
-                icon={icon}
-                iconColor={iconColor}
+                title={displayTitle}
+                icon={displayIcon}
+                iconColor={displayIconColor}
                 actions={headerActions}
-                searchPlaceholder="بحث ذكي..."
+                searchPlaceholder={t('search_by_name_phone_category')}
                 searchValue={searchTerm}
                 onSearchChange={setSearchTerm}
                 tabs={[
-                    { id: 'list', label: "السجل الرقمي", icon: Users },
-                    { id: 'statements', label: "البيانات المالية", icon: FileText },
-                    { id: 'categories', label: "المجموعات", icon: LayoutGrid }
+                    { id: 'list', label: t('records'), icon: Users },
+                    { id: 'statements', label: t('account_statements'), icon: FileText },
+                    { id: 'categories', label: t('categories'), icon: LayoutGrid }
                 ]}
                 activeTab={activeView}
                 onTabChange={(id) => setActiveView(id as PartyView)}
@@ -130,7 +134,7 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
             <PartyModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                onSubmit={(data) => saveParty({ data, id: editingParty?.id }, { onSuccess: () => handleCloseModal() })}
+                onSubmit={(data) => saveParty({ data: data as PartyFormData, id: editingParty?.id }, { onSuccess: () => handleCloseModal() })}
                 isSubmitting={isSaving}
                 initialData={editingParty}
                 partyType={partyType}

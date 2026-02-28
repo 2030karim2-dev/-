@@ -1,11 +1,11 @@
 
 export interface LedgerEntry {
   date: string;
-  journal_id: string;
+  journal_entry_id: string;
   entry_number: number;
   description: string;
-  debit: number;
-  credit: number;
+  debit_amount: number;
+  credit_amount: number;
   balance: number; // Running balance
   currency_code?: string;
   exchange_rate?: number;

@@ -27,9 +27,9 @@ export const expensesApi = {
     return { data, error };
   },
 
-  // استخدام RPC بدلاً من Insert مباشر لضمان إنشاء القيد المحاسبي
+  // استخدام RPC الموحد v2 الذي يدعم الربط المباشر بالحسابات وتحسين الأداء
   createExpenseRPC: async (companyId: string, userId: string, data: ExpenseFormData) => {
-    return await (supabase.rpc as any)('commit_expense', {
+    return await (supabase.rpc as any)('commit_expense_v2', {
       p_company_id: companyId,
       p_user_id: userId,
       p_category_id: data.category_id,

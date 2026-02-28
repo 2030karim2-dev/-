@@ -28,8 +28,8 @@ export const ledgerSyncService = {
         {
           account_id: (mainAccount as any).id,
           description: `تأثير حركة ${party.name}`,
-          debit: type === 'debit' ? amount : 0,
-          credit: type === 'credit' ? amount : 0
+          debit_amount: type === 'debit' ? amount : 0,
+          credit_amount: type === 'credit' ? amount : 0,
         },
         // الطرف الآخر يتم تحديده برمجياً بناءً على نوع العملية (صندوق/مبيعات)
       ]

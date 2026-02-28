@@ -23,7 +23,8 @@ export const reportsApi = {
         )
       `)
       .eq('journal.company_id', companyId)
-      .eq('journal.status', 'posted');
+      .eq('journal.status', 'posted')
+      .is('deleted_at', null);
 
     if (fromDate) {
       query = query.gte('journal.entry_date', fromDate);

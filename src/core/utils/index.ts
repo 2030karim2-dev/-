@@ -18,6 +18,20 @@ export {
 
 export type { CurrencyCode, CurrencyConversionParams } from './currencyUtils';
 
+// Validation utilities
+export {
+    validateInvoiceItems,
+    validateSalePayload,
+    validatePurchasePayload,
+    assertValid,
+} from './validationUtils';
+
+export type { ValidationError } from './validationUtils';
+
+// Account routing utilities
+export { routeToChildByCurrency } from './accountRouting';
+export type { RoutableAccount } from './accountRouting';
+
 // Logger
 export { logger } from './logger';
 export type { LogLevel, LoggerConfig } from './logger';

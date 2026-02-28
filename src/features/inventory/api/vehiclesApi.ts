@@ -5,6 +5,7 @@ export const vehiclesApi = {
     getVehicles: async (filters?: { make?: string, year?: number, vin?: string }) => {
         let query = (supabase.from('vehicles') as any)
             .select('*')
+            .is('deleted_at', null)
             .order('make', { ascending: true })
             .order('model', { ascending: true });
 
@@ -24,9 +25,12 @@ export const vehiclesApi = {
 
     deleteVehicle: async (id: string) => {
         return await (supabase.from('vehicles') as any)
-            .delete()
+            .update({ deleted_at: new Date().toISOString() })
             .eq('id', id);
     },
+
+    // ... searchVehicles and getFitment omitted for brevity or handled by multi-replace if needed ...
+    // Wait, I should include the rest if I'm replacing the block.
 
     searchVehicles: async (term: string) => {
         const sanitized = term.replace(/[%_\\*()]/g, '');
@@ -34,6 +38,7 @@ export const vehiclesApi = {
 
         return await (supabase.from('vehicles') as any)
             .select('*')
+            .is('deleted_at', null)
             .or(`make.ilike.%${sanitized}%,model.ilike.%${sanitized}%`)
             .limit(20);
     },
@@ -42,7 +47,8 @@ export const vehiclesApi = {
     getFitment: async (productId: string) => {
         return await (supabase.from('product_fitment') as any)
             .select('*, vehicle:vehicles(*)')
-            .eq('product_id', productId);
+            .eq('product_id', productId)
+            .is('deleted_at', null);
     },
 
     addFitment: async (fitmentData: any) => {
@@ -54,7 +60,7 @@ export const vehiclesApi = {
 
     removeFitment: async (id: string) => {
         return await (supabase.from('product_fitment') as any)
-            .delete()
+            .update({ deleted_at: new Date().toISOString() })
             .eq('id', id);
     },
 

@@ -13,7 +13,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const isSupabasePlaceholder = false;
 
 // Custom fetch with timeout and retry logic
-const customFetch = async (url: RequestInfo, options: RequestInit = {}): Promise<Response> => {
+const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): Promise<Response> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
@@ -58,15 +58,8 @@ export const supabase = createClient<Database>(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      storage: window.localStorage,
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
       storageKey: 'alz_auth_session',
-      // Add custom token refresh handler with error recovery
-      onTokenRefreshed: (accessToken, refreshToken) => {
-        console.log('[Supabase] Token refreshed successfully');
-      },
-      onRefreshTokenRefreshed: (accessToken, refreshToken) => {
-        console.log('[Supabase] Refresh token updated');
-      },
     },
     global: {
       fetch: customFetch,

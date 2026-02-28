@@ -21,16 +21,17 @@ const QUICK_PROMPTS = [
 const SLASH_COMMANDS = [
     { command: '/ملخص', label: 'ملخص مالي سريع', prompt: 'أعطني ملخص مالي مع أرقام' },
     { command: '/مخزون', label: 'حالة المخزون', prompt: 'أعطني تقرير مختصر عن المخزون مع المنتجات المنخفضة' },
-    { command: '/ديون', label: 'تقرير الديون', prompt: 'أعطني أكبر 5 مديونين مع مبالغهم' },
     { command: '/ربح', label: 'تحليل الأرباح', prompt: 'ما صافي الربح والهامش الحالي؟' },
+    { command: '/منتج', label: 'البحث وتأكيد منتج', prompt: 'ابحث عن المنتج التالي' },
+    { command: '/مصروف', label: 'إنشاء مصروف جديد', prompt: 'أضف مصروف جديد بقيمة' },
+    { command: '/سند_دفع', label: 'إنشاء سند صرف', prompt: 'اعمل سند دفع بقيمة' },
+    { command: '/سند_قبض', label: 'إنشاء سند استلام', prompt: 'اعمل سند استلام بقيمة' },
     { command: '/عميل', label: 'إضافة عميل', prompt: 'أريد إضافة عميل جديد' },
-    { command: '/منتج', label: 'إضافة منتج', prompt: 'أريد إضافة منتج جديد' },
-    { command: '/سيولة', label: 'تقرير السيولة', prompt: 'كم السيولة النقدية المتاحة حالياً؟' },
-    { command: '/ثيم', label: 'تغيير الثيم', prompt: 'غير الثيم' },
+    { command: '/مورد', label: 'إضافة مورد', prompt: 'أريد إضافة مورد جديد' },
 ];
 
 const AIChatPanel: React.FC<Props> = ({ isOpen, onClose }) => {
-    const { messages, isLoading, error, sendMessage, clearChat } = useAIChat({ enabled: isOpen });
+    const { messages, isLoading, error, sendMessage, clearChat, executePendingAction, cancelPendingAction } = useAIChat({ enabled: isOpen });
     const [input, setInput] = useState('');
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
@@ -247,6 +248,18 @@ const AIChatPanel: React.FC<Props> = ({ isOpen, onClose }) => {
                                         {qp.label}
                                     </button>
                                 ))}
+                                <button
+                                    onClick={() => sendMessage("أضف مصروف 500 ريال لكهرباء المحل")}
+                                    className="text-xs font-bold p-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 hover:border-rose-200 dark:hover:bg-rose-950/20 dark:hover:border-rose-800 transition-all text-right"
+                                >
+                                    💸 إنشاء مصروف
+                                </button>
+                                <button
+                                    onClick={() => sendMessage("كم سعر فلتر زيت تويوتا كامري 2020؟")}
+                                    className="text-xs font-bold p-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-teal-600 dark:text-teal-400 hover:bg-teal-50 hover:border-teal-200 dark:hover:bg-teal-950/20 dark:hover:border-teal-800 transition-all text-right"
+                                >
+                                    🔧 خبير قطع
+                                </button>
                             </div>
                         </div>
                     )}
@@ -281,6 +294,35 @@ const AIChatPanel: React.FC<Props> = ({ isOpen, onClose }) => {
                                         </button>
                                     )}
                                 </div>
+
+                                {msg.pendingActions && msg.pendingActions.length > 0 && (
+                                    <div className="mt-3 space-y-2 border-t border-gray-200/50 dark:border-slate-700/50 pt-3">
+                                        {msg.pendingActions.map((action, idx) => (
+                                            <div key={idx} className="bg-white dark:bg-slate-800/80 rounded-xl p-3 border border-indigo-100 dark:border-indigo-900/50 shadow-sm">
+                                                <p className="text-[11px] font-bold text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5 mb-2">
+                                                    <Sparkles size={12} />
+                                                    هل تريد تنفيذ: {action.confirmation || action.action}؟
+                                                </p>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => executePendingAction(msg.id, idx)}
+                                                        disabled={isLoading}
+                                                        className="flex-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-[11px] font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1"
+                                                    >
+                                                        ✅ تأكيد وتنفيذ
+                                                    </button>
+                                                    <button
+                                                        onClick={() => cancelPendingAction(msg.id, idx)}
+                                                        disabled={isLoading}
+                                                        className="flex-1 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-900/40 disabled:opacity-50 text-rose-600 dark:text-rose-400 text-[11px] font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1"
+                                                    >
+                                                        ❌ إلغاء
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}

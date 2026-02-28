@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { useSalesStore } from '../../store';
 import { useCreateInvoice, useNextInvoiceNumber } from '../../hooks';
 import { useCompany, useCurrencies } from '../../../settings/hooks';
 import { useSettingsStore } from '../../../settings/settingsStore';
+import { partiesService } from '../../../../features/parties/service';
 import InvoiceHeader from './InvoiceHeader';
 import InvoiceMeta from './InvoiceMeta';
 import InteractiveInvoiceTable from './InteractiveInvoiceTable';
@@ -32,31 +32,33 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
   // Apply defaults on mount
   React.useEffect(() => {
     // 1. Set default currency and invoice type from settings
-    if (invoiceSettings.default_currency) {
+    if (invoiceSettings?.default_currency) {
       setMetadata('currency', invoiceSettings.default_currency);
     }
-    if (invoiceSettings.default_invoice_type) {
+    if (invoiceSettings?.default_invoice_type) {
       setMetadata('invoiceType', invoiceSettings.default_invoice_type);
     }
 
     // 2. Load "General Customer" if none selected
-    if (!selectedCustomer) {
-      import('../../../customers/service').then(({ customersService }) => {
-        if (company?.id) {
-          customersService.getOrCreateGeneralCustomer(company.id).then(customer => {
-            setCustomer({
-              id: customer.id,
-              name: customer.name,
-              phone: customer.phone || ''
-            });
+    if (!selectedCustomer && company?.id) {
+      const loadGeneralCustomer = async (companyId: string) => {
+        try {
+          const generalCustomer = await partiesService.getOrCreateGeneralParty(companyId, 'customer');
+          setCustomer({
+            id: generalCustomer.id,
+            name: generalCustomer.name,
+            phone: generalCustomer.phone || ''
           });
+        } catch (error) {
+          console.error("Failed to load general customer:", error);
         }
-      });
+      };
+      loadGeneralCustomer(company.id);
     }
-  }, [company?.id]);
+  }, [company?.id, invoiceSettings, selectedCustomer, setMetadata, setCustomer]);
 
   const getExchangeRate = (currCode: string) => {
-    const history = (rates.data as any[])?.filter((r: any) => r.currency_code === currCode) || [];
+    const history = (rates?.data as any[])?.filter((r: any) => r.currency_code === currCode) || [];
     return history.length > 0 ? history[0].rate_to_base : 1;
   };
 

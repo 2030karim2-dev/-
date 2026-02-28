@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, Plus, Eye, RotateCcw, Truck, FileText, Search, Filter, Download, Printer, X } from 'lucide-react';
 import { usePurchaseReturns, usePurchaseReturnsStats } from '../../hooks/usePurchaseReturns';
-import CreatePurchaseReturnModal from './CreatePurchaseReturnModal';
 import Button from '../../../../ui/base/Button';
 import { exportReturnsToExcel } from '../../../../core/utils/returnsExcelExporter';
 import { exportToPDF } from '../../../../core/utils/pdfExporter';
+import { AdvancedReturnModal } from '../../../returns/components/AdvancedReturnModal'; // Import new Modal
 
 // Return reason labels
 const RETURN_REASON_LABELS: Record<string, string> = {
@@ -497,11 +497,15 @@ const PurchaseReturnsView: React.FC<PurchaseReturnsViewProps> = ({ searchTerm: p
                 </div>
             )}
 
-            <CreatePurchaseReturnModal
+            {/* Advanced Return Modal */}
+            <AdvancedReturnModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                returnType="purchase"
+                partyName="مورد"
                 onSuccess={() => {
                     setIsModalOpen(false);
+                    refetch();
                 }}
             />
         </div>

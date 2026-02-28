@@ -222,23 +222,29 @@ export interface Database {
           company_id: string
           code: string
           name_ar: string
+          name_en: string | null
           type: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense'
           parent_id: string | null
           balance: number
           currency_code: string
           is_system: boolean
+          is_active: boolean
           created_at: string
+          updated_at: string | null
+          deleted_at: string | null
         }
         Insert: {
           id?: string
           company_id: string
           code: string
           name_ar: string
+          name_en?: string | null
           type: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense'
           parent_id?: string | null
           balance?: number
           currency_code?: string
           is_system?: boolean
+          is_active?: boolean
         }
         Update: Partial<Database['public']['Tables']['accounts']['Insert']>
       }
@@ -461,7 +467,7 @@ export interface Database {
           product_id: string
           warehouse_id: string
           quantity: number
-          transaction_type: 'purchase' | 'sale' | 'return_purchase' | 'return_sale' | 'transfer_in' | 'transfer_out' | 'adj_in' | 'adj_out' | 'initial'
+          transaction_type: 'purchase' | 'sales' | 'purchase_return' | 'sales_return' | 'transfer_in' | 'transfer_out' | 'adj_in' | 'adj_out' | 'adj' | 'initial'
           reference_type: string | null
           reference_id: string | null
           created_by: string | null
@@ -473,7 +479,7 @@ export interface Database {
           product_id: string
           warehouse_id: string
           quantity: number
-          transaction_type: 'purchase' | 'sale' | 'return_purchase' | 'return_sale' | 'transfer_in' | 'transfer_out' | 'adj_in' | 'adj_out' | 'initial'
+          transaction_type: 'purchase' | 'sales' | 'purchase_return' | 'sales_return' | 'transfer_in' | 'transfer_out' | 'adj_in' | 'adj_out' | 'adj' | 'initial'
           reference_type?: string | null
           reference_id?: string | null
           created_by?: string | null
@@ -512,7 +518,9 @@ export interface Database {
           unit_price: number
           cost_price: number
           tax_amount: number
+          discount_amount: number
           total: number
+          is_core_return: boolean
         }
         Insert: {
           id?: string
@@ -523,7 +531,9 @@ export interface Database {
           unit_price?: number
           cost_price?: number
           tax_amount?: number
+          discount_amount?: number
           total?: number
+          is_core_return?: boolean
         }
         Update: Partial<Database['public']['Tables']['invoice_items']['Insert']>
       }
@@ -548,6 +558,7 @@ export interface Database {
           currency_code: string
           exchange_rate: number
           deleted_at: string | null
+          paid_amount: number
           // Return-specific fields
           reference_invoice_id: string | null
           return_reason: string | null
@@ -571,6 +582,7 @@ export interface Database {
           currency_code?: string
           exchange_rate?: number
           deleted_at?: string | null
+          paid_amount?: number
           // Return-specific fields
           reference_invoice_id?: string | null
           return_reason?: string | null

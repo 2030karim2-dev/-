@@ -198,25 +198,17 @@ export const useInventorySmartInsights = (from?: string, to?: string) => {
         queryFn: async () => {
             if (!user?.company_id || !analyticsData) return null;
 
-            const totalValuation = [
+            // M3: Compute merged array once instead of repeating 4 times
+            const allProducts = [
                 ...(analyticsData.abcAnalysis?.A || []),
                 ...(analyticsData.abcAnalysis?.B || []),
                 ...(analyticsData.abcAnalysis?.C || [])
-            ].reduce((sum: number, item: any) => sum + ((item.cost_price || 0) * (item.stock_quantity || 0)), 0);
+            ];
 
-            const totalItems = [
-                ...(analyticsData.abcAnalysis?.A || []),
-                ...(analyticsData.abcAnalysis?.B || []),
-                ...(analyticsData.abcAnalysis?.C || [])
-            ].reduce((sum: number, item: any) => sum + (item.stock_quantity || 0), 0);
-
-            const totalUnique = (analyticsData.abcAnalysis?.A?.length || 0) + (analyticsData.abcAnalysis?.B?.length || 0) + (analyticsData.abcAnalysis?.C?.length || 0);
-
-            const outOfStock = [
-                ...(analyticsData.abcAnalysis?.A || []),
-                ...(analyticsData.abcAnalysis?.B || []),
-                ...(analyticsData.abcAnalysis?.C || [])
-            ].filter((item: any) => item.stock_quantity <= 0).length;
+            const totalValuation = allProducts.reduce((sum: number, item: any) => sum + ((item.cost_price || 0) * (item.stock_quantity || 0)), 0);
+            const totalItems = allProducts.reduce((sum: number, item: any) => sum + (item.stock_quantity || 0), 0);
+            const totalUnique = allProducts.length;
+            const outOfStock = allProducts.filter((item: any) => item.stock_quantity <= 0).length;
 
             const snapshot: InventoryDataSnapshot = {
                 total_valuation: totalValuation,

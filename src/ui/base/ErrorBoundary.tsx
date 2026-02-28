@@ -1,11 +1,11 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
-interface ErrorBoundaryProps { 
-  children?: ReactNode; 
+interface ErrorBoundaryProps {
+  children?: ReactNode;
 }
 
-interface ErrorBoundaryState { 
-  hasError: boolean; 
+interface ErrorBoundaryState {
+  hasError: boolean;
 }
 
 /**
@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           button: "Refresh Page"
         }
       };
-      
+
       return (
         <div style={{
           display: 'flex',
@@ -62,8 +62,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <p style={{ marginTop: '0.5rem', maxWidth: '400px' }}>
             {texts[lang].message}
           </p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             style={{
               marginTop: '1.5rem',
               display: 'flex',
@@ -83,8 +83,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         </div>
       );
     }
-    
-    // Explicitly cast this to any to avoid "Property 'props' does not exist" error in some TS environments
-    return (this as any).props.children;
+
+    return this.props.children;
   }
 }

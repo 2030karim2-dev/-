@@ -4,6 +4,8 @@ import { purchasesApi } from './api';
 import { CreatePurchaseDTO } from './types';
 import { purchaseAccountingService } from './services/purchaseAccounting';
 import { messagingService } from '../notifications/messagingService';
+import { toBaseCurrency } from '../../core/utils/currencyUtils';
+import { validatePurchasePayload, assertValid } from '../../core/utils/validationUtils';
 
 export { purchasesApi };
 
@@ -67,21 +69,13 @@ export const purchasesService = {
     }
     const purchases = (data as any[])?.filter(p => p.type === 'purchase') || [];
 
-    // تحويل المبلغ للعملة الأساسية
-    const toBase = (inv: any): number => {
-      const amount = Number(inv.total_amount) || 0;
-      const rate = Number(inv.exchange_rate) || 1;
-      if (!inv.currency_code || inv.currency_code === 'SAR') return amount;
-      return amount * rate;
-    };
-
-    const totalPurchases = purchases.reduce((sum, p) => sum + toBase(p), 0);
+    const totalPurchases = purchases.reduce((sum, p) => sum + toBaseCurrency(p), 0);
     const creditPurchases = purchases.filter(p => p.payment_method === 'credit');
     return {
       invoiceCount: purchases.length,
       totalPurchases,
       pendingPaymentCount: creditPurchases.length,
-      totalDebt: creditPurchases.reduce((sum, p) => sum + toBase(p), 0)
+      totalDebt: creditPurchases.reduce((sum, p) => sum + toBaseCurrency(p), 0)
     };
   },
 
@@ -151,15 +145,7 @@ export const purchasesService = {
     }
     const returns = (data as any[])?.filter(p => p.type === 'return_purchase') || [];
 
-    // تحويل المبلغ للعملة الأساسية
-    const toBase = (inv: any): number => {
-      const amount = Number(inv.total_amount) || 0;
-      const rate = Number(inv.exchange_rate) || 1;
-      if (!inv.currency_code || inv.currency_code === 'SAR') return amount;
-      return amount * rate;
-    };
-
-    const totalReturns = returns.reduce((sum, r) => sum + toBase(r), 0);
+    const totalReturns = returns.reduce((sum, r) => sum + toBaseCurrency(r), 0);
     return {
       returnCount: returns.length,
       totalReturns

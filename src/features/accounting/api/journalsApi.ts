@@ -1,5 +1,6 @@
 
 import { supabase } from '../../../lib/supabaseClient';
+import { parseError } from '../../../core/utils/errorUtils';
 import type { CreateJournalEntryDTO } from '../types';
 
 export const journalsApi = {
@@ -16,6 +17,11 @@ export const journalsApi = {
           debit_amount,
           credit_amount,
           account:account_id(name_ar, code)
+        ),
+        profile:created_by(id, full_name),
+        invoice:reference_id (
+          id,
+          party:party_id(name)
         )
       `)
       .eq('company_id', companyId)
@@ -24,74 +30,51 @@ export const journalsApi = {
       .range(from, to);
   },
 
-  // TODO: Migrate to a single Supabase RPC for true atomic transactions.
-  // Current approach inserts header + lines in two steps with manual rollback.
-  postJournalEntryRPC: async (companyId: string, userId: string, data: { date: string; description: string; reference_type?: string; currency_code?: string; exchange_rate?: number; lines: Array<{ debit?: number | string; credit?: number | string; account_id: string; description?: string }> }) => {
-    // Validate: total debits must equal total credits
+  postJournalEntryRPC: async (companyId: string, userId: string, data: {
+    date: string;
+    description: string;
+    reference_type?: string;
+    currency_code?: string;
+    exchange_rate?: number;
+    lines: Array<{
+      debit?: number | string;
+      credit?: number | string;
+      account_id: string;
+      party_id?: string;
+      description?: string
+    }>
+  }) => {
+    // 1. Calculate and validate balance
     const totalDebit = data.lines.reduce((sum: number, l) => sum + (Number(l.debit) || 0), 0);
     const totalCredit = data.lines.reduce((sum: number, l) => sum + (Number(l.credit) || 0), 0);
+
     if (Math.abs(totalDebit - totalCredit) > 0.01) {
-      throw new Error(`القيد غير متوازن: مدين ${totalDebit.toFixed(2)} ≠ دائن ${totalCredit.toFixed(2)}`);
+      throw parseError(`القيد غير متوازن: مدين ${totalDebit.toFixed(2)} ≠ دائن ${totalCredit.toFixed(2)}`);
     }
 
-    // 1. إنشاء رأس القيد
-    const insertPayload = {
-      company_id: companyId,
-      entry_date: data.date,
-      description: data.description,
-      status: 'posted',
-      created_by: userId,
-      reference_type: data.reference_type || 'manual'
-    } as Record<string, unknown>;
+    // 2. Call the Atomic RPC
+    const { data: journalId, error } = await supabase.rpc('post_manual_journal', {
+      p_company_id: companyId,
+      p_user_id: userId,
+      p_date: data.date,
+      p_description: data.description,
+      p_reference_type: data.reference_type || 'manual',
+      p_currency_code: data.currency_code || 'SAR',
+      p_exchange_rate: Number(data.exchange_rate) || 1,
+      p_lines: data.lines.map(l => ({
+        account_id: l.account_id,
+        party_id: l.party_id || null,
+        debit: Number(l.debit) || 0,
+        credit: Number(l.credit) || 0,
+        description: l.description || null
+      }))
+    });
 
-    const response1 = await supabase.from('journal_entries').insert(insertPayload as never).select().single();
-    const journalData = response1.data as { id: string } | null;
-    const jErrorData = response1.error;
-
-    if (jErrorData || !journalData) {
-      console.error('Error creating journal header:', jErrorData);
-      throw jErrorData || new Error('Failed to create journal header');
+    if (error) {
+      console.error('Error in post_manual_journal RPC:', error);
+      throw parseError(error);
     }
 
-    // 2. إعداد الأسطر
-    try {
-      const exchangeRate = Number(data.exchange_rate) || 1;
-      const currencyCode = data.currency_code || 'SAR';
-
-      const lines = data.lines.map((l) => {
-        const foreignDebit = Number(l.debit) || 0;
-        const foreignCredit = Number(l.credit) || 0;
-        const baseDebit = foreignDebit * exchangeRate;
-        const baseCredit = foreignCredit * exchangeRate;
-
-        return {
-          journal_entry_id: journalData.id,
-          account_id: l.account_id,
-          debit_amount: baseDebit,
-          credit_amount: baseCredit,
-          foreign_amount: foreignDebit > 0 ? foreignDebit : (foreignCredit > 0 ? foreignCredit : 0),
-          currency_code: currencyCode,
-          exchange_rate: exchangeRate,
-          description: l.description || data.description
-        };
-      });
-
-      // 3. إدراج الأسطر
-      const { error: lError } = await supabase.from('journal_entry_lines').insert(lines as never[]);
-
-      if (lError) {
-        console.error('Error creating journal lines:', lError);
-        // Rollback بسيط: حذف القيد إذا فشل إدخال الأسطر
-        await supabase.from('journal_entries').delete().eq('id', journalData.id);
-        throw lError;
-      }
-    } catch (e) {
-      console.error('Exception in journal lines creation:', e);
-      // Attempt rollback
-      await supabase.from('journal_entries').delete().eq('id', journalData.id);
-      throw e;
-    }
-
-    return { data: journalData.id, error: null };
+    return { data: journalId, error: null };
   }
 };

@@ -174,8 +174,8 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
                     </button>
                 </div>
             </div>
-            <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={288}>
+            <div className="h-72 w-full mt-6" dir="ltr">
+                <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={288}>
                     {renderChart()}
                 </ResponsiveContainer>
             </div>

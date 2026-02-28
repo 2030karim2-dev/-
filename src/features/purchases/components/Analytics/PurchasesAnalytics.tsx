@@ -51,8 +51,8 @@ const PurchasesAnalytics: React.FC = () => {
                         </div>
                         أفضل الموردين (حسب القيمة)
                     </h3>
-                    <div className="h-72 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-72 w-full" dir="ltr">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={280}>
                             <BarChart data={analytics.topSuppliers} layout="vertical" margin={{ left: 10, right: 30 }}>
                                 <defs>
                                     <linearGradient id="supplierGradient" x1="0" y1="0" x2="1" y2="0">
@@ -87,8 +87,8 @@ const PurchasesAnalytics: React.FC = () => {
                             حجم التوريد اليومي
                         </h3>
                     </div>
-                    <div className="h-72 w-full">
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                    <div className="h-72 w-full" dir="ltr">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={280}>
                             <BarChart data={analytics.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">

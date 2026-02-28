@@ -184,6 +184,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
       isOpen={!!invoiceId}
       onClose={onClose}
       icon={FileText}
+
       title={`تفاصيل الفاتورة #${invoice?.invoice_number || ''}`}
       description="عرض تفصيلي لعملية البيع المسجلة"
       size="resizable"
@@ -195,7 +196,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
               <ShareButton
                 size="md"
                 showLabel
-                elementRef={printRef as React.RefObject<HTMLElement>}
+                elementRef={printRef as unknown as React.RefObject<HTMLElement>}
                 title={`مشاركة فاتورة #${invoice?.invoice_number}`}
                 eventType="sale_invoice"
                 message={`🧾 فاتورة بيع #${invoice?.invoice_number}\n━━━━━━━━━━━━━━\n👤 العميل: ${invoice?.parties?.name || 'عميل نقدي'}\n💰 الإجمالي: ${shareFmtCur(invoice?.total_amount || 0, invoice?.currency_code || 'SAR')}\n📅 التاريخ: ${invoice?.issue_date}\n📦 عدد الأصناف: ${invoice?.invoice_items?.length || 0}\n👨‍💼 صدرت بواسطة: ${issuedByName}`}
@@ -241,6 +242,19 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
         </div>
       )}
 
+      {invoice && invoice.type !== 'return_sale' && onReturn && (
+        <div className="flex justify-end px-4 mt-2">
+          <button
+            onClick={() => onReturn(invoice.id, [])}
+            className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
+            title="بدء عملية المرتجع لهذه الفاتورة"
+          >
+            <RotateCcw size={16} />
+            بدء مرتجع سريع
+          </button>
+        </div>
+      )}
+
       {isLoading ? (
         <div className="p-20 text-center flex justify-center"><Loader2 className="animate-spin text-blue-500" /></div>
       ) : invoice ? (
@@ -259,7 +273,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-slate-700 dark:text-slate-300">الشركة:</span>
-                  <span className="text-slate-600 dark:text-slate-400">{company?.name || 'الزهراء سمارت'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">{company?.name_ar || company?.name || user?.company_name || 'الزهراء سمارت'}</span>
                 </div>
                 {company?.tax_number && (
                   <div className="flex items-center gap-2">
@@ -309,7 +323,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-blue-700 dark:text-blue-300">الاسم:</span>
-                    <span className="text-gray-700 dark:text-slate-300">{invoice.parties?.name || 'عميل نقدي'}</span>
+                    <span className="text-gray-700 dark:text-slate-300">{invoice.parties?.name || invoice.party?.name || 'عميل نقدي'}</span>
                   </div>
                   {invoice.parties?.phone && (
                     <div className="flex items-center gap-2">
@@ -453,6 +467,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
             <table className="w-full text-sm border-collapse border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
               <thead className="bg-gray-100 dark:bg-slate-800 border-b-2 border-gray-300 dark:border-slate-600">
                 <tr>
+                  <th className="p-3 font-bold text-right border-r border-gray-200 dark:border-slate-700 whitespace-nowrap">رقم القطعة</th>
                   <th className="p-3 font-bold text-right border-r border-gray-200 dark:border-slate-700">الصنف</th>
                   <th className="p-3 font-bold text-center border-r border-gray-200 dark:border-slate-700">الكمية</th>
                   <th className="p-3 font-bold text-center border-r border-gray-200 dark:border-slate-700">السعر</th>
@@ -463,6 +478,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
               <tbody>
                 {invoice.invoice_items?.map((item: any, index: number) => (
                   <tr key={item.id} className={`border-b border-gray-200 dark:border-slate-700 ${index % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-gray-50 dark:bg-slate-800/50'}`}>
+                    <td className="p-3 border-r border-gray-200 dark:border-slate-700 font-mono text-xs whitespace-nowrap">{item.product?.part_number || item.product?.sku || '---'}</td>
                     <td className="p-3 font-bold border-r border-gray-200 dark:border-slate-700">{item.description}</td>
                     <td className="p-3 text-center border-r border-gray-200 dark:border-slate-700">
                       <span className="inline-flex items-center justify-center px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded font-bold">

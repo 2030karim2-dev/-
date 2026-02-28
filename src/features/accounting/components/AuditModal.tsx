@@ -9,8 +9,8 @@ interface AuditResult {
     id: string;
     date: string;
     description: string;
-    debit: number;
-    credit: number;
+    debit_amount: number;
+    credit_amount: number;
     status: 'balanced' | 'unbalanced' | 'error';
     message?: string;
 }
@@ -60,8 +60,8 @@ export const AuditModal: React.FC<Props> = ({ onClose }) => {
                     id: entry.id,
                     date: entry.entry_date,
                     description: entry.description || 'No Description',
-                    debit: totalDebit,
-                    credit: totalCredit,
+                    debit_amount: totalDebit,
+                    credit_amount: totalCredit,
                     status: 'unbalanced',
                     message: `Difference: ${formatCurrency(diff)}`
                 });
@@ -71,8 +71,8 @@ export const AuditModal: React.FC<Props> = ({ onClose }) => {
                     id: entry.id,
                     date: entry.entry_date,
                     description: entry.description || 'No Description',
-                    debit: 0,
-                    credit: 0,
+                    debit_amount: 0,
+                    credit_amount: 0,
                     status: 'error',
                     message: 'Empty Entry (Zero Value)'
                 });
@@ -185,8 +185,8 @@ export const AuditModal: React.FC<Props> = ({ onClose }) => {
                                                         <div className="font-bold text-gray-700 dark:text-gray-300">{res.date}</div>
                                                     </td>
                                                     <td className="p-4 text-gray-600 dark:text-gray-400">{res.message}</td>
-                                                    <td className="p-4 text-left font-mono font-bold text-gray-800 dark:text-gray-200">{formatCurrency(res.debit)}</td>
-                                                    <td className="p-4 text-left font-mono font-bold text-gray-800 dark:text-gray-200">{formatCurrency(res.credit)}</td>
+                                                    <td className="p-4 text-left font-mono font-bold text-gray-800 dark:text-gray-200">{formatCurrency(res.debit_amount)}</td>
+                                                    <td className="p-4 text-left font-mono font-bold text-gray-800 dark:text-gray-200">{formatCurrency(res.credit_amount)}</td>
                                                     <td className="p-4">
                                                         <span className={`px-2 py-1 rounded text-xs font-bold ${res.status === 'unbalanced' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
                                                             {res.status.toUpperCase()}

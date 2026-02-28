@@ -148,5 +148,24 @@ export const partiesService = {
     const { data, error } = await partiesApi.search(companyId, type, query);
     if (error) throw error;
     return (data || []) as unknown as Party[];
+  },
+
+  getOrCreateGeneralParty: async (companyId: string, type: PartyType): Promise<Party> => {
+    const name = type === 'customer' ? 'الزبون العام' : 'المورد العام';
+    const { data: searchResults, error: searchError } = await partiesApi.search(companyId, type, name);
+    if (searchError) throw searchError;
+
+    const existing = (searchResults || []).find((p: any) => p.name === name);
+    if (existing) return existing as unknown as Party;
+
+    const { data: created, error: createError } = await partiesApi.saveParty(companyId, {
+      name,
+      type,
+      status: 'active',
+      balance: 0
+    });
+
+    if (createError) throw createError;
+    return (created as any) as Party;
   }
 };

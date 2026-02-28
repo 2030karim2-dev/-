@@ -19,11 +19,11 @@ export interface Account {
 
 export interface JournalLine {
   id?: string;
-  journal_id?: string;
+  journal_entry_id?: string;
   account_id: string;
   description: string;
-  debit: number;
-  credit: number;
+  debit_amount: number;
+  credit_amount: number;
   account_name?: string; // Optional for UI display
 }
 
@@ -67,7 +67,7 @@ export interface JournalEntryFormData {
   party_name?: string;
   currency_code?: string;
   exchange_rate?: number;
-  lines: Omit<JournalLine, 'id' | 'journal_id'>[];
+  lines: Omit<JournalLine, 'id' | 'journal_entry_id'>[];
 }
 
 export interface AccountFormData {

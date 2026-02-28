@@ -35,37 +35,39 @@ const LedgerView: React.FC<Props> = ({ dateRange, accountId, showAccountSelector
     { header: 'البيان', accessor: (row: any) => <span className="text-xs font-semibold">{row.description}</span>, className: 'text-right min-w-[200px]' },
     {
       header: 'مدين',
-      accessor: (row: LedgerEntry) => (
+      accessor: () => null,
+      cell: ({ row }: { row: { original: LedgerEntry } }) => (
         <div className="text-left space-y-0.5">
-          <div dir="ltr" className="font-mono text-xs font-bold text-emerald-600">
-            {row.debit > 0 ? formatCurrency(row.debit) : '-'}
+          <div dir="ltr" className={`font-mono text-xs font-bold ${row.original.debit_amount > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
+            {row.original.debit_amount > 0 ? formatCurrency(row.original.debit_amount) : '-'}
           </div>
-          {row.foreign_amount && row.foreign_amount > 0 && Math.abs(row.debit - row.foreign_amount) > 0.01 && (
+          {row.original.foreign_amount && row.original.foreign_amount > 0 && Math.abs(row.original.debit_amount - row.original.foreign_amount) > 0.01 && (
             <div dir="ltr" className="text-[9px] text-gray-400 font-mono">
-              ({formatCurrency(row.foreign_amount, row.currency_code)})
+              ({formatCurrency(row.original.foreign_amount, row.original.currency_code)})
             </div>
           )}
         </div>
       ),
       className: 'w-28',
-      footer: (data: LedgerEntry[]) => <span dir="ltr" className="font-mono text-xs font-black text-emerald-700">{formatCurrency(data.reduce((sum, row) => sum + row.debit, 0))}</span>
+      footer: (data: LedgerEntry[]) => <span dir="ltr" className="font-mono text-xs font-black text-emerald-700">{formatCurrency(data.reduce((sum, row) => sum + row.debit_amount, 0))}</span>
     },
     {
       header: 'دائن',
-      accessor: (row: LedgerEntry) => (
+      accessor: () => null,
+      cell: ({ row }: { row: { original: LedgerEntry } }) => (
         <div className="text-left space-y-0.5">
-          <div dir="ltr" className="font-mono text-xs font-bold text-red-600">
-            {row.credit > 0 ? formatCurrency(row.credit) : '-'}
+          <div dir="ltr" className={`font-mono text-xs font-bold ${row.original.credit_amount > 0 ? 'text-red-600' : 'text-gray-400'}`}>
+            {row.original.credit_amount > 0 ? formatCurrency(row.original.credit_amount) : '-'}
           </div>
-          {row.foreign_amount && row.foreign_amount > 0 && Math.abs(row.credit - row.foreign_amount) > 0.01 && (
+          {row.original.foreign_amount && row.original.foreign_amount > 0 && Math.abs(row.original.credit_amount - row.original.foreign_amount) > 0.01 && (
             <div dir="ltr" className="text-[9px] text-gray-400 font-mono">
-              ({formatCurrency(row.foreign_amount, row.currency_code)})
+              ({formatCurrency(row.original.foreign_amount, row.original.currency_code)})
             </div>
           )}
         </div>
       ),
       className: 'w-28',
-      footer: (data: LedgerEntry[]) => <span dir="ltr" className="font-mono text-xs font-black text-red-700">{formatCurrency(data.reduce((sum, row) => sum + row.credit, 0))}</span>
+      footer: (data: LedgerEntry[]) => <span dir="ltr" className="font-mono text-xs font-black text-red-700">{formatCurrency(data.reduce((sum, row) => sum + row.credit_amount, 0))}</span>
     },
     {
       header: 'الرصيد',
@@ -103,7 +105,7 @@ const LedgerView: React.FC<Props> = ({ dateRange, accountId, showAccountSelector
               showLabel
               eventType="ledger"
               title={`مشاركة كشف حساب ${selectedAccount?.name}`}
-              message={`📒 دفتر الأستاذ - كشف حساب\n━━━━━━━━━━━━━━\n📋 الحساب: ${selectedAccount?.name} (${selectedAccount?.code})\n📗 إجمالي المدين: ${formatCurrency(ledger.reduce((s: number, r: any) => s + r.debit, 0))}\n📕 إجمالي الدائن: ${formatCurrency(ledger.reduce((s: number, r: any) => s + r.credit, 0))}\n💰 الرصيد النهائي: ${formatCurrency(ledger[ledger.length - 1]?.balance || 0)}\n📅 الفترة: من ${dateRange.from} إلى ${dateRange.to}`}
+              message={`📒 دفتر الأستاذ - كشف حساب\n━━━━━━━━━━━━━━\n📋 الحساب: ${selectedAccount?.name} (${selectedAccount?.code})\n📗 إجمالي المدين: ${formatCurrency(ledger.reduce((s: number, r: any) => s + r.debit_amount, 0))}\n📕 إجمالي الدائن: ${formatCurrency(ledger.reduce((s: number, r: any) => s + r.credit_amount, 0))}\n💰 الرصيد النهائي: ${formatCurrency(ledger[ledger.length - 1]?.balance || 0)}\n📅 الفترة: من ${dateRange.from} إلى ${dateRange.to}`}
             />
           )}
         </div>

@@ -1,12 +1,12 @@
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { useSalesStore, InvoiceItem } from '../../store';
+import { useSalesStore, SalesCartItem } from '../../store';
 import { useTaxDiscountStore } from '../../../settings/taxDiscountStore';
 import { Product } from '../../../inventory/types';
 import { Plus, Settings } from 'lucide-react';
 import { cn } from '../../../../core/utils';
 import ProductSelectionModal from './ProductSelectionModal';
 import InvoiceRow from './InvoiceRow';
+
 
 const InteractiveInvoiceTable: React.FC = () => {
   const {
@@ -89,7 +89,7 @@ const InteractiveInvoiceTable: React.FC = () => {
     }, 50);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, rowIndex: number, field: keyof InvoiceItem) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, rowIndex: number, field: keyof SalesCartItem) => {
     if (!tableRef.current) return;
 
     if (field === 'name' && (e.key === 'Enter' || (e.key.length === 1 && !e.ctrlKey && !e.metaKey))) {
@@ -98,12 +98,12 @@ const InteractiveInvoiceTable: React.FC = () => {
       return;
     }
 
-    const navigationFields: (keyof InvoiceItem)[] = ['name', 'quantity', 'price'];
+    const navigationFields: (keyof SalesCartItem)[] = ['name', 'quantity', 'price'];
     if (showDiscount) navigationFields.push('discount');
 
     const colIndex = navigationFields.indexOf(field);
 
-    const moveFocus = (row: number, colField: keyof InvoiceItem) => {
+    const moveFocus = (row: number, colField: keyof SalesCartItem) => {
       const nextCell = tableRef.current?.querySelector(`[data-row-index="${row}"][data-col-field="${colField}"]`) as HTMLInputElement;
       nextCell?.focus();
       if (nextCell) nextCell.select();
@@ -198,7 +198,7 @@ const InteractiveInvoiceTable: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y dark:divide-slate-800">
-            {items.map((item, index) => (
+            {items.map((item: SalesCartItem, index: number) => (
               <InvoiceRow
                 key={item.id}
                 item={item}

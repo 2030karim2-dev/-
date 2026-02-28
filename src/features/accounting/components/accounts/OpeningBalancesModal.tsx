@@ -14,16 +14,14 @@ interface OpeningBalancesModalProps {
     onClose: () => void;
 }
 
-type AccountBalanceInput = {
+interface OpeningBalanceLine {
     account_id: string;
-    code: string;
-    name: string;
-    debit: number;
-    credit: number;
+    debit_amount: number;
+    credit_amount: number;
 };
 
 type FormData = {
-    balances: AccountBalanceInput[];
+    lines: OpeningBalanceLine[];
     date: string;
 };
 
@@ -35,53 +33,53 @@ const OpeningBalancesModal: React.FC<OpeningBalancesModalProps> = ({ isOpen, onC
     const { control, register, handleSubmit, reset, watch, setValue } = useForm<FormData>({
         defaultValues: {
             date: new Date().toISOString().split('T')[0],
-            balances: []
+            lines: []
         }
     });
 
-    const { fields, replace } = useFieldArray({ control, name: "balances" });
+    const { fields, replace } = useFieldArray({ control, name: "lines" });
 
     useEffect(() => {
         if (isOpen && accounts) {
             replace(accounts.map(acc => ({
                 account_id: acc.id,
-                code: acc.code,
-                name: acc.name,
-                debit: 0,
-                credit: 0
+                debit_amount: 0,
+                credit_amount: 0
             })));
         }
     }, [isOpen, accounts, replace]);
 
-    const watchedBalances = watch("balances");
+    const watchedLines = watch("lines");
 
-    const totals = (watchedBalances || []).reduce((acc, curr) => ({
-        debit: acc.debit + (Number(curr.debit) || 0),
-        credit: acc.credit + (Number(curr.credit) || 0)
-    }), { debit: 0, credit: 0 });
+    const totals = (watchedLines || []).reduce((acc, curr) => ({
+        debit_amount: acc.debit_amount + (Number(curr.debit_amount) || 0),
+        credit_amount: acc.credit_amount + (Number(curr.credit_amount) || 0)
+    }), { debit_amount: 0, credit_amount: 0 });
 
-    const difference = totals.debit - totals.credit;
+    const difference = totals.debit_amount - totals.credit_amount;
     const isBalanced = Math.abs(difference) < 0.01;
 
     const onSubmit = (data: FormData) => {
-        const activeLines = data.balances.filter(b => b.debit > 0 || b.credit > 0);
-        if (activeLines.length === 0 || !isBalanced) return;
+        const filteredLines = data.lines.filter(line => Number(line.debit_amount) > 0 || Number(line.credit_amount) > 0).map(line => ({
+            account_id: line.account_id,
+            debit_amount: Number(line.debit_amount) || 0,
+            credit_amount: Number(line.credit_amount) || 0,
+            description: 'رصيد افتتاحي'
+        }));
+
+        if (filteredLines.length === 0 || !isBalanced) return;
 
         createJournal({
             date: data.date,
             description: 'القيد الافتتاحي للأرصدة (Micro-UI Sync)',
             reference_type: 'opening_balance',
-            lines: activeLines.map(line => ({
-                account_id: line.account_id,
-                description: 'رصيد أول المدة',
-                debit: line.debit,
-                credit: line.credit
-            }))
+            lines: filteredLines
         }, { onSuccess: onClose });
     };
 
     const filteredFields = fields.map((field, index) => ({ ...field, index })).filter(field =>
-        field.name.toLowerCase().includes(filter.toLowerCase()) || field.code.includes(filter)
+        (accounts?.find(acc => acc.id === field.account_id)?.name.toLowerCase().includes(filter.toLowerCase())) ||
+        (accounts?.find(acc => acc.id === field.account_id)?.code.includes(filter))
     );
 
     const footer = (
@@ -91,6 +89,18 @@ const OpeningBalancesModal: React.FC<OpeningBalancesModalProps> = ({ isOpen, onC
                     <span className="text-[7px] font-black text-gray-400 uppercase">الفرق</span>
                     <span dir="ltr" className={`text-[11px] font-black font-mono ${isBalanced ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {formatCurrency(Math.abs(difference))}
+                    </span>
+                </div>
+                <div className="flex flex-col text-right">
+                    <span className="text-[7px] font-black text-gray-400 uppercase">إجمالي المدين</span>
+                    <span dir="ltr" className="text-[11px] font-black font-mono text-gray-800 dark:text-slate-100">
+                        {formatCurrency(totals.debit_amount)}
+                    </span>
+                </div>
+                <div className="flex flex-col text-right">
+                    <span className="text-[7px] font-black text-gray-400 uppercase">إجمالي الدائن</span>
+                    <span dir="ltr" className="text-[11px] font-black font-mono text-gray-800 dark:text-slate-100">
+                        {formatCurrency(totals.credit_amount)}
                     </span>
                 </div>
             </div>
@@ -145,32 +155,35 @@ const OpeningBalancesModal: React.FC<OpeningBalancesModalProps> = ({ isOpen, onC
                                 </tr>
                             </thead>
                             <tbody className="divide-y dark:divide-slate-800">
-                                {filteredFields.map((field) => (
-                                    <tr key={field.id} className="hover:bg-blue-50/30 dark:hover:bg-blue-900/5 transition-colors">
-                                        <td className="p-2">
-                                            <div className="text-[10px] font-bold text-gray-800 dark:text-slate-200">{field.name}</div>
-                                            <div className="text-[7px] font-mono text-gray-400">{field.code}</div>
-                                        </td>
-                                        <td className="p-0 border-r dark:border-slate-800">
-                                            <input
-                                                type="number" step="0.01"
-                                                {...register(`balances.${field.index}.debit`, { valueAsNumber: true })}
-                                                className="w-full h-full p-2 bg-transparent text-[10px] font-black font-mono text-emerald-600 outline-none focus:bg-emerald-50 dark:focus:bg-emerald-900/10"
-                                                dir="ltr"
-                                                onChange={(e) => { if (parseFloat(e.target.value) > 0) setValue(`balances.${field.index}.credit`, 0); }}
-                                            />
-                                        </td>
-                                        <td className="p-0">
-                                            <input
-                                                type="number" step="0.01"
-                                                {...register(`balances.${field.index}.credit`, { valueAsNumber: true })}
-                                                className="w-full h-full p-2 bg-transparent text-[10px] font-black font-mono text-rose-600 outline-none focus:bg-rose-50 dark:focus:bg-rose-900/10"
-                                                dir="ltr"
-                                                onChange={(e) => { if (parseFloat(e.target.value) > 0) setValue(`balances.${field.index}.debit`, 0); }}
-                                            />
-                                        </td>
-                                    </tr>
-                                ))}
+                                {filteredFields.map((field) => {
+                                    const account = accounts?.find(acc => acc.id === field.account_id);
+                                    return (
+                                        <tr key={field.id} className="hover:bg-blue-50/30 dark:hover:bg-blue-900/5 transition-colors">
+                                            <td className="p-2">
+                                                <div className="text-[10px] font-bold text-gray-800 dark:text-slate-200">{account?.name}</div>
+                                                <div className="text-[7px] font-mono text-gray-400">{account?.code}</div>
+                                            </td>
+                                            <td className="p-0 border-r dark:border-slate-800">
+                                                <input
+                                                    type="number" step="0.01"
+                                                    {...register(`lines.${field.index}.debit_amount`, { valueAsNumber: true })}
+                                                    className="w-full h-full p-2 bg-transparent text-[10px] font-black font-mono text-emerald-600 outline-none focus:bg-emerald-50 dark:focus:bg-emerald-900/10"
+                                                    dir="ltr"
+                                                    onChange={(e) => { if (parseFloat(e.target.value) > 0) setValue(`lines.${field.index}.credit_amount`, 0); }}
+                                                />
+                                            </td>
+                                            <td className="p-0">
+                                                <input
+                                                    type="number" step="0.01"
+                                                    {...register(`lines.${field.index}.credit_amount`, { valueAsNumber: true })}
+                                                    className="w-full h-full p-2 bg-transparent text-[10px] font-black font-mono text-rose-600 outline-none focus:bg-rose-50 dark:focus:bg-rose-900/10"
+                                                    dir="ltr"
+                                                    onChange={(e) => { if (parseFloat(e.target.value) > 0) setValue(`lines.${field.index}.debit_amount`, 0); }}
+                                                />
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}

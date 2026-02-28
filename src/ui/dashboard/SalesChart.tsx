@@ -81,13 +81,13 @@ const SalesChart: React.FC<SalesChartProps> = ({
       )}
 
       {/* Chart */}
-      <div className="flex-1 min-h-[220px] relative group">
+      <div className="flex-1 min-h-[220px] w-full relative group" dir="ltr">
         {/* Decorative background glow */}
         <div
           className="absolute inset-x-0 bottom-0 h-32 opacity-20 transition-opacity duration-700 pointer-events-none rounded-b-3xl"
           style={{ background: `linear-gradient(to top, ${accentColor}30, transparent)` }}
         />
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={220}>
           <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="salesGradientMain" x1="0" y1="0" x2="0" y2="1">

@@ -26,8 +26,8 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
             currency_code: 'SAR',
             exchange_rate: 1,
             lines: [
-                { account_id: '', description: '', debit: 0, credit: 0 },
-                { account_id: '', description: '', debit: 0, credit: 0 }
+                { account_id: '', description: '', debit_amount: 0, credit_amount: 0 },
+                { account_id: '', description: '', debit_amount: 0, credit_amount: 0 }
             ]
         }
     });
@@ -55,12 +55,12 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
     const lines = watch("lines");
 
     const totals = lines.reduce((acc, line) => ({
-        debit: acc.debit + (Number(line.debit) || 0),
-        credit: acc.credit + (Number(line.credit) || 0)
-    }), { debit: 0, credit: 0 });
+        debit_amount: acc.debit_amount + (Number(line.debit_amount) || 0),
+        credit_amount: acc.credit_amount + (Number(line.credit_amount) || 0)
+    }), { debit_amount: 0, credit_amount: 0 });
 
-    const difference = totals.debit - totals.credit;
-    const isBalanced = Math.abs(difference) < 0.01 && totals.debit > 0;
+    const difference = totals.debit_amount - totals.credit_amount;
+    const isBalanced = Math.abs(difference) < 0.01 && totals.debit_amount > 0;
 
     useEffect(() => {
         if (isOpen) {
@@ -195,10 +195,10 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                                                 step="0.01"
                                                 min="0"
                                                 placeholder="0.00"
-                                                {...register(`lines.${index}.debit`, { valueAsNumber: true })}
+                                                {...register(`lines.${index}.debit_amount`, { valueAsNumber: true })}
                                                 className="w-full px-2 py-2 bg-emerald-50/10 dark:bg-emerald-900/5 border border-transparent hover:border-emerald-200 dark:hover:border-emerald-900/30 rounded-xl text-sm dark:text-emerald-400 focus:border-accent outline-none text-left font-mono"
                                                 onChange={(e) => {
-                                                    if (parseFloat(e.target.value) > 0) setValue(`lines.${index}.credit`, 0);
+                                                    if (parseFloat(e.target.value) > 0) setValue(`lines.${index}.credit_amount`, 0);
                                                 }}
                                                 dir="ltr"
                                             />
@@ -210,10 +210,10 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                                                 step="0.01"
                                                 min="0"
                                                 placeholder="0.00"
-                                                {...register(`lines.${index}.credit`, { valueAsNumber: true })}
+                                                {...register(`lines.${index}.credit_amount`, { valueAsNumber: true })}
                                                 className="w-full px-2 py-2 bg-red-50/10 dark:bg-red-900/5 border border-transparent hover:border-red-200 dark:hover:border-red-900/30 rounded-xl text-sm dark:text-red-400 focus:border-accent outline-none text-left font-mono"
                                                 onChange={(e) => {
-                                                    if (parseFloat(e.target.value) > 0) setValue(`lines.${index}.debit`, 0);
+                                                    if (parseFloat(e.target.value) > 0) setValue(`lines.${index}.debit_amount`, 0);
                                                 }}
                                                 dir="ltr"
                                             />
@@ -231,7 +231,7 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
 
                             <button
                                 type="button"
-                                onClick={() => append({ account_id: '', description: '', debit: 0, credit: 0 })}
+                                onClick={() => append({ account_id: '', description: '', debit_amount: 0, credit_amount: 0 })}
                                 className="w-full py-3 bg-gray-50/50 dark:bg-slate-800/30 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-400 text-sm font-bold flex items-center justify-center gap-2 border-t border-gray-100 dark:border-slate-800 transition-colors"
                             >
                                 <Plus size={18} />
@@ -245,15 +245,15 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                                 <div className="flex justify-between items-start text-sm">
                                     <span className="text-gray-500 dark:text-slate-400">إجمالي المدين</span>
                                     <div className="flex flex-col items-end">
-                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.debit, selectedCurrency)}</span>
-                                        {selectedCurrency !== 'SAR' && <span dir="ltr" className="font-mono text-[10px] text-gray-500">{formatCurrency(totals.debit * exchangeRate)}</span>}
+                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.debit_amount, selectedCurrency)}</span>
+                                        {selectedCurrency !== 'SAR' && <span dir="ltr" className="font-mono text-[10px] text-gray-500">{formatCurrency(totals.debit_amount * exchangeRate)}</span>}
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-start text-sm">
                                     <span className="text-gray-500 dark:text-slate-400">إجمالي الدائن</span>
                                     <div className="flex flex-col items-end">
-                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.credit, selectedCurrency)}</span>
-                                        {selectedCurrency !== 'SAR' && <span dir="ltr" className="font-mono text-[10px] text-gray-500">{formatCurrency(totals.credit * exchangeRate)}</span>}
+                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.credit_amount, selectedCurrency)}</span>
+                                        {selectedCurrency !== 'SAR' && <span dir="ltr" className="font-mono text-[10px] text-gray-500">{formatCurrency(totals.credit_amount * exchangeRate)}</span>}
                                     </div>
                                 </div>
                                 <div className={`flex justify-between items-start text-sm pt-3 border-t border-gray-200 dark:border-slate-700 font-bold ${isBalanced ? 'text-emerald-600' : 'text-red-600'}`}>
@@ -265,7 +265,7 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                                 </div>
                                 {!isBalanced && (
                                     <div className="text-[10px] text-red-500 dark:text-red-400 text-center bg-red-50 dark:bg-red-900/20 p-1.5 rounded-lg border border-red-100 dark:border-red-900/30 animate-pulse">
-                                        {totals.debit === 0 ? 'يجب إدخال مبالغ' : 'القيد غير متوازن'}
+                                        {totals.debit_amount === 0 ? 'يجب إدخال مبالغ' : 'القيد غير متوازن'}
                                     </div>
                                 )}
                             </div>

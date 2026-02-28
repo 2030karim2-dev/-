@@ -15,8 +15,8 @@ const TreasurySummaryStats: React.FC<Props> = ({ accountId, dateRange }) => {
     const stats = useMemo(() => {
         if (!ledger) return { balance: 0, totalDebit: 0, totalCredit: 0 };
 
-        const totalDebit = ledger.reduce((sum, item) => sum + item.debit, 0); // Inflow
-        const totalCredit = ledger.reduce((sum, item) => sum + item.credit, 0); // Outflow
+        const totalDebit = ledger.reduce((sum, item) => sum + item.debit_amount, 0); // Inflow
+        const totalCredit = ledger.reduce((sum, item) => sum + item.credit_amount, 0); // Outflow
 
         // Balance depends on account type, but for assets (Treasury), Dr is positive
         // However, the ledger usually returns a running balance. 

@@ -27,8 +27,8 @@ export const subledgerService = {
         {
           account_id: (glAccount as any).id,
           description: `تأثير حركة ${party.name}`,
-          debit: direction === 'in' ? amount : 0,
-          credit: direction === 'out' ? amount : 0
+          debit_amount: direction === 'in' ? amount : 0,
+          credit_amount: direction === 'out' ? amount : 0,
         }
       ]
     }, companyId, userId);

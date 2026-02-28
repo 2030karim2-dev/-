@@ -31,10 +31,8 @@ const ExpensesPage = lazy(() => import('../features/expenses/pages/ExpensesPage'
 const SettingsPage = lazy(() => import('../features/settings/SettingsPage'));
 const AppearancePage = lazy(() => import('../features/appearance/AppearancePage'));
 const BondsPage = lazy(() => import('../features/bonds/BondsPage'));
-const SuppliersPage = lazy(() => import('../features/suppliers/SuppliersPage'));
-const CustomersPage = lazy(() => import('../features/customers/CustomersPage'));
-const ReportsPage = lazy(() => import('../features/reports/ReportsPage'));
 const PartiesPage = lazy(() => import('../features/parties/PartiesPage'));
+const ReportsPage = lazy(() => import('../features/reports/ReportsPage'));
 const AICommandCenter = lazy(() => import('../features/ai/AICommandCenter'));
 const AIBrainPage = lazy(() => import('../features/ai/AIBrainPage'));
 
@@ -84,11 +82,11 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.DASHBOARD.SETTINGS} element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.APPEARANCE} element={<Suspense fallback={<PageLoader />}><AppearancePage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.BONDS} element={<Suspense fallback={<PageLoader />}><BondsPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.SUPPLIERS} element={<Suspense fallback={<PageLoader />}><SuppliersPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.CLIENTS} element={<Suspense fallback={<PageLoader />}><CustomersPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.PARTIES} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="customer" title="العملاء والموردون" icon={Users} iconColor="indigo" /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.PARTIES_CUSTOMERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="customer" title="العملاء" icon={Users} iconColor="indigo" /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.PARTIES_SUPPLIERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="supplier" title="الموردين" icon={Truck} iconColor="teal" /></Suspense>} />
+        <Route path={ROUTES.DASHBOARD.SUPPLIERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="supplier" /></Suspense>} />
+        <Route path={ROUTES.DASHBOARD.CLIENTS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="customer" /></Suspense>} />
+        <Route path={ROUTES.DASHBOARD.PARTIES} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="customer" /></Suspense>} />
+        <Route path={ROUTES.DASHBOARD.PARTIES_CUSTOMERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="customer" /></Suspense>} />
+        <Route path={ROUTES.DASHBOARD.PARTIES_SUPPLIERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="supplier" /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.REPORTS} element={<Suspense fallback={<PageLoader />}><ReportsPage /></Suspense>} />
         <Route path="/ai-center" element={<Suspense fallback={<PageLoader />}><AICommandCenter /></Suspense>} />
         <Route path="/ai-brain" element={<Suspense fallback={<PageLoader />}><AIBrainPage /></Suspense>} />

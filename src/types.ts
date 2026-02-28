@@ -10,13 +10,13 @@ import { LucideIcon } from 'lucide-react';
 // ------------------------------------------
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
-export type EntityStatus = 'active' | 'inactive' | 'pending' | 'deleted';
+export type EntityStatus = 'active' | 'inactive' | 'pending';
 
 export type InvoiceType = 'sale' | 'purchase' | 'return_sale' | 'return_purchase';
 
-export type InvoiceStatus = 'draft' | 'pending' | 'confirmed' | 'paid' | 'cancelled';
+export type InvoiceStatus = 'draft' | 'posted' | 'paid' | 'void';
 
-export type PaymentMethod = 'cash' | 'card' | 'bank_transfer' | 'cheque' | 'other';
+export type PaymentMethod = 'cash' | 'credit' | 'bank';
 
 export type PartyType = 'customer' | 'supplier';
 
@@ -41,29 +41,38 @@ export interface NamedEntity extends BaseEntity {
 // ------------------------------------------
 // Product Types
 // ------------------------------------------
+export type ProductStatus = 'active' | 'inactive';
+
 export interface Product extends BaseEntity {
     company_id: string;
     name_ar: string;
     sku: string;
+    part_number?: string;
+    brand?: string;
     description?: string;
-    category?: string;
+    size?: string;
+    specifications?: string;
     unit: string;
     purchase_price: number;
     sale_price: number;
     cost_price: number;
-    reorder_level: number;
-    status: EntityStatus;
+    min_stock_level: number;
     image_url?: string;
     barcode?: string;
+    alternative_numbers?: string;
+    status: ProductStatus;
+    category_id?: string;
+    is_kit?: boolean;
+    has_core_charge?: boolean;
+    core_charge_amount?: number;
+    deleted_at?: string;
 }
 
 export interface ProductCategory {
     id: string;
     company_id: string;
-    name_ar: string;
-    name_en?: string;
-    parent_id?: string;
-    product_count?: number;
+    name: string;
+    created_at: string;
 }
 
 // ------------------------------------------
@@ -73,18 +82,21 @@ export interface StockLevel {
     product_id: string;
     warehouse_id: string;
     quantity: number;
-    reserved_quantity: number;
-    available_quantity: number;
 }
 
+export type InventoryTransactionType =
+    | 'purchase' | 'sales' | 'purchase_return' | 'sales_return'
+    | 'transfer_in' | 'transfer_out' | 'adj_in' | 'adj_out' | 'adj' | 'initial';
+
 export interface StockMovement extends BaseEntity {
+    company_id: string;
     product_id: string;
     warehouse_id: string;
     quantity: number;
-    type: 'in' | 'out' | 'transfer' | 'adjustment';
+    transaction_type: InventoryTransactionType;
     reference_type?: string;
     reference_id?: string;
-    notes?: string;
+    created_by?: string;
 }
 
 // ------------------------------------------
@@ -98,11 +110,14 @@ export interface Party extends BaseEntity {
     email?: string;
     address?: string;
     balance: number;
-    credit_limit?: number;
     tax_number?: string;
+    status: 'active' | 'blocked';
+    category_id?: string;
+    deleted_at?: string;
 }
 
 export interface PartyBalance {
+    company_id: string;
     party_id: string;
     total_debit: number;
     total_credit: number;
@@ -135,9 +150,11 @@ export interface InvoiceItem {
     description?: string;
     quantity: number;
     unit_price: number;
-    tax_rate: number;
-    discount_rate: number;
+    cost_price: number;
+    tax_amount: number;
+    discount_amount: number;
     total: number;
+    is_core_return?: boolean;
 }
 
 // ------------------------------------------
@@ -156,21 +173,27 @@ export interface Account extends BaseEntity {
 
 export interface JournalEntry extends BaseEntity {
     company_id: string;
-    entry_number: string;
-    date: string;
-    description: string;
-    debit_total: number;
-    credit_total: number;
-    is_posted: boolean;
+    entry_number: number;
+    entry_date: string;
+    description?: string;
+    reference_type?: string;
+    reference_id?: string;
+    status: 'draft' | 'posted' | 'void';
+    created_by?: string;
+    deleted_at?: string;
 }
 
 export interface JournalLine {
     id: string;
-    journal_id: string;
+    journal_entry_id: string;
     account_id: string;
-    debit: number;
-    credit: number;
+    debit_amount: number;
+    credit_amount: number;
     description?: string;
+    currency_code?: string;
+    foreign_amount?: number;
+    exchange_rate?: number;
+    deleted_at?: string;
 }
 
 // ------------------------------------------
@@ -284,11 +307,7 @@ export interface CompanySettings {
     tax_number?: string;
     address?: string;
     phone?: string;
-    email?: string;
-    logo_url?: string;
     base_currency: string;
-    fiscal_year_start: string;
-    tax_rate: number;
 }
 
 export interface Warehouse {

@@ -8,6 +8,7 @@ export const accountsApi = {
     return await supabase.from('accounts')
       .select('*')
       .eq('company_id', companyId)
+      .is('deleted_at', null)
       .limit(5000)
       .order('code', { ascending: true });
   },
@@ -29,7 +30,8 @@ export const accountsApi = {
     // Safety check: prevent deleting accounts with existing journal entries
     const { count, error: checkError } = await supabase.from('journal_entry_lines')
       .select('id', { count: 'exact', head: true })
-      .eq('account_id', id);
+      .eq('account_id', id)
+      .is('deleted_at', null);
 
     if (checkError) throw checkError;
     if (count && count > 0) {
@@ -37,7 +39,7 @@ export const accountsApi = {
     }
 
     return await supabase.from('accounts')
-      .delete()
+      .update({ deleted_at: new Date().toISOString() } as any)
       .eq('id', id);
   }
 };

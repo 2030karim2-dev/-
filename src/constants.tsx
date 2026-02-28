@@ -17,10 +17,13 @@ export const APP_DESCRIPTION = 'نظام متكامل لإدارة الأعما�
 // ------------------------------------------
 export const CURRENCIES = {
     SAR: { code: 'SAR', symbol: 'ر.س', name: 'Saudi Riyal', name_ar: 'ريال سعودي' },
+    YER: { code: 'YER', symbol: 'ر.ي', name: 'Yemeni Rial', name_ar: 'ريال يمني' },
     USD: { code: 'USD', symbol: '$', name: 'US Dollar', name_ar: 'دولار أمريكي' },
     EUR: { code: 'EUR', symbol: '€', name: 'Euro', name_ar: 'يورو' },
     GBP: { code: 'GBP', symbol: '£', name: 'British Pound', name_ar: 'جنيه إسترليني' },
     AED: { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham', name_ar: 'درهم إماراتي' },
+    OMR: { code: 'OMR', symbol: 'ر.ع', name: 'Omani Rial', name_ar: 'ريال عماني' },
+    CNY: { code: 'CNY', symbol: '¥', name: 'Chinese Yuan', name_ar: 'يوان صيني' },
 } as const;
 
 export const DEFAULT_CURRENCY = 'SAR';
@@ -66,10 +69,9 @@ export const VALIDATION_PATTERNS = {
 // ------------------------------------------
 export const INVOICE_STATUS_COLORS = {
     draft: 'gray',
-    pending: 'yellow',
-    confirmed: 'blue',
+    posted: 'blue',
     paid: 'green',
-    cancelled: 'red',
+    void: 'red',
 } as const;
 
 // ------------------------------------------
@@ -203,41 +205,7 @@ export const STORAGE_KEYS = {
     LAST_INVOICE_NUMBER: 'last_invoice_number',
 } as const;
 
-// ------------------------------------------
-// API Endpoints
-// ------------------------------------------
-export const API_ENDPOINTS = {
-    AUTH: {
-        LOGIN: '/auth/login',
-        REGISTER: '/auth/register',
-        LOGOUT: '/auth/logout',
-        REFRESH: '/auth/refresh',
-    },
-    INVENTORY: {
-        PRODUCTS: '/inventory/products',
-        CATEGORIES: '/inventory/categories',
-        WAREHOUSES: '/inventory/warehouses',
-        STOCK: '/inventory/stock',
-        MOVEMENTS: '/inventory/movements',
-    },
-    SALES: {
-        INVOICES: '/sales/invoices',
-        RETURNS: '/sales/returns',
-    },
-    PURCHASES: {
-        INVOICES: '/purchases/invoices',
-        RETURNS: '/purchases/returns',
-    },
-    ACCOUNTING: {
-        ACCOUNTS: '/accounting/accounts',
-        JOURNALS: '/accounting/journals',
-        REPORTS: '/accounting/reports',
-    },
-    PARTIES: {
-        CUSTOMERS: '/parties/customers',
-        SUPPLIERS: '/parties/suppliers',
-    },
-} as const;
+// NOTE: This app uses Supabase RPC calls directly, not traditional REST endpoints.
 
 // ------------------------------------------
 // Error Messages

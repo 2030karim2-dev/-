@@ -46,8 +46,8 @@ export const reportService = {
                 journal_id: '',
                 entry_number: line.journal?.entry_number,
                 description: line.description || '',
-                debit: line.debit_amount || 0,
-                credit: line.credit_amount || 0,
+                debit_amount: line.debit_amount || 0,
+                credit_amount: line.credit_amount || 0,
                 balance,
                 currency_code: line.currency_code,
                 exchange_rate: line.exchange_rate,
@@ -65,10 +65,11 @@ export const reportService = {
         const { data: lines, error: linesError } = await reportsApi.getJournalLines(companyId, fromDate, toDate);
         if (linesError) throw linesError;
 
-        // الخطوة 2.5: جلب أسعار الصرف للتحويل
-        const rateMap = await fetchLatestRates(companyId);
+        // ملاحظة: journal_entry_lines تخزّن المبالغ بالعملة الأساسية (SAR) بالفعل
+        // لذلك لا نحتاج لتحويل العملة هنا. حقلا foreign_amount و exchange_rate
+        // موجودان للوثائق فقط.
 
-        // الخطوة 3: تجميع الحركات المدينة والدائنة لكل حساب (المبالغ مخزنة بالعملة الأساسية)
+        // الخطوة 3: تجميع الحركات المدينة والدائنة لكل حساب
         const balanceMap = new Map<string, { total_debit: number; total_credit: number }>();
         (lines as any[] || []).forEach(line => {
             const aid = line.account?.id || line.account_id;

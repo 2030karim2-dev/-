@@ -1,5 +1,6 @@
 
 import { supabase } from '../../lib/supabaseClient';
+import { parseError } from '../../core/utils/errorUtils';
 import { CreatePurchaseDTO } from './types';
 
 export const purchasesApi = {
@@ -54,15 +55,17 @@ export const purchasesApi = {
       p_items: data.items.map(item => ({
         product_id: item.productId,
         quantity: item.quantity,
-        unit_cost: Number(item.costPrice) * rate
+        unit_cost: Number(item.costPrice)
       })),
       p_notes: data.notes,
       p_currency: data.currency || 'SAR',
-      p_exchange_rate: rate
+      p_exchange_rate: rate,
+      p_payment_method: data.paymentMethod || 'credit',
+      p_payment_account_id: data.paymentMethod === 'cash' ? data.cashAccountId : data.bankAccountId
     };
 
     const { data: result, error } = await supabase.rpc('commit_purchase_invoice', rpcParams as any);
-    if (error) throw error;
+    if (error) throw parseError(error);
     return result;
   },
 
@@ -76,7 +79,7 @@ export const purchasesApi = {
       p_items: data.items.map(item => ({
         product_id: item.productId,
         quantity: item.quantity,
-        unit_cost: Number(item.costPrice) * rate
+        unit_cost: Number(item.costPrice)
       })),
       p_notes: data.notes,
       p_currency: data.currency || 'SAR',
@@ -86,7 +89,7 @@ export const purchasesApi = {
     };
 
     const { data: result, error } = await supabase.rpc('commit_purchase_return', rpcParams as any);
-    if (error) throw error;
+    if (error) throw parseError(error);
     return result;
   },
 
@@ -123,8 +126,8 @@ export const purchasesApi = {
         payment_method,
         currency_code,
         exchange_rate,
-        party:party_id(name),
-        invoice_items(id)
+        party:party_id(id, name),
+        invoice_items(id, product_id, description, quantity, unit_price, total)
       `)
       .eq('company_id', companyId)
       .eq('type', 'purchase')

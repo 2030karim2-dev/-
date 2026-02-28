@@ -48,7 +48,7 @@ export const partiesApi = {
     if (count && count > 0) {
       throw new Error('لا يمكن حذف طرف له فواتير مرتبطة. قم بحظره بدلاً من حذفه.');
     }
-    return await (supabase.from('parties') as any).delete().eq('id', id);
+    return await (supabase.from('parties') as any).update({ deleted_at: new Date().toISOString() }).eq('id', id);
   },
 
   search: async (companyId: string, type: PartyType, query: string) => {

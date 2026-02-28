@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { RefreshCw, Plus, Eye, RotateCcw, FileText, Search, Filter, Download, Printer, ChevronDown, X } from 'lucide-react';
-import { useSalesReturns, useSalesReturnsStats } from '../../hooks/useSalesReturns';
-import CreateReturnModal from './CreateReturnModal';
+import { useSalesReturns, useSalesReturnsStats, useSalesInvoicesForReturn } from '../../hooks/useSalesReturns';
 import Button from '../../../../ui/base/Button';
 import { exportReturnsToExcel } from '../../../../core/utils/returnsExcelExporter';
 import { exportToPDF } from '../../../../core/utils/pdfExporter';
+import { AdvancedReturnModal } from '../../../returns/components/AdvancedReturnModal'; // Import new Modal
 
 // Return reason labels
 const RETURN_REASON_LABELS: Record<string, string> = {
@@ -499,10 +499,16 @@ const SalesReturnsView: React.FC<SalesReturnsViewProps> = ({ searchTerm: propSea
         </div>
       )}
 
-      <CreateReturnModal
+      {/* Advanced Return Modal */}
+      <AdvancedReturnModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={() => setIsModalOpen(false)}
+        returnType="sale"
+        partyName="عميل"
+        onSuccess={() => {
+          setIsModalOpen(false);
+          refetch();
+        }}
       />
     </div>
   );

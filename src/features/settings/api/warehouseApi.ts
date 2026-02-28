@@ -7,6 +7,7 @@ export const warehouseApi = {
       .from('warehouses')
       .select('*')
       .eq('company_id', companyId)
+      .is('deleted_at', null)
       .order('name_ar', { ascending: true });
   },
 
@@ -15,6 +16,6 @@ export const warehouseApi = {
   },
 
   deleteWarehouse: async (id: string) => {
-    return await supabase.from('warehouses').delete().eq('id', id);
+    return await supabase.from('warehouses').update({ deleted_at: new Date().toISOString() } as any).eq('id', id);
   }
 };

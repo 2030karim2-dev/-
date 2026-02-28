@@ -28,6 +28,7 @@ export interface CreatePurchaseDTO {
   status: 'draft' | 'posted';
   paymentMethod: 'cash' | 'credit';
   cashAccountId?: string;
+  bankAccountId?: string;
   currency?: string;
   exchangeRate?: number;
   // Return-specific fields
