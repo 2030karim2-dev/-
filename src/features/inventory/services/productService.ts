@@ -16,7 +16,7 @@ interface RawProduct {
     sku?: string;
     part_number?: string;
     brand?: string;
-    category?: { name_ar?: string } | string;
+    category?: { id: string; name: string } | null;
     category_id?: string;
     size?: string;
     description?: string;
@@ -44,7 +44,7 @@ export const productService = {
             const prod = p as RawProduct;
             const stockList = Array.isArray(prod.stock) ? prod.stock : [];
             const totalStock = stockList.reduce((sum: number, s: RawStock) => sum + (Number(s.quantity) || 0), 0);
-            const categoryName = typeof prod.category === 'object' ? prod.category?.name_ar || 'عام' : prod.category || 'عام';
+            const categoryName = typeof prod.category === 'object' ? prod.category?.name || 'عام' : 'عام';
 
             return {
                 id: prod.id,

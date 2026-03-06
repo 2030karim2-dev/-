@@ -59,7 +59,7 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
           min_stock_level: initialData.min_stock_level,
           stock_quantity: initialData.stock_quantity,
           unit: (initialData.unit as ProductFormData['unit']) || 'piece',
-          category: initialData.category || 'عام',
+          category: initialData.category_id || '',
           location: initialData.location
         });
       } else {
@@ -67,7 +67,7 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
         reset({
           name: '', sku: autoSku, part_number: '', brand: '', size: '', specifications: '',
           alternative_numbers: '', image_url: null, cost_price: '', selling_price: '',
-          min_stock_level: 5, stock_quantity: 0, unit: 'piece', category: 'عام'
+          min_stock_level: 5, stock_quantity: 0, unit: 'piece', category: ''
         });
       }
     }

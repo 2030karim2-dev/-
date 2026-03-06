@@ -9,6 +9,7 @@ export const productsApi = {
         return await supabase.from('products')
             .select(`
         *,
+        category:product_categories(id, name),
         stock:product_stock!product_stock_product_id_fkey(
           quantity,
           warehouse_id,

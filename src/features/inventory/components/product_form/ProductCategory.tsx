@@ -29,9 +29,9 @@ const ProductCategory: React.FC<Props> = ({ register, watch, setValue }) => {
             {...register('category')}
             className="w-full pr-10 pl-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl font-bold text-sm outline-none appearance-none focus:border-blue-500 transition-all dark:text-slate-200"
           >
-            <option value="عام">قسم عام</option>
+            <option value="">{t('general_section') || 'قسم عام'}</option>
             {Array.isArray(categories) && categories.map((cat: any) => (
-              <option key={cat.id} value={cat.name}>{cat.name}</option>
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
           </select>
           <Layers className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
