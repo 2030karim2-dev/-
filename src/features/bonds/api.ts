@@ -51,7 +51,7 @@ export const bondsApi = {
       p_reference_number: data.reference_number || '',
       p_currency_code: data.currency_code,
       p_exchange_rate: data.exchange_rate,
-      p_foreign_amount: data.foreign_amount || 0
+      p_foreign_amount: data.foreign_amount || null
     });
 
     if (error) {
