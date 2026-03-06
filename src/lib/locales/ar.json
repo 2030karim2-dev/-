@@ -339,5 +339,11 @@
     "days_elapsed": "الأيام المنقضية",
     "days": "يوم",
     "excellent_no_dead_stock": "ممتاز! لا يوجد مخزون راكد",
-    "all_products_moving": "جميع المنتجات تتحرك بشكل جيد خلال الـ {days} يوم الماضية"
+    "all_products_moving": "جميع المنتجات تتحرك بشكل جيد خلال الـ {days} يوم الماضية",
+    "active": "نشط",
+    "blocked": "محظور",
+    "general": "عام",
+    "phone_number": "رقم الهاتف",
+    "email_address": "البريد الإلكتروني",
+    "address": "العنوان"
 }
