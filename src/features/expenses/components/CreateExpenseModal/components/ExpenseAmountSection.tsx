@@ -2,6 +2,7 @@ import React from 'react';
 import { DollarSign } from 'lucide-react';
 import { UseFormRegister, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import { ExpenseFormData } from '../../../types';
+import { convertToBaseCurrency } from '../../../../../core/utils';
 
 interface ExpenseAmountSectionProps {
     register: UseFormRegister<ExpenseFormData>;
@@ -42,11 +43,10 @@ export const ExpenseAmountSection: React.FC<ExpenseAmountSectionProps> = ({ regi
                         <input
                             type="number"
                             step="0.000001"
-                            value={exchangeRate ? (isDivide ? parseFloat((1 / exchangeRate).toFixed(5)) : exchangeRate) : ''}
+                            value={exchangeRate || ''}
                             onChange={(e) => {
                                 const val = parseFloat(e.target.value);
-                                if (!val) { setValue('exchange_rate', 1); return; }
-                                setValue('exchange_rate', isDivide ? (1 / val) : val, { shouldValidate: true });
+                                setValue('exchange_rate', val || 1, { shouldValidate: true });
                             }}
                             className="w-full px-3 py-3 bg-white dark:bg-slate-950 border-2 border-amber-100 dark:border-slate-800 rounded-xl text-sm font-bold text-amber-600 dark:text-amber-400 outline-none focus:border-amber-500 font-mono text-center"
                         />
@@ -68,7 +68,12 @@ export const ExpenseAmountSection: React.FC<ExpenseAmountSectionProps> = ({ regi
                 <div className="bg-amber-50 dark:bg-slate-800/50 border border-amber-100 dark:border-slate-700 p-3 rounded-xl flex items-center justify-between">
                     <span className="text-[10px] font-bold text-amber-700 dark:text-amber-500 uppercase">المعادل بالعملة المرجعية (SAR)</span>
                     <span className="text-sm font-bold text-amber-700 dark:text-amber-500 font-mono">
-                        {(amount * exchangeRate).toFixed(2)} SAR
+                        {convertToBaseCurrency({
+                            amount,
+                            currencyCode: (selectedCurrency || 'SAR') as any,
+                            exchangeRate,
+                            exchangeOperator: isDivide ? 'divide' : 'multiply'
+                        }).toFixed(2)} SAR
                     </span>
                 </div>
             )}

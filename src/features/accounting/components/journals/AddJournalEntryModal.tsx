@@ -7,7 +7,7 @@ import { JournalEntryFormData } from '../../types/index';
 // Fix: Corrected import path to point to the barrel file.
 import { useAccounts } from '../../hooks/index';
 import { useCurrencies } from '../../../settings/hooks';
-import { formatCurrency, cn } from '../../../../core/utils';
+import { formatCurrency, convertToBaseCurrency, cn } from '../../../../core/utils';
 import { useFeedbackStore } from '../../../../features/feedback/store';
 
 interface AddJournalEntryModalProps {
@@ -159,11 +159,10 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                                     type="number"
                                     step="0.000001"
                                     disabled={selectedCurrency === 'SAR'}
-                                    value={exchangeRate ? (isDivide ? parseFloat((1 / exchangeRate).toFixed(5)) : exchangeRate) : ''}
+                                    value={exchangeRate || ''}
                                     onChange={(e) => {
                                         const val = parseFloat(e.target.value);
-                                        if (!val) { setValue('exchange_rate', 1); return; }
-                                        setValue('exchange_rate', isDivide ? (1 / val) : val, { shouldValidate: true });
+                                        setValue('exchange_rate', val || 1, { shouldValidate: true });
                                     }}
                                     className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl dark:text-slate-100 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all disabled:opacity-50 font-mono"
                                     dir="ltr"
@@ -285,22 +284,49 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                                 <div className="flex justify-between items-start text-sm">
                                     <span className="text-gray-500 dark:text-slate-400">إجمالي المدين</span>
                                     <div className="flex flex-col items-end">
-                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.debit_amount, selectedCurrency)}</span>
-                                        {selectedCurrency !== 'SAR' && <span dir="ltr" className="font-mono text-[10px] text-gray-500">{formatCurrency(totals.debit_amount * exchangeRate)}</span>}
+                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.debit_amount, selectedCurrency || 'SAR')}</span>
+                                        {selectedCurrency !== 'SAR' && (
+                                            <span dir="ltr" className="font-mono text-[10px] text-gray-500">
+                                                {formatCurrency(convertToBaseCurrency({
+                                                    amount: totals.debit_amount,
+                                                    currencyCode: (selectedCurrency || 'SAR') as any,
+                                                    exchangeRate,
+                                                    exchangeOperator: isDivide ? 'divide' : 'multiply'
+                                                }), 'SAR')}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-start text-sm">
                                     <span className="text-gray-500 dark:text-slate-400">إجمالي الدائن</span>
                                     <div className="flex flex-col items-end">
-                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.credit_amount, selectedCurrency)}</span>
-                                        {selectedCurrency !== 'SAR' && <span dir="ltr" className="font-mono text-[10px] text-gray-500">{formatCurrency(totals.credit_amount * exchangeRate)}</span>}
+                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.credit_amount, selectedCurrency || 'SAR')}</span>
+                                        {selectedCurrency !== 'SAR' && (
+                                            <span dir="ltr" className="font-mono text-[10px] text-gray-500">
+                                                {formatCurrency(convertToBaseCurrency({
+                                                    amount: totals.credit_amount,
+                                                    currencyCode: (selectedCurrency || 'SAR') as any,
+                                                    exchangeRate,
+                                                    exchangeOperator: isDivide ? 'divide' : 'multiply'
+                                                }), 'SAR')}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 <div className={`flex justify-between items-start text-sm pt-3 border-t border-gray-200 dark:border-slate-700 font-bold ${isBalanced ? 'text-emerald-600' : 'text-red-600'}`}>
                                     <span>الفرق</span>
                                     <div className="flex flex-col items-end">
-                                        <span dir="ltr" className="font-mono">{formatCurrency(Math.abs(difference), selectedCurrency)}</span>
-                                        {selectedCurrency !== 'SAR' && <span dir="ltr" className="font-mono text-[10px] opacity-70">{formatCurrency(Math.abs(difference) * exchangeRate)}</span>}
+                                        <span dir="ltr" className="font-mono">{formatCurrency(Math.abs(difference), selectedCurrency || 'SAR')}</span>
+                                        {selectedCurrency !== 'SAR' && (
+                                            <span dir="ltr" className="font-mono text-[10px] opacity-70">
+                                                {formatCurrency(convertToBaseCurrency({
+                                                    amount: Math.abs(difference),
+                                                    currencyCode: selectedCurrency,
+                                                    exchangeRate,
+                                                    exchangeOperator: isDivide ? 'divide' : 'multiply'
+                                                }), 'SAR')}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 {(!isBalanced || errors.lines) && (
