@@ -3,7 +3,6 @@ import React from 'react';
 import { Box, Edit, Trash2, Layers, Car, DollarSign, Package, TrendingDown, X, Hash, Activity, TrendingUp, Info } from 'lucide-react';
 import { Product } from '../types';
 import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
-import { cn } from '../../../core/utils';
 import Button from '../../../ui/base/Button';
 import { CrossReferenceList } from './auto_parts/CrossReferenceList';
 import { SupplierPricesList } from './auto_parts/SupplierPricesList';
@@ -139,12 +138,14 @@ const ProductDetailPane: React.FC<Props> = ({ product, onEdit, onDelete, onClose
               <span className="text-gray-500">الوحدة القياسية</span>
               <strong className="text-gray-900 dark:text-white bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded-md">{product.unit || 'piece'}</strong>
             </div>
-            {product.size && (
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-gray-500">الحجم/المقاس</span>
-                <strong className="text-gray-900 dark:text-white">{product.size}</strong>
-              </div>
-            )}
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-500">الحجم / المقاس</span>
+              <strong className="text-gray-900 dark:text-white bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded-lg">{product.size || '—'}</strong>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-500">موقع الرف</span>
+              <strong className="text-gray-900 dark:text-white bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded-lg">{product.location || '—'}</strong>
+            </div>
           </div>
         </div>
 

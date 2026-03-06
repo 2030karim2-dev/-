@@ -122,6 +122,14 @@ const ProductDetailModal: React.FC<Props> = ({ product, onClose, onEdit }) => {
                                         <span className="text-gray-500">التصنيف</span>
                                         <span className="font-bold text-gray-900 dark:text-white">{product.category || 'عام'}</span>
                                     </div>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-gray-500">المقاس / الحجم</span>
+                                        <span className="font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-slate-800 px-2 py-0.5 rounded-lg">{product.size || '—'}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-gray-500">موقع الرف</span>
+                                        <span className="font-bold text-gray-900 dark:text-white">{product.location || '—'}</span>
+                                    </div>
                                     <div className="pt-2 border-t dark:border-slate-800 flex justify-between items-center text-sm">
                                         <span className="text-gray-500">حد الطلب</span>
                                         <span className="font-bold text-rose-600 bg-rose-50 dark:bg-rose-900/20 px-2 py-1 rounded-lg">{product.min_stock_level}</span>

@@ -171,42 +171,68 @@ export const productService = {
      * Update an existing product
      */
     updateProduct: async (id: string, data: ProductFormData, companyId: string) => {
-        const payload: any = {
-            name_ar: data.name,
-            sale_price: Number(data.selling_price),
-            cost_price: Number(data.cost_price),
-            purchase_price: Number(data.cost_price),
-            min_stock_level: Number(data.min_stock_level),
-            unit: data.unit,
-        };
+        console.log(`[ProductService] Updating product ${id}`, data);
 
-        if (data.part_number !== undefined) payload.part_number = data.part_number || null;
-        if (data.brand !== undefined) payload.brand = data.brand || null;
-        if (data.specifications !== undefined) payload.description = data.specifications || null;
-        if (data.size !== undefined) payload.size = data.size || null;
-        if (data.image_url !== undefined) payload.image_url = data.image_url || null;
-        if (data.alternative_numbers !== undefined) payload.alternative_numbers = data.alternative_numbers || null;
-        if (data.barcode !== undefined) payload.barcode = data.barcode || null;
-        if (data.category) payload.category_id = data.category.length === 36 ? data.category : null;
+        try {
+            const payload: any = {
+                name_ar: data.name,
+                sale_price: Number(data.selling_price),
+                cost_price: Number(data.cost_price),
+                purchase_price: Number(data.cost_price),
+                min_stock_level: Number(data.min_stock_level),
+                unit: data.unit,
+            };
 
-        const { data: product, error } = await inventoryApi.updateProduct(id, payload);
-        if (error) throw error;
+            if (data.part_number !== undefined) payload.part_number = data.part_number || null;
+            if (data.brand !== undefined) payload.brand = data.brand || null;
+            if (data.specifications !== undefined) payload.description = data.specifications || null;
+            if (data.size !== undefined) payload.size = data.size || null;
+            if (data.image_url !== undefined) payload.image_url = data.image_url || null;
+            if (data.alternative_numbers !== undefined) payload.alternative_numbers = data.alternative_numbers || null;
+            if (data.barcode !== undefined) payload.barcode = data.barcode || null;
+            if (data.category) payload.category_id = data.category.length === 36 ? data.category : null;
 
-        // Update stock in default warehouse
-        if (data.stock_quantity !== undefined) {
-            const { data: warehouses } = await supabase
-                .from('warehouses')
-                .select('id')
-                .eq('company_id', companyId)
-                .limit(1);
+            console.log(`[ProductService] Sending update payload to API`, payload);
+            const { data: product, error } = await inventoryApi.updateProduct(id, payload);
 
-            if (warehouses && warehouses.length > 0) {
-                const warehouse = warehouses[0] as { id: string };
-                await inventoryApi.updateStock(id, warehouse.id, Number(data.stock_quantity));
+            if (error) {
+                console.error(`[ProductService] API update failed`, error);
+                throw error;
             }
-        }
 
-        return product;
+            console.log(`[ProductService] Product metadata updated successfully`, product);
+
+            // Update stock in default warehouse
+            if (data.stock_quantity !== undefined) {
+                console.log(`[ProductService] Checking for default warehouse to update stock`);
+                const { data: warehouses, error: whError } = await supabase
+                    .from('warehouses')
+                    .select('id')
+                    .eq('company_id', companyId)
+                    .limit(1);
+
+                if (whError) {
+                    console.error(`[ProductService] Failed to fetch warehouses`, whError);
+                } else if (warehouses && warehouses.length > 0) {
+                    const warehouse = warehouses[0] as { id: string };
+                    console.log(`[ProductService] Updating stock in warehouse ${warehouse.id} to ${data.stock_quantity}`);
+                    try {
+                        await inventoryApi.updateStock(id, warehouse.id, Number(data.stock_quantity));
+                        console.log(`[ProductService] Stock updated successfully`);
+                    } catch (stockErr) {
+                        console.error(`[ProductService] Failed to update stock, but metadata was saved`, stockErr);
+                        // We don't throw here to avoid failing the whole operation if only stock fails
+                    }
+                } else {
+                    console.warn(`[ProductService] No default warehouse found for stock initialization`);
+                }
+            }
+
+            return product;
+        } catch (err: any) {
+            console.error(`[ProductService] Critical failure in updateProduct`, err);
+            throw err;
+        }
     },
 
     /**

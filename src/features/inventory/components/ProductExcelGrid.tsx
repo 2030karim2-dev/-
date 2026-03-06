@@ -111,6 +111,46 @@ const ProductExcelGrid: React.FC<Props> = ({ products, isLoading, onDelete, onVi
       sortKey: 'part_number'
     },
     {
+      header: 'الشركة الصانعة',
+      accessor: (p) => (
+        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">
+          {p.brand || '—'}
+        </span>
+      ),
+      width: 'w-24',
+      sortKey: 'brand'
+    },
+    {
+      header: 'المقاس',
+      accessor: (p) => (
+        <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-500 bg-slate-50 dark:bg-slate-900/40 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-800">
+          {p.size || '—'}
+        </span>
+      ),
+      width: 'w-20',
+      sortKey: 'size'
+    },
+    {
+      header: 'التصنيف',
+      accessor: (p) => (
+        <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400">
+          {p.category || 'عام'}
+        </span>
+      ),
+      width: 'w-24',
+      sortKey: 'category'
+    },
+    {
+      header: 'المخزن/الرف',
+      accessor: (p) => (
+        <span className="text-[10px] font-bold text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 px-1.5 py-0.5 rounded border border-rose-100 dark:border-rose-900/30">
+          {p.location || '—'}
+        </span>
+      ),
+      width: 'w-24',
+      sortKey: 'location'
+    },
+    {
       header: 'المخزون',
       accessor: (p) => (
         <span className={cn(
