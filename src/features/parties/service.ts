@@ -165,21 +165,28 @@ export const partiesService = {
   },
 
   saveCategory: async (companyId: string, data: { name: string, type: PartyType }, id?: string) => {
-    if (id) {
+    try {
+      if (id) {
+        const { data: result, error } = await supabase.from('party_categories')
+          .update({ name: data.name } as never)
+          .eq('id', id)
+          .select()
+          .single();
+        if (error) throw error;
+        return result;
+      }
       const { data: result, error } = await supabase.from('party_categories')
-        .update({ name: data.name } as never)
-        .eq('id', id)
+        .insert({ company_id: companyId, name: data.name, type: data.type } as never)
         .select()
         .single();
       if (error) throw error;
       return result;
+    } catch (error: any) {
+      if (error.code === '23505') {
+        throw new Error("عذراً، هذا الاسم موجود مسبقاً في قائمة الفئات");
+      }
+      throw error;
     }
-    const { data: result, error } = await supabase.from('party_categories')
-      .insert({ company_id: companyId, name: data.name, type: data.type } as never)
-      .select()
-      .single();
-    if (error) throw error;
-    return result;
   },
 
   deleteCategory: async (id: string) => {
