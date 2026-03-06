@@ -1,0 +1,170 @@
+import { useQuery } from '@tanstack/react-query';
+import { useAuthStore } from '../../auth/store';
+import { dashboardApi } from '../api/index';
+import { calculateDashboardStats } from '../services/dashboardStats';
+import { calculateDashboardInsights } from '../services/dashboardInsights';
+import { useMemo } from 'react';
+import { toBaseCurrency, formatCurrency } from '../../../core/utils/currencyUtils';
+import type { DashboardDataPayload } from '../models';
+
+// Re-export specific hooks from the old structure for backwards compatibility
+export {
+  useSalesChart,
+  useInventoryChart,
+  useRecentActivity,
+  useTopProducts,
+  useTopCustomers,
+  useDashboardAlerts
+} from './useDashboard';
+
+export const useDashboardData = () => {
+  const { user } = useAuthStore();
+  const companyId = user?.company_id;
+
+  // 1. Fetch Raw Data using React Query
+  const rawDataQuery = useQuery({
+    queryKey: ['dashboard_raw_data', companyId],
+    queryFn: async () => {
+      if (!companyId) return Promise.reject('No company ID');
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const dateLimit = thirtyDaysAgo.toISOString().split('T')[0];
+      return dashboardApi.fetchRawDashboardData(companyId, dateLimit);
+    },
+    enabled: !!companyId,
+    staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
+  });
+
+  // 2. Compute Base Metrics using useMemo
+  const baseMetrics = useMemo(() => {
+    if (!rawDataQuery.data) return null;
+    const { invoices, expenses, customers, suppliers, bondEntries } = rawDataQuery.data;
+
+    // Process Bonds
+    const bonds = bondEntries.map((entry: any) => {
+      const lines = entry.journal_entry_lines || [];
+      const amount = lines.reduce((sum: number, l: any) => sum + Number(l.debit_amount || 0), 0);
+      return {
+        id: entry.id,
+        type: entry.reference_type === 'receipt_bond' ? 'receipt' : 'payment',
+        amount,
+        date: entry.entry_date
+      };
+    });
+
+    const receiptBonds = bonds.filter((b: any) => b.type === 'receipt').reduce((sum: number, b: any) => sum + Number(b.amount), 0);
+    const paymentBonds = bonds.filter((b: any) => b.type === 'payment').reduce((sum: number, b: any) => sum + Number(b.amount), 0);
+
+    // Process Totals
+    const totalSales = invoices.filter((i: any) => i.type === 'sale').reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
+    const totalPurchases = invoices.filter((i: any) => i.type === 'purchase').reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
+    const totalExpenses = expenses.reduce((sum: number, e: any) => sum + toBaseCurrency(e), 0);
+
+    const totalDebts = customers.reduce((sum: number, c: any) => sum + (Number(c.balance) > 0 ? Number(c.balance) : 0), 0);
+    const totalSupplierDebts = suppliers.reduce((sum: number, s: any) => sum + (Number(s.balance) > 0 ? Number(s.balance) : 0), 0);
+
+
+    const netProfit = totalSales - totalExpenses;
+    const netCashPosition = totalSales - totalPurchases - totalExpenses;
+
+    const overdueInvoices = invoices.filter((i: any) => {
+      const issueDate = new Date(i.issue_date);
+      const daysDiff = Math.floor((Date.now() - issueDate.getTime()) / (1000 * 60 * 60 * 24));
+      return i.status === 'posted' && daysDiff > 7;
+    });
+
+    const lowStockProducts = rawDataQuery.data.productsWithStock.filter((p: any) => {
+      const totalStock = (p.product_stock || []).reduce((sum: number, s: any) => sum + Number(s.quantity || 0), 0);
+      return totalStock <= (p.min_stock_level || 5);
+    }).map((p: any) => ({
+      ...p,
+      name: p.name_ar,
+      quantity: (p.product_stock || []).reduce((sum: number, s: any) => sum + Number(s.quantity || 0), 0),
+      min_quantity: p.min_stock_level || 5
+    }));
+
+
+    return {
+      receiptBonds, paymentBonds,
+      totalSales, totalPurchases, totalExpenses,
+      totalDebts, totalSupplierDebts,
+      netProfit, netCashPosition,
+      overdueInvoices, lowStockProducts,
+    };
+  }, [rawDataQuery.data]);
+
+
+  // 3. Compute Complex Classifications and Insights using useMemo
+  const processedData = useMemo<DashboardDataPayload | null>(() => {
+    if (!rawDataQuery.data || !baseMetrics) return null;
+
+    const { invoices, expenses, invoiceItems } = rawDataQuery.data;
+
+    // Call external service transformers
+    const statsResult = calculateDashboardStats({
+      ...baseMetrics,
+      invoicesData: invoices,
+      expensesData: expenses,
+      invoiceItemsData: invoiceItems
+    });
+
+    const insightsResult = calculateDashboardInsights({
+      ...baseMetrics,
+      invoicesData: invoices,
+      expensesData: expenses,
+    });
+
+    // Assemble final payload
+    return {
+      stats: {
+        sales: formatCurrency(baseMetrics.totalSales),
+        purchases: formatCurrency(baseMetrics.totalPurchases),
+        expenses: formatCurrency(baseMetrics.totalExpenses),
+        debts: formatCurrency(baseMetrics.totalDebts),
+        invoices: invoices.length.toString(),
+        profit: formatCurrency(baseMetrics.netProfit),
+        netCash: formatCurrency(baseMetrics.netCashPosition),
+        salesTrend: Math.round(insightsResult.salesTrend * 10) / 10,
+        purchasesTrend: Math.round(insightsResult.purchasesTrend * 10) / 10,
+        expensesTrend: Math.round(insightsResult.expensesTrend * 10) / 10,
+        profitTrend: Math.round(((insightsResult.newerSales - insightsResult.newerPurchases - insightsResult.newerExpenses) - (insightsResult.olderSales - insightsResult.olderPurchases - insightsResult.olderExpenses)) / Math.max(Math.abs(insightsResult.olderSales - insightsResult.olderPurchases - insightsResult.olderExpenses), 1) * 1000) / 10
+      },
+      salesData: statsResult.salesData.length ? statsResult.salesData : [{ name: 'اليوم', value: 0 }],
+      categoryData: statsResult.categoryData.length ? statsResult.categoryData : [{ name: 'لا توجد بيانات', value: 0, color: '#94a3b8' }],
+      recentActivities: statsResult.recentActivities as any,
+      customers: statsResult.topCustomers as any,
+      topProducts: statsResult.topProducts as any,
+      topCustomers: statsResult.topCustomers as any,
+      targets: insightsResult.targets,
+      cashFlow: {
+        inflow: baseMetrics.receiptBonds,
+        outflow: baseMetrics.paymentBonds,
+        net: baseMetrics.receiptBonds - baseMetrics.paymentBonds
+      },
+      alerts: insightsResult.alerts as any,
+      insights: insightsResult.insights as any,
+      lowStockProducts: baseMetrics.lowStockProducts as any
+    };
+
+  }, [rawDataQuery.data, baseMetrics]);
+
+  // Provide fallback empty data if still loading or errored
+  const fallbackData: DashboardDataPayload = {
+    stats: { sales: '0', purchases: '0', expenses: '0', debts: '0', invoices: '0', profit: '0', netCash: '0', salesTrend: 0, purchasesTrend: 0, expensesTrend: 0, profitTrend: 0 },
+    salesData: [], categoryData: [], recentActivities: [], customers: [], topProducts: [], topCustomers: [],
+    targets: { salesProgress: 0, collectionRate: 0 }, cashFlow: { inflow: 0, outflow: 0, net: 0 },
+    alerts: [], insights: [], lowStockProducts: []
+  };
+
+  return {
+    ...rawDataQuery,
+    data: processedData, // Replace raw data with processed data in return
+    ... (processedData || fallbackData) // Spread attributes for ease of access
+  };
+};
+
+export const useDashboardStats = () => {
+  const { stats, isLoading, error } = useDashboardData();
+  return { stats, isLoading, error };
+};
+export default useDashboardData;

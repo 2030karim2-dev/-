@@ -1,0 +1,176 @@
+import { supabase } from '../../lib/supabaseClient';
+import { CompanyFormData, WarehouseFormData, FiscalYearFormData, ExchangeRateFormData, Company, Invitation, AuditLog, Warehouse, SupportedCurrency, ExchangeRate, FiscalYear } from './types';
+
+export const settingsApi = {
+  getCompany: async (companyId: string) => {
+    return await supabase
+      .from('companies')
+      .select('*')
+      .eq('id', companyId)
+      .returns<Company>()
+      .single();
+  },
+
+  updateCompany: async (companyId: string, data: CompanyFormData) => {
+    return await supabase
+      .from('companies')
+      .update(data)
+      .eq('id', companyId)
+      .select()
+      .returns<Company>()
+      .single();
+  },
+
+  // إدارة الفريق والدعوات (Team Management)
+  getInvitations: async (companyId: string) => {
+    return await supabase
+      .from('invitations')
+      .select('*')
+      .eq('company_id', companyId)
+      .order('created_at', { ascending: false })
+      .returns<Invitation[]>();
+  },
+
+  inviteUser: async (email: string, role: string, companyId: string, userId: string) => {
+    return await supabase
+      .from('invitations')
+      .insert({
+        email,
+        role,
+        company_id: companyId,
+        created_by: userId
+      })
+      .select()
+      .returns<Invitation>()
+      .single();
+  },
+
+  revokeInvitation: async (id: string) => {
+    return await supabase.from('invitations').delete().eq('id', id);
+  },
+
+  getAuditLogs: async (companyId: string) => {
+    return await supabase
+      .from('audit_logs')
+      .select('*, profiles:user_id(full_name)')
+      .eq('company_id', companyId)
+      .order('created_at', { ascending: false })
+      .limit(100)
+      .returns<AuditLog[]>();
+  },
+
+  getWarehouses: async (companyId: string) => {
+    return await supabase
+      .from('warehouses')
+      .select('*')
+      .eq('company_id', companyId)
+      .is('deleted_at', null)
+      .order('name_ar', { ascending: true })
+      .returns<Warehouse[]>();
+  },
+
+  createWarehouse: async (companyId: string, data: WarehouseFormData) => {
+    return await supabase
+      .from('warehouses')
+      .insert({ ...data, company_id: companyId })
+      .select()
+      .returns<Warehouse>()
+      .single();
+  },
+
+  deleteWarehouse: async (id: string) => {
+    return await supabase.from('warehouses')
+      .update({ deleted_at: new Date().toISOString() } as never)
+      .eq('id', id);
+  },
+
+  setPrimaryWarehouse: async (companyId: string, warehouseId: string) => {
+    // أولاً: إلغاء أساسي من جميع المستودعات
+    const { error: resetError } = await supabase
+      .from('warehouses')
+      .update({ is_primary: false })
+      .eq('company_id', companyId);
+
+    if (resetError) throw resetError;
+
+    // ثانياً: تعيين المستودع المحدد كأساسي
+    const result = await supabase
+      .from('warehouses')
+      .update({ is_primary: true })
+      .eq('id', warehouseId)
+      .select()
+      .single();
+
+    // Rollback: إذا فشل التعيين، نعيد المستودع الأصلي
+    if (result.error) {
+      console.error('[Settings] setPrimaryWarehouse failed, attempting no rollback available:', result.error);
+    }
+
+    return result;
+  },
+
+  getSupportedCurrencies: async () => {
+    return await supabase.from('supported_currencies').select('*')
+      .returns<SupportedCurrency[]>();
+  },
+
+  createCurrency: async (data: { code: string, name_ar: string, symbol: string, exchange_operator?: 'multiply' | 'divide' }) => {
+    return await supabase.from('supported_currencies').insert({ ...data, is_base: false });
+  },
+
+  deleteCurrency: async (code: string) => {
+    return await supabase.from('supported_currencies').delete().eq('code', code);
+  },
+
+  getExchangeRates: async (companyId: string) => {
+    return await supabase
+      .from('exchange_rates')
+      .select('*')
+      .eq('company_id', companyId)
+      .order('effective_date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .returns<ExchangeRate[]>();
+  },
+
+  updateExchangeRate: async (companyId: string, data: ExchangeRateFormData, userId: string) => {
+    return await supabase
+      .from('exchange_rates')
+      .insert({
+        company_id: companyId,
+        currency_code: data.currency_code,
+        rate_to_base: data.rate_to_base,
+        effective_date: data.effective_date,
+        created_by: userId
+      })
+      .select()
+      .returns<ExchangeRate>()
+      .single();
+  },
+
+  getFiscalYears: async (companyId: string) => {
+    return await supabase
+      .from('fiscal_years')
+      .select('*')
+      .eq('company_id', companyId)
+      .order('start_date', { ascending: false })
+      .returns<FiscalYear[]>();
+  },
+
+  createFiscalYear: async (companyId: string, data: FiscalYearFormData) => {
+    return await supabase
+      .from('fiscal_years')
+      .insert({ ...data, company_id: companyId, is_closed: false })
+      .select()
+      .returns<FiscalYear>()
+      .single();
+  },
+
+  closeFiscalYear: async (id: string) => {
+    return await supabase
+      .from('fiscal_years')
+      .update({ is_closed: true })
+      .eq('id', id);
+  }
+};
+
+export default settingsApi;

@@ -1,0 +1,115 @@
+import React, { useState } from 'react';
+import { ShoppingBag, Plus, History, RefreshCw, BarChart3 } from 'lucide-react';
+import MicroHeader from '../../../ui/base/MicroHeader';
+import CreateInvoiceView from '../components/create/CreateInvoiceView';
+import InvoiceListView from '../components/list/InvoiceListView';
+import SalesReturnsView from '../components/Returns/SalesReturnsView';
+import SalesAnalyticsView from '../components/Analytics/SalesAnalyticsView';
+import InvoiceDetailsModal from '../components/details/InvoiceDetailsModal';
+import { useCreateInvoice, useInvoices } from '../hooks';
+import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { CreateInvoiceDTO } from '../types';
+import { logger } from '../../../core/utils/logger';
+
+type SalesViewTab = 'create' | 'list' | 'returns' | 'analytics';
+
+const SalesPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<SalesViewTab>('list');
+  const [viewInvoiceId, setViewInvoiceId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useTranslation();
+  const createInvoice = useCreateInvoice();
+  const { refetch: refetchInvoices } = useInvoices();
+
+  const TABS = [
+    { id: 'list' as const, label: t('sales_log'), icon: History },
+    { id: 'create' as const, label: t('new_sale'), icon: Plus },
+    { id: 'returns' as const, label: t('returns'), icon: RefreshCw },
+    { id: 'analytics' as const, label: t('analytics'), icon: BarChart3 },
+  ];
+
+  const handleReturnAction = async (invoice: any, items: any[]) => {
+    if (!invoice || items.length === 0) return;
+
+    logger.debug('SalesPage', 'Processing return', { invoiceId: invoice.id, itemCount: items.length });
+
+    const returnPayload: CreateInvoiceDTO = {
+      partyId: invoice.party_id || null,
+      items: items.map(item => ({
+        productId: item.product_id || item.id,
+        name: item.description || item.product?.name_ar || '---',
+        sku: item.product?.sku || '',
+        quantity: item.quantity,
+        unitPrice: item.unit_price || item.unitPrice,
+        costPrice: 0,
+        taxRate: 0,
+        maxStock: item.quantity,
+      })),
+      type: 'return_sale',
+      paymentMethod: (invoice.payment_method === 'credit' ? 'credit' : 'cash'),
+      currency: invoice.currency_code || 'SAR',
+      referenceInvoiceId: invoice.id,
+      discount: 0,
+      status: 'paid',
+      notes: `مرتجع للفاتورة #${invoice.invoice_number}`,
+    };
+
+    try {
+      await createInvoice.mutateAsync(returnPayload);
+      setViewInvoiceId(null);
+      refetchInvoices();
+    } catch (error) {
+      logger.error('SalesPage', 'Return failed', error);
+    }
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'create':
+        return <CreateInvoiceView onSuccess={() => setActiveTab('list')} />;
+      case 'list':
+        return <InvoiceListView
+          viewType="sale"
+          searchTerm={searchTerm}
+          onViewDetails={setViewInvoiceId}
+        />;
+      case 'returns':
+        return <SalesReturnsView
+          searchTerm={searchTerm}
+          onViewDetails={setViewInvoiceId}
+        />;
+      case 'analytics':
+        return <SalesAnalyticsView />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-slate-950">
+      <MicroHeader
+        title={t('sales_management')}
+        icon={ShoppingBag}
+        iconColor="text-emerald-600"
+        tabs={TABS}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id as SalesViewTab)}
+        searchPlaceholder={t('search_in_sales_or_customers')}
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+      />
+      <div className="flex-1 overflow-y-auto px-2 pt-2 pb-16 custom-scrollbar">
+        <div className="max-w-7xl mx-auto">
+          {renderContent()}
+        </div>
+      </div>
+      <InvoiceDetailsModal
+        invoiceId={viewInvoiceId}
+        onClose={() => setViewInvoiceId(null)}
+        onReturn={handleReturnAction}
+      />
+    </div>
+  );
+};
+
+export default SalesPage;

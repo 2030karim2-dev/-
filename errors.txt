@@ -1,0 +1,117 @@
+﻿
+> al-zahra-smart-erp@1.0.0 type-check
+> tsc --noEmit
+
+src/features/inventory/services/productService.ts(168,15): error TS2375: Type '{ name_ar: string; sale_price: number; cost_price: number; min_stock_level: number; part_number: string | null; brand: string | null; description: string | null; size: string | null; ... 4 more ...; category_id: string | null; }' is not assignable to type '{ alternative_numbers?: string | null; barcode?: string | null; brand?: string | null; category_id?: string | null; company_id?: string; core_charge_amount?: number | null; cost_price?: number; ... 17 more ...; updated_at?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'unit' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/features/reports/components/InventoryMovementView.tsx(6,1): error TS6133: 'useThemeStore' is declared but its value is never read.
+src/features/reports/service.ts(5,24): error TS6196: 'Party' is declared but never used.
+src/features/reports/service.ts(5,31): error TS6196: 'JournalEntryLine' is declared but never used.
+src/features/reports/service.ts(8,11): error TS6196: 'AccountWithLines' is declared but never used.
+src/features/reports/service.ts(48,70): error TS7006: Parameter 'l' implicitly has an 'any' type.
+src/features/reports/service.ts(49,71): error TS7006: Parameter 'l' implicitly has an 'any' type.
+src/features/returns/components/AdvancedReturnModal.tsx(260,73): error TS2379: Argument of type '{ invoiceId: string; partyId: any; paymentMethod: any; items: { productId: string; name: string; quantity: number; unitPrice: number; costPrice: any; }[]; returnReason: string; status: "void" | "posted" | "draft" | "paid"; notes: string | undefined; issueDate: string; currency: any; exchangeRate: any; }' is not assignable to parameter of type '{ invoiceId: string; partyId: string; paymentMethod?: string; items: any[]; returnReason?: string; status?: string; notes?: string; issueDate?: string; currency?: string; exchangeRate?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'notes' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/features/returns/components/AdvancedReturnModal.tsx(290,50): error TS2322: Type 'SalesReturnQueryResult[]' is not assignable to type 'Invoice[]'.
+  Property 'type' is missing in type 'SalesReturnQueryResult' but required in type 'Invoice'.
+src/features/returns/components/ReturnsWizard.tsx(127,15): error TS7030: Not all code paths return a value.
+src/features/returns/components/ReturnsWizard.tsx(292,53): error TS2345: Argument of type '{ referenceInvoiceId: string; partyId: any; supplierId: any; invoiceNumber: any; paymentMethod: "cash"; issueDate: string; returnReason: string; notes: string; status: "posted" | "draft"; items: any; }' is not assignable to parameter of type '{ invoiceId: string; partyId: string; paymentMethod?: string; items: any[]; returnReason?: string; status?: string; notes?: string; issueDate?: string; currency?: string; exchangeRate?: number; }'.
+  Property 'invoiceId' is missing in type '{ referenceInvoiceId: string; partyId: any; supplierId: any; invoiceNumber: any; paymentMethod: "cash"; issueDate: string; returnReason: string; notes: string; status: "posted" | "draft"; items: any; }' but required in type '{ invoiceId: string; partyId: string; paymentMethod?: string; items: any[]; returnReason?: string; status?: string; notes?: string; issueDate?: string; currency?: string; exchangeRate?: number; }'.
+src/features/returns/components/ReturnsWizard.tsx(447,37): error TS2322: Type 'SalesReturnQueryResult[] | Invoice[]' is not assignable to type 'Invoice[]'.
+  Type 'SalesReturnQueryResult[]' is not assignable to type 'Invoice[]'.
+    Property 'type' is missing in type 'SalesReturnQueryResult' but required in type 'Invoice'.
+src/features/sales/components/Analytics/components/PaymentMethodsChart.tsx(7,7): error TS6133: '_COLORS' is declared but its value is never read.
+src/features/sales/components/create/CreateInvoiceView.tsx(43,39): error TS2339: Property 'id' does not exist on type 'never'.
+src/features/sales/components/create/CreateInvoiceView.tsx(56,35): error TS2339: Property 'id' does not exist on type 'never'.
+src/features/sales/components/create/CreateInvoiceView.tsx(58,16): error TS2339: Property 'id' does not exist on type 'never'.
+src/features/sales/components/create/CreateInvoiceView.tsx(89,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/features/sales/components/create/CreateInvoiceView.tsx(125,12): error TS2375: Type '{ invoiceNumber: string | undefined; }' is not assignable to type 'Props' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'invoiceNumber' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/features/sales/components/create/InteractiveInvoiceTable.tsx(200,17): error TS2322: Type '{ key: string; item: SalesCartItem; index: number; showDiscount: boolean; showTax: any; onUpdate: (index: number, field: keyof SalesCartItem, value: string | number) => void; onRemove: (idOrIndex: string | number) => void; onKeyDown: (e: KeyboardEvent<...>, rowIndex: number, field: keyof SalesCartItem) => void; onOp...' is not assignable to type 'IntrinsicAttributes & InvoiceRowProps'.
+  Property 'showTax' does not exist on type 'IntrinsicAttributes & InvoiceRowProps'.
+src/features/sales/components/create/InteractiveInvoiceTable.tsx(200,26): error TS2304: Cannot find name 'showTax'.
+src/features/sales/components/create/InvoiceMeta.tsx(75,49): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(predicate: (value: ExchangeRate, index: number, obj: ExchangeRate[]) => value is ExchangeRate, thisArg?: any): ExchangeRate | undefined', gave the following error.
+    Argument of type '(r: Record<string, unknown>) => boolean' is not assignable to parameter of type '(value: ExchangeRate, index: number, obj: ExchangeRate[]) => value is ExchangeRate'.
+      Types of parameters 'r' and 'value' are incompatible.
+        Type 'ExchangeRate' is not assignable to type 'Record<string, unknown>'.
+          Index signature for type 'string' is missing in type 'ExchangeRate'.
+  Overload 2 of 2, '(predicate: (value: ExchangeRate, index: number, obj: ExchangeRate[]) => unknown, thisArg?: any): ExchangeRate | undefined', gave the following error.
+    Argument of type '(r: Record<string, unknown>) => boolean' is not assignable to parameter of type '(value: ExchangeRate, index: number, obj: ExchangeRate[]) => unknown'.
+      Types of parameters 'r' and 'value' are incompatible.
+        Type 'ExchangeRate' is not assignable to type 'Record<string, unknown>'.
+          Index signature for type 'string' is missing in type 'ExchangeRate'.
+src/features/sales/components/create/InvoiceMeta.tsx(78,66): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(predicate: (value: SupportedCurrency, index: number, obj: SupportedCurrency[]) => value is SupportedCurrency, thisArg?: any): SupportedCurrency | undefined', gave the following error.
+    Argument of type '(c: Record<string, unknown>) => boolean' is not assignable to parameter of type '(value: SupportedCurrency, index: number, obj: SupportedCurrency[]) => value is SupportedCurrency'.
+      Types of parameters 'c' and 'value' are incompatible.
+        Type 'SupportedCurrency' is not assignable to type 'Record<string, unknown>'.
+          Index signature for type 'string' is missing in type 'SupportedCurrency'.
+  Overload 2 of 2, '(predicate: (value: SupportedCurrency, index: number, obj: SupportedCurrency[]) => unknown, thisArg?: any): SupportedCurrency | undefined', gave the following error.
+    Argument of type '(c: Record<string, unknown>) => boolean' is not assignable to parameter of type '(value: SupportedCurrency, index: number, obj: SupportedCurrency[]) => unknown'.
+      Types of parameters 'c' and 'value' are incompatible.
+        Type 'SupportedCurrency' is not assignable to type 'Record<string, unknown>'.
+          Index signature for type 'string' is missing in type 'SupportedCurrency'.
+src/features/sales/components/create/InvoiceMeta.tsx(105,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | number | boolean | null'.
+src/features/sales/components/create/InvoiceMeta.tsx(112,47): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(predicate: (value: SupportedCurrency, index: number, obj: SupportedCurrency[]) => value is SupportedCurrency, thisArg?: any): SupportedCurrency | undefined', gave the following error.
+    Argument of type '(c: Record<string, unknown>) => boolean' is not assignable to parameter of type '(value: SupportedCurrency, index: number, obj: SupportedCurrency[]) => value is SupportedCurrency'.
+      Types of parameters 'c' and 'value' are incompatible.
+        Type 'SupportedCurrency' is not assignable to type 'Record<string, unknown>'.
+          Index signature for type 'string' is missing in type 'SupportedCurrency'.
+  Overload 2 of 2, '(predicate: (value: SupportedCurrency, index: number, obj: SupportedCurrency[]) => unknown, thisArg?: any): SupportedCurrency | undefined', gave the following error.
+    Argument of type '(c: Record<string, unknown>) => boolean' is not assignable to parameter of type '(value: SupportedCurrency, index: number, obj: SupportedCurrency[]) => unknown'.
+      Types of parameters 'c' and 'value' are incompatible.
+        Type 'SupportedCurrency' is not assignable to type 'Record<string, unknown>'.
+          Index signature for type 'string' is missing in type 'SupportedCurrency'.
+src/features/sales/components/create/InvoiceMeta.tsx(113,11): error TS6133: '_isDivide' is declared but its value is never read.
+src/features/sales/components/create/InvoiceMeta.tsx(134,55): error TS2345: Argument of type '(c: Record<string, unknown>) => { id: string; label: string; }' is not assignable to parameter of type '(value: SupportedCurrency, index: number, array: SupportedCurrency[]) => { id: string; label: string; }'.
+  Types of parameters 'c' and 'value' are incompatible.
+    Type 'SupportedCurrency' is not assignable to type 'Record<string, unknown>'.
+      Index signature for type 'string' is missing in type 'SupportedCurrency'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(38,9): error TS6133: '_sizeClasses' is declared but its value is never read.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(46,9): error TS6133: '_handleIncreaseSize' is declared but its value is never read.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(51,9): error TS6133: '_handleDecreaseSize' is declared but its value is never read.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(56,9): error TS6133: '_toggleFullscreen' is declared but its value is never read.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(104,28): error TS2339: Property 'name' does not exist on type 'never'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(105,31): error TS2339: Property 'address' does not exist on type 'never'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(106,26): error TS2339: Property 'tax_number' does not exist on type 'never'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(107,7): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(286,82): error TS2339: Property 'name_ar' does not exist on type 'never'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(286,102): error TS2339: Property 'name' does not exist on type 'never'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(288,27): error TS2339: Property 'address' does not exist on type 'never'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(291,83): error TS2339: Property 'address' does not exist on type 'never'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(294,27): error TS2339: Property 'phone' does not exist on type 'never'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(297,83): error TS2339: Property 'phone' does not exist on type 'never'.
+src/features/sales/components/details/InvoiceDetailsModal.tsx(410,17): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/features/sales/components/list/InvoiceListView.tsx(29,17): error TS18047: 'item.invoiceNumber' is possibly 'null'.
+src/features/sales/components/list/InvoiceListView.tsx(138,21): error TS2322: Type '{ id: string; invoiceNumber: string | null; customerName: string; date: string; total: number; baseTotal: number; status: string; type: string; paymentMethod: string | null; currencyCode: string; exchangeRate: number; itemCount: number; referenceInvoiceId: string | null; }[]' is not assignable to type 'InvoiceListItem[]'.
+  Type '{ id: string; invoiceNumber: string | null; customerName: string; date: string; total: number; baseTotal: number; status: string; type: string; paymentMethod: string | null; currencyCode: string; exchangeRate: number; itemCount: number; referenceInvoiceId: string | null; }' is not assignable to type 'InvoiceListItem'.
+    Types of property 'invoiceNumber' are incompatible.
+      Type 'string | null' is not assignable to type 'string'.
+        Type 'null' is not assignable to type 'string'.
+src/features/sales/components/PrintableInvoice.tsx(18,99): error TS6133: '_tax_amount' is declared but its value is never read.
+src/features/sales/components/PrintableInvoice.tsx(21,11): error TS6133: '_printSettings' is declared but its value is never read.
+src/features/sales/components/PrintableInvoice.tsx(23,11): error TS6133: '_isArabic' is declared but its value is never read.
+src/features/sales/components/Returns/SalesReturnsView.tsx(94,30): error TS2345: Argument of type 'SalesReturn[]' is not assignable to parameter of type '{ amount?: number; total_amount?: number; currency_code?: string; exchange_rate?: number; }[]'.
+  Type 'SalesReturn' is not assignable to type '{ amount?: number; total_amount?: number; currency_code?: string; exchange_rate?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Types of property 'currency_code' are incompatible.
+      Type 'string | null' is not assignable to type 'string'.
+        Type 'null' is not assignable to type 'string'.
+src/features/sales/hooks/useSalesAnalytics.ts(68,81): error TS2379: Argument of type '{ company_id: string; start_date: string | undefined; end_date: string | undefined; }' is not assignable to parameter of type '{ company_id: string; start_date?: string; end_date?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'start_date' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/features/sales/types.ts(2,1): error TS6133: 'type' is declared but its value is never read.
+src/features/sales/types.ts(2,8): error TS1192: Module '"C:/Users/User/OneDrive/Desktop/alzhra smart/src/core/database.types"' has no default export.
+src/features/settings/types/integrationSettings.ts(40,14): error TS2375: Type '{ zatca_enabled: false; zatca_environment: "sandbox"; zatca_vat_number: string; zatca_api_key: string; zatca_secret: string; pos_integration_enabled: false; pos_provider: string; payment_gateway_enabled: false; ... 13 more ...; api_secret_key: string; }' is not assignable to type 'IntegrationSettings' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'payment_gateway' are incompatible.
+    Type 'undefined' is not assignable to type '"mada" | "visa" | "mastercard" | "applepay"'.
