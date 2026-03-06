@@ -20,54 +20,59 @@ const TABLE_PRESET_MAP: Record<string, InvalidationPreset> = {
     'expense_categories': 'expense'
 };
 
+// Using 'any' for global to avoid complex typing for this specific fix
+const globalAny = window as any;
+
 export const useRealtimeSync = () => {
     const queryClient = useQueryClient();
     const { user } = useAuthStore();
 
     useEffect(() => {
-        // Only connect if user is logged in
         if (!user?.company_id) return;
 
-        let isMounted = true;
-        const channelId = `global-db-${user.company_id}`;
+        const companyId = user.company_id;
+        const channelId = `global-sync-${companyId}`;
 
-        // Check if channel already exists to avoid redundant subscriptions
-        const existingChannels = supabase.getChannels();
-        if (existingChannels.some(c => c.topic === `realtime:public:all`)) {
-            return;
+        // Initialize global registry if not exists
+        if (!globalAny.__ALZ_CHANNELS__) {
+            globalAny.__ALZ_CHANNELS__ = new Map<string, any>();
         }
 
-        const channel = supabase.channel(channelId)
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public' },
-                (payload) => {
-                    if (!isMounted) return;
-                    const table = payload.table;
-                    const preset = TABLE_PRESET_MAP[table];
+        const registry = globalAny.__ALZ_CHANNELS__;
 
-                    if (preset) {
-                        logger.info('Realtime', `🔄 Realtime update on table [${table}], refreshing queries...`);
-                        invalidateByPreset(queryClient, preset);
-                    } else {
-                        logger.debug('Realtime', `🔄 Unmapped Realtime update on table [${table}], refreshing dashboard...`);
-                        invalidateKeys(queryClient, ['dashboard_data', 'dashboard']);
+        if (!registry.has(channelId)) {
+            logger.debug('Realtime', `🔌 Initializing semi-persistent channel for company [${companyId}]`);
+
+            const channel = supabase.channel(channelId)
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public' },
+                    (payload) => {
+                        const table = payload.table;
+                        const preset = TABLE_PRESET_MAP[table];
+                        if (preset) {
+                            logger.info('Realtime', `🔄 Realtime update on table [${table}], refreshing queries...`);
+                            invalidateByPreset(queryClient, preset);
+                        } else {
+                            invalidateKeys(queryClient, ['dashboard_data', 'dashboard']);
+                        }
                     }
-                }
-            )
-            .subscribe((status) => {
-                if (status === 'SUBSCRIBED' && isMounted) {
-                    logger.debug('Realtime', '✅ Realtime Active');
+                );
+
+            channel.subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    logger.debug('Realtime', '✅ Realtime Connection Active');
                 }
             });
 
+            registry.set(channelId, channel);
+        }
+
+        // We specifically DO NOT remove the channel on unmount in this global sync hook.
+        // This prevents the WebSocket race condition during HMR and StrictMode.
+        // The connection will naturally close when the tab is closed or a hard refresh occurs.
         return () => {
-            isMounted = false;
-            supabase.removeChannel(channel).then(() => {
-                logger.debug('Realtime', '🔌 Disconnected from Supabase Realtime');
-            }).catch(() => {
-                // Ignore cleanup errors during HMR
-            });
+            // No-op for stability
         };
     }, [queryClient, user?.company_id]);
 };
