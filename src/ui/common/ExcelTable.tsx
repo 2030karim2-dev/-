@@ -502,7 +502,7 @@ function ExcelTable<T>({
       {/* Table Wrapper with Resize Handles */}
       <div
         ref={tableWrapperRef}
-        className="border border-[var(--app-border)] shadow-sm bg-[var(--app-surface)] overflow-hidden rounded-xl relative"
+        className="flex-1 border border-[var(--app-border)] shadow-sm bg-[var(--app-surface)] overflow-hidden rounded-xl relative flex flex-col"
         style={{
           ...(customSize.width ? { width: customSize.width } : {}),
           ...(customSize.height ? { maxHeight: customSize.height } : {}),
@@ -550,7 +550,7 @@ function ExcelTable<T>({
         <div
           ref={tableRef}
           tabIndex={-1}
-          className="overflow-auto custom-scrollbar outline-none max-h-[calc(100vh-220px)]"
+          className="flex-1 overflow-auto custom-scrollbar outline-none"
           onMouseDown={() => setIsMouseDown(true)}
           onMouseUp={() => { setIsMouseDown(false); endSelection(); }}
           onMouseLeave={() => { setIsMouseDown(false); endSelection(); }}

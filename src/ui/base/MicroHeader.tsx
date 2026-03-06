@@ -44,8 +44,20 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
   const location = useLocation();
   const { dir } = useTranslation();
   const isRoot = location.pathname === '/';
+  const [localSearch, setLocalSearch] = React.useState(searchValue || '');
+
+  // Keep local search in sync if external value changes (e.g. cleared by parent)
+  React.useEffect(() => {
+    setLocalSearch(searchValue || '');
+  }, [searchValue]);
 
   const BackIcon = dir === 'rtl' ? ArrowRight : ArrowLeft;
+
+  const triggerSearch = () => {
+    if (onSearchChange) {
+      onSearchChange(localSearch);
+    }
+  };
 
   return (
     <div className="sticky top-0 z-40 bg-[var(--app-surface)]/70 backdrop-blur-2xl border-b border-[var(--app-border)] shadow-sm transition-all no-print supports-[backdrop-filter]:bg-[var(--app-surface)]/50">
@@ -73,51 +85,66 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
           </div>
         </div>
 
-        {/* Tab Row - Advanced Tab Bar */}
-        {tabs && onTabChange && activeTab && (
-          <div className="border-t border-[var(--app-border)] bg-[var(--app-surface)]/40 px-2 md:px-4 py-2">
-            <AdvancedTabBar
-              tabs={tabs}
-              activeTab={activeTab}
-              onTabChange={onTabChange}
-              onTabsReorder={onTabsReorder}
-              enableDragDrop={enableDragDrop}
-              enableKeyboardNav={enableKeyboardNav}
-              size="md"
-              theme="auto"
-              animation={{
-                transitionDuration: 400,
-                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                enable3D: enable3D,
-                enableGlassmorphism: true,
-                enablePulsing: true,
-                enableMultiLayerShadows: true,
-              }}
-              a11y={{
-                ariaLabel: `${title} navigation tabs`,
-                announceChanges: true,
-              }}
-            />
-          </div>
-        )}
-
-        {/* Dynamic Search/Filter Row */}
-        {(onSearchChange || extraRow) && (
-          <div className="p-2 md:p-3 flex items-center gap-2 md:gap-3 bg-[var(--app-bg)]/50 border-t border-[var(--app-border)]">
-            {onSearchChange && (
-              <div className="relative flex-1 group">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 transition-colors" size={14} />
-                <input
-                  type="text"
-                  placeholder={searchPlaceholder || "بحث ذكي..."}
-                  value={searchValue}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="w-full bg-[var(--app-surface)] border border-[var(--app-border)] rounded-lg py-1.5 md:py-2.5 pr-10 md:pr-12 pl-4 md:pl-5 text-xs md:text-sm font-medium outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                  aria-label={searchPlaceholder || "Search"}
+        {/* Unified Search & Tab Row - MERGED TO SAVE SPACE */}
+        {(tabs || onSearchChange || extraRow) && (
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 p-2 md:px-4 bg-[var(--app-bg)]/50 border-t border-[var(--app-border)]">
+            {/* Tabs Section */}
+            {tabs && onTabChange && activeTab && (
+              <div className="flex-1 w-full overflow-x-auto no-scrollbar min-w-0">
+                <AdvancedTabBar
+                  tabs={tabs}
+                  activeTab={activeTab}
+                  onTabChange={onTabChange}
+                  onTabsReorder={onTabsReorder}
+                  enableDragDrop={enableDragDrop}
+                  enableKeyboardNav={enableKeyboardNav}
+                  size="sm"
+                  theme="auto"
+                  animation={{
+                    transitionDuration: 400,
+                    easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                    enable3D: enable3D,
+                    enableGlassmorphism: true,
+                    enablePulsing: true,
+                    enableMultiLayerShadows: true,
+                  }}
+                  a11y={{
+                    ariaLabel: `${title} navigation tabs`,
+                    announceChanges: true,
+                  }}
                 />
               </div>
             )}
-            {extraRow}
+
+            {/* Search/Filter Section */}
+            {(onSearchChange || extraRow) && (
+              <div className="flex items-center gap-2 w-full md:w-80 shrink-0">
+                {onSearchChange && (
+                  <div className="relative flex-1 group">
+                    <button
+                      onClick={triggerSearch}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 hover:text-blue-600 transition-colors z-10"
+                    >
+                      <Search size={14} />
+                    </button>
+                    <input
+                      type="text"
+                      placeholder={searchPlaceholder ? `${searchPlaceholder} (اضغط Enter)` : "بحث... (اضغط Enter)"}
+                      value={localSearch}
+                      onChange={(e) => setLocalSearch(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          triggerSearch();
+                        }
+                      }}
+                      className="w-full bg-[var(--app-surface)] border border-[var(--app-border)] rounded-lg py-1.5 pr-10 pl-4 text-xs font-medium outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:opacity-50"
+                      aria-label={searchPlaceholder || "Search"}
+                    />
+                  </div>
+                )}
+                {extraRow}
+              </div>
+            )}
           </div>
         )}
       </div>

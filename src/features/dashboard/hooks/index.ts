@@ -55,17 +55,24 @@ export const useDashboardData = () => {
     const receiptBonds = bonds.filter((b: any) => b.type?.trim().toLowerCase() === 'receipt').reduce((sum: number, b: any) => sum + Number(b.amount), 0);
     const paymentBonds = bonds.filter((b: any) => b.type?.trim().toLowerCase() === 'payment').reduce((sum: number, b: any) => sum + Number(b.amount), 0);
 
-    // Process Totals with case-insensitive type checks
-    const clientTotalSales = invoices.filter((i: any) => i.type?.trim().toLowerCase() === 'sale').reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
-    const clientTotalPurchases = invoices.filter((i: any) => i.type?.trim().toLowerCase() === 'purchase').reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
+    // Process Totals with case-insensitive type checks and returns handling
+    const sales = invoices.filter((i: any) => i.type?.trim().toLowerCase() === 'sale').reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
+    const saleReturns = invoices.filter((i: any) => ['return_sale', 'sale_return', 'sales_return'].includes(i.type?.trim().toLowerCase())).reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
+    const clientTotalSales = sales - saleReturns;
+
+    const purchases = invoices.filter((i: any) => i.type?.trim().toLowerCase() === 'purchase').reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
+    const purchaseReturns = invoices.filter((i: any) => ['return_purchase', 'purchase_return'].includes(i.type?.trim().toLowerCase())).reduce((sum: number, i: any) => sum + toBaseCurrency(i), 0);
+    const clientTotalPurchases = purchases - purchaseReturns;
+
     const clientTotalExpenses = expenses.reduce((sum: number, e: any) => sum + toBaseCurrency(e), 0);
 
     // Server-side totals (RPC) used for debts/suppliers as they are not subject to the 30-day limit
-    const serverTotalSales = Number(rawDataQuery.data.serverTotals?.total_sales) || 0;
-    const serverTotalPurchases = Number(rawDataQuery.data.serverTotals?.total_purchases) || 0;
-    const serverTotalExpenses = Number(rawDataQuery.data.serverTotals?.total_expenses) || 0;
-    const serverTotalDebts = Number(rawDataQuery.data.serverTotals?.total_debts) || 0;
-    const totalSupplierDebts = Number(rawDataQuery.data.serverTotals?.total_supplier_debts) || 0;
+    const serverTotals = (rawDataQuery.data.serverTotals || {}) as any;
+    const serverTotalSales = Number(serverTotals.total_sales) || 0;
+    const serverTotalPurchases = Number(serverTotals.total_purchases) || 0;
+    const serverTotalExpenses = Number(serverTotals.total_expenses) || 0;
+    const serverTotalDebts = Number(serverTotals.total_debts) || 0;
+    const totalSupplierDebts = Number(serverTotals.total_supplier_debts) || 0;
 
     // Client-side totals (Aggregated with toBaseCurrency) are the primary source for high-level cards
     // This ensures correct currency normalization. We use server RPC as a safety check.
@@ -74,10 +81,16 @@ export const useDashboardData = () => {
     const totalExpenses = clientTotalExpenses > 0 ? clientTotalExpenses : serverTotalExpenses;
     const totalDebts = Math.max(serverTotalDebts, 0);
 
-    // Consistency check: Net Profit should always be Sales - Purchases - Expenses
-    // We ensure result is finite and default to 0 to prevent NaN display
-    const rawProfit = totalSales - totalPurchases - totalExpenses;
-    const netProfit = isFinite(rawProfit) ? rawProfit : 0;
+    // Process Trial Balance for accurate Net Profit/Loss
+    const trialBalanceRows = rawDataQuery.data.trialBalanceRows || [];
+    const revenues = trialBalanceRows.filter((a: any) => a.account_code?.startsWith('4'));
+    const expensesAcc = trialBalanceRows.filter((a: any) => a.account_code?.startsWith('5'));
+
+    const totalRevenues = revenues.reduce((s: number, a: any) => s + Math.abs(a.balance || 0), 0);
+    const totalExpensesAcc = expensesAcc.reduce((s: number, a: any) => s + Math.abs(a.balance || 0), 0);
+
+    // Net Profit based on accounting accounts (Revenues - Expenses)
+    const netProfit = totalRevenues - totalExpensesAcc;
     const netCashPosition = isFinite(receiptBonds - paymentBonds) ? (receiptBonds - paymentBonds) : 0;
 
     const overdueInvoices = invoices.filter((i: any) => {

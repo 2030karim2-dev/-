@@ -12,7 +12,6 @@ import ProfitLossView from './components/ProfitLossView';
 import BalanceSheetView from './components/BalanceSheetView';
 import CurrencyDiffView from './components/CurrencyDiffView';
 import InventoryMovementView from './components/InventoryMovementView';
-import AIInsightsView from './components/AIInsightsView';
 import ReturnsReportView from './components/ReturnsReportView';
 import CashFlowView from './components/CashFlowView';
 import DailySalesReport from './components/DailySalesReport';
@@ -25,20 +24,18 @@ import { cn } from '../../core/utils';
 type ReportCategory = 'all' | 'ai' | 'sales' | 'financial' | 'accounting';
 
 const ReportsPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ReportTab>('ai_insights');
+  const [activeTab, setActiveTab] = useState<ReportTab>('daily_sales');
   const [activeCategory, setActiveCategory] = useState<ReportCategory>('all');
   const { t } = useTranslation();
 
   const categories: { id: ReportCategory; label: string; icon: any; color: string }[] = [
     { id: 'all', label: 'الكل', icon: LayoutGrid, color: 'text-slate-500' },
-    { id: 'ai', label: 'الذكاء الاصطناعي', icon: BrainCircuit, color: 'text-blue-500' },
     { id: 'sales', label: 'المبيعات والمخزون', icon: Activity, color: 'text-emerald-500' },
     { id: 'financial', label: 'القوائم المالية', icon: FileText, color: 'text-amber-500' },
     { id: 'accounting', label: 'المحاسبة والديون', icon: Layers, color: 'text-purple-500' },
   ];
 
   const allTabs: { id: ReportTab; label: string; icon: any; category: ReportCategory }[] = [
-    { id: 'ai_insights', label: t('ai_auditor'), icon: BrainCircuit, category: 'ai' },
     { id: 'daily_sales', label: 'المبيعات اليومي', icon: ShoppingCart, category: 'sales' },
     { id: 'returns_report', label: 'تقرير المرتجعات', icon: RotateCcw, category: 'sales' },
     { id: 'trial_balance', label: t('trial_balance'), icon: Scale, category: 'financial' },
@@ -59,7 +56,6 @@ const ReportsPage: React.FC = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'ai_insights': return <AIInsightsView />;
       case 'daily_sales': return <DailySalesReport />;
       case 'returns_report': return <ReturnsReportView />;
       case 'debt_report': return <DebtReportView />;
@@ -71,7 +67,7 @@ const ReportsPage: React.FC = () => {
       case 'currency_diff': return <CurrencyDiffView />;
       case 'item_movement': return <InventoryMovementView />;
       case 'cash_flow': return <CashFlowView />;
-      default: return <AIInsightsView />;
+      default: return <DailySalesReport />;
     }
   };
 

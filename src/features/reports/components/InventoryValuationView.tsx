@@ -94,7 +94,7 @@ const InventoryValuationView: React.FC = () => {
           </div>
 
           <div className="mt-12 w-full h-full">
-            <ResponsiveContainer width="100%" height={320}>
+            <ResponsiveContainer width="100%" height={320} minWidth={0} minHeight={320}>
               <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
                 <defs>
                   {chartData.map((entry, index) => (

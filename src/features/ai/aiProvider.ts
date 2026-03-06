@@ -65,7 +65,10 @@ async function callOpenRouter(
     options?: { jsonMode?: boolean; temperature?: number }
 ): Promise<string> {
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-    if (!apiKey) throw new Error('VITE_OPENROUTER_API_KEY مفقود. أضف المفتاح في ملف .env');
+    if (!apiKey) {
+        console.warn('AI: VITE_OPENROUTER_API_KEY is missing. AI features will be disabled.');
+        throw new Error('MISSING_API_KEY');
+    }
 
     const model = getActiveModel();
 

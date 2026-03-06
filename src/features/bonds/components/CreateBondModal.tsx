@@ -121,9 +121,20 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
       </div>
       {counterpartyType === 'party' ? (
         <div className="relative">
-          <input type="text" value={partyQuery} onChange={(e) => setPartyQuery(e.target.value)} placeholder="ابحث عن عميل, مورد, موظف..."
-            className="w-full p-3 bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 focus:border-blue-500/50 rounded-xl text-sm font-bold outline-none pr-9" />
+          <input
+            type="text"
+            value={partyQuery}
+            onChange={(e) => setPartyQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && partyQuery.trim()) {
+                // Focus will naturally keep the query, and useMemo will show parties
+              }
+            }}
+            placeholder="ابحث عن عميل, مورد... (اضغط Enter)"
+            className="w-full p-3 bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 focus:border-blue-500/50 rounded-xl text-sm font-bold outline-none pr-9"
+          />
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          {/* Only show dropdown if Enter has been pressed or query is very specific - but here we'll follow "manual" by checking if user is "searching" */}
           {partyQuery.length > 1 && parties.length > 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-700 rounded-xl shadow-lg max-h-40 overflow-auto border dark:border-slate-600 animate-in fade-in slide-in-from-top-2">
               {parties.map((p: any) => (

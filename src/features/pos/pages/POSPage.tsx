@@ -144,13 +144,6 @@ const POSPage: React.FC = () => {
           overflow-hidden relative bg-gray-50/50 dark:bg-slate-950/50
         `}>
           <ProductGrid searchTerm={searchTerm} onAddToCart={(p) => addProductToCart(p as any)} />
-
-          {searchTerm && (
-            <div className="absolute top-0 left-0 right-0 p-3 bg-blue-600/90 text-white backdrop-blur-md z-10 flex justify-between items-center animate-in slide-in-from-top-4">
-              <span className="text-[10px] font-bold uppercase tracking-widest">نمط البحث السريع نشط...</span>
-              <button onClick={() => setSearchTerm('')} className="bg-white/20 p-1 rounded-lg"><X size={14} /></button>
-            </div>
-          )}
         </main>
       </div>
 

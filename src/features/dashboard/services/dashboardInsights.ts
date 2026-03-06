@@ -27,12 +27,28 @@ export const calculateDashboardInsights = (data: {
     const olderHalf = allInvoices.filter((i: any) => new Date(i.issue_date) < fifteenDaysAgo);
     const newerHalf = allInvoices.filter((i: any) => new Date(i.issue_date) >= fifteenDaysAgo);
 
-    const olderSales = olderHalf.filter((i: any) => i.type === 'sale').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
-    const newerSales = newerHalf.filter((i: any) => i.type === 'sale').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
+    const getNetSales = (list: any[]) => list.reduce((sum: number, i: any) => {
+        const type = i.type?.trim().toLowerCase();
+        const amount = toBaseCurrency(i);
+        if (type === 'sale') return sum + amount;
+        if (['return_sale', 'sale_return', 'sales_return'].includes(type)) return sum - amount;
+        return sum;
+    }, 0);
+
+    const olderSales = getNetSales(olderHalf);
+    const newerSales = getNetSales(newerHalf);
     const salesTrend = olderSales > 0 ? ((newerSales - olderSales) / olderSales) * 100 : 0;
 
-    const olderPurchases = olderHalf.filter((i: any) => i.type === 'purchase').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
-    const newerPurchases = newerHalf.filter((i: any) => i.type === 'purchase').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
+    const getNetPurchases = (list: any[]) => list.reduce((sum: number, i: any) => {
+        const type = i.type?.trim().toLowerCase();
+        const amount = toBaseCurrency(i);
+        if (type === 'purchase') return sum + amount;
+        if (['return_purchase', 'purchase_return'].includes(type)) return sum - amount;
+        return sum;
+    }, 0);
+
+    const olderPurchases = getNetPurchases(olderHalf);
+    const newerPurchases = getNetPurchases(newerHalf);
     const purchasesTrend = olderPurchases > 0 ? ((newerPurchases - olderPurchases) / olderPurchases) * 100 : 0;
 
     const expenseMidpoint = new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000));

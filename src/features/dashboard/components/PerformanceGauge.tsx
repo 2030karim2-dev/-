@@ -19,6 +19,11 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
 }) => {
     const { theme } = useThemeStore();
     const isDark = theme === 'dark';
+    const [isMounted, setIsMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const percentage = target > 0 ? Math.min(100, (value / target) * 100) : 0;
     const remaining = 100 - percentage;
@@ -92,40 +97,42 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
                     }}
                 />
 
-                <ResponsiveContainer width="100%" height={160} minWidth={0} minHeight={160}>
-                    <PieChart>
-                        <defs>
-                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor={color} floodOpacity="0.4" />
-                            </filter>
-                            <linearGradient id="gaugeGradient" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0%" stopColor={color} stopOpacity={0.7} />
-                                <stop offset="100%" stopColor={color} stopOpacity={1} />
-                            </linearGradient>
-                        </defs>
-                        <Pie
-                            data={data}
-                            cx="50%"
-                            cy="75%"
-                            startAngle={180}
-                            endAngle={0}
-                            innerRadius={65}
-                            outerRadius={85}
-                            paddingAngle={2}
-                            dataKey="value"
-                            stroke="none"
-                            cornerRadius={8}
-                        >
-                            {data.map((_entry, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={index === 0 ? "url(#gaugeGradient)" : (isDark ? '#334155' : '#e2e8f0')}
-                                    filter={index === 0 ? "url(#glow)" : undefined}
-                                />
-                            ))}
-                        </Pie>
-                    </PieChart>
-                </ResponsiveContainer>
+                {isMounted && (
+                    <ResponsiveContainer width="100%" height={160} minWidth={0} minHeight={160}>
+                        <PieChart>
+                            <defs>
+                                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor={color} floodOpacity="0.4" />
+                                </filter>
+                                <linearGradient id="gaugeGradient" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stopColor={color} stopOpacity={0.7} />
+                                    <stop offset="100%" stopColor={color} stopOpacity={1} />
+                                </linearGradient>
+                            </defs>
+                            <Pie
+                                data={data}
+                                cx="50%"
+                                cy="75%"
+                                startAngle={180}
+                                endAngle={0}
+                                innerRadius={65}
+                                outerRadius={85}
+                                paddingAngle={2}
+                                dataKey="value"
+                                stroke="none"
+                                cornerRadius={8}
+                            >
+                                {data.map((_entry, index) => (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={index === 0 ? "url(#gaugeGradient)" : (isDark ? '#334155' : '#e2e8f0')}
+                                        filter={index === 0 ? "url(#glow)" : undefined}
+                                    />
+                                ))}
+                            </Pie>
+                        </PieChart>
+                    </ResponsiveContainer>
+                )}
 
                 {/* Center Text */}
                 <div className="absolute inset-0 flex items-center justify-center pt-10">

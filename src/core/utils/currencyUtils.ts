@@ -248,9 +248,11 @@ export const toBaseCurrency = (entity: {
     total_amount?: number;
     currency_code?: string;
     exchange_rate?: number;
+    exchange_operator?: string;
 }): number => {
     const amount = Number(entity.amount ?? entity.total_amount ?? 0);
     const exchangeRate = Number(entity.exchange_rate ?? 1);
+    const exchangeOperator = (entity.exchange_operator as any) || 'multiply';
 
     if (isNaN(amount)) return 0;
 
@@ -259,6 +261,7 @@ export const toBaseCurrency = (entity: {
             amount,
             currencyCode: entity.currency_code || 'SAR',
             exchangeRate,
+            exchangeOperator,
         });
     } catch (e) {
         // Fallback to raw amount if conversion fails (e.g. rate is 0 or NaN)

@@ -25,10 +25,10 @@ const AuditLogView: React.FC = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleSelectProduct = (product: any) => {
-        setSelectedProduct(product);
-        setSearchQuery('');
-        setIsDropdownOpen(false);
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && searchQuery.trim()) {
+            setIsDropdownOpen(true);
+        }
     };
 
     return (
@@ -59,9 +59,9 @@ const AuditLogView: React.FC = () => {
                     ) : (
                         <input
                             type="text"
-                            placeholder="ابحث عن صنف بالاسم أو الكود للبدء في التدقيق..."
+                            placeholder="ابحث عن صنف بالاسم أو الكود... (اضغط Enter للبحث)"
                             value={searchQuery}
-                            onFocus={() => setIsDropdownOpen(true)}
+                            onKeyDown={handleKeyDown}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="flex-1 bg-transparent border-none outline-none text-sm font-bold placeholder:text-gray-400 dark:text-white"
                         />
@@ -69,7 +69,7 @@ const AuditLogView: React.FC = () => {
                 </div>
 
                 {/* Dropdown Results */}
-                {isDropdownOpen && (
+                {isDropdownOpen && searchQuery.trim() && (
                     <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-[2rem] shadow-2xl z-[100] overflow-hidden animate-in zoom-in-95 duration-200 backdrop-blur-xl">
                         <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                             {isProductsLoading ? (

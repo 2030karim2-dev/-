@@ -114,8 +114,8 @@ const InventoryPage: React.FC = () => {
                 // Filter products locally for now as RPC might not be applied
                 const lowStockProducts = products.filter(p => p.stock_quantity <= (p.min_stock_level || 0) && (p.min_stock_level || 0) > 0);
                 return (
-                    <div className="space-y-4">
-                        <div className="bg-rose-50 border border-rose-200 p-4 rounded-xl flex items-center justify-between">
+                    <div className="space-y-4 h-full flex flex-col">
+                        <div className="bg-rose-50 border border-rose-200 p-4 rounded-xl flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-3 text-rose-800">
                                 <Activity className="animate-pulse" />
                                 <div>
@@ -124,13 +124,15 @@ const InventoryPage: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <ProductExcelGrid
-                            products={lowStockProducts}
-                            isLoading={isLoading}
-                            onDelete={deleteProduct}
-                            onViewDetails={setSelectedProduct}
-                            onEdit={handleEdit}
-                        />
+                        <div className="flex-1 overflow-hidden">
+                            <ProductExcelGrid
+                                products={lowStockProducts}
+                                isLoading={isLoading}
+                                onDelete={deleteProduct}
+                                onViewDetails={setSelectedProduct}
+                                onEdit={handleEdit}
+                            />
+                        </div>
                     </div>
                 );
             default: // Products View
@@ -236,8 +238,8 @@ const InventoryPage: React.FC = () => {
                 onTabChange={setActiveView}
             />
 
-            <div className="flex-1 overflow-y-auto p-2 pb-16 custom-scrollbar">
-                <div className="max-w-[1600px] mx-auto h-full">
+            <div className="flex-1 overflow-hidden p-2 flex flex-col">
+                <div className="max-w-[1600px] mx-auto h-full w-full flex flex-col">
                     {error ? <ErrorDisplay error={error?.message || null} onRetry={refetch} variant="full" /> : renderActiveView()}
                 </div>
             </div>

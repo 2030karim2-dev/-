@@ -105,7 +105,7 @@ export interface RawInvoice extends BaseEntity {
     party_id: string;
     currency_code?: string;
     exchange_rate?: number;
-    parties?: { name: string } | null;
+    party?: { name: string } | null;
 }
 
 export interface RawExpense extends BaseEntity {

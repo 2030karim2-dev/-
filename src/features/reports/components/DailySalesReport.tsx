@@ -185,7 +185,7 @@ const DailySalesReport: React.FC = () => {
                     <h4 className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">اتجاه المبيعات اليومي</h4>
                     <div className="w-full h-[220px] relative" style={{ minHeight: '220px' }}>
                         {isMounted && (
-                            <ResponsiveContainer key="daily-sales-chart" width="99%" height="100%" debounce={1} minWidth={0}>
+                            <ResponsiveContainer key="daily-sales-chart" width="99%" height="100%" debounce={1} minWidth={0} minHeight={220}>
                                 <BarChart data={data?.dailyData || []}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                                     <XAxis dataKey="date" tick={{ fontSize: 9 }} tickFormatter={(v) => v.slice(5)} />

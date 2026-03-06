@@ -19,16 +19,22 @@ export const calculateDashboardStats = (data: {
 
     const chartDataMap: Record<string, { sales: number; purchases: number; expenses: number }> = {};
 
-    (invoicesData || []).filter((i: any) => i.type === 'sale').forEach((inv: any) => {
+    (invoicesData || []).forEach((inv: any) => {
+        const type = inv.type?.trim().toLowerCase();
         const date = new Date(inv.issue_date).toLocaleDateString('en-CA');
         if (!chartDataMap[date]) chartDataMap[date] = { sales: 0, purchases: 0, expenses: 0 };
-        chartDataMap[date].sales += toBaseCurrency(inv);
-    });
 
-    (invoicesData || []).filter((i: any) => i.type?.trim().toLowerCase() === 'purchase').forEach((inv: any) => {
-        const date = new Date(inv.issue_date).toLocaleDateString('en-CA');
-        if (!chartDataMap[date]) chartDataMap[date] = { sales: 0, purchases: 0, expenses: 0 };
-        chartDataMap[date].purchases += toBaseCurrency(inv);
+        const amount = toBaseCurrency(inv);
+
+        if (type === 'sale') {
+            chartDataMap[date].sales += amount;
+        } else if (['return_sale', 'sale_return', 'sales_return'].includes(type)) {
+            chartDataMap[date].sales -= amount;
+        } else if (type === 'purchase') {
+            chartDataMap[date].purchases += amount;
+        } else if (['return_purchase', 'purchase_return'].includes(type)) {
+            chartDataMap[date].purchases -= amount;
+        }
     });
 
     (expensesData || []).forEach((exp: any) => {
@@ -65,14 +71,24 @@ export const calculateDashboardStats = (data: {
         .slice(0, 3);
 
     const customerPurchases: Record<string, { name: string; total: number; invoices: number }> = {};
-    (invoicesData || []).filter((i: any) => i.type === 'sale').forEach((inv: any) => {
+    (invoicesData || []).forEach((inv: any) => {
+        const type = inv.type?.trim().toLowerCase();
+        if (type !== 'sale' && !['return_sale', 'sale_return', 'sales_return'].includes(type)) return;
+
         const customerId = inv.party_id;
-        const customerName = inv.parties?.name || 'غير معروف';
+        const customerName = inv.party?.name || 'غير معروف';
         if (!customerPurchases[customerId]) {
             customerPurchases[customerId] = { name: customerName, total: 0, invoices: 0 };
         }
-        customerPurchases[customerId].total += toBaseCurrency(inv);
-        customerPurchases[customerId].invoices += 1;
+
+        const amount = toBaseCurrency(inv);
+        if (type === 'sale') {
+            customerPurchases[customerId].total += amount;
+            customerPurchases[customerId].invoices += 1;
+        } else {
+            customerPurchases[customerId].total -= amount;
+            // We don't necessarily decrement invoice count for a return, as it's a separate document
+        }
     });
 
     const topCustomers = Object.entries(customerPurchases)
