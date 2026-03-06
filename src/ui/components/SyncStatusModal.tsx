@@ -29,12 +29,12 @@ const SyncStatusModal: React.FC<SyncStatusModalProps> = ({ isOpen, onClose }) =>
     };
 
     useEffect(() => {
-        if (isOpen) {
-            loadPending();
-            // Poll for changes while open
-            const interval = setInterval(loadPending, 3000);
-            return () => clearInterval(interval);
-        }
+        if (!isOpen) return undefined;
+
+        loadPending();
+        // Poll for changes while open
+        const interval = setInterval(loadPending, 3000);
+        return () => clearInterval(interval);
     }, [isOpen]);
 
     const handleRemove = async (id: string) => {

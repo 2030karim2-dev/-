@@ -7,7 +7,7 @@
  */
 
 import { CardMigrationFlags, FeatureFlagConfig } from '@/ui/cards/types';
-import { logger } from '../core/utils/logger';
+// import { logger } from '../core/utils/logger';
 
 // ======== Feature Flags ========
 
@@ -136,5 +136,5 @@ if (import.meta.env.DEV) {
     (window as any).featureFlags = featureFlags;
     (window as any).getAllFeatureFlags = getAllFeatureFlags;
 
-    logger.info('[Feature Flags] Initialized:', getAllFeatureFlags());
+    console.info('[Feature Flags] Initialized:', getAllFeatureFlags());
 }

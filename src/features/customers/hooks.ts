@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { customerApi } from './api';
+import { partiesApi } from '../parties/api';
 
 export interface Customer {
     id: string;
@@ -13,7 +13,7 @@ export const useCustomers = (companyId: string) => {
     return useQuery<Customer[]>({
         queryKey: ['customers', companyId],
         queryFn: async () => {
-            const { data, error } = await customerApi.getCustomers(companyId);
+            const { data, error } = await partiesApi.getParties(companyId, 'customer');
 
             if (error) throw error;
             return (data || []) as Customer[];
@@ -28,7 +28,7 @@ export const useCustomerSearch = (companyId: string, searchTerm: string) => {
         queryFn: async () => {
             if (!searchTerm.trim()) return [];
 
-            const { data, error } = await customerApi.searchCustomers(companyId, searchTerm);
+            const { data, error } = await partiesApi.search(companyId, 'customer', searchTerm);
 
             if (error) throw error;
             return (data || []) as Customer[];
@@ -41,7 +41,7 @@ export const useCustomerStats = (companyId: string) => {
     return useQuery({
         queryKey: ['customer-stats', companyId],
         queryFn: async () => {
-            const { data, error } = await customerApi.getCustomerStats(companyId);
+            const { data, error } = await partiesApi.getParties(companyId, 'customer');
 
             if (error) throw error;
 

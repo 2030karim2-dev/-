@@ -236,7 +236,6 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                     setSelectedCustomer(null);
                 }}
                 customer={selectedCustomer}
-                size="resizable"
             />
         </div>
     );

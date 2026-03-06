@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Car, Plus,  Hash } from 'lucide-react';
+import { Car, Plus, Hash } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inventoryApi } from '../inventory/api';
 import { Vehicle } from '../inventory/types';
@@ -82,7 +82,7 @@ const VehiclesPage: React.FC = () => {
             />
 
             <div className="flex-1 overflow-y-auto px-4 pt-4 pb-20 custom-scrollbar">
-                <div className="max-w-7xl mx-auto space-y-4">
+                <div className="max-w-[1600px] mx-auto space-y-4">
                     {activeTab === 'list' ? (
                         <>
                             {isLoading ? (

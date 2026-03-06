@@ -35,6 +35,7 @@ const ProductCoreInfo: React.FC<Props> = ({ register, errors }) => {
           icon={<FileCode className="text-indigo-500" />}
           dir="ltr"
           className="font-mono text-xs"
+          error={errors.part_number?.message as string}
         />
         <Input
           label={t('manufacturer')}
@@ -42,6 +43,7 @@ const ProductCoreInfo: React.FC<Props> = ({ register, errors }) => {
           {...register('brand')}
           icon={<Award className="text-amber-500" />}
           className="font-bold text-xs"
+          error={errors.brand?.message as string}
         />
       </div>
 
@@ -56,6 +58,7 @@ const ProductCoreInfo: React.FC<Props> = ({ register, errors }) => {
             className="w-full px-4 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg text-xs font-mono text-gray-700 dark:text-gray-300 focus:border-blue-500 outline-none transition-all"
             dir="ltr"
           />
+          {errors.alternative_numbers && <p className="text-[9px] text-rose-500 font-bold mt-1 px-1">{errors.alternative_numbers.message}</p>}
         </div>
 
         {/* Core charge option removed because is_core is not in the database schema yet */}

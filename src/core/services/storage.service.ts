@@ -60,7 +60,7 @@ export const storageService = {
                 mime_type: file.type,
             };
 
-            const { data, error: dbError } = await supabase
+            const { data, error: dbError } = await (supabase as any)
                 .from('file_attachments')
                 .insert([attachmentRecord])
                 .select()
@@ -99,7 +99,7 @@ export const storageService = {
      * Fetches metadata for all files attached to a specific entity.
      */
     async getEntityAttachments(companyId: string, entityType: FileAttachment['entity_type'], entityId: string): Promise<FileAttachment[]> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('file_attachments')
             .select('*')
             .eq('company_id', companyId)
@@ -120,7 +120,7 @@ export const storageService = {
     async deleteAttachment(attachmentId: string): Promise<boolean> {
         try {
             // 1. Get attachment record to find the path
-            const { data: record, error: fetchError } = await supabase
+            const { data: record, error: fetchError } = await (supabase as any)
                 .from('file_attachments')
                 .select('storage_path')
                 .eq('id', attachmentId)
@@ -140,7 +140,7 @@ export const storageService = {
             if (storageError) throw storageError;
 
             // 3. Delete from database
-            const { error: dbError } = await supabase
+            const { error: dbError } = await (supabase as any)
                 .from('file_attachments')
                 .delete()
                 .eq('id', attachmentId);

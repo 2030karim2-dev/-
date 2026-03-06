@@ -599,7 +599,7 @@ function ExcelTable<T>({
               handleCellClick={handleCellClick}
               handleMouseDownCell={handleMouseDownCell}
               handleMouseEnterCell={handleMouseEnterCell}
-              onRowDoubleClick={onRowDoubleClick}
+              onRowDoubleClick={onRowDoubleClick as any}
               startEditing={startEditing}
               editValue={editValue}
               setEditValue={setEditValue}

@@ -90,7 +90,7 @@ const AuditSessionPage: React.FC = () => {
                 onSearchChange={setFilter}
             />
             <div className="flex-1 overflow-y-auto p-2 pb-16 custom-scrollbar">
-                <div className="max-w-7xl mx-auto space-y-2">
+                <div className="max-w-[1600px] mx-auto space-y-2">
                     <AuditStats stats={stats} session={session} />
                     <AuditItemsTable
                         fields={fields}

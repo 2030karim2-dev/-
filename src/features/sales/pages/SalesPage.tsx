@@ -99,7 +99,7 @@ const SalesPage: React.FC = () => {
         onSearchChange={setSearchTerm}
       />
       <div className="flex-1 overflow-y-auto px-2 pt-2 pb-16 custom-scrollbar">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[1600px] mx-auto">
           {renderContent()}
         </div>
       </div>

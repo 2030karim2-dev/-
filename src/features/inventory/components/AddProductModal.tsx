@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Save, Zap, ShieldCheck, Package, DollarSign, Box } from 'lucide-react';
 import { ProductFormData, Product } from '../types';
+import { productFormSchema } from '../schema';
 import Modal from '../../../ui/base/Modal';
 import Button from '../../../ui/base/Button';
 // import Input from '../../../ui/base/Input';
@@ -35,6 +37,7 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
   const [_isCheckingSimilarity, setIsCheckingSimilarity] = React.useState(false);
 
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<ProductFormData>({
+    resolver: zodResolver(productFormSchema) as any,
     defaultValues: {
       unit: 'piece',
       category: 'عام',
@@ -107,7 +110,7 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
         {t('cancel')}
       </button>
       <Button
-        onClick={handleSubmit(onSubmit)}
+        onClick={handleSubmit(onSubmit as any)}
         isLoading={isSubmitting}
         className="flex-[2] rounded-none text-[11px] font-bold bg-blue-600 border-blue-700 shadow-xl uppercase tracking-widest"
         leftIcon={<Save size={16} />}
@@ -167,7 +170,7 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
                 <DollarSign size={12} /> {t('pricing')}
               </h4>
               <div className="grid grid-cols-2 gap-2">
-                <ProductFinancials register={register} />
+                <ProductFinancials register={register} errors={errors} />
               </div>
             </div>
             <div className="space-y-3">
@@ -175,7 +178,7 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
                 <Box size={12} /> {t('stock')}
               </h4>
               <div className="grid grid-cols-2 gap-2">
-                <ProductStockInfo register={register} />
+                <ProductStockInfo register={register} errors={errors} />
               </div>
             </div>
           </div>

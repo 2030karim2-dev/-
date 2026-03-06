@@ -37,8 +37,8 @@ export const productService = {
     /**
      * Get all products for a company
      */
-    getProducts: async (companyId: string): Promise<Product[]> => {
-        const { data, error } = await inventoryApi.getProducts(companyId);
+    getProducts: async (companyId: string, page: number = 1, limitNum: number = 1000): Promise<Product[]> => {
+        const { data, error } = await inventoryApi.getProducts(companyId, page, limitNum);
         if (error) throw error;
 
         return (data || []).map((p: unknown) => {

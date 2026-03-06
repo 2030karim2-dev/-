@@ -5,7 +5,10 @@ import { TableInsert, TableUpdate } from '@/core/types/supabase-helpers';
 
 /** Products CRUD and search */
 export const productsApi = {
-    getProducts: async (companyId: string) => {
+    getProducts: async (companyId: string, page: number = 1, limitNum: number = 1000) => {
+        const from = (page - 1) * limitNum;
+        const to = from + limitNum - 1;
+
         return await supabase.from('products')
             .select(`
                 id,
@@ -37,7 +40,7 @@ export const productsApi = {
             .eq('company_id', companyId)
             .is('deleted_at', null)
             .order('created_at', { ascending: false })
-            .limit(1000);
+            .range(from, to);
     },
 
     getProductById: async (id: string) => {

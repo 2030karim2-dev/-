@@ -120,7 +120,7 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto space-y-3 animate-in fade-in duration-500 pt-2 pb-24">
+      <div className="max-w-[1600px] mx-auto space-y-3 animate-in fade-in duration-500 pt-2 pb-24">
         <div className="bg-white dark:bg-slate-900 border-2 border-gray-100 dark:border-slate-800 shadow-2xl rounded-none flex flex-col overflow-hidden">
           {comp && <InvoiceHeader company={comp} />}
           <InvoiceMeta invoiceNumber={nextInvoiceNumber as any} />

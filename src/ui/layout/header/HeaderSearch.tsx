@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { productsApi } from '../../../features/inventory/api/productsApi';
 import { useAuthStore } from '../../../features/auth/store';
-import { cn, formatCurrency } from '../../../core/utils';
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { formatCurrency } from '../../../core/utils';
 
 // Custom Debounce Hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -24,7 +23,6 @@ const HeaderSearch: React.FC = () => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const { t } = useTranslation();
 
   const { data: results, isFetching } = useQuery({
     queryKey: ['product_search', user?.company_id, debouncedQuery],

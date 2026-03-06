@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useItemMovement, useProducts } from '../hooks';
 import { formatNumberDisplay } from '../../../core/utils';
-import { History, User, Search, X, ArrowUpRight, ArrowDownLeft, Box, Info } from 'lucide-react';
+import { History, Search, X, ArrowUpRight, ArrowDownLeft, Box, Info } from 'lucide-react';
 import { cn } from '../../../core/utils';
 import Avatar from '../../../ui/base/Avatar';
 

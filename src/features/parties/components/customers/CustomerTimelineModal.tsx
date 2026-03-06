@@ -6,7 +6,7 @@
 import React from 'react';
 import { X, History } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { customerApi } from '../../api/enhanced/customerApi';
+import { customerApi } from '../../api';
 import CustomerTimeline from './CustomerTimeline';
 import AddActivityModal from './AddActivityModal';
 import type { Party } from '../../types';

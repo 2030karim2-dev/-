@@ -106,3 +106,5 @@ export const partiesApi = {
     return { invoices, payments, journalLines };
   }
 };
+
+export { customerApi } from './api/enhanced/customerApi';

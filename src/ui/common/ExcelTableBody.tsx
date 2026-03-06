@@ -18,7 +18,7 @@ interface ExcelTableBodyProps<T> {
     handleDragEnd: () => void;
     handleDrop: () => void;
     onRowClick?: ((row: T) => void) | undefined;
-    onOrderChange?: (data: T[]) => void;
+    onOrderChange?: ((data: T[]) => void) | undefined;
     currentTheme: { hover: string; glow: string };
     toggleRowSelection: (id: string, e: React.MouseEvent) => void;
     currentPage: number;

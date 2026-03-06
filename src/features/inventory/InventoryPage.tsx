@@ -237,7 +237,7 @@ const InventoryPage: React.FC = () => {
             />
 
             <div className="flex-1 overflow-y-auto p-2 pb-16 custom-scrollbar">
-                <div className="max-w-7xl mx-auto h-full">
+                <div className="max-w-[1600px] mx-auto h-full">
                     {error ? <ErrorDisplay error={error?.message || null} onRetry={refetch} variant="full" /> : renderActiveView()}
                 </div>
             </div>
@@ -247,10 +247,14 @@ const InventoryPage: React.FC = () => {
             <AddProductModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                onSubmit={(data) => {
-                    saveProduct(editingProduct?.id ? { data, id: editingProduct.id } : { data }).then(() => {
+                onSubmit={async (data) => {
+                    try {
+                        await saveProduct(editingProduct?.id ? { data, id: editingProduct.id } : { data });
                         handleCloseModal();
-                    });
+                    } catch (err) {
+                        // Error is handled and toasted by the mutation layer
+                        console.error('Validation or API error:', err);
+                    }
                 }}
                 isSubmitting={isSaving}
                 initialData={editingProduct}

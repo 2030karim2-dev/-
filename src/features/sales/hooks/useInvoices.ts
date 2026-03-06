@@ -6,13 +6,6 @@ import { useFeedbackStore } from '../../feedback/store';
 import { CreateInvoiceDTO } from '../types';
 import { syncStore } from '../../../core/lib/sync-store';
 import { useNetworkStatus } from '../../../lib/hooks/useNetworkStatus';
-import { RefreshCw } from 'lucide-react';
-
-const HeaderActions: React.FC = () => {
-  // Assuming this component will have some JSX and logic here.
-  // For now, it's an empty functional component as per the provided snippet.
-  return null;
-};
 
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();

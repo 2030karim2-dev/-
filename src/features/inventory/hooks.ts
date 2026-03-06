@@ -84,13 +84,13 @@ export const useInventoryCategoryMutations = () => {
     return { createCategory: create.mutate, deleteCategory: remove.mutate, isCreating: create.isPending };
 };
 
-export const useProducts = (searchTerm: string = '', options: { enabled?: boolean } = {}) => {
+export const useProducts = (searchTerm: string = '', options: { enabled?: boolean; page?: number; limitNum?: number } = {}) => {
     const { user } = useAuthStore();
     const companyId = user?.company_id;
 
     const query = useQuery({
-        queryKey: ['products', companyId],
-        queryFn: () => companyId ? inventoryService.getProducts(companyId) : Promise.resolve([]),
+        queryKey: ['products', companyId, options.page, options.limitNum],
+        queryFn: () => companyId ? inventoryService.getProducts(companyId, options.page, options.limitNum) : Promise.resolve([]),
         enabled: (options.enabled !== false) && !!companyId,
     });
 

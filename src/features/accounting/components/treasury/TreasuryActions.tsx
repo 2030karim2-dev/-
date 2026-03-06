@@ -12,25 +12,31 @@ const TreasuryActions: React.FC<Props> = ({ onAction, onPrint }) => {
         <div className="flex gap-2 mb-4">
             <Button
                 onClick={() => onAction('receipt')}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="flex-1 bg-emerald-600/50 hover:bg-emerald-600/50 text-white cursor-not-allowed opacity-70"
                 leftIcon={<ArrowDownLeft size={16} />}
+                disabled
+                title="قريباً"
             >
-                سند قبض (إيداع)
+                سند قبض (قريباً)
             </Button>
             <Button
                 onClick={() => onAction('payment')}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                className="flex-1 bg-red-600/50 hover:bg-red-600/50 text-white cursor-not-allowed opacity-70"
                 leftIcon={<ArrowUpRight size={16} />}
+                disabled
+                title="قريباً"
             >
-                سند صرف (سحب)
+                سند صرف (قريباً)
             </Button>
             <Button
                 onClick={() => onAction('transfer')}
                 variant="outline"
-                className="flex-1 border-blue-200 hover:bg-blue-50 text-blue-700"
+                className="flex-1 border-gray-200 text-gray-400 cursor-not-allowed opacity-70"
                 leftIcon={<ArrowRightLeft size={16} />}
+                disabled
+                title="قريباً"
             >
-                تحويل داخلي
+                تحويل داخلي (قريباً)
             </Button>
             <Button
                 onClick={onPrint}
