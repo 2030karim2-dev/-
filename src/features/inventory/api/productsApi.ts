@@ -101,7 +101,7 @@ export const productsApi = {
             .select('id, name_ar, sku, sale_price, part_number, alternative_numbers, quantity:product_stock(quantity)')
             .eq('company_id', companyId)
             .eq('status', 'active')
-            .or(`name_ar.ilike.%${sanitized}%,sku.ilike.%${sanitized}%,part_number.ilike.%${sanitized}%,alternative_numbers.ilike.%${sanitized}%`)
+            .or(`name_ar.ilike.%${sanitized}%,sku.ilike.%${sanitized}%,part_number.ilike.%${sanitized}%,alternative_numbers.ilike.%${sanitized}%,brand.ilike.%${sanitized}%,size.ilike.%${sanitized}%,description.ilike.%${sanitized}%`)
             .limit(15);
     },
 
@@ -112,7 +112,7 @@ export const productsApi = {
         const { data, error } = await supabase.from('products')
             .select('id, name_ar, name_en, sku, part_number, brand')
             .eq('company_id', companyId)
-            .or(`name_ar.ilike.%${sanitized}%,name_en.ilike.%${sanitized}%,part_number.ilike.%${sanitized}%,sku.ilike.%${sanitized}%`)
+            .or(`name_ar.ilike.%${sanitized}%,name_en.ilike.%${sanitized}%,part_number.ilike.%${sanitized}%,sku.ilike.%${sanitized}%,brand.ilike.%${sanitized}%,size.ilike.%${sanitized}%,description.ilike.%${sanitized}%`)
             .limit(10);
 
         if (error) throw error;
