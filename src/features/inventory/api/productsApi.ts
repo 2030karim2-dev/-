@@ -8,14 +8,31 @@ export const productsApi = {
     getProducts: async (companyId: string) => {
         return await supabase.from('products')
             .select(`
-        *,
-        category:product_categories(id, name),
-        stock:product_stock!product_stock_product_id_fkey(
-          quantity,
-          warehouse_id,
-          warehouses!product_stock_warehouse_id_fkey(name_ar)
-        )
-      `)
+                id,
+                company_id,
+                name_ar,
+                sku,
+                part_number,
+                brand,
+                category_id,
+                size,
+                description,
+                cost_price,
+                sale_price,
+                min_stock_level,
+                unit,
+                image_url,
+                alternative_numbers,
+                barcode,
+                created_at,
+                status,
+                category:product_categories(id, name),
+                stock:product_stock!product_stock_product_id_fkey(
+                    quantity,
+                    warehouse_id,
+                    warehouses!product_stock_warehouse_id_fkey(name_ar)
+                )
+            `)
             .eq('company_id', companyId)
             .is('deleted_at', null)
             .order('created_at', { ascending: false })

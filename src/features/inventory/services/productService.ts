@@ -42,24 +42,31 @@ export const productService = {
 
         return (data || []).map((p: unknown) => {
             const prod = p as RawProduct;
+            if (!prod || !prod.id) return null;
+
             const stockList = Array.isArray(prod.stock) ? prod.stock : [];
-            const totalStock = stockList.reduce((sum: number, s: RawStock) => sum + (Number(s.quantity) || 0), 0);
-            const categoryName = typeof prod.category === 'object' ? prod.category?.name || 'عام' : 'عام';
+            const totalStock = stockList.reduce((sum: number, s: RawStock) => {
+                const qty = Number(s.quantity);
+                return sum + (isNaN(qty) ? 0 : qty);
+            }, 0);
+
+            const categoryName = prod.category?.name || 'عام';
 
             return {
                 id: prod.id,
                 company_id: prod.company_id,
-                name_ar: prod.name_ar,
-                name_en: '', // Placeholder if not in DB yet
-                name: prod.name_ar, // For legacy support
+                name_ar: prod.name_ar || 'بدون اسم',
+                name_en: '',
+                name: prod.name_ar || 'بدون اسم',
                 sku: prod.sku || '---',
-                part_number: prod.part_number || null,
+                part_number: prod.part_number || '---',
                 brand: prod.brand || '',
                 category: categoryName,
                 category_id: prod.category_id || null,
                 size: prod.size || '',
                 specifications: prod.description || '',
                 cost_price: Number(prod.cost_price) || 0,
+                sale_price: Number(prod.sale_price) || 0,
                 selling_price: Number(prod.sale_price) || 0,
                 stock_quantity: totalStock,
                 min_stock_level: Number(prod.min_stock_level) || 0,
@@ -67,7 +74,7 @@ export const productService = {
                 image_url: prod.image_url || null,
                 alternative_numbers: prod.alternative_numbers || null,
                 barcode: prod.barcode || null,
-                created_at: prod.created_at,
+                created_at: prod.created_at || new Date().toISOString(),
                 isLowStock: totalStock <= (Number(prod.min_stock_level) || 5),
 
                 warehouse_distribution: stockList.map((s: RawStock) => ({
@@ -77,7 +84,7 @@ export const productService = {
                     location: ''
                 })),
 
-                alternatives: [],
+                alternatives: prod.alternative_numbers ? prod.alternative_numbers.split(',').map(n => n.trim()) : [],
                 compatibility: [],
                 total_purchases_qty: 0,
                 total_sales_qty: 0,
@@ -85,7 +92,7 @@ export const productService = {
                 total_loss: 0,
                 last_invoice_date: new Date().toISOString()
             } as any;
-        });
+        }).filter(Boolean);
     },
 
     /**
