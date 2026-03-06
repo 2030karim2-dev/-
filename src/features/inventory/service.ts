@@ -40,6 +40,10 @@ export const inventoryService = {
     return productService.searchProducts(companyId, term);
   },
 
+  getProductById: async (id: string) => {
+    return productService.getProductById(id);
+  },
+
   createProduct: async (data: ProductFormData, companyId: string, userId: string) => {
     return productService.createProduct(data, companyId, userId);
   },

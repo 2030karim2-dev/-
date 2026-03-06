@@ -110,27 +110,27 @@ export const SalesChartPlot: React.FC<SalesChartPlotProps> = ({
             series.push(
                 chartType === 'area' ?
                     <Area key="exp" type="monotone" dataKey="expenses" name={seriesConfig.expenses.label} stroke={seriesConfig.expenses.color} fill="url(#expensesGradient)" strokeWidth={2} strokeDasharray="5 5" activeDot={{ r: 4, strokeWidth: 0 }} /> :
-                    <Bar key="exp" dataKey="expenses" name={seriesConfig.expenses.label} fill={seriesConfig.expenses.color} radius={[6, 6, 0, 0]} />
+                    <Bar key="exp" dataKey="expenses" name={seriesConfig.expenses.label} fill={seriesConfig.expenses.color} radius={[6, 6, 0, 0]} minPointSize={1} />
             );
         }
         if (visibleSeries.purchases) {
             series.push(
                 chartType === 'area' ?
                     <Area key="pur" type="monotone" dataKey="purchases" name={seriesConfig.purchases.label} stroke={seriesConfig.purchases.color} fill="url(#purchasesGradient)" strokeWidth={2} strokeDasharray="3 3" activeDot={{ r: 4, strokeWidth: 0 }} /> :
-                    <Bar key="pur" dataKey="purchases" name={seriesConfig.purchases.label} fill={seriesConfig.purchases.color} radius={[6, 6, 0, 0]} />
+                    <Bar key="pur" dataKey="purchases" name={seriesConfig.purchases.label} fill={seriesConfig.purchases.color} radius={[6, 6, 0, 0]} minPointSize={1} />
             );
         }
         if (visibleSeries.sales) {
             series.push(
                 chartType === 'bar' ?
-                    <Bar key="sale" dataKey="sales" name={seriesConfig.sales.label} fill="url(#salesGradient)" stroke={seriesConfig.sales.color} radius={[6, 6, 0, 0]} /> :
+                    <Bar key="sale" dataKey="sales" name={seriesConfig.sales.label} fill="url(#salesGradient)" stroke={seriesConfig.sales.color} radius={[6, 6, 0, 0]} minPointSize={1} /> :
                     <Area key="sale" type="monotone" dataKey="sales" name={seriesConfig.sales.label} stroke={seriesConfig.sales.color} fill="url(#salesGradient)" strokeWidth={4} activeDot={{ r: 8, stroke: seriesConfig.sales.color, strokeWidth: 2, fill: isDark ? '#1e293b' : '#fff' }} filter="url(#shadow)" />
             );
         }
         if (visibleSeries.profit) {
             series.push(
                 chartType === 'bar' ?
-                    <Bar key="prof" dataKey="profit" name={seriesConfig.profit.label} fill={seriesConfig.profit.color} radius={[6, 6, 0, 0]} /> :
+                    <Bar key="prof" dataKey="profit" name={seriesConfig.profit.label} fill={seriesConfig.profit.color} radius={[6, 6, 0, 0]} minPointSize={1} /> :
                     <Line key="prof" type="monotone" dataKey="profit" name={seriesConfig.profit.label} stroke={seriesConfig.profit.color} strokeWidth={4} dot={{ r: 0 }} activeDot={{ r: 6, stroke: seriesConfig.profit.color, strokeWidth: 2, fill: isDark ? '#1e293b' : '#fff' }} filter="url(#shadow)" />
             );
         }

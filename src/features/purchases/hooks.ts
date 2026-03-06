@@ -6,6 +6,8 @@ import { CreatePurchaseDTO, CreatePaymentDTO } from './types';
 import { purchasesApi } from './api';
 import { usePartySearch } from '../parties/hooks';
 import { invalidateByPreset } from '../../lib/invalidation';
+import { useNetworkStatus } from '../../lib/hooks/useNetworkStatus';
+import { syncStore } from '../../core/lib/sync-store';
 
 // Fix: Added missing usePurchases hook to fetch purchase history
 export const usePurchases = () => {
@@ -47,6 +49,7 @@ export const useCreatePurchase = () => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const { showToast } = useFeedbackStore();
+  const { isOnline } = useNetworkStatus();
 
   return useMutation({
     mutationFn: async (data: CreatePurchaseDTO) => {
@@ -59,7 +62,15 @@ export const useCreatePurchase = () => {
       showToast(`تم توريد الفاتورة بنجاح وتحديث الأرصدة المخزنية والمالية`, 'success');
       invalidateByPreset(queryClient, 'purchase');
     },
-    onError: (err: Error) => {
+    onError: (err: Error, variables) => {
+      if (!isOnline || err.message?.includes('Failed to fetch')) {
+        syncStore.enqueue({
+          mutationKey: ['purchases', 'create'],
+          variables: { ...variables, company_id: user?.company_id, user_id: user?.id }
+        });
+        showToast("تم حفظ فاتورة المشتريات محلياً (وضع عدم الاتصال). سيتم المزامنة تلقائياً.", 'info');
+        return;
+      }
       showToast(err.message || "فشل توريد الفاتورة", 'error');
     }
   });
@@ -70,6 +81,7 @@ export const useCreatePayment = () => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const { showToast } = useFeedbackStore();
+  const { isOnline } = useNetworkStatus();
 
   return useMutation({
     mutationFn: async (data: CreatePaymentDTO) => {
@@ -80,7 +92,17 @@ export const useCreatePayment = () => {
       showToast('تم تسجيل سند الصرف بنجاح', 'success');
       invalidateByPreset(queryClient, 'purchase');
     },
-    onError: (err: Error) => showToast(err.message || "فشل تسجيل السند", 'error')
+    onError: (err: Error, variables) => {
+      if (!isOnline || err.message?.includes('Failed to fetch')) {
+        syncStore.enqueue({
+          mutationKey: ['purchases', 'payment'],
+          variables: { ...variables, company_id: user?.company_id, user_id: user?.id }
+        });
+        showToast("تم حفظ السند محلياً (وضع عدم الاتصال). سيتم المزامنة تلقائياً.", 'info');
+        return;
+      }
+      showToast(err.message || "فشل تسجيل السند", 'error')
+    }
   });
 };
 

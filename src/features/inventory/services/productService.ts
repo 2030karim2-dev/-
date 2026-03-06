@@ -97,6 +97,15 @@ export const productService = {
     },
 
     /**
+     * Get a single product by ID
+     */
+    getProductById: async (id: string) => {
+        const { data, error } = await inventoryApi.getProductById(id);
+        if (error) throw error;
+        return { data };
+    },
+
+    /**
      * Search products using advanced database search
      */
     searchProducts: async (companyId: string, term: string): Promise<Record<string, unknown>[]> => {

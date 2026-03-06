@@ -3,7 +3,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
     Car, Mail, Package, FileText,
     BarChart3, Sun, Moon, Shield, Zap, ArrowLeft, ArrowRight,
-    Users, Globe, Heart
+    Users, Globe, Heart, Menu, X
 } from 'lucide-react';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import { useThemeStore } from '../../lib/themeStore';
@@ -16,6 +16,7 @@ import { RegisterForm } from './components/RegisterForm';
 // ─── Main Landing Page ─────────────────────────────────────────────
 const LandingPage: React.FC = () => {
     const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { dir } = useTranslation();
     const { theme, toggleTheme } = useThemeStore();
     const authRef = useRef<HTMLDivElement>(null);
@@ -80,7 +81,7 @@ const LandingPage: React.FC = () => {
                 transition={{ duration: 0.8, ease: "circOut" }}
                 className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
             >
-                <div className="max-w-7xl mx-auto px-4 py-6">
+                <div className="max-w-[1600px] mx-auto px-4 py-6">
                     <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/20 dark:border-slate-800/50 rounded-[2rem] shadow-2xl shadow-blue-500/5 px-6 h-20 flex items-center justify-between">
                         <div className="flex items-center gap-4 group cursor-pointer">
                             <motion.div
@@ -113,29 +114,76 @@ const LandingPage: React.FC = () => {
                             ))}
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             <button
                                 onClick={toggleTheme}
-                                className="w-11 h-11 rounded-2xl bg-gray-100/50 dark:bg-slate-800/50 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 transition-all border border-transparent hover:border-gray-200 dark:hover:border-slate-600 shadow-sm"
+                                className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gray-100/50 dark:bg-slate-800/50 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 transition-all border border-transparent hover:border-gray-200 dark:hover:border-slate-600 shadow-sm"
                             >
-                                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                             </button>
+
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={scrollToAuth}
-                                className="px-8 h-11 bg-blue-600 text-white rounded-2xl text-sm font-black shadow-xl shadow-blue-500/30 hover:bg-blue-700 transition-all border border-blue-400/20"
+                                className="hidden sm:flex px-6 sm:px-8 h-10 sm:h-11 bg-blue-600 text-white rounded-2xl text-sm font-black shadow-xl shadow-blue-500/30 hover:bg-blue-700 transition-all border border-blue-400/20 items-center"
                             >
                                 سجل الآن
                             </motion.button>
+
+                            {/* Mobile Menu Toggle */}
+                            <button
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                className="md:hidden w-10 h-10 rounded-2xl bg-gray-100/50 dark:bg-slate-800/50 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm"
+                            >
+                                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                            </button>
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile Menu Overlay */}
+                <AnimatePresence>
+                    {mobileMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="md:hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-gray-100 dark:border-slate-800 mt-2 mx-4 rounded-3xl overflow-hidden shadow-2xl"
+                        >
+                            <div className="p-6 flex flex-col gap-6 font-black text-gray-600 dark:text-slate-400">
+                                {['الميزات', 'كيف يعمل', 'الأسعار', 'الدخول'].map((item) => (
+                                    <button
+                                        key={item}
+                                        onClick={() => {
+                                            setMobileMenuOpen(false);
+                                            if (item === 'الميزات') featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
+                                            if (item === 'كيف يعمل') howItWorksRef.current?.scrollIntoView({ behavior: 'smooth' });
+                                            if (item === 'الدخول') scrollToAuth();
+                                        }}
+                                        className="text-right hover:text-blue-600 transition-colors"
+                                    >
+                                        {item}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => {
+                                        setMobileMenuOpen(false);
+                                        scrollToAuth();
+                                    }}
+                                    className="w-full py-4 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-500/20"
+                                >
+                                    ابدأ الآن مجاناً
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </motion.nav>
 
             {/* ─── Hero Section ────────────────────────────────────── */}
-            <section className="relative pt-32 pb-20 px-4 z-10">
-                <div className="max-w-7xl mx-auto">
+            <section className="relative pt-32 lg:pt-0 pb-20 px-4 z-10 lg:flex lg:items-center lg:min-h-screen">
+                <div className="max-w-[1600px] mx-auto w-full">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
                         {/* Hero Text */}
                         <motion.div
@@ -150,7 +198,7 @@ const LandingPage: React.FC = () => {
 
                             <motion.h1
                                 variants={itemVariants}
-                                className="text-5xl sm:text-6xl lg:text-8xl font-black text-gray-900 dark:text-white leading-[1.05] mb-8 tracking-tighter"
+                                className="text-4xl sm:text-6xl lg:text-8xl font-black text-gray-900 dark:text-white leading-[1.05] mb-8 tracking-tighter"
                             >
                                 أحدث تقنيات <br />
                                 <span className="bg-gradient-to-l from-blue-700 via-blue-500 to-emerald-500 bg-clip-text text-transparent drop-shadow-sm">
@@ -162,31 +210,31 @@ const LandingPage: React.FC = () => {
                                 نظام الزهراء هو الحل السحابي المتكامل لإدارة المخازن، المبيعات، والعملاء لمحلات قطع غيار السيارات. سرعة، دقة، وسهولة في الاستخدام.
                             </motion.p>
 
-                            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start">
+                            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 justify-center lg:justify-start">
                                 <button
                                     onClick={scrollToAuth}
-                                    className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-2xl font-black flex items-center justify-center gap-3 text-lg shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-1 transition-all active:scale-95 border border-white/10"
+                                    className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-2xl font-black flex items-center justify-center gap-3 text-base sm:text-lg shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-1 transition-all active:scale-95 border border-white/10"
                                 >
                                     ابدأ مجاناً الآن
                                     <ArrowIcon size={22} />
                                 </button>
                                 <button
                                     onClick={() => featuresRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                                    className="w-full sm:w-auto px-10 py-5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md text-gray-700 dark:text-white border-2 border-gray-100 dark:border-slate-800 rounded-2xl font-black hover:border-blue-500 hover:bg-white dark:hover:bg-slate-900 transition-all active:scale-95 shadow-sm"
+                                    className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md text-gray-700 dark:text-white border-2 border-gray-100 dark:border-slate-800 rounded-2xl font-black hover:border-blue-500 hover:bg-white dark:hover:bg-slate-900 transition-all active:scale-95 shadow-sm text-sm sm:text-base"
                                 >
                                     مشاهدة المميزات
                                 </button>
                             </motion.div>
 
                             {/* Stats Grid */}
-                            <motion.div variants={itemVariants} className="mt-12 grid grid-cols-3 gap-8 border-t border-gray-100 dark:border-slate-800 pt-8">
+                            <motion.div variants={itemVariants} className="mt-12 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8 border-t border-gray-100 dark:border-slate-800 pt-8">
                                 {[
                                     { label: 'عميل نشط', value: 1200, suffix: '+' },
                                     { label: 'فاتورة منجزة', value: 45, suffix: 'K+' },
                                     { label: 'قطعة مدارة', value: 250, suffix: 'K+' },
-                                ].map((stat) => (
-                                    <div key={stat.label}>
-                                        <div className="text-2xl font-black text-gray-900 dark:text-white">
+                                ].map((stat, i) => (
+                                    <div key={stat.label} className={i === 2 ? "col-span-2 sm:col-span-1" : ""}>
+                                        <div className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
                                             <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                                         </div>
                                         <div className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-widest">{stat.label}</div>
@@ -212,7 +260,7 @@ const LandingPage: React.FC = () => {
 
             {/* ─── Features Section ────────────────────────────────── */}
             <section ref={featuresRef} className="relative py-32 px-4 z-10 bg-gray-50/50 dark:bg-transparent overflow-hidden">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-[1600px] mx-auto">
                     <SectionHeader
                         badge="ميزات متقدمة"
                         title="كل ما تحتاجه لإدارة تجارتك باحترافية"
@@ -291,7 +339,7 @@ const LandingPage: React.FC = () => {
 
             {/* ─── How It Works ────────────────────────────────────── */}
             <section ref={howItWorksRef} className="relative py-32 px-4 z-10 overflow-hidden">
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-[1600px] mx-auto">
                     <SectionHeader
                         badge="خطوات بسيطة"
                         title="ابدأ العمل خلال دقائق معدودة"
@@ -339,7 +387,7 @@ const LandingPage: React.FC = () => {
                 <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/20 blur-[150px]" />
                 <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-emerald-600/10 blur-[150px]" />
 
-                <div className="max-w-7xl mx-auto">
+                <div className="max-w-[1600px] mx-auto">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
                         {/* CTA Content */}
                         <motion.div
@@ -450,8 +498,8 @@ const LandingPage: React.FC = () => {
             <footer className="relative bg-slate-950 pt-32 pb-12 overflow-hidden border-t border-slate-900">
                 <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
 
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
+                <div className="max-w-[1600px] mx-auto px-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-24">
                         <div className="lg:col-span-1">
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/30">
@@ -477,8 +525,8 @@ const LandingPage: React.FC = () => {
                         </div>
 
                         <div>
-                            <h4 className="text-white font-black mb-10 text-lg uppercase tracking-tight">الروابط السريعة</h4>
-                            <ul className="space-y-5 font-medium text-slate-500">
+                            <h4 className="text-white font-black mb-8 lg:mb-10 text-lg uppercase tracking-tight">الروابط السريعة</h4>
+                            <ul className="space-y-4 lg:space-y-5 font-medium text-slate-500">
                                 <li><button onClick={() => featuresRef.current?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-blue-400 transition-colors">الميزات الرئيسية</button></li>
                                 <li><button onClick={() => howItWorksRef.current?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-blue-400 transition-colors">كيفية الاستخدام</button></li>
                                 <li><button onClick={scrollToAuth} className="hover:text-blue-400 transition-colors">تسجيل الدخول</button></li>
@@ -487,19 +535,17 @@ const LandingPage: React.FC = () => {
                         </div>
 
                         <div>
-                            <h4 className="text-white font-black mb-10 text-lg uppercase tracking-tight">الدعم والمساعدة</h4>
-                            <ul className="space-y-5 font-medium text-slate-500">
+                            <h4 className="text-white font-black mb-8 lg:mb-10 text-lg uppercase tracking-tight">الدعم والمساعدة</h4>
+                            <ul className="space-y-4 lg:space-y-5 font-medium text-slate-500">
                                 <li><a href="#" className="hover:text-blue-400 transition-colors">الأسئلة الشائعة</a></li>
                                 <li><a href="#" className="hover:text-blue-400 transition-colors">سياسة الخصوصية</a></li>
                                 <li><a href="#" className="hover:text-blue-400 transition-colors">شروط الاستخدام</a></li>
                                 <li><a href="mailto:2030.krim2@gmail.com" className="hover:text-blue-400 transition-colors">اتصل بنا</a></li>
-                                <li className="text-xs text-slate-600 pt-2">المطور: عبدالكريم الجعفري</li>
-                                <li className="text-xs text-slate-600">779816860</li>
                             </ul>
                         </div>
 
                         <div>
-                            <h4 className="text-white font-black mb-10 text-lg uppercase tracking-tight">النشرة البريدية</h4>
+                            <h4 className="text-white font-black mb-8 lg:mb-10 text-lg uppercase tracking-tight">النشرة البريدية</h4>
                             <p className="text-slate-500 mb-8 font-medium">اشترك لتصلك أحدث الميزات والتحديثات الدورية بنظامنا.</p>
                             <div className="relative">
                                 <input

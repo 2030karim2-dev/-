@@ -25,6 +25,7 @@ export const productsApi = {
                 alternative_numbers,
                 barcode,
                 created_at,
+                updated_at,
                 status,
                 category:product_categories(id, name),
                 stock:product_stock!product_stock_product_id_fkey(
@@ -37,6 +38,13 @@ export const productsApi = {
             .is('deleted_at', null)
             .order('created_at', { ascending: false })
             .limit(1000);
+    },
+
+    getProductById: async (id: string) => {
+        return await supabase.from('products')
+            .select('*')
+            .eq('id', id)
+            .single();
     },
 
     createProduct: async (productData: TableInsert<'products'>) => {

@@ -1,5 +1,5 @@
 import { ResponsiveContainer, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, Area, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
-import { Receipt, DollarSign, Tag, Activity, PieChart as PieIcon, Wallet,  TrendingUp, Calendar, Filter } from 'lucide-react';
+import { Receipt, DollarSign, Tag, Activity, PieChart as PieIcon, Wallet, TrendingUp, Calendar, Filter } from 'lucide-react';
 import { formatCurrency } from '../../../core/utils';
 import { Expense } from '../types';
 import { useExpenseAnalytics } from '../hooks/useExpenseAnalytics';
@@ -266,7 +266,7 @@ const ExpensesAnalyticsView: React.FC<ExpensesAnalyticsViewProps> = ({ expenses 
                                     return null;
                                 }}
                             />
-                            <Bar dataKey="amount" radius={[0, 20, 20, 0]} barSize={32}>
+                            <Bar dataKey="amount" radius={[0, 20, 20, 0]} barSize={32} minPointSize={1}>
                                 {analytics.paymentData.map((_entry, index) => (
                                     <Cell
                                         key={`cell-${index}`}

@@ -213,6 +213,7 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
                                 fill="url(#barRevenue)"
                                 radius={[6, 6, 0, 0]}
                                 maxBarSize={40}
+                                minPointSize={1}
                             />
                             <Bar
                                 dataKey="expenses"
@@ -220,6 +221,7 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
                                 fill="url(#barExpenses)"
                                 radius={[6, 6, 0, 0]}
                                 maxBarSize={40}
+                                minPointSize={1}
                             />
                         </BarChart>
                     </ResponsiveContainer>

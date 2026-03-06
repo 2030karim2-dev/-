@@ -4,6 +4,8 @@ import { accountingService } from '../services/index';
 import { useAuthStore } from '../../auth/store';
 import { AccountFormData } from '../types/index';
 import { useFeedbackStore } from '../../feedback/store';
+import { useNetworkStatus } from '../../../lib/hooks/useNetworkStatus';
+import { syncStore } from '../../../core/lib/sync-store';
 
 export const useAccounts = () => {
   const { user } = useAuthStore();
@@ -19,6 +21,7 @@ export const useAccountMutations = () => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const { showToast } = useFeedbackStore();
+  const { isOnline } = useNetworkStatus();
 
   const seedAccounts = useMutation({
     mutationFn: () => {
@@ -37,6 +40,17 @@ export const useAccountMutations = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    },
+    onError: (err: Error, variables) => {
+      if (!isOnline || err.message?.includes('Failed to fetch')) {
+        syncStore.enqueue({
+          mutationKey: ['accounting', 'create_account'],
+          variables: { ...variables, company_id: user?.company_id }
+        });
+        showToast("تم حفظ الحساب محلياً. سيتم المزامنة فور توفر الإنترنت.", 'info');
+        return;
+      }
+      showToast(err.message, 'error');
     }
   });
 

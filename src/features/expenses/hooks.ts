@@ -7,6 +7,8 @@ import { useMemo } from 'react';
 import { AuthorizeActionUsecase } from '../../core/usecases/auth/AuthorizeActionUsecase';
 import { supabase } from '../../lib/supabaseClient';
 import { invalidateByPreset } from '../../lib/invalidation';
+import { useNetworkStatus } from '../../lib/hooks/useNetworkStatus';
+import { syncStore } from '../../core/lib/sync-store';
 
 export const useNextExpenseNumber = () => {
   const { user } = useAuthStore();
@@ -87,6 +89,7 @@ export const useExpenseActions = () => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const { showToast } = useFeedbackStore();
+  const { isOnline } = useNetworkStatus();
 
   const create = useMutation({
     mutationFn: async (data: ExpenseFormData) => {
@@ -98,7 +101,15 @@ export const useExpenseActions = () => {
       invalidateByPreset(queryClient, 'expense');
       showToast('تم تسجيل المصروف وترحيله بنجاح', 'success');
     },
-    onError: (error: Error) => {
+    onError: (error: Error, variables) => {
+      if (!isOnline || error.message?.includes('Failed to fetch')) {
+        syncStore.enqueue({
+          mutationKey: ['expenses', 'create'],
+          variables: { ...variables, company_id: user?.company_id, user_id: user?.id }
+        });
+        showToast("تم حفظ المصروف محلياً (وضع عدم الاتصال). سيتم المزامنة تلقائياً.", 'info');
+        return;
+      }
       showToast(error.message, 'error', { error });
     }
   });

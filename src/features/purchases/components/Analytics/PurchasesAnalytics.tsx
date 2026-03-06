@@ -70,7 +70,7 @@ const PurchasesAnalytics: React.FC = () => {
                                     tickLine={false}
                                 />
                                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(59, 130, 246, 0.05)' }} />
-                                <Bar dataKey="value" name="إجمالي المشتريات" fill="url(#supplierGradient)" radius={[0, 10, 10, 0]} barSize={24} />
+                                <Bar dataKey="value" name="إجمالي المشتريات" fill="url(#supplierGradient)" radius={[0, 10, 10, 0]} barSize={24} minPointSize={1} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -132,7 +132,7 @@ const PurchasesAnalytics: React.FC = () => {
                                     }}
                                     cursor={{ fill: 'rgba(16, 185, 129, 0.05)' }}
                                 />
-                                <Bar dataKey="amount" name="القيمة" fill="url(#trendGradient)" radius={[10, 10, 0, 0]} barSize={32} animationDuration={2500} />
+                                <Bar dataKey="amount" name="القيمة" fill="url(#trendGradient)" radius={[10, 10, 0, 0]} barSize={32} animationDuration={2500} minPointSize={1} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

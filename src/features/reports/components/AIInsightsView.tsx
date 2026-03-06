@@ -116,6 +116,7 @@ const AIInsightsView: React.FC = () => {
                                         cornerRadius={12}
                                         animationDuration={2000}
                                         animationEasing="ease-out"
+                                        minPointSize={1}
                                     />
                                 </RadialBarChart>
                             </ResponsiveContainer>

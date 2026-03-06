@@ -6,6 +6,7 @@ import { useFeedbackStore } from '../feedback/store';
 import { PartyFormData, PartyType, Party, PartyView } from './types';
 import { useMemo, useState } from 'react';
 import { AuthorizeActionUsecase } from '../../core/usecases/auth/AuthorizeActionUsecase';
+import { syncStore } from '../../core/lib/sync-store';
 
 export const useParties = (type: PartyType, searchTerm: string = '') => {
   const { user } = useAuthStore();
@@ -67,7 +68,18 @@ export const usePartyMutations = (type: PartyType) => {
       queryClient.invalidateQueries({ queryKey: ['parties', user?.company_id, type] });
       showToast('تم حفظ البيانات بنجاح', 'success');
     },
-    onError: (err: Error) => showToast("خطأ في حفظ البيانات", 'error', err)
+    onError: (err: any, variables) => {
+      // If it's a network error, enqueue for offline processing
+      if (!navigator.onLine || err.message?.includes('Failed to fetch') || err.status === 0) {
+        syncStore.enqueue({
+          mutationKey: ['parties', 'save'],
+          variables: { ...variables.data, id: variables.id, company_id: user?.company_id, type }
+        });
+        showToast("تم الحفظ محلياً (وضع عدم الاتصال). سيتم المزامنة تلقائياً عند عودة الإنترنت.", 'info');
+        return;
+      }
+      showToast("خطأ في حفظ البيانات", 'error', err);
+    }
   });
 
   const deleteParty = useMutation({
@@ -99,7 +111,15 @@ export const useCategoryMutations = (type: PartyType) => {
       queryClient.invalidateQueries({ queryKey: ['party_categories', user?.company_id, type] });
       showToast("تم حفظ الفئة بنجاح", 'success');
     },
-    onError: (err: any) => {
+    onError: (err: any, variables) => {
+      if (!navigator.onLine || err.message?.includes('Failed to fetch') || err.status === 0) {
+        syncStore.enqueue({
+          mutationKey: ['parties', 'save_category'],
+          variables: { name: variables.name, id: variables.id, company_id: user?.company_id, type }
+        });
+        showToast("تم حفظ الفئة محلياً (وضع عدم الاتصال).", 'info');
+        return;
+      }
       showToast(err.message || "فشل حفظ الفئة", 'error');
     }
   });

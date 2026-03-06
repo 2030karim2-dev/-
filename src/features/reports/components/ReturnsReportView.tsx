@@ -634,8 +634,8 @@ const ReturnsReportView: React.FC = () => {
                                 contentStyle={{ backgroundColor: '#0f172a', borderRadius: '16px', border: 'none', color: '#fff' }}
                             />
                             <Legend verticalAlign="top" align="right" wrapperStyle={{ paddingBottom: '30px', fontSize: '10px', fontWeight: '900' }} />
-                            <Bar dataKey="sales" name="Sales Returns" fill="#f43f5e" radius={[6, 6, 0, 0]} barSize={32} />
-                            <Bar dataKey="purchase" name="Purchase Returns" fill="#10b981" radius={[6, 6, 0, 0]} barSize={32} />
+                            <Bar dataKey="sales" name="Sales Returns" fill="#f43f5e" radius={[6, 6, 0, 0]} barSize={32} minPointSize={1} />
+                            <Bar dataKey="purchase" name="Purchase Returns" fill="#10b981" radius={[6, 6, 0, 0]} barSize={32} minPointSize={1} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

@@ -178,7 +178,7 @@ const DebtAgingReport: React.FC = () => {
                                 <XAxis type="number" tick={{ fontSize: 9 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                                 <YAxis type="category" dataKey="name" tick={{ fontSize: 9 }} width={100} />
                                 <Tooltip formatter={(value: any) => [formatCurrency(Number(value)), 'المبلغ']} contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-                                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                                <Bar dataKey="value" radius={[0, 4, 4, 0]} minPointSize={1}>
                                     {data?.chartData.map((_, i) => (
                                         <Cell key={i} fill={AGING_COLORS[i]} />
                                     ))}

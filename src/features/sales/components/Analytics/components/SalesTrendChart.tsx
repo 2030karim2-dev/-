@@ -108,7 +108,7 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
                         {xAxis}
                         {yAxis}
                         {tooltip}
-                        <Bar dataKey="sales" fill="url(#barGrad)" radius={[6, 6, 0, 0]} barSize={24} />
+                        <Bar dataKey="sales" fill="url(#barGrad)" radius={[6, 6, 0, 0]} barSize={24} minPointSize={1} />
                     </BarChart>
                 );
             case 'line':

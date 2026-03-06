@@ -126,7 +126,7 @@ const InventoryValuationView: React.FC = () => {
                     return null;
                   }}
                 />
-                <Bar dataKey="value" radius={[16, 16, 16, 16]} barSize={80}>
+                <Bar dataKey="value" radius={[16, 16, 16, 16]} barSize={80} minPointSize={1}>
                   {chartData.map((_entry, index) => (
                     <Cell key={`cell-${index}`} fill={`url(#barGrad-${index})`} style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />
                   ))}

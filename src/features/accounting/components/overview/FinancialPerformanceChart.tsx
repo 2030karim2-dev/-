@@ -119,6 +119,7 @@ const FinancialPerformanceChart: React.FC = () => {
               radius={[10, 10, 0, 0]}
               barSize={12}
               animationDuration={2000}
+              minPointSize={1}
             />
             <Bar
               dataKey="expenses"
@@ -127,6 +128,7 @@ const FinancialPerformanceChart: React.FC = () => {
               radius={[10, 10, 0, 0]}
               barSize={12}
               animationDuration={2000}
+              minPointSize={1}
             />
           </BarChart>
         </ResponsiveContainer>

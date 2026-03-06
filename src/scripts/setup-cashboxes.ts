@@ -26,7 +26,41 @@ if (!supabaseUrl || !supabaseKey) {
     process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Custom fetch with timeout and retry logic
+const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): Promise<Response> => {
+    const MAX_RETRIES = 4;
+    for (let i = 0; i <= MAX_RETRIES; i++) {
+        const timeoutController = new AbortController();
+        const timeoutId = setTimeout(() => {
+            try { timeoutController.abort('timeout'); } catch (_) { }
+        }, 45000);
+
+        try {
+            const response = await fetch(url, { ...options, signal: timeoutController.signal });
+            clearTimeout(timeoutId);
+            return response;
+        } catch (error: any) {
+            clearTimeout(timeoutId);
+            const isTimeout = error.name === 'AbortError' || error.message?.includes('timeout');
+            const isNetworkError = error.message?.toLowerCase().includes('fetch') ||
+                error.message?.toLowerCase().includes('network') ||
+                error.message?.toLowerCase().includes('proxy');
+
+            if (i < MAX_RETRIES && (isTimeout || isNetworkError)) {
+                console.warn(`[Supabase] Request failed (${isTimeout ? 'timeout' : 'network'}), retrying ${i + 1}/${MAX_RETRIES}...`);
+                const backoff = (Math.pow(2, i) * 1000) + Math.random() * 1000;
+                await new Promise(resolve => setTimeout(resolve, backoff));
+                continue;
+            }
+            throw error;
+        }
+    }
+    throw new Error('Max retries reached');
+};
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+    global: { fetch: customFetch }
+});
 
 async function setupCashboxes() {
     console.log("Starting Cashbox setup...");

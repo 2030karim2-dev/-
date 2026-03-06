@@ -163,6 +163,8 @@ export const useDashboard = (options?: UseDashboardOptions) => {
         queryFn: () => fetchDashboardData(period),
         refetchInterval: refetchInterval ?? false,
         retry: 2,
+        staleTime: 1000 * 60 * 30, // 30 minutes
+        gcTime: 1000 * 60 * 60 * 24, // 24 hours
     });
 
     return {

@@ -8,6 +8,11 @@ import { useI18nStore } from '../../../lib/i18nStore';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 import { useNotificationStore, useSoundStore } from '../../../features/notifications/store';
 import NotificationDropdown from '../../../features/notifications/components/NotificationDropdown';
+import { useNetworkStatus } from '../../../lib/hooks/useNetworkStatus';
+import { cn } from '../../../core/utils';
+import { syncStore } from '../../../core/lib/sync-store';
+import { RefreshCw } from 'lucide-react';
+import SyncStatusModal from '../../components/SyncStatusModal';
 
 const HeaderActions: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +20,20 @@ const HeaderActions: React.FC = () => {
   const { user } = useAuthStore();
   const { lang, setLang } = useI18nStore();
   const { t } = useTranslation();
+  const status = useNetworkStatus();
+  const [pendingCount, setPendingCount] = useState(0);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
+
+  // Poll for pending sync count
+  useEffect(() => {
+    const checkPending = async () => {
+      const pending = await syncStore.getPending();
+      setPendingCount(pending.length);
+    };
+    checkPending();
+    const interval = setInterval(checkPending, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const { getCompanyUnreadCount } = useNotificationStore();
   const companyId = user?.company_id || '';
@@ -94,6 +113,26 @@ const HeaderActions: React.FC = () => {
         )}
       </button>
 
+      {/* Sync Status Button */}
+      {pendingCount > 0 && (
+        <button
+          onClick={() => setIsSyncModalOpen(true)}
+          className="relative w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-all active:scale-95 border border-amber-200 dark:border-amber-800"
+          title={`${pendingCount} عمليات بانتظار المزامنة`}
+        >
+          <RefreshCw size={16} className={cn("md:size-18", pendingCount > 0 && "animate-spin-slow")} />
+          <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] bg-amber-600 text-white text-[10px] font-bold rounded-full border-2 border-[var(--app-surface)] shadow-sm">
+            {pendingCount}
+          </span>
+        </button>
+      )}
+
+      {/* Sync Modal */}
+      <SyncStatusModal
+        isOpen={isSyncModalOpen}
+        onClose={() => setIsSyncModalOpen(false)}
+      />
+
       {/* Notifications */}
       <div className="relative" ref={notifRef}>
         <button
@@ -126,8 +165,13 @@ const HeaderActions: React.FC = () => {
           <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-xs md:text-sm border-2 border-[var(--app-surface)] shadow-lg shadow-blue-500/25 transform transition-all duration-300 group-hover:scale-105 group-hover:shadow-blue-500/40 group-hover:rotate-3 group-active:scale-95">
             {userInitial}
           </div>
-          {/* Online indicator */}
-          <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-[var(--app-surface)] rounded-full"></span>
+          {/* Connectivity Status Indicator */}
+          <span className={cn(
+            "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-[var(--app-surface)] rounded-full transition-colors duration-500",
+            status.isOnline
+              ? (status.isPoorConnection ? "bg-amber-500 animate-pulse" : "bg-emerald-500")
+              : "bg-rose-500"
+          )} title={status.isOnline ? (status.isPoorConnection ? "Poor Connection" : "Online") : "Offline"}></span>
         </button>
 
         {/* Dropdown Menu */}

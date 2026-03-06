@@ -6,6 +6,7 @@ import { inventoryApi } from '../api';
 import { useEffect } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { logger } from '../../../core/utils/logger';
+import { syncStore } from '../../../core/lib/sync-store';
 
 export const useWarehouses = () => {
     const { user } = useAuthStore();
@@ -134,6 +135,17 @@ export const useInventoryMutations = () => {
             queryClient.invalidateQueries({ queryKey: ['products'] });
             queryClient.invalidateQueries({ queryKey: ['transfers'] });
             showToast("تمت المناقلة بنجاح", 'success');
+        },
+        onError: (err: any, variables) => {
+            if (!navigator.onLine || err.message?.includes('Failed to fetch') || err.status === 0) {
+                syncStore.enqueue({
+                    mutationKey: ['inventory', 'transfer'],
+                    variables: { ...variables, company_id: user?.company_id, user_id: user?.id }
+                });
+                showToast("تمت المناقلة محلياً (وضع عدم الاتصال).", 'info');
+                return;
+            }
+            showToast("فشل المناقلة: " + err.message, 'error');
         }
     });
 
@@ -146,6 +158,17 @@ export const useInventoryMutations = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['audit_sessions'] });
             showToast("تم بدء جلسة الجرد", 'success');
+        },
+        onError: (err: any, variables) => {
+            if (!navigator.onLine || err.message?.includes('Failed to fetch') || err.status === 0) {
+                syncStore.enqueue({
+                    mutationKey: ['inventory', 'start_audit'],
+                    variables: { ...variables, company_id: user?.company_id, user_id: user?.id }
+                });
+                showToast("بدء الجرد محلياً (وضع عدم الاتصال).", 'info');
+                return;
+            }
+            showToast("فشل بدء الجرد: " + err.message, 'error');
         }
     });
 
@@ -166,6 +189,16 @@ export const useInventoryMutations = () => {
         mutationFn: (items: any[]) => inventoryService.saveAuditProgress(items),
         onSuccess: () => {
             showToast("تم حفظ التقدم", 'info', { hideAfter: 2000 });
+        },
+        onError: (err: any, items) => {
+            if (!navigator.onLine || err.message?.includes('Failed to fetch') || err.status === 0) {
+                syncStore.enqueue({
+                    mutationKey: ['inventory', 'save_audit_progress'],
+                    variables: { items }
+                });
+                // No toast for silent progress save
+                return;
+            }
         }
     });
 

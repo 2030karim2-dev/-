@@ -195,7 +195,7 @@ const DailySalesReport: React.FC = () => {
                                         labelFormatter={(label) => `التاريخ: ${label}`}
                                         contentStyle={{ fontSize: 11, borderRadius: 8 }}
                                     />
-                                    <Bar dataKey="total" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="total" fill="#3b82f6" radius={[4, 4, 0, 0]} minPointSize={1} />
                                 </BarChart>
                             </ResponsiveContainer>
                         )}

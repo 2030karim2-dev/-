@@ -6,7 +6,7 @@ import { ProductFormData } from '../types';
 import { useMemo, useEffect } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { logger } from '../../../core/utils/logger';
-import { useOfflineQueueStore } from '../../../core/services/offlineQueueStore';
+import { syncStore } from '../../../core/lib/sync-store';
 
 export const useProducts = (searchTerm: string = '') => {
     const { user } = useAuthStore();
@@ -87,7 +87,7 @@ export const useProductMutations = () => {
     const queryClient = useQueryClient();
     const { user } = useAuthStore();
     const { showToast } = useFeedbackStore();
-    const { enqueue } = useOfflineQueueStore();
+    // const { enqueue } = useOfflineQueueStore(); // LEGACY - REMOVING
 
     const saveProduct = useMutation({
         mutationFn: async ({ data, id }: { data: ProductFormData, id?: string }) => {
@@ -120,11 +120,18 @@ export const useProductMutations = () => {
                 queryClient.setQueryData(['products', user?.company_id], context.previousProducts);
             }
 
-            // If it's a network error, enqueue for offline processing
+            // If it's a network error, enqueue for offline processing via new global syncStore
             if (!navigator.onLine || error.message?.includes('Failed to fetch') || error.status === 0) {
-                const actionType = variables.id ? 'UPDATE_STOCK' : 'CREATE_PRODUCT'; // We can distinguish better later
-                enqueue(actionType, { ...variables.data, company_id: user?.company_id, user_id: user?.id });
-                showToast("تم الحفظ محلياً (وضع عدم الاتصال). سيتم المزامنة لاحقاً.", 'info');
+                const originalProduct = (context?.previousProducts as any[])?.find(p => p.id === variables.id);
+
+                syncStore.enqueue({
+                    mutationKey: ['products', 'save'], // Key for identification
+                    variables: { ...variables.data, id: variables.id, company_id: user?.company_id, user_id: user?.id },
+                    metadata: {
+                        last_updated_at: originalProduct?.updated_at
+                    }
+                });
+                showToast("تم الحفظ محلياً (وضع عدم الاتصال). سيتم المزامنة تلقائياً عند عودة الإنترنت.", 'info');
                 return;
             }
 

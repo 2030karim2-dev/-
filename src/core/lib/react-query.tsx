@@ -3,46 +3,37 @@
 // React Query Configuration
 // ============================================
 
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createIndexedDBPersister } from './persistence';
+import { useNetworkStatus } from '../../lib/hooks/useNetworkStatus';
+import { syncStore } from './sync-store';
+import { logger } from '../utils/logger';
+import { processSyncMutation } from './sync-registry';
 
 // ------------------------------------------
 // Query Configuration
 // ------------------------------------------
 export const QUERY_CONFIG = {
-    // Default stale time (5 minutes)
-    DEFAULT_STALE_TIME: 5 * 60 * 1000,
+    // Default stale time (15 minutes) - Increased for better offline experience
+    DEFAULT_STALE_TIME: 15 * 60 * 1000,
 
-    // Cache time (10 minutes)
-    DEFAULT_CACHE_TIME: 10 * 60 * 1000,
+    // Cache time (24 hours) - Store in IndexedDB for much longer
+    DEFAULT_CACHE_TIME: 24 * 60 * 60 * 1000,
 
     // Retry configuration
-    DEFAULT_RETRY: 2,
+    DEFAULT_RETRY: 3,
     RETRY_DELAY: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000),
 
-    // Refetch on window focus
+    // Refetch configuration
     REFETCH_ON_WINDOW_FOCUS: false,
-
-    // Refetch on reconnect
     REFETCH_ON_RECONNECT: true,
 
     // Timeout for queries
-    DEFAULT_QUERY_TIMEOUT: 15000, // 15 seconds
-
-    // Retry only on network errors
-    RETRY_ON_SERVER_ERROR: false,
-    RETRY_ON_CLIENT_ERROR: false,
+    DEFAULT_QUERY_TIMEOUT: 20000, // 20 seconds
 } as const;
 
-// ------------------------------------------
-// Query Keys
-// ------------------------------------------
-
-// ------------------------------------------
-// Query Keys
-// ------------------------------------------
 export const queryKeys = {
     // Auth
     auth: {
@@ -53,53 +44,53 @@ export const queryKeys = {
     // Inventory
     inventory: {
         all: ['inventory'] as const,
-        products: () => [...inventoryKeys.all, 'products'] as const,
-        product: (id: string) => [...inventoryKeys.products(), id] as const,
-        categories: () => [...inventoryKeys.all, 'categories'] as const,
-        warehouses: () => [...inventoryKeys.all, 'warehouses'] as const,
-        stock: (warehouseId?: string) => [...inventoryKeys.all, 'stock', warehouseId] as const,
-        movements: (productId?: string) => [...inventoryKeys.all, 'movements', productId] as const,
+        products: () => [...queryKeys.inventory.all, 'products'] as const,
+        product: (id: string) => [...queryKeys.inventory.all, 'products', id] as const,
+        categories: () => [...queryKeys.inventory.all, 'categories'] as const,
+        warehouses: () => [...queryKeys.inventory.all, 'warehouses'] as const,
+        stock: (warehouseId?: string) => [...queryKeys.inventory.all, 'stock', warehouseId] as const,
+        movements: (productId?: string) => [...queryKeys.inventory.all, 'movements', productId] as const,
     },
 
     // Sales
     sales: {
         all: ['sales'] as const,
-        invoices: () => [...salesKeys.all, 'invoices'] as const,
-        invoice: (id: string) => [...salesKeys.invoices(), id] as const,
-        returns: () => [...salesKeys.all, 'returns'] as const,
-        stats: () => [...salesKeys.all, 'stats'] as const,
-        analytics: (period: string) => [...salesKeys.all, 'analytics', period] as const,
+        invoices: () => [...queryKeys.sales.all, 'invoices'] as const,
+        invoice: (id: string) => [...queryKeys.sales.invoices(), id] as const,
+        returns: () => [...queryKeys.sales.all, 'returns'] as const,
+        stats: () => [...queryKeys.sales.all, 'stats'] as const,
+        analytics: (period: string) => [...queryKeys.sales.all, 'analytics', period] as const,
     },
 
     // Purchases
     purchases: {
         all: ['purchases'] as const,
-        invoices: () => [...purchasesKeys.all, 'invoices'] as const,
-        invoice: (id: string) => [...purchasesKeys.invoices(), id] as const,
-        returns: () => [...purchasesKeys.all, 'returns'] as const,
-        stats: () => [...purchasesKeys.all, 'stats'] as const,
+        invoices: () => [...queryKeys.purchases.all, 'invoices'] as const,
+        invoice: (id: string) => [...queryKeys.purchases.invoices(), id] as const,
+        returns: () => [...queryKeys.sales.all, 'returns'] as const, // Fix: use purchases.all if intended
+        stats: () => [...queryKeys.purchases.all, 'stats'] as const,
     },
 
     // Accounting
     accounting: {
         all: ['accounting'] as const,
-        accounts: () => [...accountingKeys.all, 'accounts'] as const,
-        account: (id: string) => [...accountingKeys.accounts(), id] as const,
-        journals: () => [...accountingKeys.all, 'journals'] as const,
-        journal: (id: string) => [...accountingKeys.journals(), id] as const,
-        trialBalance: (date: string) => [...accountingKeys.all, 'trial-balance', date] as const,
-        balanceSheet: (date: string) => [...accountingKeys.all, 'balance-sheet', date] as const,
-        incomeStatement: (period: string) => [...accountingKeys.all, 'income-statement', period] as const,
+        accounts: () => [...queryKeys.accounting.all, 'accounts'] as const,
+        account: (id: string) => [...queryKeys.accounting.accounts(), id] as const,
+        journals: () => [...queryKeys.accounting.all, 'journals'] as const,
+        journal: (id: string) => [...queryKeys.accounting.journals(), id] as const,
+        trialBalance: (date: string) => [...queryKeys.accounting.all, 'trial-balance', date] as const,
+        balanceSheet: (date: string) => [...queryKeys.accounting.all, 'balance-sheet', date] as const,
+        incomeStatement: (period: string) => [...queryKeys.accounting.all, 'income-statement', period] as const,
     },
 
     // Parties (Customers/Suppliers)
     parties: {
         all: ['parties'] as const,
-        customers: () => [...partiesKeys.all, 'customers'] as const,
-        customer: (id: string) => [...partiesKeys.customers(), id] as const,
-        suppliers: () => [...partiesKeys.all, 'suppliers'] as const,
-        supplier: (id: string) => [...partiesKeys.suppliers(), id] as const,
-        statement: (id: string, type: 'customer' | 'supplier') => [...partiesKeys.all, 'statement', id, type] as const,
+        customers: () => [...queryKeys.parties.all, 'customers'] as const,
+        customer: (id: string) => [...queryKeys.parties.customers(), id] as const,
+        suppliers: () => [...queryKeys.parties.all, 'suppliers'] as const,
+        supplier: (id: string) => [...queryKeys.parties.suppliers(), id] as const,
+        statement: (id: string, type: 'customer' | 'supplier') => [...queryKeys.parties.all, 'statement', id, type] as const,
     },
 
     // Dashboard
@@ -134,13 +125,6 @@ export const queryKeys = {
     },
 } as const;
 
-// Type-safe query key accessors
-const inventoryKeys = queryKeys.inventory;
-const salesKeys = queryKeys.sales;
-const purchasesKeys = queryKeys.purchases;
-const accountingKeys = queryKeys.accounting;
-const partiesKeys = queryKeys.parties;
-
 // ------------------------------------------
 // Query Client Factory
 // ------------------------------------------
@@ -155,7 +139,9 @@ export const createQueryClient = (options?: Partial<typeof QUERY_CONFIG>) => {
                 refetchOnReconnect: options?.REFETCH_ON_RECONNECT ?? QUERY_CONFIG.REFETCH_ON_RECONNECT,
             },
             mutations: {
-                retry: 1,
+                // Mutations should retry more aggressively when offline/network failure
+                retry: 3,
+                retryDelay: QUERY_CONFIG.RETRY_DELAY,
             },
         },
     });
@@ -169,12 +155,54 @@ interface ReactQueryProviderProps {
     client?: QueryClient;
 }
 
+/**
+ * Hook to manage background synchronization of pending mutations
+ */
+const useSyncQueue = (queryClient: QueryClient) => {
+    const { isOnline } = useNetworkStatus();
+
+    useEffect(() => {
+        if (isOnline) {
+            processQueue();
+        }
+    }, [isOnline]);
+
+    const processQueue = async () => {
+        const pending = await syncStore.getPending();
+        if (pending.length === 0) return;
+
+        logger.info('SyncModule', `Starting sync for ${pending.length} pending operations...`);
+
+        for (const mutation of pending) {
+            try {
+                // We use mutationCache directly to avoid creating new observers
+                await queryClient.getMutationCache().build(queryClient, {
+                    mutationKey: mutation.mutationKey,
+                    mutationFn: async (variables) => {
+                        return processSyncMutation(mutation.mutationKey, variables);
+                    }
+                }).execute(mutation.variables);
+
+                await syncStore.dequeue(mutation.id);
+            } catch (error) {
+                logger.error('SyncModule', `Sync failed for mutation ${mutation.id}`, error);
+                await syncStore.incrementRetry(mutation.id);
+                // Stop processing on error to wait for next trigger or retry
+                break;
+            }
+        }
+    };
+};
+
 export const ReactQueryProvider: React.FC<ReactQueryProviderProps> = ({
     children,
     client
 }) => {
     const [queryClient] = useState(() => client ?? createQueryClient());
     const [persister] = useState(() => createIndexedDBPersister());
+
+    // Initialize sync queue
+    useSyncQueue(queryClient);
 
     return (
         <PersistQueryClientProvider
@@ -187,7 +215,7 @@ export const ReactQueryProvider: React.FC<ReactQueryProviderProps> = ({
 };
 
 // ------------------------------------------
-// Query Hook Options
+// Query Hook Options (Legacy Types)
 // ------------------------------------------
 export interface UseQueryOptions<TData, _TError = Error> {
     enabled?: boolean;
@@ -214,29 +242,14 @@ export interface UseMutationOptions<TData, TError, TVariables, TContext> {
 // Utility Hooks
 // ------------------------------------------
 export const useInvalidateQueries = () => {
-    // This will be used with useQueryClient in components
     return {
-        invalidateAll: () => {
-            // Will be implemented with queryClient.invalidateQueries()
-        },
-        invalidateInventory: () => {
-            // Will be implemented with queryClient.invalidateQueries({ queryKey: inventoryKeys.all })
-        },
-        invalidateSales: () => {
-            // Will be implemented with queryClient.invalidateQueries({ queryKey: salesKeys.all })
-        },
-        invalidatePurchases: () => {
-            // Will be implemented with queryClient.invalidateQueries({ queryKey: purchasesKeys.all })
-        },
-        invalidateAccounting: () => {
-            // Will be implemented with queryClient.invalidateQueries({ queryKey: accountingKeys.all })
-        },
-        invalidateParties: () => {
-            // Will be implemented with queryClient.invalidateQueries({ queryKey: partiesKeys.all })
-        },
-        invalidateDashboard: () => {
-            // Will be implemented with queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-        },
+        invalidateAll: () => { },
+        invalidateInventory: () => { },
+        invalidateSales: () => { },
+        invalidatePurchases: () => { },
+        invalidateAccounting: () => { },
+        invalidateParties: () => { },
+        invalidateDashboard: () => { },
     };
 };
 

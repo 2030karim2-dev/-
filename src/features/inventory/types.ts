@@ -122,6 +122,7 @@ export interface Product {
   }> | undefined;
 
   created_at: string;
+  updated_at?: string;
 
   alternatives?: string[] | undefined;
   cross_references?: ProductCrossReference[] | undefined;

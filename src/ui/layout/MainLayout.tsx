@@ -17,7 +17,7 @@ const MainLayout: React.FC = () => {
   const isDesktop = useBreakpoint('md');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isDesktop);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const isOnline = useNetworkStatus();
+  const { isOnline } = useNetworkStatus();
 
   const { dir } = useI18nStore();
   const location = useLocation();
@@ -49,7 +49,7 @@ const MainLayout: React.FC = () => {
     <div className="h-screen bg-[var(--app-bg)] overflow-hidden font-sans" dir={dir}>
       {/* Network Alert Overlay */}
       {!isOnline && (
-        <div className="fixed top-0 left-0 right-0 h-1 bg-rose-600 z-[300] animate-pulse"></div>
+        <div className="fixed top-0 left-0 right-0 h-1 bg-rose-500 z-[300] animate-pulse"></div>
       )}
 
       {/* Mobile Sidebar Overlay */}
@@ -76,12 +76,10 @@ const MainLayout: React.FC = () => {
         <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
 
         {/* Connection Banner - Integrated into the flow */}
-        {!isOnline && (
-          <div className="bg-rose-500 text-white text-[9px] font-bold py-1.5 flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg">
-            <WifiOff size={12} />
-            <span>Offline Mode Active - Data synced to neural local cache</span>
-          </div>
-        )}
+        <div className="bg-rose-500 text-white text-[9px] font-black py-1.5 flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg animate-in slide-in-from-top duration-500">
+          <WifiOff size={11} className="animate-bounce" />
+          <span>Offline Mode Active - Performance optimized via Local Cache</span>
+        </div>
 
         <main className="flex-1 overflow-y-auto custom-scrollbar relative pb-20 md:pb-4 scroll-smooth">
           <ErrorBoundary>
