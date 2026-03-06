@@ -28,13 +28,21 @@ export const useRealtimeSync = () => {
         // Only connect if user is logged in
         if (!user?.company_id) return;
 
-        logger.debug('Realtime', '🔌 Connecting to Supabase Realtime for auto-refresh...');
+        let isMounted = true;
+        const channelId = `global-db-${user.company_id}`;
 
-        const channel = supabase.channel('global-db-changes')
+        // Check if channel already exists to avoid redundant subscriptions
+        const existingChannels = supabase.getChannels();
+        if (existingChannels.some(c => c.topic === `realtime:public:all`)) {
+            return;
+        }
+
+        const channel = supabase.channel(channelId)
             .on(
                 'postgres_changes',
                 { event: '*', schema: 'public' },
                 (payload) => {
+                    if (!isMounted) return;
                     const table = payload.table;
                     const preset = TABLE_PRESET_MAP[table];
 
@@ -42,21 +50,24 @@ export const useRealtimeSync = () => {
                         logger.info('Realtime', `🔄 Realtime update on table [${table}], refreshing queries...`);
                         invalidateByPreset(queryClient, preset);
                     } else {
-                        // Fallback for unmapped tables that might still need dashboard refresh
                         logger.debug('Realtime', `🔄 Unmapped Realtime update on table [${table}], refreshing dashboard...`);
                         invalidateKeys(queryClient, ['dashboard_data', 'dashboard']);
                     }
                 }
             )
             .subscribe((status) => {
-                if (status === 'SUBSCRIBED') {
+                if (status === 'SUBSCRIBED' && isMounted) {
                     logger.debug('Realtime', '✅ Realtime Active');
                 }
             });
 
         return () => {
-            logger.debug('Realtime', '🔌 Disconnecting from Supabase Realtime...');
-            supabase.removeChannel(channel);
+            isMounted = false;
+            supabase.removeChannel(channel).then(() => {
+                logger.debug('Realtime', '🔌 Disconnected from Supabase Realtime');
+            }).catch(() => {
+                // Ignore cleanup errors during HMR
+            });
         };
     }, [queryClient, user?.company_id]);
 };

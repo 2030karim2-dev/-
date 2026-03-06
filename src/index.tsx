@@ -54,19 +54,22 @@ if (import.meta.env.DEV) {
   const originalDebug = console.debug;
 
   console.log = (...args: unknown[]) => {
-    // Only warn if the call didn't originate from our logger
-    const isFromLogger = new Error().stack?.includes('logger.ts');
+    const stack = new Error().stack || '';
+    const isFromLogger = stack.includes('logger.ts');
+    const isInternal = stack.includes('vite') || stack.includes('hmr') || stack.includes('node_modules');
 
-    if (!isFromLogger && args.length > 0 && typeof args[0] === 'string' && !args[0].includes('[TEST]')) {
+    if (!isFromLogger && !isInternal && args.length > 0 && typeof args[0] === 'string' && !args[0].includes('[TEST]')) {
       console.warn('[DEV WARNING] Use logger.info() instead of console.log():', args[0]);
     }
     originalLog.apply(console, args);
   };
 
   console.debug = (...args: unknown[]) => {
-    const isFromLogger = new Error().stack?.includes('logger.ts');
+    const stack = new Error().stack || '';
+    const isFromLogger = stack.includes('logger.ts');
+    const isInternal = stack.includes('vite') || stack.includes('hmr') || stack.includes('node_modules');
 
-    if (!isFromLogger && args.length > 0 && typeof args[0] === 'string') {
+    if (!isFromLogger && !isInternal && args.length > 0 && typeof args[0] === 'string') {
       console.warn('[DEV WARNING] Use logger.debug() instead of console.debug():', args[0]);
     }
     originalDebug.apply(console, args);
