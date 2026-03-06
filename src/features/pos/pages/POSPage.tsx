@@ -94,7 +94,7 @@ const POSPage: React.FC = () => {
   );
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-50 dark:bg-slate-950 fixed inset-0 z-50 overflow-hidden font-cairo select-none">
+    <div className="h-[100dvh] w-screen flex flex-col bg-gray-50 dark:bg-slate-950 fixed inset-0 z-50 overflow-hidden font-cairo select-none">
       <MicroHeader
         title={t('pos_title')}
         icon={Store}

@@ -108,7 +108,7 @@ export const POSCart: React.FC<POSCartProps> = ({ onPay, onSuspend }) => {
                 )}
             </div>
 
-            <div className="p-3 bg-slate-900 text-white flex flex-col gap-3">
+            <div className="p-3 pb-6 md:pb-3 bg-slate-900 text-white flex flex-col gap-3">
                 <div className="space-y-1 opacity-60">
                     <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest">
                         <span>{t('subtotal')}</span>
