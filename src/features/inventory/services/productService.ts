@@ -281,10 +281,10 @@ export const productService = {
         const transferIds = data.filter((m: any) => m.reference_type === 'transfer').map((m: any) => m.reference_id).filter(Boolean);
 
         // Fetch Invoices (for Sales/Purchases)
-        let invoices: Record<string, unknown>[] = [];
+        let invoices: Record<string, any>[] = [];
         if (invoiceIds.length > 0) {
-            const { data: inv } = await supabase.from('invoices').select('id, invoice_number, party_id, parties(name)').in('id', invoiceIds);
-            invoices = (inv || []) as Record<string, unknown>[];
+            const { data: inv } = await supabase.from('invoices').select('id, invoice_number, type, party_id, parties(name)').in('id', invoiceIds);
+            invoices = (inv || []) as Record<string, any>[];
         }
 
         // Fetch Transfers (for Stock Transfers)
@@ -298,15 +298,36 @@ export const productService = {
         const { data: warehouses } = await supabase.from('warehouses').select('id, name_ar');
         const warehouseMap = new Map((warehouses || []).map((w: { id: string, name_ar: string }) => [w.id, w.name_ar]));
 
-        return (data || []).map((m: Record<string, unknown>) => {
+        // 1. Map raw transactions and resolve names
+        const movements = (data || []).map((m: Record<string, any>) => {
             let sourceName = '---';
             let docNumber = '---';
             let notes = m.notes || '';
+            const dbType = (m.transaction_type || '').trim().toLowerCase();
+            const rawQty = Number(m.quantity) || 0;
+
+            // Explicitly determine if it's IN (Positive/Increasing) or OUT (Negative/Decreasing)
+            // Purchase, Sales Return, Adj In, Transfer In = IN (+)
+            // Sales, Purchase Return, Adj Out, Transfer Out = OUT (-)
+            // Fallback: use quantity sign
+            const incomingTypes = ['purchase', 'sales_return', 'return_sale', 'adj_in', 'transfer_in', 'initial'];
+            const outgoingTypes = ['sales', 'purchase_return', 'return_purchase', 'adj_out', 'transfer_out'];
+
+            let isIncoming = false;
+            if (incomingTypes.includes(dbType)) isIncoming = true;
+            else if (outgoingTypes.includes(dbType)) isIncoming = false;
+            else isIncoming = rawQty > 0; // Final fallback
 
             if (typeof m.reference_type === 'string' && m.reference_type?.includes('invoice')) {
                 const inv = invoices.find(i => i.id === m.reference_id);
                 if (inv) {
-                    docNumber = m.reference_type === 'sale_invoice' ? `فاتورة بيع #${inv.invoice_number}` : `فاتورة شراء #${inv.invoice_number}`;
+                    const invType = (inv.type || '').trim().toLowerCase();
+                    if (invType === 'sale' || invType === 'sales') docNumber = `فاتورة بيع #${inv.invoice_number}`;
+                    else if (invType === 'purchase') docNumber = `فاتورة شراء #${inv.invoice_number}`;
+                    else if (invType === 'return_sale' || invType === 'sale_return' || invType === 'sales_return') docNumber = `مردود مبيعات #${inv.invoice_number}`;
+                    else if (invType === 'return_purchase' || invType === 'purchase_return') docNumber = `مردود مشتريات #${inv.invoice_number}`;
+                    else docNumber = `فاتورة #${inv.invoice_number}`;
+
                     const party = inv.parties as { name?: string };
                     sourceName = party?.name || '---';
                 }
@@ -326,16 +347,36 @@ export const productService = {
             return {
                 id: m.id,
                 date: m.created_at,
-                quantity: m.quantity,
-                transaction_type: m.transaction_type,
+                quantity: Math.abs(rawQty), // UI expects positive quantity, logic handled by transaction_type
+                transaction_type: isIncoming ? 'in' : 'out',
+                original_type: dbType,
                 reference_type: m.reference_type,
-                balance_after: m.balance_after || 0,
                 source_user: (m.created_by as { email?: string })?.email || 'System',
                 source_name: sourceName,
                 document_number: docNumber,
-                notes: notes
+                notes: notes,
+                raw_quantity: rawQty // Keep for balance calculation
             };
         });
+
+        // 2. Calculate cumulative balance (Bottom to Top)
+        // Since database doesn't store balance_after, we must calculate it manually from the history
+        // Sort chronologically (oldest first) to calculate running total
+        const sortedMovements = [...movements].sort((a, b) =>
+            new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+
+        let currentBalance = 0;
+        const movementsWithBalance = sortedMovements.map(m => {
+            currentBalance += m.raw_quantity;
+            return {
+                ...m,
+                balance_after: currentBalance
+            };
+        });
+
+        // 3. Return in original order (newest first)
+        return movementsWithBalance.reverse();
     },
 
     /**

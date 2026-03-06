@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useItemMovement, useProducts } from '../hooks';
 import { formatNumberDisplay } from '../../../core/utils';
-import { History, User, Clock, Search, X, ArrowUpRight, ArrowDownLeft, RefreshCw, ClipboardCheck, Box, Info } from 'lucide-react';
+import { History, User, Search, X, ArrowUpRight, ArrowDownLeft, Box, Info } from 'lucide-react';
 import { cn } from '../../../core/utils';
 import Avatar from '../../../ui/base/Avatar';
 
@@ -112,157 +112,149 @@ const AuditLogView: React.FC = () => {
                 )}
             </div>
 
-            {/* Movement Log Content */}
-            <div className="flex flex-col flex-1">
+            {/* Movement Log Table Content */}
+            <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
                 {selectedProduct ? (
-                    <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border dark:border-slate-800 shadow-sm min-h-[400px]">
-                        <div className="flex items-center justify-between mb-8 pb-4 border-b dark:border-slate-800">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-600/10 text-blue-600 rounded-2xl">
-                                    <History size={24} />
+                    <>
+                        {/* Table Header / Summary */}
+                        <div className="p-5 border-b dark:border-slate-800 flex items-center justify-between bg-gray-50/50 dark:bg-slate-900/50">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-600/10 text-blue-600 rounded-xl">
+                                    <History size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">سجل العمليات التفصيلي</h3>
-                                    <p className="text-xs text-gray-500 font-medium">مراجعة كافة الحركات المخزنية للصنف في الوقت الفعلي</p>
+                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">سجل العمليات (Excel Style)</h3>
+                                    <p className="text-[10px] text-gray-500 font-medium tracking-tight">تدقيق كامل لكل العمليات المخزنية بحسب التسلسل الزمني</p>
                                 </div>
                             </div>
-                            <div className="text-left">
-                                <p className="text-2xl font-black text-gray-900 dark:text-white font-mono leading-none">
-                                    {formatNumberDisplay(selectedProduct.stock_quantity)}
-                                </p>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">الرصيد الحالي الكلي</p>
+                            <div className="flex items-center gap-6">
+                                <div className="text-right">
+                                    <p className="text-xs font-black text-gray-900 dark:text-white font-mono leading-none">
+                                        {formatNumberDisplay(selectedProduct.stock_quantity)}
+                                    </p>
+                                    <p className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">الرصيد الكلي الحالي</p>
+                                </div>
+                                <div className="h-8 w-px bg-gray-200 dark:bg-slate-800" />
+                                <div className="text-right">
+                                    <p className="text-xs font-black text-gray-900 dark:text-white font-mono leading-none">
+                                        {log?.length || 0}
+                                    </p>
+                                    <p className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">إجمالي العمليات</p>
+                                </div>
                             </div>
                         </div>
 
-                        {isLogLoading ? (
-                            <div className="flex flex-col items-center justify-center py-20 gap-4">
-                                <div className="w-10 h-10 border-4 border-blue-500/10 border-t-blue-500 rounded-full animate-spin" />
-                                <p className="text-xs font-bold text-gray-400 tracking-widest">جاري استرجاع البيانات التاريخية...</p>
-                            </div>
-                        ) : !log || log.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-20 text-gray-400 bg-gray-50/50 dark:bg-slate-800/20 rounded-[2rem] border-2 border-dashed dark:border-slate-800">
-                                <Info size={48} className="mb-4 opacity-10" />
-                                <p className="text-sm font-bold">لا يوجد حركات مسجلة لهذا الصنف بعد</p>
-                                <p className="text-xs opacity-60 mt-1">سيتم سرد المبيعات والمشتريات والمناقلات هنا فور حدوثها</p>
-                            </div>
-                        ) : (
-                            <div className="relative border-r-2 border-slate-100 dark:border-slate-800 mr-8 pr-10 space-y-8">
-                                {log.map((entry: any, i: number) => (
-                                    <div key={i} className="relative group animate-in slide-in-from-top-2 duration-300" style={{ animationDelay: `${i * 50}ms` }}>
-                                        {/* Timeline Dot */}
-                                        <div className={cn(
-                                            "absolute -right-[49px] top-2 w-4 h-4 rounded-full border-4 border-white dark:border-slate-900 z-10 transition-transform group-hover:scale-125 shadow-sm",
-                                            getTransactionColor(entry.transaction_type, entry.reference_type)
-                                        )} />
-
-                                        <div className="bg-gray-50 dark:bg-slate-800/40 p-5 rounded-3xl border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 transition-all hover:shadow-xl hover:shadow-blue-500/5 group">
-                                            <div className="flex flex-wrap justify-between items-start gap-4 mb-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={cn(
-                                                        "p-2.5 rounded-2xl shadow-sm",
-                                                        entry.transaction_type === 'in' ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20" : "bg-rose-50 text-rose-600 dark:bg-rose-900/20"
-                                                    )}>
-                                                        {getTransactionIcon(entry.transaction_type, entry.reference_type)}
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-sm font-bold text-gray-900 dark:text-slate-100 leading-tight">
-                                                            {entry.document_number}
-                                                        </h4>
-                                                        <p className="text-[10px] text-gray-500 font-bold mt-0.5">
-                                                            {entry.source_name}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="text-left bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border dark:border-slate-800 shadow-sm">
-                                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 dark:text-gray-400 font-mono">
-                                                        <Clock size={12} className="opacity-50" />
-                                                        <span>{new Date(entry.date).toLocaleString('ar-SA', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-4 border-t dark:border-slate-800/50">
-                                                <div className="space-y-1">
-                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">الكمية</span>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className={cn(
-                                                            "text-lg font-black font-mono",
-                                                            entry.transaction_type === 'in' ? "text-emerald-500" : "text-rose-500"
+                        {/* Excel-Style Table Container */}
+                        <div className="flex-1 overflow-auto custom-scrollbar relative">
+                            {isLogLoading ? (
+                                <div className="flex flex-col items-center justify-center py-20 gap-3">
+                                    <div className="w-8 h-8 border-2 border-blue-500/10 border-t-blue-500 rounded-full animate-spin" />
+                                    <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">جاري تجهيز البيانات التدقيقية...</p>
+                                </div>
+                            ) : !log || log.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                                    <Info size={40} className="mb-3 opacity-10" />
+                                    <p className="text-xs font-bold">لا توجد حركات مسجلة لهذا الصنف</p>
+                                </div>
+                            ) : (
+                                <table className="w-full border-collapse text-right select-all">
+                                    <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-slate-800 shadow-sm border-b-2 border-gray-200 dark:border-slate-700">
+                                        <tr>
+                                            <th className="border border-gray-100 dark:border-slate-700 p-2 text-[9px] font-black text-gray-500 uppercase tracking-tighter w-12 text-center">#</th>
+                                            <th className="border border-gray-100 dark:border-slate-700 p-2 text-[10px] font-bold text-gray-600 dark:text-gray-300">التاريخ والوقت</th>
+                                            <th className="border border-gray-100 dark:border-slate-700 p-2 text-[10px] font-bold text-gray-600 dark:text-gray-300">نوع العملية / المرجع</th>
+                                            <th className="border border-gray-100 dark:border-slate-700 p-2 text-[10px] font-bold text-gray-600 dark:text-gray-300">الجهة / المورد / العميل</th>
+                                            <th className="border border-gray-100 dark:border-slate-700 p-2 text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center w-20">الحالة</th>
+                                            <th className="border border-gray-100 dark:border-slate-700 p-2 text-[10px] font-bold text-gray-600 dark:text-gray-300 text-left w-24">الكمية</th>
+                                            <th className="border border-gray-100 dark:border-slate-700 p-2 text-[10px] font-bold text-gray-600 dark:text-gray-300 text-left w-24">الرصيد بعدها</th>
+                                            <th className="border border-gray-100 dark:border-slate-700 p-2 text-[10px] font-bold text-gray-600 dark:text-gray-300 w-32">المستخدم</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y dark:divide-slate-800">
+                                        {log.map((entry: any, i: number) => {
+                                            const isIncoming = entry.transaction_type === 'in';
+                                            return (
+                                                <tr key={i} className="odd:bg-white even:bg-gray-50/30 dark:odd:bg-slate-900 dark:even:bg-slate-800/20 hover:bg-blue-50/50 dark:hover:bg-blue-900/5 transition-colors group">
+                                                    <td className="border border-gray-50 dark:border-slate-800/60 p-2 text-center text-[9px] font-mono font-bold text-gray-400 group-hover:text-blue-500">
+                                                        {log.length - i}
+                                                    </td>
+                                                    <td className="border border-gray-50 dark:border-slate-800/60 p-2 text-gray-600 dark:text-gray-400 text-[10px] whitespace-nowrap">
+                                                        {new Date(entry.date).toLocaleString('ar-EG', {
+                                                            year: 'numeric', month: '2-digit', day: '2-digit',
+                                                            hour: '2-digit', minute: '2-digit', hour12: true
+                                                        })}
+                                                    </td>
+                                                    <td className="border border-gray-50 dark:border-slate-800/60 p-2">
+                                                        <div className="font-bold text-blue-700 dark:text-blue-400 mb-0.5">{entry.document_number}</div>
+                                                        <div className="text-[10px] text-gray-400 font-medium">
+                                                            {entry.reference_type === 'invoice' || entry.reference_type?.includes('invoice') ? 'فاتورة إلكترونية' :
+                                                                entry.reference_type === 'transfer' ? 'مناقلة مخزنية' :
+                                                                    entry.reference_type === 'audit' ? 'تسوية جردية' : 'مستند يدوي'}
+                                                        </div>
+                                                    </td>
+                                                    <td className="border border-gray-50 dark:border-slate-800/60 p-2 text-[10px] font-bold text-gray-600 dark:text-gray-300">
+                                                        {entry.source_name || '--'}
+                                                    </td>
+                                                    <td className="border border-gray-50 dark:border-slate-800/60 p-2 text-center">
+                                                        <div className={cn(
+                                                            "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg border text-[9px] font-black uppercase tracking-tighter",
+                                                            isIncoming ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
                                                         )}>
-                                                            {entry.transaction_type === 'in' ? '+' : '-'}{formatNumberDisplay(Math.abs(entry.quantity))}
-                                                        </span>
-                                                        <span className="text-[10px] font-bold text-gray-400">قطعة</span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-1">
-                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">الرصيد بعدها</span>
-                                                    <span className="text-lg font-black font-mono text-gray-900 dark:text-white">
+                                                            {isIncoming ? <ArrowDownLeft size={10} /> : <ArrowUpRight size={10} />}
+                                                            {isIncoming ? 'وارد' : 'صادر'}
+                                                        </div>
+                                                    </td>
+                                                    <td dir="ltr" className={cn(
+                                                        "border border-gray-50 dark:border-slate-800/60 p-2 text-left text-xs font-black font-mono",
+                                                        isIncoming ? "text-emerald-600" : "text-rose-600"
+                                                    )}>
+                                                        {isIncoming ? '+' : '-'}{formatNumberDisplay(Math.abs(entry.quantity))}
+                                                    </td>
+                                                    <td dir="ltr" className="border border-gray-50 dark:border-slate-800/60 p-2 text-left text-xs font-black font-mono text-gray-900 dark:text-white bg-blue-50/20 dark:bg-blue-900/5">
                                                         {formatNumberDisplay(entry.balance_after)}
-                                                    </span>
-                                                </div>
+                                                    </td>
+                                                    <td className="border border-gray-50 dark:border-slate-800/60 p-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <Avatar name={entry.source_user || entry.created_by_name || 'System'} size="xs" />
+                                                            <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 truncate max-w-[80px]">
+                                                                {entry.source_user?.split('@')[0] || entry.created_by_name?.split(' ')[0] || 'النظام'}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
 
-                                                <div className="col-span-2 sm:col-span-1 flex items-center gap-3 bg-white/50 dark:bg-slate-900/50 p-2 rounded-2xl border dark:border-slate-800/40">
-                                                    <Avatar name={entry.source_user || entry.created_by_name || 'System'} size="xs" />
-                                                    <div className="overflow-hidden">
-                                                        <span className="text-[9px] font-bold text-gray-400 block uppercase">بواسطة</span>
-                                                        <span className="text-[10px] font-bold text-gray-700 dark:text-slate-300 truncate block">
-                                                            {entry.source_user?.split('@')[0] || entry.created_by_name?.split(' ')[0] || 'النظام'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {entry.notes && (
-                                                <div className="mt-4 text-[10px] text-gray-500 bg-blue-50/30 dark:bg-blue-900/10 p-3 rounded-2xl border border-blue-100/20 dark:border-blue-900/20 italic flex gap-2">
-                                                    <Info size={12} className="shrink-0 mt-0.5" />
-                                                    <span>"{entry.notes}"</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
+                        {/* Footer Excel-like Info */}
+                        <div className="p-2 px-4 bg-gray-50 dark:bg-slate-800 border-t dark:border-slate-700 flex justify-between items-center text-[9px] font-bold text-gray-400">
+                            <div className="flex gap-4">
+                                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> واردات (مشتريات/مردود)</span>
+                                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-rose-500" /> صادرات (مبيعات/هالك)</span>
                             </div>
-                        )}
-                    </div>
+                            <span>* كافة الكميات معالجة ومربوطة بالرصيد التراكمي في الوقت الفعلي</span>
+                        </div>
+                    </>
                 ) : (
-                    <div className="flex-1 min-h-[500px] flex flex-col items-center justify-center text-center p-12 bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-dashed dark:border-slate-800 animate-in fade-in zoom-in duration-700">
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-12 bg-white dark:bg-slate-900 animate-in fade-in zoom-in duration-700">
                         <div className="relative mb-6">
-                            <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full" />
-                            <div className="relative p-8 bg-blue-600/10 text-blue-600 rounded-[2.5rem] shadow-inner">
-                                <History size={64} strokeWidth={1.5} />
+                            <div className="absolute inset-0 bg-blue-500/10 blur-3xl rounded-full" />
+                            <div className="relative p-8 bg-blue-600/5 text-blue-600/30 rounded-[2.5rem]">
+                                <History size={64} strokeWidth={1} />
                             </div>
                         </div>
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">تدقيق سجل الحركة المتطور</h2>
-                        <p className="max-w-md text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
-                            قم باختيار صنف من صندوق البحث أعلاه للبدء في تتبع كافة الحركات المخزنية، المبيعات، المشتريات والمناقلات بدقة كاملة.
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">تدقيق سجل الحركة المتطور</h2>
+                        <p className="max-w-sm text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+                            اختر صنفاً من مربع البحث بالأعلى لعرض كافة عملياته المخزنية بتنسيق Excel احترافي مع الربط المباشر بالمستخدمين والمستندات.
                         </p>
-                        <div className="mt-8 flex gap-3">
-                            <div className="px-4 py-2 bg-gray-50 dark:bg-slate-800 rounded-2xl text-[10px] font-bold text-gray-500 border dark:border-slate-700">
-                                تتبع الوقت الفعلي
-                            </div>
-                            <div className="px-4 py-2 bg-gray-50 dark:bg-slate-800 rounded-2xl text-[10px] font-bold text-gray-500 border dark:border-slate-700">
-                                هوية المستخدمين
-                            </div>
-                        </div>
                     </div>
                 )}
             </div>
         </div>
     );
-};
-
-// Typed Helpers
-const getTransactionIcon = (type: string, ref: string) => {
-    if (ref === 'transfer') return <RefreshCw size={18} />;
-    if (ref === 'audit') return <ClipboardCheck size={18} />;
-    return type === 'in' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />;
-};
-
-const getTransactionColor = (type: string, ref: string) => {
-    if (ref === 'transfer') return 'bg-blue-500';
-    if (ref === 'audit') return 'bg-indigo-500';
-    return type === 'in' ? 'bg-emerald-500' : 'bg-rose-500';
 };
 
 export default AuditLogView;

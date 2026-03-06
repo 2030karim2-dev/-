@@ -86,6 +86,7 @@ const PartyModal: React.FC<PartyModalProps> = ({ isOpen, onClose, onSubmit, isSu
         icon={initialData ? ShieldCheck : Zap}
         title={title}
         description={t('party_management_desc')}
+        size="xl"
         footer={footer}
       >
         <form className="flex flex-col overflow-hidden">

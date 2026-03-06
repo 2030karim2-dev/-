@@ -33,12 +33,12 @@ const Modal: React.FC<ModalProps> = ({
     sm: 'md:max-w-sm',
     md: 'md:max-w-md',
     lg: 'md:max-w-lg',
-    xl: 'md:max-w-xl',
-    '2xl': 'md:max-w-2xl',
-    '3xl': 'md:max-w-3xl',
-    '4xl': 'md:max-w-4xl',
-    '5xl': 'md:max-w-5xl',
-    full: 'md:max-w-[95vw]'
+    xl: 'md:max-w-2xl',
+    '2xl': 'md:max-w-3xl',
+    '3xl': 'md:max-w-4xl',
+    '4xl': 'md:max-w-6xl',
+    '5xl': 'md:max-w-7xl',
+    full: 'md:max-w-[96vw]'
   };
 
   const sizeOrder: Array<'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'full'> = ['sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', 'full'];
@@ -137,7 +137,7 @@ const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Content Segment */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 bg-[var(--app-bg)]">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 lg:p-10 bg-[var(--app-bg)]">
           {children}
         </div>
 

@@ -172,9 +172,8 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
       onClose={onClose}
       icon={FileText}
 
-      title={`تفاصيل الفاتورة #${invoice?.invoice_number || ''}`}
       description="عرض تفصيلي لعملية البيع المسجلة"
-      size="3xl"
+      size="4xl"
       footer={
         fullInvoiceData && (
           <>
