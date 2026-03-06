@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Store, ScanBarcode, RotateCcw, PauseCircle, X } from 'lucide-react';
+import { Store, ScanBarcode, RotateCcw, PauseCircle, X, ShoppingCart, ChevronLeft } from 'lucide-react';
 import MicroHeader from '../../../ui/base/MicroHeader';
 import ProductGrid from '../components/ProductGrid';
 // Fix: Changed default import to named import to resolve "no default export" error.
@@ -12,11 +12,14 @@ import { usePOSStore } from '../store';
 import { usePOSCheckout } from '../hooks';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 import { useBreakpoint } from '../../../lib/hooks/useBreakpoint';
-import { ShoppingCart, LayoutGrid, ChevronLeft } from 'lucide-react';
 import { formatCurrency } from '../../../core/utils';
 
 
 const POSPage: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [showSuspended, setShowSuspended] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState<'products' | 'cart'>('products');
   const isDesktop = useBreakpoint('md');
   const { t } = useTranslation();
