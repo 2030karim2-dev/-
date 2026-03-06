@@ -321,7 +321,7 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                                             <span dir="ltr" className="font-mono text-[10px] opacity-70">
                                                 {formatCurrency(convertToBaseCurrency({
                                                     amount: Math.abs(difference),
-                                                    currencyCode: selectedCurrency,
+                                                    currencyCode: (selectedCurrency || 'SAR') as any,
                                                     exchangeRate,
                                                     exchangeOperator: isDivide ? 'divide' : 'multiply'
                                                 }), 'SAR')}
