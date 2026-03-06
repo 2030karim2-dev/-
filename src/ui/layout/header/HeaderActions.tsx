@@ -13,6 +13,8 @@ import { cn } from '../../../core/utils';
 import { syncStore } from '../../../core/lib/sync-store';
 import { RefreshCw } from 'lucide-react';
 import SyncStatusModal from '../../components/SyncStatusModal';
+import LogoutConfirmModal from '../../../features/auth/components/LogoutConfirmModal';
+import { useLogout } from '../../../features/auth/hooks';
 
 const HeaderActions: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +25,8 @@ const HeaderActions: React.FC = () => {
   const status = useNetworkStatus();
   const [pendingCount, setPendingCount] = useState(0);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const { logout: performLogout, isLoggingOut } = useLogout();
 
   // Poll for pending sync count
   useEffect(() => {
@@ -66,16 +70,16 @@ const HeaderActions: React.FC = () => {
     };
   }, [isNotifOpen]);
 
-  const { logout } = useAuthStore();
+  // const { logout } = useAuthStore();
 
   const handleProfileClick = () => {
     navigate('/settings');
     setIsProfileOpen(false);
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+    setIsProfileOpen(false);
   };
 
   return (
@@ -202,7 +206,7 @@ const HeaderActions: React.FC = () => {
 
             <div className="p-1.5 border-t border-gray-100 dark:border-slate-800">
               <button
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all"
               >
                 <LogOut size={16} />
@@ -212,6 +216,14 @@ const HeaderActions: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={performLogout}
+        isLoading={isLoggingOut}
+      />
     </div>
   );
 };

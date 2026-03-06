@@ -20,6 +20,26 @@ export const useAuth = () => {
     };
 };
 
+export const useLogout = () => {
+    const { logout } = useAuthStore();
+    const navigate = useNavigate();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            await logout();
+            navigate(ROUTES.AUTH.LOGIN);
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            setIsLoggingOut(false);
+        }
+    };
+
+    return { logout: handleLogout, isLoggingOut };
+};
+
 export const useLogin = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

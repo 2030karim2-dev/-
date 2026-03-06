@@ -9,7 +9,8 @@ export const useDashboardMetrics = () => {
     const extractNumericValue = (formatted: string) => {
         if (!formatted) return 0;
         const numeric = formatted.replace(/[^0-9.-]/g, '');
-        return parseFloat(numeric) || 0;
+        const val = parseFloat(numeric) || 0;
+        return Math.max(0, val);
     };
 
     const revenueExpensesData = useMemo(() => {

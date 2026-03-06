@@ -49,7 +49,13 @@ export const useSalesFlowChart = ({ data, onPeriodChange }: UseSalesFlowChartPar
             case 'all': return data;
         }
 
-        return data.filter(d => new Date(d.name) >= cutoff);
+        return data.filter(d => new Date(d.name) >= cutoff).map(d => ({
+            ...d,
+            sales: Math.max(0, d.sales || 0),
+            purchases: Math.max(0, d.purchases || 0),
+            expenses: Math.max(0, d.expenses || 0),
+            // profit remains as is as it's allowed to be negative
+        }));
     }, [data, period]);
 
     // Calculate summary stats based on filtered data

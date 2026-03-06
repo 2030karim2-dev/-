@@ -3,14 +3,18 @@ import React from 'react';
 import { LogOut } from 'lucide-react';
 import { useAuthStore } from '../../../features/auth/store';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useLogout } from '../../../features/auth/hooks';
+import LogoutConfirmModal from '../../../features/auth/components/LogoutConfirmModal';
 
 interface SidebarFooterProps {
   isCollapsed: boolean;
 }
 
 const SidebarFooter: React.FC<SidebarFooterProps> = ({ isCollapsed }) => {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const { t } = useTranslation();
+  const { logout: performLogout, isLoggingOut } = useLogout();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
 
   const initial = user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U';
   const name = user?.full_name || user?.email?.split('@')[0] || 'User';
@@ -30,7 +34,7 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({ isCollapsed }) => {
               <span className="text-[10px] text-[var(--app-text-secondary)] capitalize">{role}</span>
             </div>
             <button
-              onClick={logout}
+              onClick={() => setIsLogoutModalOpen(true)}
               className="mr-auto p-2 text-[var(--app-text-secondary)] hover:text-red-500 transition-colors"
               title={t('logout')}
               aria-label={t('logout')}
@@ -40,7 +44,7 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({ isCollapsed }) => {
           </>
         ) : (
           <button
-            onClick={logout}
+            onClick={() => setIsLogoutModalOpen(true)}
             className="p-2 text-[var(--app-text-secondary)] hover:text-red-500 transition-colors mt-2"
             title={t('logout')}
             aria-label={t('logout')}
@@ -49,6 +53,13 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({ isCollapsed }) => {
           </button>
         )}
       </div>
+
+      <LogoutConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={performLogout}
+        isLoading={isLoggingOut}
+      />
     </div>
   );
 };
