@@ -18,8 +18,8 @@ const ProductCoreInfo: React.FC<Props> = ({ register, errors }) => {
         <label className="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1.5 px-1">{t('base_product_name')}</label>
         <div className="relative">
           <input
-            placeholder="مثال: فحمات فرامل سيراميك تويوتا"
-            {...register('name', { required: 'الاسم مطلوب' })}
+            placeholder={t('enter_full_name')}
+            {...register('name', { required: t('name_required') })}
             className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border-2 border-gray-100 dark:border-slate-800 rounded-xl text-sm font-bold text-gray-800 dark:text-white placeholder:text-gray-300 focus:border-blue-500 outline-none transition-all pr-10 shadow-sm"
           />
           <Tag className="absolute right-3.5 top-1/2 -translate-y-1/2 text-blue-500" size={18} />
@@ -48,7 +48,7 @@ const ProductCoreInfo: React.FC<Props> = ({ register, errors }) => {
       <div className="pt-3 border-t border-gray-100 dark:border-slate-800 space-y-4">
         <div>
           <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 px-1 flex items-center gap-1">
-            <Combine size={12} /> الأرقام البديلة السريعة (مفصولة بفاصلة)
+            <Combine size={12} /> {t('alternative_numbers_label')}
           </label>
           <input
             placeholder="مثال: 04465-0K320, 04465-YZZE1"
