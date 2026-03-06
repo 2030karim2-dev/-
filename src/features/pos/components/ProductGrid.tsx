@@ -41,7 +41,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, onAddToCart }) =>
                             onClick={() => onAddToCart(product)}
                             disabled={!hasStock}
                             className={`
-                        relative bg-white dark:bg-slate-900 p-2 rounded-xl border transition-all active:scale-95 text-right flex flex-col justify-between h-28 md:h-32
+                        relative bg-white dark:bg-slate-900 p-1.5 md:p-2 rounded-xl border transition-all active:scale-95 text-right flex flex-col justify-between h-24 md:h-32
                         ${hasStock
                                     ? 'border-gray-100 dark:border-slate-800 hover:border-blue-600'
                                     : 'bg-gray-50 dark:bg-slate-900 opacity-60 cursor-not-allowed'

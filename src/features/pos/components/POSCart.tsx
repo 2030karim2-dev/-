@@ -67,19 +67,19 @@ export const POSCart: React.FC<POSCartProps> = ({ onPay, onSuspend }) => {
                     <div className="flex flex-col divide-y dark:divide-slate-800">
                         {validItems.map((item) => (
                             <div key={item.productId} className="flex gap-0 group hover:bg-blue-50/30 dark:hover:bg-blue-900/5 transition-colors animate-in slide-in-from-right-2 duration-300">
-                                <div className="flex-1 p-2.5 min-w-0 border-l dark:border-slate-800">
-                                    <h4 className="font-bold text-gray-800 dark:text-slate-100 text-[10px] truncate leading-none mb-1.5">{item.name}</h4>
+                                <div className="flex-1 p-2 md:p-2.5 min-w-0 border-l dark:border-slate-800 flex flex-col justify-center">
+                                    <h4 className="font-bold text-gray-800 dark:text-slate-100 text-[9px] md:text-[10px] truncate leading-none mb-1.5">{item.name}</h4>
                                     <div className="flex justify-between items-center">
-                                        <div className="flex items-center gap-1.5">
-                                            <span dir="ltr" className="text-[9px] font-mono font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-1 rounded">
+                                        <div className="flex items-center gap-1">
+                                            <span dir="ltr" className="text-[8px] md:text-[9px] font-mono font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-1 rounded">
                                                 {formatNumberDisplay(item.quantity)}
                                             </span>
-                                            <span className="text-[8px] text-gray-400 font-bold uppercase">x</span>
-                                            <span dir="ltr" className="text-[9px] text-gray-500 font-mono font-bold tracking-tighter">
+                                            <span className="text-[7px] md:text-[8px] text-gray-400 font-bold uppercase">x</span>
+                                            <span dir="ltr" className="text-[8px] md:text-[9px] text-gray-500 font-mono font-bold tracking-tighter">
                                                 {formatCurrency(item.price)}
                                             </span>
                                         </div>
-                                        <span dir="ltr" className="text-[10px] font-bold text-blue-800 dark:text-blue-400 font-mono">
+                                        <span dir="ltr" className="text-[9px] md:text-[10px] font-bold text-blue-800 dark:text-blue-400 font-mono">
                                             {formatCurrency(item.price * item.quantity)}
                                         </span>
                                     </div>
@@ -91,15 +91,15 @@ export const POSCart: React.FC<POSCartProps> = ({ onPay, onSuspend }) => {
                                             if (item.quantity > 1) updateQuantity(item.productId, item.quantity - 1);
                                             else removeItem(item.productId);
                                         }}
-                                        className="w-9 h-full flex items-center justify-center text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors border-r dark:border-slate-800"
+                                        className="w-10 md:w-9 h-full flex items-center justify-center text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors border-r dark:border-slate-800"
                                     >
-                                        {item.quantity === 1 ? <Trash2 size={11} /> : <Minus size={11} strokeWidth={3} />}
+                                        {item.quantity === 1 ? <Trash2 size={12} /> : <Minus size={12} strokeWidth={3} />}
                                     </button>
                                     <button
                                         onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                                        className="w-9 h-full flex items-center justify-center text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                                        className="w-10 md:w-9 h-full flex items-center justify-center text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
                                     >
-                                        <Plus size={11} strokeWidth={3} />
+                                        <Plus size={12} strokeWidth={3} />
                                     </button>
                                 </div>
                             </div>
