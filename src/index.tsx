@@ -81,16 +81,16 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(registrations => {
       for (const registration of registrations) {
         registration.unregister().catch((err: Error) => {
-          console.warn('SW unregister failed:', err);
+          logger.warn('SW', 'unregister failed', err);
         });
       }
     }).catch((err: Error) => {
       // This catch block handles "The document is in an invalid state" error
       // which can happen during rapid reloads or specific browser states
-      console.warn('Service Worker access failed:', err);
+      logger.warn('SW', 'access failed', err);
     });
   } catch (e) {
-    console.warn('Service Worker not supported or access denied:', e);
+    logger.warn('SW', 'not supported or access denied', e);
   }
 }
 

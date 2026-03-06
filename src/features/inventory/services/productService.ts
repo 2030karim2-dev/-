@@ -2,6 +2,7 @@ import { Product, ProductFormData } from '../types';
 import { inventoryApi } from '../api';
 import { supabase } from '../../../lib/supabaseClient';
 import { InsertDto } from '../../../core/database.helpers';
+import { logger } from '../../../core/utils/logger';
 
 interface RawStock {
     quantity?: number | string;
@@ -171,7 +172,7 @@ export const productService = {
      * Update an existing product
      */
     updateProduct: async (id: string, data: ProductFormData, companyId: string) => {
-        console.log(`[ProductService] Updating product ${id}`, data);
+        logger.debug('ProductService', `Updating product ${id}`, data);
 
         try {
             const payload: any = {
@@ -192,19 +193,19 @@ export const productService = {
             if (data.barcode !== undefined) payload.barcode = data.barcode || null;
             if (data.category) payload.category_id = data.category.length === 36 ? data.category : null;
 
-            console.log(`[ProductService] Sending update payload to API`, payload);
+            logger.debug('ProductService', `Sending update payload to API`, payload);
             const { data: product, error } = await inventoryApi.updateProduct(id, payload);
 
             if (error) {
-                console.error(`[ProductService] API update failed`, error);
+                logger.error('ProductService', `API update failed`, error);
                 throw error;
             }
 
-            console.log(`[ProductService] Product metadata updated successfully`, product);
+            logger.debug('ProductService', `Product metadata updated successfully`, product);
 
             // Update stock in default warehouse
             if (data.stock_quantity !== undefined) {
-                console.log(`[ProductService] Checking for default warehouse to update stock`);
+                logger.debug('ProductService', `Checking for default warehouse to update stock`);
                 const { data: warehouses, error: whError } = await supabase
                     .from('warehouses')
                     .select('id')
@@ -212,25 +213,25 @@ export const productService = {
                     .limit(1);
 
                 if (whError) {
-                    console.error(`[ProductService] Failed to fetch warehouses`, whError);
+                    logger.error('ProductService', `Failed to fetch warehouses`, whError);
                 } else if (warehouses && warehouses.length > 0) {
                     const warehouse = warehouses[0] as { id: string };
-                    console.log(`[ProductService] Updating stock in warehouse ${warehouse.id} to ${data.stock_quantity}`);
+                    logger.debug('ProductService', `Updating stock in warehouse ${warehouse.id} to ${data.stock_quantity}`);
                     try {
                         await inventoryApi.updateStock(id, warehouse.id, Number(data.stock_quantity));
-                        console.log(`[ProductService] Stock updated successfully`);
+                        logger.debug('ProductService', `Stock updated successfully`);
                     } catch (stockErr) {
-                        console.error(`[ProductService] Failed to update stock, but metadata was saved`, stockErr);
+                        logger.error('ProductService', `Failed to update stock, but metadata was saved`, stockErr);
                         // We don't throw here to avoid failing the whole operation if only stock fails
                     }
                 } else {
-                    console.warn(`[ProductService] No default warehouse found for stock initialization`);
+                    logger.warn('ProductService', `No default warehouse found for stock initialization`);
                 }
             }
 
             return product;
         } catch (err: any) {
-            console.error(`[ProductService] Critical failure in updateProduct`, err);
+            logger.error('ProductService', `Critical failure in updateProduct`, err);
             throw err;
         }
     },
