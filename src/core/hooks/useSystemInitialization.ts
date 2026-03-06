@@ -11,7 +11,7 @@ import { notificationService } from '../../features/notifications/service';
 import { useLocalizationSettings } from '../../features/settings/settingsStore';
 import { useSoundStore } from '../../features/notifications/store';
 import { logger } from '../utils/logger';
-
+import { useRealtimeSync } from '../../lib/hooks/useRealtimeSync';
 export const useSystemInitialization = () => {
   const { initialize } = useAuth();
   const { user } = useAuthStore();
@@ -22,6 +22,8 @@ export const useSystemInitialization = () => {
   const localizationSettings = useLocalizationSettings();
   const { setUserInteracted } = useSoundStore();
 
+  // Initialize Global Realtime Sync
+  useRealtimeSync();
   // 0. Track first user interaction for AudioContext / Autoplay policies
   useEffect(() => {
     const handleInteraction = () => {
