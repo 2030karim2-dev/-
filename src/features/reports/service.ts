@@ -187,8 +187,8 @@ export const reportsService = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const monthlyTrend = ((monthlyData || []) as Array<{ month: string, inflow: number, outflow: number, net: number }>).map(d => ({
       month: d.month,
-      in: Number(d.inflow) || 0,
-      out: Number(d.outflow) || 0,
+      in: Math.max(0, Number(d.inflow) || 0),
+      out: Math.max(0, Number(d.outflow) || 0),
       net: Number(d.net) || 0
     }));
 

@@ -25,7 +25,7 @@ export const calculateDashboardStats = (data: {
         chartDataMap[date].sales += toBaseCurrency(inv);
     });
 
-    (invoicesData || []).filter((i: any) => i.type === 'purchase').forEach((inv: any) => {
+    (invoicesData || []).filter((i: any) => i.type?.trim().toLowerCase() === 'purchase').forEach((inv: any) => {
         const date = new Date(inv.issue_date).toLocaleDateString('en-CA');
         if (!chartDataMap[date]) chartDataMap[date] = { sales: 0, purchases: 0, expenses: 0 };
         chartDataMap[date].purchases += toBaseCurrency(inv);
@@ -40,11 +40,11 @@ export const calculateDashboardStats = (data: {
     const salesData = Object.entries(chartDataMap)
         .map(([name, d]) => ({
             name,
-            sales: d.sales,
-            purchases: d.purchases,
-            expenses: d.expenses,
+            sales: Math.max(0, d.sales),
+            purchases: Math.max(0, d.purchases),
+            expenses: Math.max(0, d.expenses),
             profit: d.sales - d.purchases - d.expenses,
-            value: d.sales
+            value: Math.max(0, d.sales)
         }))
         .sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
 

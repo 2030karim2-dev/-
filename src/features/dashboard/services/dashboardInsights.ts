@@ -20,9 +20,12 @@ export const calculateDashboardInsights = (data: {
 
 
     const allInvoices = invoicesData || [];
-    const midpoint = Math.floor(allInvoices.length / 2);
-    const olderHalf = allInvoices.slice(0, midpoint);
-    const newerHalf = allInvoices.slice(midpoint);
+    const now = new Date();
+    const fifteenDaysAgo = new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000));
+
+    // Split based on date instead of array length for accuracy
+    const olderHalf = allInvoices.filter((i: any) => new Date(i.issue_date) < fifteenDaysAgo);
+    const newerHalf = allInvoices.filter((i: any) => new Date(i.issue_date) >= fifteenDaysAgo);
 
     const olderSales = olderHalf.filter((i: any) => i.type === 'sale').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
     const newerSales = newerHalf.filter((i: any) => i.type === 'sale').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
@@ -32,8 +35,9 @@ export const calculateDashboardInsights = (data: {
     const newerPurchases = newerHalf.filter((i: any) => i.type === 'purchase').reduce((s: number, i: any) => s + toBaseCurrency(i), 0);
     const purchasesTrend = olderPurchases > 0 ? ((newerPurchases - olderPurchases) / olderPurchases) * 100 : 0;
 
-    const olderExpenses = (expensesData || []).slice(0, Math.floor((expensesData || []).length / 2)).reduce((s: number, e: any) => s + toBaseCurrency(e), 0);
-    const newerExpenses = (expensesData || []).slice(Math.floor((expensesData || []).length / 2)).reduce((s: number, e: any) => s + toBaseCurrency(e), 0);
+    const expenseMidpoint = new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000));
+    const olderExpenses = (expensesData || []).filter((e: any) => new Date(e.expense_date) < expenseMidpoint).reduce((s: number, e: any) => s + toBaseCurrency(e), 0);
+    const newerExpenses = (expensesData || []).filter((e: any) => new Date(e.expense_date) >= expenseMidpoint).reduce((s: number, e: any) => s + toBaseCurrency(e), 0);
     const expensesTrend = olderExpenses > 0 ? ((newerExpenses - olderExpenses) / olderExpenses) * 100 : 0;
 
     const alerts = [];

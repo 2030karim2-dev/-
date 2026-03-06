@@ -3,7 +3,7 @@
 // Al-Zahra Smart ERP
 // ============================================
 
-import  { Component, ReactNode } from 'react';
+import { Component, ReactNode } from 'react';
 import { AppError, ErrorCode, UnknownRecord } from '../types/common';
 
 interface Props {
@@ -48,6 +48,27 @@ export class ErrorBoundary extends Component<Props, State> {
 
         console.error('[ErrorBoundary] Caught error:', appError, errorInfo);
 
+        // Handle dynamic import / chunk load failures (common after new deployments)
+        const isChunkError =
+            error.message.includes('Failed to fetch dynamically imported module') ||
+            error.message.includes('MIME type') ||
+            error.name === 'ChunkLoadError';
+
+        if (isChunkError) {
+            console.warn('[ErrorBoundary] Detected chunk load error. Attempting to recover by reloading...');
+
+            // Try to auto-reload once per session to fix the version mismatch
+            const lastReload = sessionStorage.getItem('last_chunk_error_reload');
+            const now = Date.now();
+
+            // If we haven't reloaded for a chunk error in the last 10 seconds, do it once
+            if (!lastReload || now - parseInt(lastReload) > 10000) {
+                sessionStorage.setItem('last_chunk_error_reload', now.toString());
+                window.location.reload();
+                return;
+            }
+        }
+
         this.props.onError?.(appError, errorInfo);
     }
 
@@ -74,62 +95,53 @@ export class ErrorBoundary extends Component<Props, State> {
                 return this.props.fallback;
             }
 
+            const errorMsg = this.state.error?.message || '';
+            const isVersionMismatch =
+                errorMsg.includes('Failed to fetch dynamically imported module') ||
+                errorMsg.includes('MIME type');
+
             return (
-                <div className="min-h-[400px] flex items-center justify-center p-8">
-                    <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-red-100 dark:border-red-900/30 p-6">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                <svg
-                                    className="w-6 h-6 text-red-600 dark:text-red-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                    />
-                                </svg>
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-red-800 dark:text-red-400">
-                                    حدث خطأ
-                                </h2>
-                                <p className="text-sm text-red-600 dark:text-red-300">
-                                    يرجى إعادة المحاولة
-                                </p>
-                            </div>
+                <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950">
+                    <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-8 text-center">
+                        <div className="w-20 h-20 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center mx-auto mb-6">
+                            <svg className="w-10 h-10 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
                         </div>
 
-                        {this.state.error && (
-                            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
-                                <p className="text-sm text-red-700 dark:text-red-300">
-                                    {this.state.error.message}
-                                </p>
-                                {import.meta.env.DEV && (
-                                    <p className="text-xs text-red-500 mt-2 font-mono">
-                                        {this.state.error.code}
-                                    </p>
-                                )}
-                            </div>
-                        )}
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
+                            {isVersionMismatch ? 'تحديث متوفر' : 'حدث خطأ غير متوقع'}
+                        </h2>
 
-                        <div className="flex gap-3">
-                            <button
-                                onClick={this.handleReset}
-                                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
-                            >
-                                إعادة المحاولة
-                            </button>
+                        <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+                            {isVersionMismatch
+                                ? 'يبدو أن هناك نسخة جديدة من النظام متوفرة. يرجى تحديث الصفحة للحصول على آخر التحسينات.'
+                                : 'نعتذر عن هذا الخلل. لقد تم تسجيل الخطأ وسيعمل فريقنا على إصلاحه قريباً.'}
+                        </p>
+
+                        <div className="flex flex-col gap-3">
                             <button
                                 onClick={() => window.location.reload()}
-                                className="px-4 py-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors"
+                                className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-95"
                             >
-                                إعادة تحميل الصفحة
+                                {isVersionMismatch ? 'تحديث الآن' : 'إعادة تحميل الصفحة'}
                             </button>
+
+                            {!isVersionMismatch && (
+                                <button
+                                    onClick={this.handleReset}
+                                    className="w-full px-6 py-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-2xl transition-all"
+                                >
+                                    حاول مرة أخرى
+                                </button>
+                            )}
                         </div>
+
+                        {import.meta.env.DEV && this.state.error && (
+                            <div className="mt-8 p-4 bg-slate-50 dark:bg-black/20 rounded-xl text-left font-mono text-[10px] overflow-auto max-h-32 text-slate-500">
+                                {this.state.error.message}
+                            </div>
+                        )}
                     </div>
                 </div>
             );

@@ -249,14 +249,21 @@ export const toBaseCurrency = (entity: {
     currency_code?: string;
     exchange_rate?: number;
 }): number => {
-    const amount = entity.amount ?? entity.total_amount ?? 0;
-    const exchangeRate = entity.exchange_rate ?? 1;
+    const amount = Number(entity.amount ?? entity.total_amount ?? 0);
+    const exchangeRate = Number(entity.exchange_rate ?? 1);
 
-    return convertToBaseCurrency({
-        amount,
-        currencyCode: entity.currency_code || 'SAR',
-        exchangeRate,
-    });
+    if (isNaN(amount)) return 0;
+
+    try {
+        return convertToBaseCurrency({
+            amount,
+            currencyCode: entity.currency_code || 'SAR',
+            exchangeRate,
+        });
+    } catch (e) {
+        // Fallback to raw amount if conversion fails (e.g. rate is 0 or NaN)
+        return amount;
+    }
 };
 
 /**

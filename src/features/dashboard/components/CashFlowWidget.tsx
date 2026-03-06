@@ -46,8 +46,8 @@ const CashFlowWidget: React.FC<CashFlowWidgetProps> = ({
                 </div>
                 <div className="text-center py-8">
                     <Wallet size={40} className="mx-auto text-[var(--app-text-secondary)] mb-3" />
-                    <p className="text-xs font-bold text-[var(--app-text-secondary)]">لا توجد بيانات</p>
-                    <p className="text-[10px] text-[var(--app-text-secondary)] mt-1 opacity-60">أضف سندات قبض وصرف لمشاهدة التدفق</p>
+                    <p className="text-xs font-bold text-[var(--app-text-secondary)]">بانتظار حركة مالية</p>
+                    <p className="text-[10px] text-[var(--app-text-secondary)] mt-1 opacity-60">قم بتسجيل سندات قبض أو صرف لتفعيل مؤشر التدفق</p>
                 </div>
             </div>
         );

@@ -44,7 +44,7 @@ const useDailySalesReport = (days: number = 30) => {
 
             const dailyData = Object.values(dailyMap)
                 .sort((a, b) => a.date.localeCompare(b.date))
-                .map(d => ({ ...d, total: Math.round(d.total * 100) / 100 })); // Round for display
+                .map(d => ({ ...d, total: Math.max(0, Math.round(d.total * 100) / 100) })); // Round for display and clamp to 0
 
             const totalSales = dailyData.reduce((s, d) => s + d.total, 0);
             const totalInvoices = dailyData.reduce((s, d) => s + d.count, 0);

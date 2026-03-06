@@ -52,16 +52,19 @@ const FinancialHealthScore: React.FC<FinancialHealthProps> = ({
     const expenses = parseValue(stats?.expenses);
     const debts = parseValue(stats?.debts);
 
-    const profitMargin = sales > 0 ? Math.min(100, ((sales - expenses) / sales) * 100) : 0;
-    const profitScore = Math.max(0, Math.min(30, profitMargin * 0.3));
+    const profitMargin = sales > 0 ? Math.max(-100, Math.min(100, ((sales - expenses) / sales) * 100)) : 0;
+    const profitScore = Math.max(0, Math.min(30, (profitMargin > 0 ? profitMargin * 0.3 : 0)));
     const collectionScore = Math.min(25, (targets?.collectionRate || 0) * 0.25);
-    const cashHealthRaw = cashFlow && (cashFlow.inflow + cashFlow.outflow) > 0
-        ? (cashFlow.inflow / (cashFlow.inflow + cashFlow.outflow)) * 100 : 0;
+
+    // Cash Health based on net cash flow (inflow vs outflow)
+    const totalFlow = (cashFlow?.inflow || 0) + (cashFlow?.outflow || 0);
+    const cashHealthRaw = totalFlow > 0 ? ((cashFlow?.inflow || 0) / totalFlow) * 100 : 0;
     const cashScore = Math.min(25, cashHealthRaw * 0.25);
+
     const debtRatio = sales > 0 ? Math.max(0, 100 - (debts / sales) * 100) : 0;
     const debtScore = Math.min(20, debtRatio * 0.2);
 
-    const healthScore = Math.max(0, Math.min(100, Math.round(profitScore + collectionScore + cashScore + debtScore)));
+    const healthScore = Math.max(5, Math.min(100, Math.round(profitScore + collectionScore + cashScore + debtScore)));
     const animatedScore = useCountUp(healthScore, 2000);
 
     const getScoreColor = () => {

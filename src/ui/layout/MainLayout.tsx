@@ -75,11 +75,12 @@ const MainLayout: React.FC = () => {
       )}>
         <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
 
-        {/* Connection Banner - Integrated into the flow */}
-        <div className="bg-rose-500 text-white text-[9px] font-black py-1.5 flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg animate-in slide-in-from-top duration-500">
-          <WifiOff size={11} className="animate-bounce" />
-          <span>Offline Mode Active - Performance optimized via Local Cache</span>
-        </div>
+        {!isOnline && (
+          <div className="bg-rose-500 text-white text-[9px] font-black py-1.5 flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg animate-in slide-in-from-top duration-500">
+            <WifiOff size={11} className="animate-bounce" />
+            <span>Offline Mode Active - Performance optimized via Local Cache</span>
+          </div>
+        )}
 
         <main className="flex-1 overflow-y-auto custom-scrollbar relative pb-20 md:pb-4 scroll-smooth">
           <ErrorBoundary>

@@ -11,7 +11,7 @@ export const dashboardApi = {
      * @param companyId The current active company ID
      * @param dateLimit The ISO string limit for filtering (e.g., last 30 days)
      */
-    async fetchRawDashboardData(companyId: string, dateLimit: string) {
+    async fetchRawDashboardData(companyId: string, _dateLimit: string) {
         const [
             invoicesResult,
             expensesResult,
@@ -20,7 +20,8 @@ export const dashboardApi = {
             bondResult,
             productsResult,
             categoriesResult,
-            itemsResult
+            itemsResult,
+            totalsResult
         ] = await Promise.all([
             // 1. Invoices (recent)
             supabase
@@ -28,7 +29,7 @@ export const dashboardApi = {
                 .select('id, total_amount, issue_date, status, type, party_id, currency_code, exchange_rate, parties:party_id(name)')
                 .eq('company_id', companyId)
                 .neq('status', 'void')
-                .gte('issue_date', dateLimit)
+                // .gte('issue_date', dateLimit)
                 .order('issue_date', { ascending: false })
                 .limit(1000),
             // 2. Expenses (recent)
@@ -37,27 +38,25 @@ export const dashboardApi = {
                 .select('id, amount, expense_date, description, status, category_id, currency_code, exchange_rate, expense_categories(name)')
                 .eq('company_id', companyId)
                 .neq('status', 'void')
-                .gte('expense_date', dateLimit)
+                // .gte('expense_date', dateLimit)
                 .order('expense_date', { ascending: false })
                 .limit(1000),
-            // 3. Customers (Top 100 for balance calculation)
+            // 3. Customer Debts (Absolute Total)
             supabase
                 .from('parties')
-                .select('id, name, balance, type')
+                .select('balance')
                 .eq('company_id', companyId)
                 .eq('type', 'customer')
                 .is('deleted_at', null)
-                .order('balance', { ascending: false })
-                .limit(100),
-            // 4. Suppliers (Top 100)
+                .gt('balance', 0),
+            // 4. Supplier Debts (Absolute Total)
             supabase
                 .from('parties')
-                .select('id, name, balance, type')
+                .select('balance')
                 .eq('company_id', companyId)
                 .eq('type', 'supplier')
                 .is('deleted_at', null)
-                .order('balance', { ascending: false })
-                .limit(100),
+                .gt('balance', 0),
             // 5. Journal Entries (Bonds - recent)
             supabase
                 .from('journal_entries')
@@ -70,7 +69,7 @@ export const dashboardApi = {
                 .eq('company_id', companyId)
                 .in('reference_type', ['receipt_bond', 'payment_bond'])
                 .eq('status', 'posted')
-                .gte('entry_date', dateLimit)
+                // .gte('entry_date', dateLimit)
                 .order('entry_date', { ascending: false })
                 .limit(1000) as any,
             // 6. Products with stock levels
@@ -103,8 +102,10 @@ export const dashboardApi = {
                 .eq('invoices.company_id', companyId)
                 .eq('invoices.type', 'sale')
                 .neq('invoices.status', 'void')
-                .gte('invoices.issue_date', dateLimit)
+                // .gte('invoices.issue_date', dateLimit)
                 .limit(2000) as any,
+            // 9. Server Aggregated Totals
+            supabase.rpc('get_dashboard_totals' as any, { p_company_id: companyId })
         ]);
 
         // Error aggregation
@@ -116,7 +117,8 @@ export const dashboardApi = {
             bondResult.error,
             productsResult.error,
             categoriesResult.error,
-            itemsResult.error
+            itemsResult.error,
+            totalsResult.error
         ].filter(Boolean);
 
         if (errors.length > 0) {
@@ -133,6 +135,7 @@ export const dashboardApi = {
             productsWithStock: productsResult.data || [],
             categories: categoriesResult.data || [],
             invoiceItems: itemsResult.data || [],
+            serverTotals: totalsResult.data || {}
         };
     }
 };

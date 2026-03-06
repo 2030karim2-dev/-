@@ -178,6 +178,10 @@ export const reportService = {
             }
         });
 
-        return monthlyData;
+        return monthlyData.map(d => ({
+            ...d,
+            revenues: Math.max(0, d.revenues),
+            expenses: Math.max(0, d.expenses)
+        }));
     }
 };

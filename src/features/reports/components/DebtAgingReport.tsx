@@ -72,10 +72,10 @@ const useDebtAging = () => {
             const criticalCount = partiesList.filter(p => p.days90 > 0).length;
 
             const chartData = [
-                { name: AGING_LABELS[0], value: agingBuckets.current },
-                { name: AGING_LABELS[1], value: agingBuckets.days30 },
-                { name: AGING_LABELS[2], value: agingBuckets.days60 },
-                { name: AGING_LABELS[3], value: agingBuckets.days90 },
+                { name: AGING_LABELS[0], value: Math.max(0, agingBuckets.current) },
+                { name: AGING_LABELS[1], value: Math.max(0, agingBuckets.days30) },
+                { name: AGING_LABELS[2], value: Math.max(0, agingBuckets.days60) },
+                { name: AGING_LABELS[3], value: Math.max(0, agingBuckets.days90) },
             ];
 
             return {
