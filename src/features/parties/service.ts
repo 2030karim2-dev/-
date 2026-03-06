@@ -140,7 +140,7 @@ export const partiesService = {
       id: cat.id as string,
       name: cat.name as string,
       type: cat.type as PartyType,
-      count: partyList.filter((p: Record<string, unknown>) => p.category === cat.name).length
+      count: partyList.filter((p: Record<string, unknown>) => p.category_id === cat.id).length
     }));
 
     return result;

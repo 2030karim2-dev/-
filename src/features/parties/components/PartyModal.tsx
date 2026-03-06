@@ -46,7 +46,11 @@ const PartyModal: React.FC<PartyModalProps> = ({ isOpen, onClose, onSubmit, isSu
     }
   }, [isOpen, initialData, reset, partyType]);
 
-  const title = `${initialData ? 'تعديل' : 'إضافة'} ${partyType === 'customer' ? 'عميل' : 'مورد'}`;
+  const entityType = partyType === 'customer' ? t('customer') : t('supplier');
+  const title = initialData
+    ? t('edit_entity', { entity: entityType })
+    : t('add_entity', { entity: entityType });
+
   const currentStatus = watch('status');
 
   const handleSaveCategory = (data: { name: string }) => {
@@ -152,6 +156,7 @@ const PartyModal: React.FC<PartyModalProps> = ({ isOpen, onClose, onSubmit, isSu
                       type="button"
                       onClick={() => setIsCategoryModalOpen(true)}
                       className="w-12 h-12 flex-shrink-0 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                      title={t('add_new_category')}
                     >
                       <Plus size={18} />
                     </button>

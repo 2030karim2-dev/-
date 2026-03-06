@@ -97,7 +97,10 @@ export const useCategoryMutations = (type: PartyType) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['party_categories', user?.company_id, type] });
-      showToast("تم حفظ الفئة", 'success');
+      showToast("تم حفظ الفئة بنجاح", 'success');
+    },
+    onError: (err: any) => {
+      showToast(err.message || "فشل حفظ الفئة", 'error');
     }
   });
 
@@ -106,6 +109,9 @@ export const useCategoryMutations = (type: PartyType) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['party_categories', user?.company_id, type] });
       showToast("تم حذف الفئة", 'info');
+    },
+    onError: (err: any) => {
+      showToast(err.message || "لا يمكن حذف هذه الفئة حالياً", 'error');
     }
   });
 

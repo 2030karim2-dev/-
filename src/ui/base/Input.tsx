@@ -11,10 +11,9 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, icon, onIconClick, variant = 'default', inputRef, ...props }, _ref) => {
+  ({ className, label, error, icon, onIconClick, variant = 'default', inputRef, ...props }, ref) => {
     const isMicro = variant === 'micro';
-    const internalRef = React.useRef<HTMLInputElement>(null);
-    const combinedRef = (inputRef || internalRef) as React.RefObject<HTMLInputElement>;
+    const combinedRef = (ref || inputRef) as React.RefObject<HTMLInputElement>;
 
     // Handle keyboard navigation between inputs
     const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
