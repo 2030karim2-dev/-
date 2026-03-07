@@ -1,20 +1,20 @@
 import React from 'react';
-import { useSuppliers } from '../hooks';
+import { useParties } from '../../parties/hooks';
 import { Star } from 'lucide-react';
 
 interface SupplierRatingCardProps {
     companyId: string;
 }
 
-export const SupplierRatingCard: React.FC<SupplierRatingCardProps> = ({ companyId }) => {
-    const { data: suppliers, isLoading } = useSuppliers(companyId);
+export const SupplierRatingCard: React.FC<SupplierRatingCardProps> = () => {
+    const { data: suppliers, isLoading } = useParties('supplier');
 
     if (isLoading) {
         return <div className="p-4 text-gray-500">جاري التحميل...</div>;
     }
 
     const topSuppliers = suppliers
-        ?.sort((a, b) => (b.balance || 0) - (a.balance || 0))
+        ?.sort((a: any, b: any) => (b.balance || 0) - (a.balance || 0))
         .slice(0, 5);
 
     return (

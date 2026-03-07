@@ -111,10 +111,7 @@ const InvoiceCart: React.FC<InvoiceCartProps> = ({
                         <span className="text-gray-500">{t('subtotal') || 'المجموع الفرعي'}</span>
                         <span className="font-medium">{summary.subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">{t('tax') || 'الضريبة'}</span>
-                        <span className="font-medium">{summary.taxAmount.toFixed(2)}</span>
-                    </div>
+
                     {summary.discountAmount > 0 && (
                         <div className="flex justify-between text-sm text-green-600">
                             <span>{t('discount') || 'الخصم'}</span>

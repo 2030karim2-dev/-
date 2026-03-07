@@ -1,5 +1,5 @@
 
-import { accountsApi, reportsApi } from '../api/index';
+import { reportsApi } from '../api/index';
 import { TrialBalanceItem, LedgerEntry } from '../types/index';
 import { supabase } from '../../../lib/supabaseClient';
 import { logger } from '../../../core/utils/logger';
@@ -7,6 +7,14 @@ import { logger } from '../../../core/utils/logger';
 
 export const reportService = {
     getLedger: async (companyId: string, accountId: string, fromDate?: string, toDate?: string): Promise<LedgerEntry[]> => {
+        // Fix #14: Get account type to correctly compute running balance
+        const { data: accountData } = await supabase.from('accounts')
+            .select('type')
+            .eq('id', accountId)
+            .single();
+        const accountType = accountData?.type || 'asset';
+        const isDebitNature = ['asset', 'expense'].includes(accountType);
+
         let query = supabase.from('journal_entry_lines')
             .select(`
             journal:journal_entries(entry_date, entry_number, status, company_id),
@@ -25,7 +33,13 @@ export const reportService = {
 
         let balance = 0;
         return (data || []).map((line) => {
-            balance += (Number(line.debit_amount) || 0) - (Number(line.credit_amount) || 0);
+            // Debit-nature accounts (asset/expense): balance = debit - credit
+            // Credit-nature accounts (liability/equity/revenue): balance = credit - debit
+            if (isDebitNature) {
+                balance += (Number(line.debit_amount) || 0) - (Number(line.credit_amount) || 0);
+            } else {
+                balance += (Number(line.credit_amount) || 0) - (Number(line.debit_amount) || 0);
+            }
             return {
                 date: line.journal?.entry_date,
                 journal_id: '',
@@ -43,45 +57,30 @@ export const reportService = {
     },
 
     getTrialBalance: async (companyId: string, fromDate?: string, toDate?: string): Promise<TrialBalanceItem[]> => {
-        // الخطوة 1: جلب كافة الحسابات
-        const { data: accounts, error: accError } = await accountsApi.getAccounts(companyId);
-        if (accError) throw accError;
+        // Fix #15: Use server-side RPC which correctly handles account types
+        const now = new Date();
+        const from = fromDate || `${now.getFullYear()}-01-01`;
+        const to = toDate || now.toISOString().split('T')[0];
 
-        // الخطوة 2: جلب كافة القيود المرحلة خلال الفترة
-        const { data: lines, error: linesError } = await reportsApi.getJournalLines(companyId, fromDate, toDate);
-        if (linesError) throw linesError;
-
-        // ملاحظة: journal_entry_lines تخزّن المبالغ بالعملة الأساسية (SAR) بالفعل
-        // لذلك لا نحتاج لتحويل العملة هنا. حقلا foreign_amount و exchange_rate
-        // موجودان للوثائق فقط.
-
-        // الخطوة 3: تجميع الحركات المدينة والدائنة لكل حساب
-        const balanceMap = new Map<string, { total_debit: number; total_credit: number }>();
-        (lines || []).forEach(line => {
-            const aid = line.account?.id || line.account_id;
-            const current = balanceMap.get(aid) || { total_debit: 0, total_credit: 0 };
-
-            current.total_debit += (line.debit_amount || 0);
-            current.total_credit += (line.credit_amount || 0);
-            balanceMap.set(aid, current);
+        const { data, error } = await supabase.rpc('report_trial_balance', {
+            p_company_id: companyId,
+            p_from: from,
+            p_to: to
         });
+        if (error) throw error;
 
-        // الخطوة 4: دمج هيكل الحسابات مع الأرصدة المجمعة
-        return (accounts || []).map((acc) => {
-            const balances = balanceMap.get(acc.id) || { total_debit: 0, total_credit: 0 };
-            const net_balance = balances.total_debit - balances.total_credit;
-
-            return {
-                account_id: acc.id,
-                code: acc.code,
-                name: acc.name_ar,
-                type: acc.type,
-                total_debit: balances.total_debit,
-                total_credit: balances.total_credit,
-                net_balance,
-                currency_code: acc.currency_code || 'SAR' // إضافة كود العملة للواجهة
-            };
-        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (data || []).map((row: any) => ({
+            account_id: row.account_id,
+            code: row.account_code,
+            name: row.account_name,
+            type: row.account_type,
+            total_debit: Number(row.total_debit) || 0,
+            total_credit: Number(row.total_credit) || 0,
+            // Server-side already computes balance based on account type
+            net_balance: Number(row.balance) || 0,
+            currency_code: 'SAR'
+        }));
     },
 
     getFinancials: async (companyId: string, fromDate?: string, toDate?: string) => {

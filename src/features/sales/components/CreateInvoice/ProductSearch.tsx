@@ -15,8 +15,8 @@ interface ProductSearchProps {
     onClose?: () => void;
 }
 
-const ProductSearch: React.FC<ProductSearchProps> = ({ onSelectProduct,}) => {
-    const {} = useTranslation();
+const ProductSearch: React.FC<ProductSearchProps> = ({ onSelectProduct, }) => {
+    const { } = useTranslation();
     const { user } = useAuthStore();
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -34,7 +34,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onSelectProduct,}) => {
             quantity: 1,
             unitPrice: product.sale_price,
             costPrice: product.purchase_price,
-            taxRate: 15,
+
             maxStock: product.quantity || 999,
             isCoreReturn: product.is_core === true
         };

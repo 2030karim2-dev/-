@@ -62,7 +62,7 @@ const ExpenseBreakdownChart: React.FC<Props> = ({ data }) => {
       <div className="absolute top-0 right-0 text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
         Interactive Analysis
       </div>
-      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={320}>
+      <ResponsiveContainer width="100%" height={320} minWidth={0}>
         <PieChart>
           <defs>
             {data.map((entry, index) => (

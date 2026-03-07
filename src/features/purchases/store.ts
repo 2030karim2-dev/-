@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 import { Product } from '../inventory/types';
-import { useTaxDiscountStore } from '../settings/taxDiscountStore';
+import { useDiscountStore } from '../settings/taxDiscountStore';
 
 export interface PurchaseInvoiceItem {
   id: string;
@@ -13,7 +13,7 @@ export interface PurchaseInvoiceItem {
   quantity: number;
   costPrice: number;
   discount: number;
-  tax: number;
+
 }
 
 interface PurchaseState {
@@ -29,7 +29,7 @@ interface PurchaseState {
   cashboxId: string;
 
   // UI Settings
-  showTax: boolean;
+
   showDiscount: boolean;
 
   // Actions
@@ -42,7 +42,7 @@ interface PurchaseState {
   calculateTotals: () => void;
   setSupplier: (supplier: { id: string, name: string } | null) => void;
   setMetadata: (field: string, value: string | number) => void;
-  toggleColumn: (field: 'showTax' | 'showDiscount') => void;
+  toggleColumn: (field: 'showDiscount') => void;
   resetCart: () => void;
 }
 
@@ -56,7 +56,7 @@ const createNewItem = (): PurchaseInvoiceItem => ({
   quantity: 0,
   costPrice: 0,
   discount: 0,
-  tax: 0,
+
 });
 
 export const usePurchaseStore = create<PurchaseState>((set, get) => ({
@@ -70,7 +70,7 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
   warehouseId: 'wh_main',
   invoiceType: 'cash',
   cashboxId: '',
-  showTax: false,
+
   showDiscount: false,
 
   initializeItems: (count) => {
@@ -91,7 +91,7 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
       quantity: Number(item.quantity) || 1,
       costPrice: Number(item.unitPrice ?? item.costPrice) || 0,
       discount: 0,
-      tax: 0
+
     }));
 
     // Ensure we have at least 6 rows for UI consistency
@@ -150,14 +150,13 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
 
   calculateTotals: () => {
     set(state => {
-      const { taxEnabled, discountEnabled } = useTaxDiscountStore.getState();
+      const { discountEnabled } = useDiscountStore.getState();
 
       const grandTotal = state.items.reduce((acc, item) => {
         const sub = (Number(item.quantity) * Number(item.costPrice));
         const discount = (discountEnabled && state.showDiscount) ? (Number(item.discount) || 0) : 0;
         const afterDiscount = sub - discount;
-        const tax = (taxEnabled && state.showTax) ? (afterDiscount * ((Number(item.tax) || 0) / 100)) : 0;
-        return acc + afterDiscount + tax;
+        return acc + afterDiscount;
       }, 0);
       return { totals: { grandTotal } };
     });

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useSalesStore, SalesCartItem } from '../../store';
-import { useTaxDiscountStore } from '../../../settings/taxDiscountStore';
+import { useDiscountStore } from '../../../settings/taxDiscountStore';
 import { Product } from '../../../inventory/types';
 import { Plus, Settings } from 'lucide-react';
 import { cn } from '../../../../core/utils';
@@ -10,10 +10,8 @@ import InvoiceRow from './InvoiceRow';
 
 const InteractiveInvoiceTable: React.FC = () => {
   const {
-    items, addItem, updateItem, setProductForRow, removeItem,
-    showDiscount, toggleColumn
+    items, setProductForRow, addItem, updateItem, removeItem, showDiscount, toggleColumn
   } = useSalesStore();
-  const { taxEnabled: showTax } = useTaxDiscountStore();
 
   const tableRef = useRef<HTMLTableElement>(null);
   const [modalState, setModalState] = useState<{ isOpen: boolean; rowIndex: number; query: string }>({
@@ -30,10 +28,9 @@ const InteractiveInvoiceTable: React.FC = () => {
         quantity: 100,
         price: 120,
         discount: 100,
-        tax: 100,
         total: 140,
       };
-    } catch { return { index: 40, description: 350, quantity: 100, price: 120, discount: 100, tax: 100, total: 140 }; }
+    } catch { return { index: 40, description: 350, quantity: 100, price: 120, discount: 100, total: 140 }; }
   })();
 
   const [colWidths, setColWidths] = useState<Record<string, number>>(initialWidths);
@@ -150,7 +147,7 @@ const InteractiveInvoiceTable: React.FC = () => {
         </div>
         <div className="flex gap-1.5">
           <div className="flex bg-gray-100 dark:bg-slate-800 p-0.5 rounded-lg border dark:border-slate-800">
-            {useTaxDiscountStore.getState().discountEnabled && (
+            {useDiscountStore.getState().discountEnabled && (
               <button onClick={() => toggleColumn('showDiscount')} className={cn("px-4 py-1 text-[9px] font-bold uppercase transition-all rounded-md", showDiscount ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-gray-400")}>خصم</button>
             )}
 
@@ -198,7 +195,6 @@ const InteractiveInvoiceTable: React.FC = () => {
                 item={item}
                 index={index}
                 showDiscount={showDiscount}
-                showTax={showTax}
                 onUpdate={updateItem}
                 onRemove={removeItem}
                 onKeyDown={handleKeyDown}

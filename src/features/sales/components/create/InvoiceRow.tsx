@@ -7,7 +7,7 @@ interface InvoiceRowProps {
     item: SalesCartItem;
     index: number;
     showDiscount: boolean;
-    showTax?: boolean;
+
     onUpdate: (index: number, field: keyof SalesCartItem, value: string | number) => void;
     onRemove: (index: number) => void;
     onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>, rowIndex: number, field: keyof SalesCartItem) => void;
@@ -18,7 +18,7 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({
     item,
     index,
     showDiscount,
-    showTax,
+
     onUpdate,
     onRemove,
     onKeyDown,
@@ -59,12 +59,6 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({
                     <input type="number" value={item.discount || ''} onChange={(e) => onUpdate(index, 'discount', parseFloat(e.target.value) || 0)} onKeyDown={(e) => onKeyDown(e, index, 'discount')} data-row-index={index} data-col-field="discount" className="w-full h-full p-2 bg-transparent outline-none text-center font-mono font-bold text-[11px] text-rose-500 focus:bg-rose-50 dark:focus:bg-slate-800" placeholder="0" />
                 </td>
             )}
-            {showTax && (
-                <td className="p-0 border-l dark:border-slate-800">
-                    <input type="number" value={item.tax || ''} onChange={(e) => onUpdate(index, 'tax', parseFloat(e.target.value) || 0)} onKeyDown={(e) => onKeyDown(e, index, 'tax')} data-row-index={index} data-col-field="tax" className="w-full h-full p-2 bg-transparent outline-none text-center font-mono font-bold text-[11px] text-orange-500 focus:bg-orange-50 dark:focus:bg-slate-800" placeholder="0%" />
-                </td>
-            )}
-
 
             <td dir="ltr" className="p-2 text-left font-mono font-bold text-[11px] text-gray-800 dark:text-white bg-gray-50/50 dark:bg-slate-800/30">
                 {((Number(item.quantity) * Number(item.price)) - (showDiscount ? Number(item.discount || 0) : 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}

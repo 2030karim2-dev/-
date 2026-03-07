@@ -42,3 +42,30 @@ export const useBondMutation = () => {
     }
   });
 };
+
+export const useDeleteBond = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const { showToast } = useFeedbackStore();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      if (!user) throw new Error("جلسة العمل منتهية");
+
+      // فحص الصلاحية لحذف السندات
+      AuthorizeActionUsecase.validateAction(user, 'delete_bond');
+
+      return bondsService.deleteBond(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bonds'] });
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+      queryClient.invalidateQueries({ queryKey: ['financials'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      showToast("تم حذف وإلغاء السند بنجاح", 'success');
+    },
+    onError: (error: Error) => {
+      showToast(error.message || "فشل حذف السند", 'error', error);
+    }
+  });
+};

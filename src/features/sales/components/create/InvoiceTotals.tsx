@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useSalesStore } from '../../store';
-import { useTaxDiscountStore } from '../../../settings/taxDiscountStore';
+import { useDiscountStore } from '../../../settings/taxDiscountStore';
 import { formatCurrency, cn } from '../../../../core/utils';
 import { Wallet } from 'lucide-react';
 
@@ -20,12 +20,12 @@ const InvoiceTotals: React.FC = () => {
                 </div>
 
                 <div className="w-full md:w-80 flex flex-col border-l dark:border-slate-800">
-                    <div className={cn("grid", (useTaxDiscountStore.getState().taxEnabled || useTaxDiscountStore.getState().discountEnabled) ? "grid-cols-2" : "grid-cols-1")}>
+                    <div className={cn("grid", useDiscountStore.getState().discountEnabled ? "grid-cols-2" : "grid-cols-1")}>
                         <div className="p-3 border-b dark:border-slate-800 text-right">
                             <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">المجموع الفرعي</span>
                             <span dir="ltr" className="text-sm font-bold font-mono text-gray-700 dark:text-slate-300">{formatCurrency(summary.subtotal, currency)}</span>
                         </div>
-                        {useTaxDiscountStore.getState().discountEnabled && (
+                        {useDiscountStore.getState().discountEnabled && (
                             <div className="p-3 border-b border-l dark:border-slate-800 text-right">
                                 <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">إجمالي الخصم</span>
                                 <span dir="ltr" className="text-sm font-bold font-mono text-rose-500">{formatCurrency(summary.discountAmount, currency)}</span>

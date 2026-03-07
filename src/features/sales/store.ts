@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 import { Product } from '../inventory/types';
-import { useTaxDiscountStore } from '../settings/taxDiscountStore';
+import { useDiscountStore } from '../settings/taxDiscountStore';
 
 /**
  * SalesCartItem - Used for the sales cart/UI state
@@ -18,7 +18,7 @@ export interface SalesCartItem {
   basePrice: number; // Price in SAR (base currency)
   price: number;     // Converted price based on current exchange rate
   discount: number;
-  tax: number;
+
   costPrice: number;
 }
 
@@ -26,7 +26,7 @@ export interface SalesCartItem {
 
 export interface SalesSummary {
   subtotal: number;
-  taxAmount: number;
+
   discountAmount: number;
   totalAmount: number;
 }
@@ -42,7 +42,7 @@ interface SalesState {
   warehouseId: string;
   cashboxId: string;
 
-  showTax: boolean;
+
   showDiscount: boolean;
 
   // Actions
@@ -56,7 +56,7 @@ interface SalesState {
   calculateTotals: () => void;
   setCustomer: (customer: { id: string, name: string, phone?: string } | null) => void;
   setMetadata: (field: string, value: string | boolean | null | number) => void;
-  toggleColumn: (field: 'showTax' | 'showDiscount') => void;
+  toggleColumn: (field: 'showDiscount') => void;
   resetCart: () => void;
 }
 
@@ -71,21 +71,21 @@ const createNewItem = (): SalesCartItem => ({
   basePrice: 0,
   price: 0,
   discount: 0,
-  tax: 0,
+
   costPrice: 0,
 });
 
 export const useSalesStore = create<SalesState>((set, get) => ({
   items: [],
   selectedCustomer: null,
-  summary: { subtotal: 0, taxAmount: 0, discountAmount: 0, totalAmount: 0 },
+  summary: { subtotal: 0, discountAmount: 0, totalAmount: 0 },
   invoiceType: 'cash',
   currency: 'SAR',
   exchangeRate: 1,
   exchangeOperator: 'multiply',
   warehouseId: 'wh_main',
   cashboxId: 'box_1',
-  showTax: false,
+
   showDiscount: false,
 
   initializeItems: (count) => set({ items: Array.from({ length: count }, createNewItem) }),
@@ -148,7 +148,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         };
       }
 
-      const { taxEnabled, defaultTaxRate } = useTaxDiscountStore.getState();
+
       const basePrice = product.selling_price || 0;
       const convertedPrice = state.exchangeOperator === 'divide'
         ? basePrice * state.exchangeRate
@@ -165,7 +165,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         basePrice: basePrice,
         price: convertedPrice,
         discount: 0,
-        tax: taxEnabled ? defaultTaxRate : 0,
+
         costPrice: product.cost_price || 0
       };
 
@@ -187,11 +187,9 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   calculateTotals: () => {
     set(state => {
       let subtotal = 0;
-      let taxAmount = 0;
       let discountAmount = 0;
 
-      // Read tax/discount settings
-      const { taxEnabled, defaultTaxRate, discountEnabled } = useTaxDiscountStore.getState();
+      const { discountEnabled } = useDiscountStore.getState();
 
       state.items.forEach(item => {
         const qty = Number(item.quantity) || 0;
@@ -202,21 +200,12 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         // Discount: only if globally enabled AND column shown
         const lineDiscount = (discountEnabled && state.showDiscount) ? (Number(item.discount) || 0) : 0;
         discountAmount += lineDiscount;
-
-        const afterDiscount = lineSub - lineDiscount;
-
-        // Tax: only if globally enabled AND column shown
-        if (taxEnabled && state.showTax) {
-          const itemTaxRate = Number(item.tax) > 0 ? Number(item.tax) : defaultTaxRate;
-          const lineTax = afterDiscount * (itemTaxRate / 100);
-          taxAmount += lineTax;
-        }
       });
 
-      const totalAmount = subtotal - discountAmount + taxAmount;
+      const totalAmount = subtotal - discountAmount;
 
       return {
-        summary: { subtotal, taxAmount, discountAmount, totalAmount }
+        summary: { subtotal, discountAmount, totalAmount }
       };
     });
   },
@@ -252,7 +241,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   resetCart: () => set({
     items: [],
     selectedCustomer: null,
-    summary: { subtotal: 0, taxAmount: 0, discountAmount: 0, totalAmount: 0 },
+    summary: { subtotal: 0, discountAmount: 0, totalAmount: 0 },
     invoiceType: 'cash',
     currency: 'SAR',
     exchangeRate: 1,

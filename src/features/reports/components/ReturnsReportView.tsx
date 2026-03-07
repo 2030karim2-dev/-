@@ -517,7 +517,7 @@ const ReturnsReportView: React.FC = () => {
                         </div>
                     </div>
                     <div className="h-[320px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={320}>
                             <LineChart data={monthlyTrends}>
                                 <defs>
                                     <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
@@ -574,7 +574,7 @@ const ReturnsReportView: React.FC = () => {
                     </div>
                     {reasonDistribution.length > 0 ? (
                         <div className="h-[320px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height={320}>
                                 <RePieChart>
                                     <Pie
                                         data={reasonDistribution}
@@ -615,7 +615,7 @@ const ReturnsReportView: React.FC = () => {
                     </div>
                 </div>
                 <div className="h-[350px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height={350}>
                         <BarChart data={monthlyTrends}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#94a3b8" opacity={0.1} />
                             <XAxis

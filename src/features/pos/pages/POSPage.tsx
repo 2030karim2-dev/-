@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Store, ScanBarcode, RotateCcw, PauseCircle, X, ShoppingCart, ChevronLeft } from 'lucide-react';
+import { Store, ScanBarcode, RotateCcw, PauseCircle, ShoppingCart, ChevronLeft, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import MicroHeader from '../../../ui/base/MicroHeader';
 import ProductGrid from '../components/ProductGrid';
 // Fix: Changed default import to named import to resolve "no default export" error.
@@ -16,6 +17,7 @@ import { formatCurrency } from '../../../core/utils';
 
 
 const POSPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -50,7 +52,7 @@ const POSPage: React.FC = () => {
         unitPrice: i.price,
         costPrice: i.costPrice || 0,
         maxStock: 0,
-        taxRate: i.tax
+
       })),
       discount: 0,
       paymentMethod: method === 'card' ? 'credit' : 'cash',
@@ -84,6 +86,13 @@ const POSPage: React.FC = () => {
         )}
       </button>
       <button
+        onClick={() => navigate('/')}
+        className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-100 active:scale-95 transition-all border border-slate-100 dark:border-slate-800"
+        title="الرجوع للرئيسية"
+      >
+        <Home size={18} />
+      </button>
+      <button
         onClick={() => resetCart()}
         className="p-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-xl hover:bg-rose-100 active:scale-95 transition-all border border-rose-100 dark:border-rose-900/30"
         title={t('clear_cart')}
@@ -103,6 +112,7 @@ const POSPage: React.FC = () => {
         searchPlaceholder={t('pos_search_placeholder')}
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
+        searchWidth="md:w-[550px] lg:w-[800px] xl:w-[1000px]"
         extraRow={
           <button
             onClick={() => setIsScannerOpen(true)}

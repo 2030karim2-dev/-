@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { useTaxDiscountStore } from '../../taxDiscountStore';
-import {   Tag } from 'lucide-react';
+import { useDiscountStore } from '../../taxDiscountStore';
+import { Tag } from 'lucide-react';
 
-const TaxDiscountSettings: React.FC = () => {
-    const { discountEnabled, setDiscountEnabled } = useTaxDiscountStore();
+const DiscountSettings: React.FC = () => {
+    const { discountEnabled, setDiscountEnabled } = useDiscountStore();
 
     return (
         <div className="space-y-6">
@@ -44,4 +44,4 @@ const TaxDiscountSettings: React.FC = () => {
     );
 };
 
-export default TaxDiscountSettings;
+export default DiscountSettings;

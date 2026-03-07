@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trash2, Plus, Minus, ShoppingCart, CreditCard, PauseCircle, Coins } from 'lucide-react';
 import { useSalesStore } from '../../sales/store';
-import { useTaxDiscountStore } from '../../settings/taxDiscountStore';
+import { useDiscountStore } from '../../settings/taxDiscountStore';
 import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
 import CustomerSelector from '../../sales/components/CreateInvoice/CustomerSelector';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
@@ -114,18 +114,13 @@ export const POSCart: React.FC<POSCartProps> = ({ onPay, onSuspend }) => {
                         <span>{t('subtotal')}</span>
                         <span dir="ltr" className="font-mono">{formatCurrency(summary.subtotal)} {currency}</span>
                     </div>
-                    {useTaxDiscountStore.getState().discountEnabled && summary.discountAmount > 0 && (
+                    {useDiscountStore.getState().discountEnabled && summary.discountAmount > 0 && (
                         <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest text-rose-500">
                             <span>الخصم</span>
                             <span dir="ltr" className="font-mono">-{formatCurrency(summary.discountAmount)} {currency}</span>
                         </div>
                     )}
-                    {useTaxDiscountStore.getState().taxEnabled && (
-                        <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest">
-                            <span>{t('tax_vat')}</span>
-                            <span dir="ltr" className="font-mono">{formatCurrency(summary.taxAmount)} {currency}</span>
-                        </div>
-                    )}
+
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-t border-white/10">

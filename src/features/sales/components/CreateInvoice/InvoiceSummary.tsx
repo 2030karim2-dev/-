@@ -27,11 +27,6 @@ const InvoiceSummary: React.FC<InvoiceSummaryProps> = ({
                     <span className="font-medium">{summary.subtotal.toFixed(2)}</span>
                 </div>
 
-                <div className="flex justify-between items-center">
-                    <span className="text-gray-500">الضريبة (15%)</span>
-                    <span className="font-medium">{summary.taxAmount.toFixed(2)}</span>
-                </div>
-
                 {showDiscount && summary.discountAmount > 0 && (
                     <div className="flex justify-between items-center text-green-600">
                         <span>الخصم</span>

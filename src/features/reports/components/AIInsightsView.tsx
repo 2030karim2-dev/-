@@ -101,7 +101,7 @@ const AIInsightsView: React.FC = () => {
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                         <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-6 relative">مؤشر الصحة المالية</h3>
                         <div className="h-48 w-full relative z-10 flex flex-col items-center justify-center">
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                            <ResponsiveContainer width="100%" height={192}>
                                 <RadialBarChart
                                     cx="50%" cy="50%"
                                     innerRadius="75%" outerRadius="100%"

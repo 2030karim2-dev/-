@@ -34,24 +34,24 @@ interface MonthlyCashFlow {
 
 export const reportsService = {
   getTrialBalance: async (companyId: string): Promise<TrialBalanceItem[]> => {
-    const { data, error } = await reportsApi.getAccountingData(companyId);
+    // Use server-side RPC which correctly handles account types
+    const now = new Date();
+    const fromDate = `${now.getFullYear()}-01-01`;
+    const toDate = now.toISOString().split('T')[0];
+
+    const { data, error } = await reportsApi.getTrialBalanceRPC(companyId, fromDate, toDate);
     if (error) throw error;
 
-    return (data || []).map((acc) => {
-      // حساب المجاميع من الخطوط (Lines) المرتبطة بالحساب
-      const totalDebit = acc.journal_entry_lines?.reduce((s: number, l: any) => s + Number(l.debit_amount || 0), 0) || 0;
-      const totalCredit = acc.journal_entry_lines?.reduce((s: number, l: any) => s + Number(l.credit_amount || 0), 0) || 0;
-
-      return {
-        id: acc.id,
-        code: acc.code,
-        name: acc.name_ar,
-        type: acc.type,
-        totalDebit,
-        totalCredit,
-        netBalance: totalDebit - totalCredit
-      };
-    });
+    return (data || []).map((acc: any) => ({
+      id: acc.account_id,
+      code: acc.account_code,
+      name: acc.account_name,
+      type: acc.account_type,
+      totalDebit: Number(acc.total_debit) || 0,
+      totalCredit: Number(acc.total_credit) || 0,
+      // Server-side already computes balance based on account type
+      netBalance: Number(acc.balance) || 0
+    }));
   },
 
   getProfitAndLoss: async (companyId: string): Promise<{

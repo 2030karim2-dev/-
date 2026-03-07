@@ -257,7 +257,7 @@ const InventoryMovementView: React.FC = () => {
                             </div>
                             <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-12">اتـجـاه الرصـيـد</h4>
                             <div className="h-full w-full">
-                                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={200}>
+                                <ResponsiveContainer width="100%" height={200}>
                                     <AreaChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                                         <XAxis dataKey="date" hide />
                                         <YAxis hide />

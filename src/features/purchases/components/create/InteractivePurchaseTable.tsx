@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { usePurchaseStore, PurchaseInvoiceItem } from '../../store';
-import { useTaxDiscountStore } from '../../../settings/taxDiscountStore';
+import { useDiscountStore } from '../../../settings/taxDiscountStore';
 import { Product } from '../../../inventory/types';
 import { Plus, Trash2, Settings, Search } from 'lucide-react';
 import { cn } from '../../../../core/utils';
@@ -10,7 +10,7 @@ import ProductSelectionModal from '../../../sales/components/create/ProductSelec
 const InteractivePurchaseTable: React.FC = () => {
     const {
         items, initializeItems, addItem, updateItem, setProductForRow, removeItem,
- showDiscount, toggleColumn
+        showDiscount, toggleColumn
     } = usePurchaseStore();
 
     const tableRef = useRef<HTMLTableElement>(null);
@@ -97,7 +97,7 @@ const InteractivePurchaseTable: React.FC = () => {
             {/* Table Toolbar */}
             <div className="p-1.5 flex justify-end gap-2 bg-blue-600 dark:bg-slate-950 border-b dark:border-slate-800">
                 <div className="flex bg-white/10 p-0.5 rounded-none border border-white/20">
-                    {useTaxDiscountStore.getState().discountEnabled && (
+                    {useDiscountStore.getState().discountEnabled && (
                         <button onClick={() => toggleColumn('showDiscount')}
                             className={cn("px-3 py-1 text-[9px] font-bold uppercase transition-all", showDiscount ? "bg-white text-blue-600" : "text-blue-100")}>إظهار الخصم</button>
                     )}

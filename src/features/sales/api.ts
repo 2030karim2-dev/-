@@ -53,10 +53,14 @@ export const salesApi = {
   },
 
   commitInvoiceRPC: async (companyId: string, userId: string, payload: CreateInvoicePayload): Promise<InvoiceResponse> => {
+    if (!payload.partyId) {
+      throw new Error('يجب اختيار العميل قبل إنشاء الفاتورة');
+    }
+
     const rpcParams = {
       p_company_id: companyId,
       p_user_id: userId,
-      p_party_id: payload.partyId || '',
+      p_party_id: payload.partyId,
       p_items: payload.items.map(i => ({ product_id: i.productId, quantity: i.quantity, unit_price: i.unitPrice })),
       ...(payload.paymentMethod ? { p_payment_method: payload.paymentMethod } : {}),
       ...(payload.notes ? { p_notes: payload.notes } : {}),
@@ -71,10 +75,14 @@ export const salesApi = {
   },
 
   commitReturnRPC: async (companyId: string, userId: string, payload: CreateInvoicePayload): Promise<InvoiceResponse> => {
+    if (!payload.partyId) {
+      throw new Error('يجب اختيار العميل قبل إنشاء مرتجع المبيعات');
+    }
+
     const rpcParams = {
       p_company_id: companyId,
       p_user_id: userId,
-      p_party_id: payload.partyId || '',
+      p_party_id: payload.partyId,
       p_items: payload.items.map(i => ({ product_id: i.productId, quantity: i.quantity, unit_price: i.unitPrice })),
       ...(payload.notes ? { p_notes: payload.notes } : {}),
       ...(payload.currency ? { p_currency: payload.currency } : {}),

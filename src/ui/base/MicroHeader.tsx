@@ -1,5 +1,5 @@
 import React from 'react';
-import { LucideIcon, ArrowRight, ArrowLeft, Search } from 'lucide-react';
+import { LucideIcon, ArrowRight, ArrowLeft, Search, X } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // import { cn } from '../../core/utils';
 import { useTranslation } from '../../lib/hooks/useTranslation';
@@ -17,6 +17,7 @@ interface MicroHeaderProps {
   searchPlaceholder?: string;
   searchValue?: string;
   onSearchChange?: (val: string) => void;
+  searchWidth?: string;
   extraRow?: React.ReactNode;
   enableDragDrop?: boolean;
   enableKeyboardNav?: boolean;
@@ -35,6 +36,7 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
   searchPlaceholder,
   searchValue,
   onSearchChange,
+  searchWidth = "md:w-80",
   extraRow,
   enableDragDrop = false,
   enableKeyboardNav = true,
@@ -118,7 +120,7 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
 
             {/* Search/Filter Section */}
             {(onSearchChange || extraRow) && (
-              <div className="flex items-center gap-2 w-full md:w-80 shrink-0">
+              <div className={`flex items-center gap-2 w-full ${searchWidth} shrink-0`}>
                 {onSearchChange && (
                   <div className="relative flex-1 group">
                     <button
@@ -137,9 +139,20 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
                           triggerSearch();
                         }
                       }}
-                      className="w-full bg-[var(--app-surface)] border border-[var(--app-border)] rounded-lg py-1.5 pr-10 pl-4 text-xs font-medium outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:opacity-50"
+                      className="w-full bg-[var(--app-surface)] border border-[var(--app-border)] rounded-lg py-1.5 pr-10 pl-10 text-xs font-medium outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:opacity-50"
                       aria-label={searchPlaceholder || "Search"}
                     />
+                    {localSearch && (
+                      <button
+                        onClick={() => {
+                          setLocalSearch('');
+                          onSearchChange('');
+                        }}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 bg-[var(--app-bg)]/80 backdrop-blur-sm p-0.5 rounded-full transition-colors z-10"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
                   </div>
                 )}
                 {extraRow}

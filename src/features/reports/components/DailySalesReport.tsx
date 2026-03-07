@@ -183,9 +183,9 @@ const DailySalesReport: React.FC = () => {
             {(data?.dailyData.length || 0) > 0 && (
                 <div className="bg-white dark:bg-slate-900 rounded-lg border dark:border-slate-800 p-4 shadow-sm">
                     <h4 className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">اتجاه المبيعات اليومي</h4>
-                    <div className="w-full h-[220px] relative" style={{ minHeight: '220px' }}>
+                    <div className="w-full h-[220px] relative">
                         {isMounted && (
-                            <ResponsiveContainer key="daily-sales-chart" width="99%" height="100%" debounce={1} minWidth={0} minHeight={220}>
+                            <ResponsiveContainer key="daily-sales-chart" width="99%" height={220} debounce={1}>
                                 <BarChart data={data?.dailyData || []}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                                     <XAxis dataKey="date" tick={{ fontSize: 9 }} tickFormatter={(v) => v.slice(5)} />

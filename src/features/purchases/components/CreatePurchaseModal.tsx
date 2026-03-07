@@ -62,7 +62,7 @@ const CreatePurchaseModal: React.FC<Props> = ({ onSuccess }) => {
         brand: i.brand || '',
         quantity: i.quantity,
         costPrice: i.costPrice,
-        taxRate: i.tax,
+
         total: (i.quantity * i.costPrice) - i.discount
       })),
       status: 'posted',

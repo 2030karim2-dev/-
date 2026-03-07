@@ -52,7 +52,7 @@ const FinancialPerformanceChart: React.FC = () => {
       </div>
 
       {isMounted && (
-        <ResponsiveContainer width="100%" height="100%" debounce={1}>
+        <ResponsiveContainer width="100%" height={288} debounce={1}>
           <BarChart data={data} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">

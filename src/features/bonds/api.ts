@@ -60,5 +60,25 @@ export const bondsApi = {
     }
 
     return result;
+  },
+
+  deleteBond: async (id: string) => {
+    // Use void_bond RPC to create a reversal journal entry before voiding
+    const { error: rpcError } = await supabase.rpc('void_bond' as never, {
+      p_payment_id: id
+    } as never);
+
+    if (rpcError) {
+      // Fallback: if RPC doesn't exist yet, do a soft delete
+      console.warn('void_bond RPC not available, falling back:', rpcError.message);
+      return await supabase.from('payments')
+        .update({
+          deleted_at: new Date().toISOString(),
+          status: 'void'
+        } as never)
+        .eq('id', id);
+    }
+
+    return { error: null };
   }
 };

@@ -115,7 +115,7 @@ const CashFlowView: React.FC = () => {
                     </div>
 
                     <div className="flex-1 min-h-[400px] relative z-10">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={400}>
                             <AreaChart data={data?.monthlyTrend || []} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="flowIn" x1="0" y1="0" x2="0" y2="1">

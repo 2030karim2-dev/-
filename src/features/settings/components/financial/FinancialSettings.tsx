@@ -1,7 +1,7 @@
 import { useI18nStore } from '@/lib/i18nStore';
 import CurrencyManager from '../CurrencyManager';
 import FiscalYearManager from '../FiscalYearManager';
-import TaxDiscountSettings from './TaxDiscountSettings';
+import DiscountSettings from './DiscountSettings';
 import ExchangeRateHistory from './ExchangeRateHistory';
 import { useDefaultExchangeRates } from '../../hooks/useDefaultExchangeRates';
 import { Banknote, ShieldCheck, Zap } from 'lucide-react';
@@ -46,7 +46,7 @@ const FinancialSettings: React.FC = () => {
                </h3>
             </div>
             <div className="hidden">
-               <TaxDiscountSettings />
+               <DiscountSettings />
             </div>
          </div>
 

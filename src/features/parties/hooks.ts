@@ -7,6 +7,7 @@ import { PartyFormData, PartyType, Party, PartyView } from './types';
 import { useMemo, useState } from 'react';
 import { AuthorizeActionUsecase } from '../../core/usecases/auth/AuthorizeActionUsecase';
 import { syncStore } from '../../core/lib/sync-store';
+import { partyCache } from './lib/party-cache';
 
 export const useParties = (type: PartyType, searchTerm: string = '') => {
   const { user } = useAuthStore();
@@ -14,8 +15,15 @@ export const useParties = (type: PartyType, searchTerm: string = '') => {
 
   const query = useQuery({
     queryKey: ['parties', companyId, type],
-    queryFn: () => companyId ? partiesService.getParties(companyId, type) : Promise.resolve([]),
+    queryFn: async () => {
+      if (!companyId) return [];
+      const data = await partiesService.getParties(companyId, type);
+      partyCache.set(companyId, type, data);
+      return data;
+    },
     enabled: !!companyId,
+    initialData: () => companyId ? partyCache.get(companyId, type) : [],
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const filteredData = useMemo(() => {

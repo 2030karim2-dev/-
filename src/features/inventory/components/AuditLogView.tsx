@@ -11,6 +11,11 @@ const AuditLogView: React.FC = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
+    const handleSelectProduct = (p: any) => {
+        setSelectedProduct(p);
+        setIsDropdownOpen(false);
+    };
+
     const { products, isLoading: isProductsLoading } = useProducts(searchQuery, { enabled: isDropdownOpen });
     const { data: log, isLoading: isLogLoading } = useItemMovement(selectedProduct?.id || null);
 

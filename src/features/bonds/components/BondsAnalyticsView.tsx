@@ -168,7 +168,7 @@ const BondsAnalyticsView: React.FC<Props> = ({ analytics, totals, onSwitchToList
                                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">تحليل التدفق الزمني</h4>
                             </div>
                             <div className="h-[280px]">
-                                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                                <ResponsiveContainer width="100%" height={280} minWidth={0}>
                                     <AreaChart data={analytics.chartData}>
                                         <defs>
                                             <linearGradient id="colorBond" x1="0" y1="0" x2="0" y2="1">
@@ -247,7 +247,7 @@ const BondsAnalyticsView: React.FC<Props> = ({ analytics, totals, onSwitchToList
                                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">توزيع النقدية حسب الحسابات</h4>
                             </div>
                             <div className="h-[200px] mb-8">
-                                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                                <ResponsiveContainer width="100%" height={200} minWidth={0}>
                                     <PieChart>
                                         <Pie
                                             {...{

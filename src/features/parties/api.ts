@@ -91,6 +91,8 @@ export const partiesApi = {
     const { data: payments, error: payError } = await supabase.from('payments')
       .select('id, payment_number, payment_date, amount, type, notes, currency_code, exchange_rate')
       .eq('party_id', partyId)
+      .neq('status', 'void')
+      .is('deleted_at', null)
       .order('payment_date', { ascending: true });
 
     if (payError) throw payError;

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
-  FileText, Plus, ArrowDownCircle, ArrowUpCircle,
+  FileText, Plus, ArrowDownCircle, ArrowUpCircle, LayoutGrid, Table as TableIcon
 } from 'lucide-react';
 import { useBonds, useBondMutation } from './hooks';
 import { BondType } from './types';
@@ -11,13 +11,17 @@ import BondsList from './components/BondsList';
 import BondsAnalyticsView from './components/BondsAnalyticsView';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 
+import { useNavigate } from 'react-router-dom';
+
 type ViewType = 'list' | 'analytics';
 
 const BondsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<BondType>('receipt');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewType, setViewType] = useState<ViewType>('list');
+  const [displayMode, setDisplayMode] = useState<'table' | 'cards'>('cards');
   const { t } = useTranslation();
 
   const { data: bonds, isLoading } = useBonds(activeTab);
@@ -26,7 +30,7 @@ const BondsPage: React.FC = () => {
   // Calculate analytics
   const analytics = useMemo(() => {
     const allBonds = bonds || [];
-    const totalAmount = allBonds.reduce((sum, b) => sum + b.amount, 0);
+    const totalAmount = allBonds.reduce((sum, b) => sum + (b.base_amount || b.amount), 0);
     const count = allBonds.length;
     const avgAmount = count > 0 ? totalAmount / count : 0;
 
@@ -55,7 +59,7 @@ const BondsPage: React.FC = () => {
     const byAccount = allBonds.reduce((acc, bond) => {
       const name = bond.account_name;
       if (!acc[name]) acc[name] = { name, amount: 0, count: 0 };
-      acc[name].amount += bond.amount;
+      acc[name].amount += (bond.base_amount || bond.amount);
       acc[name].count += 1;
       return acc;
     }, {} as Record<string, { name: string; amount: number; count: number }>);
@@ -70,12 +74,14 @@ const BondsPage: React.FC = () => {
   const totals = useMemo(() => {
     const receipt = bonds?.filter(b => b.type === 'receipt') || [];
     const payment = bonds?.filter(b => b.type === 'payment') || [];
+    const rSum = receipt.reduce((sum, b) => sum + (b.base_amount || b.amount), 0);
+    const pSum = payment.reduce((sum, b) => sum + (b.base_amount || b.amount), 0);
     return {
       receiptCount: receipt.length,
-      receiptAmount: receipt.reduce((sum, b) => sum + b.amount, 0),
+      receiptAmount: rSum,
       paymentCount: payment.length,
-      paymentAmount: payment.reduce((sum, b) => sum + b.amount, 0),
-      netAmount: receipt.reduce((sum, b) => sum + b.amount, 0) - payment.reduce((sum, b) => sum + b.amount, 0)
+      paymentAmount: pSum,
+      netAmount: rSum - pSum
     };
   }, [bonds]);
 
@@ -92,6 +98,25 @@ const BondsPage: React.FC = () => {
 
   const headerActions = (
     <div className="flex items-center gap-2">
+      <div className="flex items-center bg-white dark:bg-slate-900 rounded-lg p-0.5 border border-gray-200 dark:border-slate-800 mr-2">
+        <button
+          onClick={() => setDisplayMode('cards')}
+          className={`p-1.5 rounded-md transition-all ${displayMode === 'cards' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30' : 'text-gray-400 hover:text-gray-600'}`}
+          title="عرض البطاقات"
+        >
+          <LayoutGrid size={16} />
+        </button>
+        <button
+          onClick={() => setDisplayMode('table')}
+          className={`p-1.5 rounded-md transition-all ${displayMode === 'table' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30' : 'text-gray-400 hover:text-gray-600'}`}
+          title="عرض الجدول (إكسل)"
+        >
+          <TableIcon size={16} />
+        </button>
+      </div>
+      <Button onClick={() => navigate('/pos')} variant="outline" size="sm" leftIcon={<LayoutGrid size={14} />}>
+        نقطة البيع
+      </Button>
       <Button onClick={() => setViewType('analytics')} variant="outline" size="sm">
         تحليلات
       </Button>
@@ -124,9 +149,14 @@ const BondsPage: React.FC = () => {
         onSearchChange={setSearchTerm}
       />
 
-      <div className="flex-1 overflow-y-auto px-2 pt-2 pb-16 custom-scrollbar">
-        <div className="max-w-4xl mx-auto">
-          <BondsList bonds={bonds || []} isLoading={isLoading} searchTerm={searchTerm} />
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-16 custom-scrollbar">
+        <div className={displayMode === 'table' ? "w-full overflow-x-auto" : "max-w-[1600px] mx-auto"}>
+          <BondsList
+            bonds={bonds || []}
+            isLoading={isLoading}
+            searchTerm={searchTerm}
+            displayMode={displayMode}
+          />
         </div>
       </div>
 

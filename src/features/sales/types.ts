@@ -11,7 +11,7 @@ export interface CartItem {
   quantity: number;
   unitPrice: number;
   costPrice: number; // Hidden from UI, needed for profit calc
-  taxRate: number; // Usually 15%
+
   maxStock: number; // To prevent overselling
   estimatedPrice?: number;
   isCoreReturn?: boolean; // Added for core charge processing
@@ -19,7 +19,7 @@ export interface CartItem {
 
 export interface InvoiceSummary {
   subtotal: number;
-  taxAmount: number;
+
   discountAmount: number;
   totalAmount: number;
 }

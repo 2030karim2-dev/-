@@ -32,7 +32,7 @@ export interface PurchaseInvoice {
     readonly items: PurchaseInvoiceItem[];
     readonly subtotal: Money;
     readonly discount: Money;
-    readonly tax: Money;
+
     readonly total: Money;
     readonly paidAmount: Money;
     readonly balanceDue: Money;
@@ -57,7 +57,7 @@ export interface PurchaseInvoiceItem {
     readonly quantity: number;
     readonly unitPrice: Money;
     readonly costPrice: Money;
-    readonly taxAmount: Money;
+
     readonly discountAmount: Money;
     readonly total: Money;
 }
@@ -87,7 +87,7 @@ export interface CreatePurchaseInvoiceItemDTO {
     readonly quantity: number;
     readonly unitPrice: number;
     readonly costPrice?: number;
-    readonly taxAmount?: number;
+
     readonly discountAmount?: number;
 }
 
@@ -124,7 +124,7 @@ export const PurchaseInvoiceMapper = {
             items: row.items?.map(PurchaseInvoiceItemMapper.fromDB) || [],
             subtotal: MoneyUtils.create(row.subtotal || 0, currency, row.exchange_rate || 1),
             discount: MoneyUtils.create(row.discount_amount || 0, currency, row.exchange_rate || 1),
-            tax: MoneyUtils.create(row.tax_amount || 0, currency, row.exchange_rate || 1),
+
             total: MoneyUtils.create(total, currency, row.exchange_rate || 1),
             paidAmount: MoneyUtils.create(paid, currency, row.exchange_rate || 1),
             balanceDue: MoneyUtils.create(total - paid, currency, row.exchange_rate || 1),
@@ -147,7 +147,7 @@ export const PurchaseInvoiceItemMapper = {
             quantity: row.quantity,
             unitPrice: MoneyUtils.create(row.unit_price || 0),
             costPrice: MoneyUtils.create(row.cost_price || 0),
-            taxAmount: MoneyUtils.create(row.tax_amount || 0),
+
             discountAmount: MoneyUtils.create(row.discount_amount || 0),
             total: MoneyUtils.create(row.total || 0),
         };

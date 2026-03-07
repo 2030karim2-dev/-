@@ -31,7 +31,11 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
   const { invoice: invoiceSettings } = useSettingsStore();
 
   // Apply defaults on mount
+  const isInitialized = React.useRef(false);
+
   React.useEffect(() => {
+    if (isInitialized.current) return;
+
     // 1. Set default currency and invoice type from settings
     if (invoiceSettings?.default_currency) {
       setMetadata('currency', invoiceSettings.default_currency);
@@ -40,21 +44,31 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
       setMetadata('invoiceType', invoiceSettings.default_invoice_type);
     }
 
-    // 2. Load "General Customer" if none selected
+    // 2. Load "General Customer" ONLY on first mount if none selected
     if (!selectedCustomer && comp?.id) {
+      isInitialized.current = true; // Mark as initialized immediately
       const loadGeneralCustomer = async (companyId: string) => {
         try {
           const generalCustomer = await partiesService.getOrCreateGeneralParty(companyId, 'customer');
-          setCustomer({
-            id: generalCustomer.id,
-            name: generalCustomer.name,
-            phone: generalCustomer.phone || ''
-          });
+
+          // Re-check selectedCustomer from store to avoid overwriting a fast user selection
+          const currentStoreState = (useSalesStore.getState()).selectedCustomer;
+
+          if (!currentStoreState && generalCustomer) {
+            setCustomer({
+              id: generalCustomer.id,
+              name: generalCustomer.name,
+              phone: generalCustomer.phone || ''
+            });
+          }
         } catch (error) {
           console.error("Failed to load general customer:", error);
         }
       };
       loadGeneralCustomer(comp.id);
+    } else if (selectedCustomer || !comp?.id) {
+      // If already has a customer or no company yet, consider it initialized to prevent future overwrites
+      if (comp?.id) isInitialized.current = true;
     }
   }, [comp?.id, invoiceSettings, selectedCustomer, setMetadata, setCustomer]);
 
@@ -78,7 +92,7 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
         quantity: item.quantity,
         unitPrice: item.price,
         costPrice: 0,
-        taxRate: item.tax,
+
         maxStock: 100
       })),
       discount: summary.discountAmount,

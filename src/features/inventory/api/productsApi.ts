@@ -5,7 +5,7 @@ import { TableInsert, TableUpdate } from '@/core/types/supabase-helpers';
 
 /** Products CRUD and search */
 export const productsApi = {
-    getProducts: async (companyId: string, page: number = 1, limitNum: number = 1000) => {
+    getProducts: async (companyId: string, page: number = 1, limitNum: number = 500) => {
         const from = (page - 1) * limitNum;
         const to = from + limitNum - 1;
 
@@ -39,7 +39,7 @@ export const productsApi = {
             `)
             .eq('company_id', companyId)
             .is('deleted_at', null)
-            .order('created_at', { ascending: false })
+            // Removed .order('created_at', { ascending: false }) to prevent slow sort & ERR_CONNECTION_CLOSED
             .range(from, to);
     },
 

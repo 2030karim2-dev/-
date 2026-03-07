@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   BarChart3, Scale, RefreshCw, PieChart, Landmark, Wallet, History,
-  BrainCircuit, RotateCcw, Droplets, ShoppingCart, TrendingDown, Clock,
+  RotateCcw, Droplets, ShoppingCart, TrendingDown, Clock,
   LayoutGrid, FileText, Activity, Layers
 } from 'lucide-react';
 import MicroHeader from '../../ui/base/MicroHeader';

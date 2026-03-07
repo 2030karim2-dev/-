@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { X,  Loader2,  Search, Banknote, Calendar,  ShieldCheck } from 'lucide-react';
-// Fix: Corrected import for useSupplierSearch from ../../suppliers/hooks.
+import { X, Loader2, Search, Banknote, Calendar, ShieldCheck } from 'lucide-react';
 import { useCreatePayment } from '../hooks';
-import { useSupplierSearch } from '../../suppliers/hooks';
+import { useParties } from '../../parties/hooks';
 import { useAuthStore } from '../../auth/store';
 import { Database } from '../../../core/database.types';
 type DbParty = Database['public']['Tables']['parties']['Row'];
@@ -15,8 +14,7 @@ interface CreatePaymentModalProps {
 
 const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({ isOpen, onClose }) => {
     const { mutate: createPayment, isPending } = useCreatePayment();
-    const { user } = useAuthStore();
-    const companyId = user?.company_id ?? '';
+    const { } = useAuthStore();
 
     const [amount, setAmount] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -25,7 +23,7 @@ const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({ isOpen, onClose
 
     const [supplierQuery, setSupplierQuery] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const { data: suppliers } = useSupplierSearch(companyId, supplierQuery);
+    const { data: suppliers } = useParties('supplier', supplierQuery);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

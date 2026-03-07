@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, User, X, Check } from 'lucide-react';
-import { useCustomerSearch } from '../../../customers/hooks';
+import { useParties } from '../../../parties/hooks';
 import { useSalesStore } from '../../store';
 import { useAuthStore } from '../../../auth/store';
 import { cn } from '../../../../core/utils';
@@ -12,13 +11,12 @@ interface Props {
 
 const CustomerSelector: React.FC<Props> = ({ compact = false }) => {
   const { selectedCustomer, setCustomer } = useSalesStore();
-  const { user } = useAuthStore();
-  const companyId = user?.company_id ?? '';
+  const { } = useAuthStore();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const { data: customers, isLoading } = useCustomerSearch(companyId, query);
+  const { data: filteredCustomers, isLoading } = useParties('customer', query);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -79,13 +77,13 @@ const CustomerSelector: React.FC<Props> = ({ compact = false }) => {
           />
           <Search className={cn("absolute right-2.5 text-gray-400", compact ? "top-2.5" : "top-3.5")} size={compact ? 14 : 20} />
 
-          {isOpen && query.length > 1 && (
+          {isOpen && query.length > 0 && (
             <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-blue-600 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-1">
               {isLoading ? (
-                <div className="p-3 text-center text-[10px] text-gray-400">جاري المسح...</div>
-              ) : customers && customers.length > 0 ? (
-                <ul className="max-h-48 overflow-y-auto custom-scrollbar">
-                  {customers.map((customer: any) => (
+                <div className="p-3 text-center text-[10px] text-gray-400 font-bold">جاري التحميل...</div>
+              ) : filteredCustomers.length > 0 ? (
+                <ul className="max-h-64 overflow-y-auto custom-scrollbar">
+                  {filteredCustomers.map((customer: any) => (
                     <li
                       key={customer.id}
                       onClick={() => handleSelect(customer)}

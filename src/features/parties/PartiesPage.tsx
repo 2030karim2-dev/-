@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Users, UserPlus, FileText, LayoutGrid, Edit, Trash2, History, LucideIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useParties, usePartyMutations, usePartiesView } from './hooks';
 import { Party, PartyView, PartyType, PartyFormData } from './types';
 import MicroHeader from '../../ui/base/MicroHeader';
@@ -22,6 +23,7 @@ interface PartiesPageProps {
 }
 
 const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconColor }) => {
+    const navigate = useNavigate();
     const { t } = useTranslation();
     const {
         activeView, setActiveView,
@@ -153,14 +155,24 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
     ], [t, partyType, handleEdit, deleteParty]);
 
     const headerActions = (
-        <Button
-            onClick={handleAddNew}
-            variant={partyType === 'customer' ? 'success' : 'primary'}
-            size="sm"
-            leftIcon={<UserPlus size={14} />}
-        >
-            {partyType === 'customer' ? t('new_customer') : t('new_supplier')}
-        </Button>
+        <div className="flex items-center gap-2">
+            <Button
+                onClick={() => navigate('/pos')}
+                variant="outline"
+                size="sm"
+                leftIcon={<LayoutGrid size={14} />}
+            >
+                نقطة البيع
+            </Button>
+            <Button
+                onClick={handleAddNew}
+                variant={partyType === 'customer' ? 'success' : 'primary'}
+                size="sm"
+                leftIcon={<UserPlus size={14} />}
+            >
+                {partyType === 'customer' ? t('new_customer') : t('new_supplier')}
+            </Button>
+        </div>
     );
 
     const renderContent = () => {

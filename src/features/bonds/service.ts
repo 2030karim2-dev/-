@@ -70,5 +70,10 @@ export const bondsService = {
     }
 
     return result;
+  },
+
+  deleteBond: async (id: string) => {
+    const { error } = await bondsApi.deleteBond(id);
+    if (error) throw error;
   }
 };
