@@ -144,7 +144,7 @@ export const SupplierPricesList: React.FC<SupplierPricesListProps> = ({ product 
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">سعر التكلفة (شامل الضريبة)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">سعر التكلفة</label>
                             <div className="relative">
                                 <DollarSign className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <input

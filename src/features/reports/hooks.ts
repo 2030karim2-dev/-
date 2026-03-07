@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { reportsService } from './service';
 import { useAuthStore } from '../auth/store';
 import { supabase } from '../../lib/supabaseClient';
-import { taxService } from '../accounting/services/taxService';
 
 // Typed result shape from report_trial_balance RPC
 interface TrialBalanceRow {
@@ -107,15 +106,6 @@ export const useCashFlow = (options: { enabled?: boolean } = {}) => {
     return useQuery({
         queryKey: ['cash_flow', user?.company_id],
         queryFn: () => user?.company_id ? reportsService.getCashFlow(user.company_id) : Promise.resolve(null),
-        enabled: (options.enabled !== false) && !!user?.company_id,
-    });
-};
-
-export const useVATReport = (fromDate: string, toDate: string, options: { enabled?: boolean } = {}) => {
-    const { user } = useAuthStore();
-    return useQuery({
-        queryKey: ['vat_report', user?.company_id, fromDate, toDate],
-        queryFn: () => user?.company_id ? taxService.getVATReport(user.company_id, fromDate, toDate) : Promise.resolve(null),
         enabled: (options.enabled !== false) && !!user?.company_id,
     });
 };

@@ -12,9 +12,9 @@ export const costingService = {
     newQty: number,
     newUnitPrice: number
   ): number => {
-    const totalCurrentValue = Math.max(0, currentStock) * currentAvgCost;
+    const totalCurrentValue = currentStock * currentAvgCost;
     const totalNewValue = newQty * newUnitPrice;
-    const totalQty = Math.max(0, currentStock) + newQty;
+    const totalQty = currentStock + newQty;
 
     if (totalQty <= 0) return newUnitPrice;
 

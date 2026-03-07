@@ -6,7 +6,7 @@ import { persister } from './persister';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: Infinity, // ⚡ Keep data fresh throughout the session
+      staleTime: 1000 * 60, // ⚡ 1 minute - balanced freshness for financial data
       gcTime: 1000 * 60 * 60 * 48, // Keep in cache for 48 hours
       retry: (failureCount, error: any) => {
         // ⚡ عدم إعادة المحاولة لأخطاء المصادقة - توجيه فوري للواجهة
@@ -23,9 +23,9 @@ export const queryClient = new QueryClient({
         }
         return failureCount < 1; // محاولة واحدة فقط للأخطاء الأخرى
       },
-      refetchOnWindowFocus: false,
-      refetchOnMount: false, // ⚡ Prevent re-fetching when navigating back to a page
-      refetchOnReconnect: false, // Prevent re-fetching on network reconnect (offline-first focus)
+      refetchOnWindowFocus: true, // ⚡ Enabled to ensure freshness on return
+      refetchOnMount: true, // ⚡ Enabled to ensure freshness on navigation
+      refetchOnReconnect: true,
     },
     mutations: {
       networkMode: 'always',

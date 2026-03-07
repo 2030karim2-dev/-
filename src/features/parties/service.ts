@@ -12,6 +12,7 @@ interface StatementMovement {
   debit: number;
   credit: number;
   currency: string;
+  operation_type?: string;
 }
 
 export const partiesService = {
@@ -26,96 +27,73 @@ export const partiesService = {
     })) as Party[];
   },
 
-  getStatement: async (partyId: string, type: PartyType) => {
-    const { invoices, payments, journalLines } = await partiesApi.getTransactionDetails(partyId);
+  getStatement: async (partyId: string, _type: PartyType) => {
+    const { journalLines } = await partiesApi.getTransactionDetails(partyId);
 
-    const movements: StatementMovement[] = [];
+    const movements: StatementMovement[] = (journalLines || [])
+      .filter((line: any) => {
+        const code = line.account?.code;
+        // Strict Filter: Only show lines that affect the actual Party debt/credit accounts
+        // Typically Accounts Receivable (1100...) or Accounts Payable (2100...)
+        // This excludes internal Inventory, Revenue, Cash, and COGS lines even if tagged with party_id
+        return code?.startsWith('1100') || code?.startsWith('2100');
+      })
+      .map((line: any) => {
+        const entry = line.journal_entries;
+        if (!entry) return null;
 
-    // Process Invoices
-    invoices.forEach((inv: Record<string, unknown>) => {
-      const isCustomer = type === 'customer';
-      const baseAmount = Number(inv.total_amount) * (Number(inv.exchange_rate) || 1);
+        let description = line.description || entry.description || 'حركة محاسبية';
+        let operationType = 'قيد محاسبي';
+        let reference = entry.entry_number ? `JV-${entry.entry_number}` : 'JV';
 
-      let description = '';
-      if (inv.type === 'sale') description = 'فاتورة مبيعات';
-      else if (inv.type === 'purchase') description = 'فاتورة مشتريات';
-      else if (inv.type === 'sales_return') description = 'مرتجع مبيعات';
-      else if (inv.type === 'purchase_return') description = 'مرتجع مشتريات';
-      else description = 'فاتورة';
+        // Enhance reference and operation type based on context
+        const refType = entry.reference_type;
+        if (refType === 'sales_invoice' || refType === 'invoice') {
+          reference = 'INV';
+          operationType = 'فاتورة مبيعات';
+        } else if (refType === 'purchase_invoice') {
+          reference = 'PUR';
+          operationType = 'فاتورة مشتريات';
+        } else if (refType === 'payment' || refType === 'payment_bond') {
+          reference = 'PAY';
+          operationType = 'سند دفع';
+        } else if (refType === 'receipt' || refType === 'receipt_bond') {
+          reference = 'RCV';
+          operationType = 'سند قبض';
+        } else if (refType === 'sale_return' || refType === 'sales_return' || refType === 'return_sale') {
+          reference = 'RET';
+          operationType = 'مرتجع مبيعات';
+        } else if (refType === 'purchase_return' || refType === 'return_purchase') {
+          reference = 'PRET';
+          operationType = 'مرتجع مشتريات';
+        } else if (refType === 'expense') {
+          reference = 'EXP';
+          operationType = 'صرف مصروف';
+        }
 
-      movements.push({
-        id: inv.id as string,
-        date: inv.issue_date as string,
-        ref: inv.invoice_number as string,
-        desc: description,
-        type: inv.type as string,
-        debit: isCustomer ? (inv.type === 'sale' ? baseAmount : 0) : (inv.type === 'purchase_return' ? baseAmount : 0),
-        credit: isCustomer ? (inv.type === 'sales_return' ? baseAmount : 0) : (inv.type === 'purchase' ? baseAmount : 0),
-        currency: inv.currency_code as string
-      });
+        return {
+          id: line.id,
+          date: entry.entry_date,
+          ref: reference,
+          operation_type: operationType,
+          desc: description,
+          type: entry.reference_type || 'journal',
+          debit: Number(line.debit_amount) || 0,
+          credit: Number(line.credit_amount) || 0,
+          currency: line.currency_code
+        };
+      })
+      .filter(m => m !== null) as StatementMovement[];
 
-      // If it's a cash invoice, it balances out immediately
-      if (inv.payment_method === 'cash') {
-        movements.push({
-          id: `${inv.id}-payment`,
-          date: inv.issue_date as string,
-          ref: inv.invoice_number as string,
-          desc: 'سداد نقدي (فوري)',
-          type: 'payment',
-          debit: isCustomer ? 0 : baseAmount,
-          credit: isCustomer ? baseAmount : 0,
-          currency: inv.currency_code as string
-        });
-      }
-    });
-
-    // Process Payments (Bonds)
-    payments.forEach((pay: Record<string, unknown>) => {
-      const baseAmount = Number(pay.amount) * (Number(pay.exchange_rate) || 1);
-
-      movements.push({
-        id: pay.id as string,
-        date: pay.payment_date as string,
-        ref: pay.payment_number as string,
-        desc: (pay.notes as string) || (pay.type === 'receipt' ? 'سند قبض' : 'سند صرف'),
-        type: pay.type as string,
-        debit: pay.type === 'payment' ? baseAmount : 0,
-        credit: pay.type === 'receipt' ? baseAmount : 0,
-        currency: pay.currency_code as string
-      });
-    });
-
-    // Process Ledger (Journal Entries)
-    (journalLines || []).forEach((line: any) => {
-      const entry = line.journal_entries;
-      if (!entry) return;
-
-      // CRITICAL FILTER: Skip journal entries that are linked to documents we already processed
-      const systemTypes = ['sale', 'purchase', 'receipt', 'payment', 'return', 'sales_return', 'purchase_return'];
-      if (entry.reference_type && systemTypes.includes(entry.reference_type)) {
-        return;
-      }
-
-      movements.push({
-        id: line.id,
-        date: entry.entry_date,
-        ref: entry.entry_number ? `JV-${entry.entry_number}` : 'JV',
-        desc: line.description || entry.description || 'تعديل/قيد محاسبي',
-        type: 'journal',
-        debit: Number(line.debit_amount) || 0,
-        credit: Number(line.credit_amount) || 0,
-        currency: line.currency_code
-      });
-    });
-
-    // Sort by date then by id to ensure stable sort
+    // Sort by date then by ID for a stable, professional order
     movements.sort((a, b) => {
-      const dateDiff = new Date(a.date).getTime() - new Date(b.date).getTime();
-      if (dateDiff !== 0) return dateDiff;
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      if (dateA !== dateB) return dateA - dateB;
       return a.id.localeCompare(b.id);
     });
 
-    // Calculate running balance
+    // Calculate running balance (Net Position)
     let runningBalance = 0;
     return movements.map(m => {
       runningBalance += (m.debit - m.credit);
@@ -199,6 +177,16 @@ export const partiesService = {
     const { data, error } = await partiesApi.search(companyId, type, query);
     if (error) throw error;
     return (data || []) as unknown as Party[];
+  },
+
+  getCompanyDetails: async (companyId: string) => {
+    const { data, error } = await supabase
+      .from('companies')
+      .select('name_ar, address, phone, tax_number, logo_url')
+      .eq('id', companyId)
+      .single();
+    if (error) throw error;
+    return data;
   },
 
   getOrCreateGeneralParty: async (companyId: string, type: PartyType): Promise<Party> => {

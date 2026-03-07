@@ -56,7 +56,6 @@ export interface SalesInvoice {
     readonly items: InvoiceItem[];
     readonly subtotal: Money;
     readonly discount: Money;
-    readonly tax: Money;
     readonly total: Money;
     readonly paidAmount: Money;
     readonly balanceDue: Money;
@@ -81,7 +80,6 @@ export interface InvoiceItem {
     readonly quantity: number;
     readonly unitPrice: Money;
     readonly costPrice: Money;
-    readonly taxAmount: Money;
     readonly discountAmount: Money;
     readonly total: Money;
 }
@@ -95,7 +93,6 @@ export interface Customer {
     readonly phone: string | null;
     readonly email: string | null;
     readonly address: string | null;
-    readonly taxNumber: string | null;
     readonly balance: number;
     readonly status: 'active' | 'blocked';
 }
@@ -127,7 +124,6 @@ export interface CreateInvoiceItemDTO {
     readonly quantity: number;
     readonly unitPrice: number;
     readonly costPrice?: number;
-    readonly taxAmount?: number;
     readonly discountAmount?: number;
 }
 
@@ -240,7 +236,6 @@ export const InvoiceMapper = {
             items: row.items?.map(InvoiceItemMapper.fromDB) || [],
             subtotal: MoneyUtils.create(row.subtotal || 0, currency, row.exchange_rate || 1),
             discount: MoneyUtils.create(row.discount_amount || 0, currency, row.exchange_rate || 1),
-            tax: MoneyUtils.create(row.tax_amount || 0, currency, row.exchange_rate || 1),
             total: MoneyUtils.create(total, currency, row.exchange_rate || 1),
             paidAmount: MoneyUtils.create(paid, currency, row.exchange_rate || 1),
             balanceDue: MoneyUtils.create(total - paid, currency, row.exchange_rate || 1),
@@ -279,7 +274,6 @@ export const InvoiceItemMapper = {
             quantity: row.quantity,
             unitPrice: MoneyUtils.create(row.unit_price || 0),
             costPrice: MoneyUtils.create(row.cost_price || 0),
-            taxAmount: MoneyUtils.create(row.tax_amount || 0),
             discountAmount: MoneyUtils.create(row.discount_amount || 0),
             total: MoneyUtils.create(row.total || 0),
         };
@@ -293,7 +287,6 @@ export const InvoiceItemMapper = {
             unit_price: dto.unitPrice,
         };
         if (dto.costPrice !== undefined) insert.cost_price = dto.costPrice;
-        if (dto.taxAmount !== undefined) insert.tax_amount = dto.taxAmount;
         if (dto.discountAmount !== undefined) insert.discount_amount = dto.discountAmount;
         if (dto.description !== undefined) insert.description = dto.description;
         return insert as InvoiceItemInsert;
@@ -308,7 +301,6 @@ export const CustomerMapper = {
             phone: row.phone,
             email: row.email,
             address: row.address,
-            taxNumber: row.tax_number,
             balance: row.balance || 0,
             status: (row.status as 'active' | 'blocked') || 'active',
         };

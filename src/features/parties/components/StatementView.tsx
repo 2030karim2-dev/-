@@ -8,11 +8,17 @@ import { Printer, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { PartyType } from '../types';
 import Button from '../../../ui/base/Button';
 import ShareButton from '../../../ui/common/ShareButton';
+import { exportStatementToExcel } from '../utils/statementExcelExporter';
+import { partiesService } from '../service';
+import { useAuthStore } from '../../auth/store';
+import { FileDown } from 'lucide-react';
 
 const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
   const [selectedPartyId, setSelectedPartyId] = useState<string>('');
   const { data: parties } = useParties(partyType);
   const { data: statement, isLoading } = useStatement(selectedPartyId, partyType);
+  const [isExporting, setIsExporting] = useState(false);
+  const user = useAuthStore(state => state.user);
 
   const selectedParty = parties.find(p => p.id === selectedPartyId);
 
@@ -31,8 +37,14 @@ const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
     },
     {
       header: 'نوع العملية',
-      accessor: (row: Record<string, unknown>) => <span className="font-medium">{row.desc as string}</span>,
+      accessor: (row: Record<string, unknown>) => <span className="font-bold text-gray-700 dark:text-slate-300">{row.operation_type as string}</span>,
+      width: '120px',
       align: 'center' as const
+    },
+    {
+      header: 'البيان',
+      accessor: (row: Record<string, unknown>) => <span className="text-xs text-gray-500 line-clamp-1" title={row.desc as string}>{row.desc as string}</span>,
+      align: 'right' as const
     },
     {
       header: 'مدين',
@@ -81,6 +93,25 @@ const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
               title={`مشاركة كشف حساب ${selectedParty.name}`}
               message={`📄 كشف حساب: ${selectedParty.name}\n━━━━━━━━━━━━━━\n${(statement || []).map((row: Record<string, unknown>) => `${row.date} | ${row.desc} | مدين: ${formatCurrency(row.debit as number)} | دائن: ${formatCurrency(row.credit as number)} | رصيد: ${formatCurrency(row.balance as number)}`).join('\n')}\n━━━━━━━━━━━━━━\n📊 الرصيد النهائي: ${formatCurrency(((statement || []).at(-1) as Record<string, unknown>)?.balance as number || 0)}`}
             />
+            <Button
+              onClick={async () => {
+                if (!selectedPartyId || !statement || !user?.company_id) return;
+                setIsExporting(true);
+                try {
+                  const company = await partiesService.getCompanyDetails(user.company_id);
+                  exportStatementToExcel(company, selectedParty.name, statement as any);
+                } catch (err) {
+                  console.error('Export failed', err);
+                } finally {
+                  setIsExporting(false);
+                }
+              }}
+              isLoading={isExporting}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              leftIcon={<FileDown size={14} />}
+            >
+              تصدير Excel
+            </Button>
             <Button onClick={() => window.print()} className="" leftIcon={<Printer size={14} />}>
               طباعة الكشف
             </Button>

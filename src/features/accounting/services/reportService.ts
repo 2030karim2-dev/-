@@ -31,7 +31,25 @@ export const reportService = {
         const { data, error } = await query;
         if (error) throw error;
 
-        let balance = 0;
+        // Calculate Opening Balance for the period before fromDate
+        let openingBalance = 0;
+        if (fromDate) {
+            const { data: beforeData } = await supabase.from('journal_entry_lines')
+                .select('debit_amount, credit_amount')
+                .eq('account_id', accountId)
+                .eq('journal.status', 'posted')
+                .lt('journal.entry_date', fromDate);
+
+            (beforeData || []).forEach(l => {
+                if (isDebitNature) {
+                    openingBalance += (Number(l.debit_amount) || 0) - (Number(l.credit_amount) || 0);
+                } else {
+                    openingBalance += (Number(l.credit_amount) || 0) - (Number(l.debit_amount) || 0);
+                }
+            });
+        }
+
+        let balance = openingBalance;
         return (data || []).map((line) => {
             // Debit-nature accounts (asset/expense): balance = debit - credit
             // Credit-nature accounts (liability/equity/revenue): balance = credit - debit

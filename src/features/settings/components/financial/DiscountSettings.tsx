@@ -36,7 +36,7 @@ const DiscountSettings: React.FC = () => {
             {!discountEnabled && (
                 <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-2xl animate-in fade-in duration-300">
                     <p className="text-[11px] font-bold text-blue-700 dark:text-blue-400 leading-relaxed">
-                        💡 الخصم معطل حالياً. لن تظهر أعمدة الخصم في الفواتير. (ملحوظة: تم تعطيل الضريبة نهائياً حسب طلبك).
+                        💡 الخصم معطل حالياً. لن تظهر أعمدة الخصم في الفواتير.
                     </p>
                 </div>
             )}

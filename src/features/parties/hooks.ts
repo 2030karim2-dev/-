@@ -56,7 +56,7 @@ export const useCategories = (type: PartyType) => {
 
 export const useStatement = (partyId: string | null, type: PartyType) => {
   return useQuery({
-    queryKey: ['party_statement', partyId],
+    queryKey: ['party_statement_v3', partyId],
     queryFn: () => partyId ? partiesService.getStatement(partyId, type) : Promise.resolve([]),
     enabled: !!partyId,
   });

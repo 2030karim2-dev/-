@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Save, Building, Globe, Hash, Banknote, FileText, CheckCircle, Building2, Crown } from 'lucide-react';
+import { Save, Building, Globe, Banknote, FileText, CheckCircle, Building2, Crown } from 'lucide-react';
 import { useCompany, useCompanyMutation } from '../hooks';
 import { useFeedbackStore } from '../../feedback/store';
 import Input from '../../../ui/base/Input';
@@ -15,7 +15,6 @@ const CompanyProfile: React.FC = () => {
     defaultValues: {
       name: '',
       english_name: '',
-      tax_number: '',
       base_currency: 'SAR',
     }
   });
@@ -28,7 +27,6 @@ const CompanyProfile: React.FC = () => {
       reset({
         name: comp.name || comp.name_ar || '',
         english_name: comp.english_name || comp.name_en || '',
-        tax_number: comp.tax_number || '',
         base_currency: comp.base_currency || 'SAR',
       });
     }
@@ -39,7 +37,6 @@ const CompanyProfile: React.FC = () => {
     const payload: Record<string, any> = {
       name_ar: data.name,
       name_en: data.english_name || null,
-      tax_number: data.tax_number || null,
       base_currency: data.base_currency,
     };
 
@@ -136,7 +133,7 @@ const CompanyProfile: React.FC = () => {
             <div className="flex items-center gap-2 mb-2">
               <span className="w-1 h-4 bg-emerald-500 rounded-full"></span>
               <h3 className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
-                المعلومات المالية والضريبية
+                المعلومات المالية
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -164,14 +161,6 @@ const CompanyProfile: React.FC = () => {
                 </div>
               </div>
 
-              {/* Tax Number */}
-              <Input
-                label="الرقم الضريبي (VAT)"
-                placeholder="300XXXXXXXXXXXX"
-                {...register('tax_number')}
-                dir="ltr"
-                icon={<Hash size={16} />}
-              />
             </div>
           </div>
         </div>

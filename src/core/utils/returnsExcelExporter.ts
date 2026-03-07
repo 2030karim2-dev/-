@@ -152,7 +152,6 @@ export const exportReturnsToExcel = (data: ReturnExcelData) => {
 export const exportSingleReturnToExcel = (data: {
     companyName: string;
     companyAddress?: string;
-    taxNumber?: string;
     invoiceNumber: string;
     issueDate: string;
     customerName: string;
@@ -183,7 +182,7 @@ export const exportSingleReturnToExcel = (data: {
 
     // Header section
     rows.push([data.companyName]);
-    rows.push([`${data.companyAddress || ''} | الرقم الضريبي: ${data.taxNumber || '---'}`]);
+    rows.push([data.companyAddress || '']);
     rows.push([]);
     rows.push([`${title} رقم: ${data.invoiceNumber}`]);
     rows.push([]);

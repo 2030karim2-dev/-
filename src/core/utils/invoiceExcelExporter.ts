@@ -21,7 +21,6 @@ interface InvoiceExcelData {
         total: number;
     }[];
     subtotal: number;
-    taxAmount: number;
     totalAmount: number;
 }
 
@@ -33,8 +32,8 @@ export const exportInvoiceToExcel = (data: InvoiceExcelData) => {
 
     // Row 1: Company Name (centered header)
     rows.push([data.companyName]);
-    // Row 2: Address & Tax Number
-    rows.push([`${data.companyAddress || ''} | الرقم الضريبي: ${data.taxNumber || '---'}`]);
+    // Row 2: Address
+    rows.push([data.companyAddress || '']);
     // Row 3: Empty spacer
     rows.push([]);
     // Row 4: Invoice title
@@ -62,7 +61,6 @@ export const exportInvoiceToExcel = (data: InvoiceExcelData) => {
     rows.push([]);
     // Totals
     rows.push(['', '', '', 'المجموع الفرعي:', data.subtotal]);
-    rows.push(['', '', '', 'ضريبة القيمة المضافة (15%):', data.taxAmount]);
     rows.push(['', '', '', 'الإجمالي المستحق:', data.totalAmount]);
 
     const ws = XLSX.utils.aoa_to_sheet(rows);

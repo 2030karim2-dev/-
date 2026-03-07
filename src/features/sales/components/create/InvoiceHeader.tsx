@@ -8,7 +8,6 @@ const InvoiceHeader = ({ company }: { company: any }) => {
     const nameAr = settings.company_name_ar || company?.name || 'اسم المنشأة';
     const nameEn = settings.company_name_en || company?.english_name || 'Company Name';
     const address = settings.company_address || company?.address || 'المملكة العربية السعودية';
-    const taxNumber = company?.tax_number || '300000000000003';
     const specialization = settings.company_specialization || '';
 
     return (
@@ -27,7 +26,6 @@ const InvoiceHeader = ({ company }: { company: any }) => {
                     )}
                     <div className="text-[8px] font-bold text-slate-500 space-y-0.5">
                         <p>{address}</p>
-                        <p className="text-blue-600 font-mono tracking-tighter">VAT ID: {taxNumber}</p>
                     </div>
                 </div>
 
@@ -47,8 +45,7 @@ const InvoiceHeader = ({ company }: { company: any }) => {
                         {nameEn}
                     </h1>
                     <div className="text-[8px] font-bold text-slate-500 space-y-0.5 uppercase tracking-tighter">
-                        <p>{settings.invoice_header_text || 'OFFICIAL TAX INVOICE'}</p>
-                        <p className="text-emerald-600">ZATCA COMPLIANT</p>
+                        <p>{settings.invoice_header_text || 'SALES INVOICE'}</p>
                     </div>
                 </div>
             </div>

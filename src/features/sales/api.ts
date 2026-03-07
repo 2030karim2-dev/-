@@ -66,7 +66,8 @@ export const salesApi = {
       ...(payload.notes ? { p_notes: payload.notes } : {}),
       ...(payload.treasuryAccountId ? { p_treasury_account_id: payload.treasuryAccountId } : {}),
       ...(payload.currency ? { p_currency: payload.currency } : {}),
-      ...(payload.exchangeRate ? { p_exchange_rate: payload.exchangeRate } : {})
+      ...(payload.exchangeRate ? { p_exchange_rate: payload.exchangeRate } : {}),
+      p_discount_amount: payload.discount || 0
     };
 
     const { data: result, error } = await supabase.rpc('commit_sales_invoice', rpcParams);

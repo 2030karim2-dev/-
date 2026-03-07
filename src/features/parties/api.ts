@@ -99,7 +99,11 @@ export const partiesApi = {
 
     const { data: journalLines, error: journalError } = await supabase
       .from('journal_entry_lines')
-      .select('id, description, debit_amount, credit_amount, currency_code, exchange_rate, journal_entries(id, entry_date, entry_number, reference_type, reference_id)')
+      .select(`
+        id, description, debit_amount, credit_amount, currency_code, exchange_rate,
+        journal_entries(id, entry_date, entry_number, reference_type, reference_id),
+        account:accounts(id, code, type)
+      `)
       .eq('party_id', partyId)
       .is('deleted_at', null);
 
