@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRightLeft, Save, Trash2 } from 'lucide-react';
+import { ArrowRightLeft, Save, Trash2, RefreshCw, ExternalLink } from 'lucide-react';
 import { formatNumberDisplay, cn } from '../../../../../core/utils';
 
 // Local icon component 
@@ -19,6 +19,8 @@ interface CurrencyTableProps {
     setNewRateValue: (val: number) => void;
     handleUpdateRate: (code: string) => void;
     deleteCurrency: (code: string) => void;
+    refreshRates?: () => void;
+    isSaving?: boolean;
 }
 
 export const CurrencyTable: React.FC<CurrencyTableProps> = ({
@@ -29,10 +31,47 @@ export const CurrencyTable: React.FC<CurrencyTableProps> = ({
     setActiveRateEdit,
     setNewRateValue,
     handleUpdateRate,
-    deleteCurrency
+    deleteCurrency,
+    refreshRates,
+    isSaving
 }) => {
     return (
         <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-gray-200/50 dark:border-slate-800/50 rounded-[2rem] overflow-hidden shadow-xl shadow-blue-900/5 dark:shadow-black/20">
+            <div className="p-6 border-b border-gray-100 dark:border-slate-800/60 flex items-center justify-between bg-gradient-to-r from-gray-50/50 to-transparent dark:from-slate-800/20">
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-2xl">
+                        <ArrowRightLeft size={20} />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-bold text-gray-800 dark:text-slate-100">أسعار الصرف</h3>
+                        <p className="text-[10px] text-gray-500 font-medium">إدارة أسعار العملات مقابل {baseCurrency?.code}</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <a
+                        href="https://ye-rial.com/aden/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold text-gray-500 hover:text-blue-600 transition-colors"
+                    >
+                        <ExternalLink size={12} />
+                        المصدر: ye-rial.com (عدن)
+                    </a>
+                    <button
+                        onClick={() => refreshRates?.()}
+                        disabled={isSaving}
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-2xl text-[10px] font-bold shadow-lg shadow-blue-600/20 transition-all active:scale-95",
+                            isSaving && "animate-pulse"
+                        )}
+                    >
+                        <RefreshCw size={14} className={cn(isSaving && "animate-spin")} />
+                        تحديث من السوق (بيع - عدن)
+                    </button>
+                </div>
+            </div>
+
             <div className="overflow-x-auto p-1">
                 <table className="w-full text-right border-collapse">
                     <thead>

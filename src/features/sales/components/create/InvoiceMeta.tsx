@@ -66,16 +66,15 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
     React.useEffect(() => {
         const currencyChanged = prevCurrency.current !== currency;
 
-        // 1. Handle Exchange Rate Sync (Only on currency change or initial load)
         if (currencyChanged && rates.data) {
             if (currency === 'SAR') {
                 setMetadata('exchangeRate', 1);
                 setMetadata('exchangeOperator', 'multiply');
             } else {
-                const rateObj = (rates.data as any[])?.find((r: any) => r.currency_code === currency);
+                const rateObj = (rates.data as { currency_code: string; rate_to_base: number }[])?.find(r => r.currency_code === currency);
                 if (rateObj) {
                     setMetadata('exchangeRate', rateObj.rate_to_base);
-                    const currencyConfig = (currencies.data as any[])?.find((c: any) => c.code === currency);
+                    const currencyConfig = (currencies.data as { code: string; exchange_operator: string }[])?.find(c => c.code === currency);
                     if (currencyConfig) {
                         setMetadata('exchangeOperator', currencyConfig.exchange_operator);
                     }
@@ -102,7 +101,7 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
             const primary = castWarehouses.find((w) => w.is_primary);
             const target = primary || castWarehouses[0];
             if (target && warehouseId) {
-                setMetadata('warehouseId', warehouseId as any);
+                setMetadata('warehouseId', warehouseId as string);
             }
         }
 
@@ -128,7 +127,7 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
                 </div>
                 <div className="flex -space-x-px border-t border-gray-100 dark:border-slate-800">
                     <MetaBlock label="العملة" field="currency" value={currency} icon={Coins} isSelect
-                        options={(currencies.data as any[])?.map((c: any) => ({ id: c.code as string, label: c.code as string })) || [{ id: 'SAR', label: 'SAR' }]}
+                        options={(currencies.data as { code: string }[])?.map(c => ({ id: c.code, label: c.code })) || [{ id: 'SAR', label: 'SAR' }]}
                         onChange={setMetadata} />
                     {currency && currency !== 'SAR' && (
                         <div className="flex-1 bg-white dark:bg-slate-900/50 border-r border-gray-100 dark:border-slate-800 p-2.5 flex flex-col group hover:bg-gray-50/40 transition-colors">

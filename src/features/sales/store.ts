@@ -93,7 +93,8 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   updateItem: (index, field, value) => {
     set(state => {
       const newItems = [...state.items];
-      if (newItems[index]) newItems[index][field] = value as never;
+      // @ts-expect-error assignment bypass for generic field updates
+      if (newItems[index]) newItems[index][field] = value;
       return { items: newItems };
     });
     get().calculateTotals();

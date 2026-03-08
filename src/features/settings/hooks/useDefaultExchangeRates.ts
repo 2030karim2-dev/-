@@ -1,6 +1,5 @@
 
 import { useEffect, useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useCurrencies, useCurrencyMutation } from '../hooks';
 import { useAuthStore } from '../../auth/store';
 
@@ -28,9 +27,8 @@ const CORRECT_RATES: Record<string, number> = {
 
 export function useDefaultExchangeRates() {
     const { rates } = useCurrencies();
-    const { setRate } = useCurrencyMutation();
+    const { setRate, refreshRates } = useCurrencyMutation();
     const { user } = useAuthStore();
-    const queryClient = useQueryClient();
     const processed = useRef(false);
 
     useEffect(() => {
@@ -42,12 +40,20 @@ export function useDefaultExchangeRates() {
         ) return;
 
         processed.current = true;
+
+        // If no rates exist at all, trigger an initial market fetch
+        if (!rates.data || rates.data.length === 0) {
+            console.log("[Currency] No rates found, triggering initial market sync...");
+            refreshRates();
+            return;
+        }
+
         const existingRates = (rates.data || []) as Array<{ currency_code: string, effective_date: string, created_at?: string, rate_to_base: number }>;
         const today = new Date().toISOString().split('T')[0];
-        let needsRefresh = false;
 
+        // We can still keep CORRECT_RATES as a absolute safety fallback, but only if market sync fails 
+        // or for currencies not in our scraper (OMR, CNY).
         Object.entries(CORRECT_RATES).forEach(([code, correctRate], index) => {
-            // أحدث سعر مسجل لهذه العملة (مرتب بـ effective_date + created_at تنازلي)
             const latestRate = existingRates
                 .filter(r => r.currency_code === code)
                 .sort((a, b) => {
@@ -56,10 +62,7 @@ export function useDefaultExchangeRates() {
                     return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
                 })[0];
 
-            // إذا السعر مختلف عن الصحيح — أدخل تصحيح
-            const currentRate = latestRate?.rate_to_base || 0;
-            if (!latestRate || Math.abs(currentRate - correctRate) > 0.00001) {
-                needsRefresh = true;
+            if (!latestRate) {
                 setTimeout(() => {
                     setRate({
                         currency_code: code,
@@ -69,13 +72,5 @@ export function useDefaultExchangeRates() {
                 }, index * 400);
             }
         });
-
-        // أعد تحميل الأسعار بعد التصحيح
-        if (needsRefresh) {
-            const totalDelay = Object.keys(CORRECT_RATES).length * 400 + 500;
-            setTimeout(() => {
-                queryClient.invalidateQueries({ queryKey: ['exchange_rates'] });
-            }, totalDelay);
-        }
     }, [rates.isLoading, rates.data, user?.company_id]);
 }

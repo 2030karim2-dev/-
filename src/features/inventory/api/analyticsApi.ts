@@ -37,6 +37,6 @@ export const analyticsApi = {
     },
 
     getLowStockProducts: async (companyId: string) => {
-        return await supabase.rpc('get_low_stock_products', { p_company_id: companyId } as never);
+        return await supabase.rpc('get_low_stock_products', { p_company_id: companyId });
     },
 };

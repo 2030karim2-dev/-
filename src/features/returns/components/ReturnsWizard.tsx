@@ -286,8 +286,9 @@ const ReturnsWizard: React.FC<ReturnsWizardProps> = ({
                     name: item.name,
                     quantity: item.returnQuantity,
                     unitPrice: item.unitPrice,
-                    unitCost: item.unitPrice * 0.6,
-                    costPrice: item.unitPrice * 0.6,
+                    // ⚡ Fix: Use actual cost_price from invoice items instead of hardcoded 60%
+                    unitCost: item.costPrice || item.unitPrice,
+                    costPrice: item.costPrice || item.unitPrice,
                 })),
             };
 

@@ -53,6 +53,23 @@ export const expensesService = {
     await expensesApi.deleteExpenseRecord(id);
   },
 
+  // ⚡ Server-side stats via RPC — no frontend aggregation
+  getStatsFromServer: async (companyId: string): Promise<ExpenseStats> => {
+    const { supabase } = await import('../../lib/supabaseClient');
+    const { data, error } = await supabase.rpc('get_expense_stats', {
+      p_company_id: companyId
+    });
+    if (error) throw error;
+    const result = data as any;
+    return {
+      totalExpenses: result.totalExpenses || 0,
+      paidExpenses: result.paidExpenses || 0,
+      pendingExpenses: result.pendingExpenses || 0,
+      categoriesCount: result.categoriesCount || 0
+    };
+  },
+
+  // Legacy: Used when expenses list is already loaded in memory
   calculateStats: (expenses: Expense[]): ExpenseStats => {
     const totalExpenses = expenses.reduce((sum, e) => sum + toBaseCurrency({ amount: Number(e.amount), currency_code: e.currency_code, exchange_rate: e.exchange_rate }), 0);
     const paidExpenses = expenses.filter(e => e.status === 'paid' || e.status === 'posted').reduce((sum, e) => sum + toBaseCurrency({ amount: Number(e.amount), currency_code: e.currency_code, exchange_rate: e.exchange_rate }), 0);

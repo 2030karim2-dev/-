@@ -159,11 +159,12 @@ export const useMinimalProducts = () => {
     });
 };
 
-export const useItemMovement = (productId: string | null, from?: string, to?: string) => {
+export const useItemMovement = (productId: string | null) => {
+    const { user } = useAuthStore();
     return useQuery({
-        queryKey: ['item_movement', productId, from, to],
-        queryFn: () => productId ? inventoryService.getItemMovement(productId, from, to) : Promise.resolve([]),
-        enabled: !!productId,
+        queryKey: ['item_movement', productId, user?.company_id],
+        queryFn: () => (productId && user?.company_id) ? inventoryService.getItemMovement(productId, user.company_id) : Promise.resolve([]),
+        enabled: !!productId && !!user?.company_id,
     });
 };
 

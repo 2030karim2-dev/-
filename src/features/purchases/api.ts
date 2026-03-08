@@ -69,22 +69,22 @@ export const purchasesApi = {
     const rpcParams = {
       p_company_id: companyId,
       p_user_id: userId,
-      p_supplier_id: data.supplierId,
+      p_supplier_id: data.supplierId || '',
       p_invoice_number: data.invoiceNumber,
       p_issue_date: data.issueDate,
       p_items: data.items.map(item => ({
         product_id: item.productId,
         quantity: item.quantity,
         unit_cost: Number(item.costPrice)
-      })) as any,
-      p_notes: data.notes ?? undefined,
+      })),
+      ...(data.notes ? { p_notes: data.notes } : {}),
       p_currency: data.currency || 'SAR',
       p_exchange_rate: rate,
       p_payment_method: data.paymentMethod || 'credit',
-      p_payment_account_id: (data.paymentMethod === 'cash' ? data.cashAccountId : data.bankAccountId) ?? undefined
+      ...(data.paymentMethod === 'cash' && data.cashAccountId ? { p_payment_account_id: data.cashAccountId } : data.bankAccountId ? { p_payment_account_id: data.bankAccountId } : {})
     };
 
-    const { data: result, error } = await supabase.rpc('commit_purchase_invoice', rpcParams as any);
+    const { data: result, error } = await supabase.rpc('commit_purchase_invoice', rpcParams);
     if (error) throw parseError(error);
     return result;
   },
@@ -94,17 +94,16 @@ export const purchasesApi = {
     const rpcParams = {
       p_company_id: companyId,
       p_user_id: userId,
-      p_supplier_id: data.supplierId,
-      p_original_invoice_num: data.invoiceNumber, // Used as reference
+      p_supplier_id: data.supplierId || '',
       p_items: data.items.map(item => ({
         product_id: item.productId,
         quantity: item.quantity,
         unit_cost: Number(item.costPrice)
-      })) as any,
-      p_notes: data.notes || '',
+      })),
       p_currency: data.currency || 'SAR',
-      p_exchange_rate: rate
-    } as any;
+      p_exchange_rate: rate,
+      p_notes: data.notes || ''
+    };
 
     const { data: result, error } = await supabase.rpc('commit_purchase_return', rpcParams);
     if (error) throw parseError(error);
@@ -125,15 +124,14 @@ export const purchasesApi = {
       p_bond_type: 'payment',
       p_amount: paymentData.amount,
       p_date: paymentData.date,
-      p_cash_account_id: cashAccount?.id || null,
+      p_cash_account_id: cashAccount?.id || '',
       p_counterparty_type: 'party',
-      p_counterparty_id: paymentData.supplierId,
+      p_counterparty_id: paymentData.supplierId || '',
       p_description: paymentData.notes || 'سند صرف لمورد',
-      p_reference_number: null,
       p_currency_code: paymentData.currencyCode || 'SAR',
       p_exchange_rate: paymentData.exchangeRate || 1,
-      p_foreign_amount: paymentData.foreignAmount || paymentData.amount
-    } as any);
+      ...((paymentData.foreignAmount || paymentData.amount) ? { p_foreign_amount: paymentData.foreignAmount || paymentData.amount } : {})
+    });
   },
 
   // Get purchase invoices that can be used for returns

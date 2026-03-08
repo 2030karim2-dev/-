@@ -80,7 +80,7 @@ export const settingsApi = {
 
   deleteWarehouse: async (id: string) => {
     return await supabase.from('warehouses')
-      .update({ deleted_at: new Date().toISOString() } as never)
+      .update({ deleted_at: new Date().toISOString() })
       .eq('id', id);
   },
 
@@ -170,6 +170,17 @@ export const settingsApi = {
       .from('fiscal_years')
       .update({ is_closed: true })
       .eq('id', id);
+  },
+
+  /**
+   * جلب أسعار الصرف من السوق (Edge Function)
+   */
+  fetchMarketRates: async (companyId?: string) => {
+    const { data, error } = await supabase.functions.invoke('fetch-exchange-rates-aden', {
+      body: { company_id: companyId }
+    });
+    if (error) throw error;
+    return data;
   }
 };
 

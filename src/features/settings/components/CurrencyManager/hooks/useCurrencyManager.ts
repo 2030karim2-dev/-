@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useCurrencyMutation } from '../../../hooks';
 
 export const useCurrencyManager = () => {
-    const { setRate, addCurrency, deleteCurrency, isSaving } = useCurrencyMutation();
+    const { setRate, addCurrency, deleteCurrency, refreshRates, isSaving } = useCurrencyMutation();
 
     const [activeRateEdit, setActiveRateEdit] = useState<string | null>(null);
     const [newRateValue, setNewRateValue] = useState<number>(0);
@@ -35,6 +35,6 @@ export const useCurrencyManager = () => {
         isAddModalOpen, setIsAddModalOpen,
         newCurrency, setNewCurrency,
         handleUpdateRate, handleAddCurrency,
-        deleteCurrency, isSaving
+        deleteCurrency, refreshRates, isSaving
     };
 };

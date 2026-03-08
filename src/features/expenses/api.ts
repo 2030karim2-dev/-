@@ -37,7 +37,7 @@ export const expensesApi = {
 
   // استخدام RPC الموحد v2 الذي يدعم الربط المباشر بالحسابات وتحسين الأداء
   createExpenseRPC: async (companyId: string, userId: string, data: ExpenseFormData) => {
-    return await supabase.rpc('commit_expense_v2' as never, {
+    return await supabase.rpc('commit_expense_v2', {
       p_company_id: companyId,
       p_user_id: userId,
       p_category_id: data.category_id,
@@ -45,31 +45,34 @@ export const expensesApi = {
       p_description: data.description,
       p_date: data.expense_date,
       p_payment_method: data.payment_method,
-      p_voucher_number: data.voucher_number,
+      ...(data.voucher_number ? { p_voucher_number: data.voucher_number } : {}),
       p_currency: data.currency_code || 'SAR',
       p_exchange_rate: data.exchange_rate || 1
-    } as never);
+    });
   },
 
   createExpenseCategory: async (categoryData: CategoryInsert) => {
-    return await (supabase.from('expense_categories') as unknown as ReturnType<typeof supabase.from>)
-      .insert(categoryData as never)
+    return await supabase.from('expense_categories')
+      .insert({
+        company_id: categoryData.company_id,
+        name: categoryData.name
+      })
       .select()
       .single();
   },
 
   deleteExpenseRecord: async (id: string) => {
     // Try RPC that both voids the expense and creates a reversal journal entry
-    const { error: rpcError } = await supabase.rpc('void_expense' as never, {
+    const { error: rpcError } = await supabase.rpc('void_expense', {
       p_expense_id: id
-    } as never);
+    });
 
     if (rpcError) {
       // Fallback: if RPC doesn't exist yet, do a soft delete (status = void)
       // WARNING: this does NOT reverse the journal entry
       console.warn('void_expense RPC not available, falling back to soft delete:', rpcError.message);
       const { error } = await supabase.from('expenses')
-        .update({ status: 'void' } as never)
+        .update({ status: 'void' })
         .eq('id', id);
       if (error) throw error;
       return;

@@ -50,7 +50,7 @@ export const useSalesSeed = () => {
 
             const { data: inserted, error } = await supabase
                 .from('invoices')
-                .upsert(invoices as never, { onConflict: 'invoice_number' })
+                .upsert(invoices, { onConflict: 'invoice_number' })
                 .select();
 
             if (error) throw error;

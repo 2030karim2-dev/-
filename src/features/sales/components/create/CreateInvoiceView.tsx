@@ -20,7 +20,7 @@ interface CreateInvoiceViewProps {
 
 const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
   const { data: company, isLoading: companyLoading, error: companyError } = useCompany();
-  const comp = company as any;
+  const comp = company as { id: string;[key: string]: unknown } | null;
   const { data: nextInvoiceNumber, isLoading: numberLoading, error: numberError } = useNextInvoiceNumber();
   const {
     items, selectedCustomer, summary, resetCart, invoiceType, cashboxId, currency,
@@ -73,7 +73,7 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
   }, [comp?.id, invoiceSettings, selectedCustomer, setMetadata, setCustomer]);
 
   const getExchangeRate = (currCode: string): number => {
-    const history = (rates?.data as any[] | undefined)?.filter((r) => r.currency_code === currCode) || [];
+    const history = (rates?.data as { currency_code: string; rate_to_base: number }[] | undefined)?.filter((r) => r.currency_code === currCode) || [];
     return (history.length > 0 ? history[0].rate_to_base : 1) as number;
   };
 
@@ -137,7 +137,7 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
       <div className="max-w-[1600px] mx-auto space-y-3 animate-in fade-in duration-500 pt-2 pb-24">
         <div className="bg-white dark:bg-slate-900 border-2 border-gray-100 dark:border-slate-800 shadow-2xl rounded-none flex flex-col overflow-hidden">
           {comp && <InvoiceHeader company={comp} />}
-          <InvoiceMeta invoiceNumber={nextInvoiceNumber as any} />
+          <InvoiceMeta invoiceNumber={nextInvoiceNumber as string} />
           <InteractiveInvoiceTable />
           <InvoiceTotals />
         </div>

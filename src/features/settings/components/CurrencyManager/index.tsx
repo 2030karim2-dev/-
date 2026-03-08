@@ -27,7 +27,7 @@ const CurrencyManager: React.FC = () => {
         isAddModalOpen, setIsAddModalOpen,
         newCurrency, setNewCurrency,
         handleUpdateRate, handleAddCurrency,
-        deleteCurrency, isSaving
+        deleteCurrency, refreshRates, isSaving
     } = useCurrencyManager();
 
     if (currencies.isLoading || rates.isLoading) {
@@ -101,6 +101,8 @@ const CurrencyManager: React.FC = () => {
                 setNewRateValue={setNewRateValue}
                 handleUpdateRate={handleUpdateRate}
                 deleteCurrency={deleteCurrency}
+                refreshRates={refreshRates}
+                isSaving={isSaving}
             />
 
             {/* Info Alert */}

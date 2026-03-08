@@ -154,11 +154,23 @@ export const useCurrencyMutation = () => {
     }
   });
 
+  const refreshRates = useMutation({
+    mutationFn: () => settingsService.refreshMarketRates(user?.company_id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['exchange_rates'] });
+      showToast("تم تحديث أسعار الصرف من السوق بنجاح", 'success');
+    },
+    onError: (error: any) => {
+      showToast(error.message || "فشل تحديث الأسعار من السوق", 'error');
+    }
+  });
+
   return {
     setRate: setRate.mutate,
     addCurrency: addCurrency.mutate,
     deleteCurrency: deleteCurrency.mutate,
-    isSaving: setRate.isPending || addCurrency.isPending
+    refreshRates: refreshRates.mutate,
+    isSaving: setRate.isPending || addCurrency.isPending || refreshRates.isPending
   };
 };
 

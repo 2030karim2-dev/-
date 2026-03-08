@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { bondsService } from './service';
 import { useAuthStore } from '../auth/store';
@@ -11,6 +10,15 @@ export const useBonds = (type: BondType) => {
   return useQuery({
     queryKey: ['bonds', user?.company_id, type],
     queryFn: () => user?.company_id ? bondsService.fetchBonds(user.company_id, type) : Promise.resolve([]),
+    enabled: !!user?.company_id,
+  });
+};
+
+export const useBondsAnalytics = () => {
+  const { user } = useAuthStore();
+  return useQuery({
+    queryKey: ['bonds_analytics', user?.company_id],
+    queryFn: () => user?.company_id ? bondsService.getBondsStats(user.company_id) : Promise.resolve(null),
     enabled: !!user?.company_id,
   });
 };

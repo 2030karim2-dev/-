@@ -3,7 +3,7 @@ import { partiesApi } from './api';
 import { supabase } from '../../lib/supabaseClient';
 import { Party, PartyStats, PartyFormData, PartyType, PartyCategory } from './types';
 
-interface StatementMovement {
+export interface StatementMovement {
   id: string;
   date: string;
   ref: string;
@@ -13,6 +13,7 @@ interface StatementMovement {
   credit: number;
   currency: string;
   operation_type?: string;
+  balance?: number;
 }
 
 export const partiesService = {
@@ -27,78 +28,35 @@ export const partiesService = {
     })) as Party[];
   },
 
+  // ⚡ Server-side party statement via RPC — no frontend aggregation
   getStatement: async (partyId: string, _type: PartyType) => {
-    const { journalLines } = await partiesApi.getTransactionDetails(partyId);
+    const { supabase } = await import('../../lib/supabaseClient');
+    const { data: userData } = await supabase.auth.getUser();
+    const { data: role } = await supabase.from('user_company_roles')
+      .select('company_id')
+      .eq('user_id', userData.user?.id || '')
+      .single();
 
-    const movements: StatementMovement[] = (journalLines || [])
-      .filter((line: any) => {
-        const code = line.account?.code;
-        // Strict Filter: Only show lines that affect the actual Party debt/credit accounts
-        // Typically Accounts Receivable (1100...) or Accounts Payable (2100...)
-        // This excludes internal Inventory, Revenue, Cash, and COGS lines even if tagged with party_id
-        return code?.startsWith('1100') || code?.startsWith('2100');
-      })
-      .map((line: any) => {
-        const entry = line.journal_entries;
-        if (!entry) return null;
+    if (!role?.company_id) return [];
 
-        let description = line.description || entry.description || 'حركة محاسبية';
-        let operationType = 'قيد محاسبي';
-        let reference = entry.entry_number ? `JV-${entry.entry_number}` : 'JV';
-
-        // Enhance reference and operation type based on context
-        const refType = entry.reference_type;
-        if (refType === 'sales_invoice' || refType === 'invoice') {
-          reference = 'INV';
-          operationType = 'فاتورة مبيعات';
-        } else if (refType === 'purchase_invoice') {
-          reference = 'PUR';
-          operationType = 'فاتورة مشتريات';
-        } else if (refType === 'payment' || refType === 'payment_bond') {
-          reference = 'PAY';
-          operationType = 'سند دفع';
-        } else if (refType === 'receipt' || refType === 'receipt_bond') {
-          reference = 'RCV';
-          operationType = 'سند قبض';
-        } else if (refType === 'sale_return' || refType === 'sales_return' || refType === 'return_sale') {
-          reference = 'RET';
-          operationType = 'مرتجع مبيعات';
-        } else if (refType === 'purchase_return' || refType === 'return_purchase') {
-          reference = 'PRET';
-          operationType = 'مرتجع مشتريات';
-        } else if (refType === 'expense') {
-          reference = 'EXP';
-          operationType = 'صرف مصروف';
-        }
-
-        return {
-          id: line.id,
-          date: entry.entry_date,
-          ref: reference,
-          operation_type: operationType,
-          desc: description,
-          type: entry.reference_type || 'journal',
-          debit: Number(line.debit_amount) || 0,
-          credit: Number(line.credit_amount) || 0,
-          currency: line.currency_code
-        };
-      })
-      .filter(m => m !== null) as StatementMovement[];
-
-    // Sort by date then by ID for a stable, professional order
-    movements.sort((a, b) => {
-      const dateA = new Date(a.date).getTime();
-      const dateB = new Date(b.date).getTime();
-      if (dateA !== dateB) return dateA - dateB;
-      return a.id.localeCompare(b.id);
+    const { data, error } = await supabase.rpc('get_party_statement', {
+      p_company_id: role.company_id,
+      p_party_id: partyId
     });
+    if (error) throw error;
 
-    // Calculate running balance (Net Position)
-    let runningBalance = 0;
-    return movements.map(m => {
-      runningBalance += (m.debit - m.credit);
-      return { ...m, balance: runningBalance };
-    });
+    return ((data as any[]) || []).map((m: any) => ({
+      id: m.line_id,
+      date: m.entry_date,
+      ref: m.ref,
+      operation_type: m.operation_type,
+      desc: m.description,
+      type: m.type,
+      debit: Number(m.debit) || 0,
+      credit: Number(m.credit) || 0,
+      currency: m.currency,
+      balance: Number(m.balance) || 0
+    })) as StatementMovement[];
   },
 
   getCategoriesWithStats: async (companyId: string, type: PartyType): Promise<PartyCategory[]> => {
@@ -133,8 +91,13 @@ export const partiesService = {
 
   saveParty: async (companyId: string, data: PartyFormData, id?: string) => {
     if (!data.name) throw new Error("الاسم مطلوب");
-    const { error } = await partiesApi.saveParty(companyId, data, id);
-    if (error) throw error;
+    if (id) {
+      const { error } = await partiesApi.updateParty(id, data);
+      if (error) throw error;
+    } else {
+      const { error } = await partiesApi.createParty(data, companyId);
+      if (error) throw error;
+    }
   },
 
   deleteParty: async (id: string) => {
@@ -146,7 +109,7 @@ export const partiesService = {
     try {
       if (id) {
         const { data: result, error } = await supabase.from('party_categories')
-          .update({ name: data.name } as never)
+          .update({ name: data.name })
           .eq('id', id)
           .select()
           .single();
@@ -154,7 +117,7 @@ export const partiesService = {
         return result;
       }
       const { data: result, error } = await supabase.from('party_categories')
-        .insert({ company_id: companyId, name: data.name, type: data.type } as never)
+        .insert({ company_id: companyId, name: data.name, type: data.type })
         .select()
         .single();
       if (error) throw error;
@@ -197,12 +160,11 @@ export const partiesService = {
     const existing = (searchResults || []).find((p: Record<string, unknown>) => p.name === name);
     if (existing) return existing as unknown as Party;
 
-    const { data: created, error: createError } = await partiesApi.saveParty(companyId, {
+    const { data: created, error: createError } = await partiesApi.createParty({
       name,
       type,
-      status: 'active',
-      balance: 0
-    });
+      status: 'active'
+    } as any, companyId);
 
     if (createError) throw createError;
     return (created as unknown) as Party;

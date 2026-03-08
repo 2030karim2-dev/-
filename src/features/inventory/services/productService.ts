@@ -112,7 +112,7 @@ export const productService = {
         const { data, error } = await supabase.rpc('search_inventory', {
             p_term: term,
             p_company_id: companyId
-        } as never);
+        });
         if (error) throw error;
         return data || [];
     },
@@ -279,113 +279,17 @@ export const productService = {
     },
 
     /**
-     * Get item movement history with date filtering and detail resolution
+     * Get item movement history with date filtering and detail resolution, now processed on the DB side
      */
-    getItemMovement: async (productId: string, from?: string, to?: string) => {
-        const { data, error } = await inventoryApi.getProductMovements(productId, from, to);
+    getItemMovement: async (productId: string, companyId: string) => {
+        const { data, error } = await supabase.rpc('get_item_movements_with_balance', {
+            p_company_id: companyId,
+            p_product_id: productId
+        });
+
         if (error) throw error;
 
-        // Collect Reference IDs to fetch details in bulk
-        const invoiceIds = data.filter((m: any) => m.reference_type?.includes('invoice')).map((m: any) => m.reference_id).filter(Boolean);
-        const transferIds = data.filter((m: any) => m.reference_type === 'transfer').map((m: any) => m.reference_id).filter(Boolean);
-
-        // Fetch Invoices (for Sales/Purchases)
-        let invoices: Record<string, any>[] = [];
-        if (invoiceIds.length > 0) {
-            const { data: inv } = await supabase.from('invoices').select('id, invoice_number, type, party_id, parties(name)').in('id', invoiceIds);
-            invoices = (inv || []) as Record<string, any>[];
-        }
-
-        // Fetch Transfers (for Stock Transfers)
-        let transfers: Record<string, unknown>[] = [];
-        if (transferIds.length > 0) {
-            const { data: tr } = await supabase.from('stock_transfers').select('id, from_warehouse_id, to_warehouse_id').in('id', transferIds);
-            transfers = (tr || []) as Record<string, unknown>[];
-        }
-
-        // Fetch Warehouses for name resolution
-        const { data: warehouses } = await supabase.from('warehouses').select('id, name_ar');
-        const warehouseMap = new Map((warehouses || []).map((w: { id: string, name_ar: string }) => [w.id, w.name_ar]));
-
-        // 1. Map raw transactions and resolve names
-        const movements = (data || []).map((m: Record<string, any>) => {
-            let sourceName = '---';
-            let docNumber = '---';
-            let notes = m.notes || '';
-            const dbType = (m.transaction_type || '').trim().toLowerCase();
-            const rawQty = Number(m.quantity) || 0;
-
-            // Explicitly determine if it's IN (Positive/Increasing) or OUT (Negative/Decreasing)
-            // Purchase, Sales Return, Adj In, Transfer In = IN (+)
-            // Sales, Purchase Return, Adj Out, Transfer Out = OUT (-)
-            // Fallback: use quantity sign
-            const incomingTypes = ['purchase', 'sales_return', 'return_sale', 'adj_in', 'transfer_in', 'initial'];
-            const outgoingTypes = ['sales', 'purchase_return', 'return_purchase', 'adj_out', 'transfer_out'];
-
-            let isIncoming = false;
-            if (incomingTypes.includes(dbType)) isIncoming = true;
-            else if (outgoingTypes.includes(dbType)) isIncoming = false;
-            else isIncoming = rawQty > 0; // Final fallback
-
-            if (typeof m.reference_type === 'string' && m.reference_type?.includes('invoice')) {
-                const inv = invoices.find(i => i.id === m.reference_id);
-                if (inv) {
-                    const invType = (inv.type || '').trim().toLowerCase();
-                    if (invType === 'sale' || invType === 'sales') docNumber = `فاتورة بيع #${inv.invoice_number}`;
-                    else if (invType === 'purchase') docNumber = `فاتورة شراء #${inv.invoice_number}`;
-                    else if (invType === 'return_sale' || invType === 'sale_return' || invType === 'sales_return') docNumber = `مردود مبيعات #${inv.invoice_number}`;
-                    else if (invType === 'return_purchase' || invType === 'purchase_return') docNumber = `مردود مشتريات #${inv.invoice_number}`;
-                    else docNumber = `فاتورة #${inv.invoice_number}`;
-
-                    const party = inv.parties as { name?: string };
-                    sourceName = party?.name || '---';
-                }
-            } else if (m.reference_type === 'transfer') {
-                const tr = transfers.find(t => t.id === m.reference_id);
-                if (tr) {
-                    docNumber = 'مناقلة مخزنية';
-                    const fromName = warehouseMap.get(tr.from_warehouse_id as string) || '?';
-                    const toName = warehouseMap.get(tr.to_warehouse_id as string) || '?';
-                    sourceName = `${fromName} ◄ ${toName}`;
-                }
-            } else if (m.reference_type === 'audit') {
-                docNumber = 'جرد مخزني';
-                sourceName = 'تسوية جردية';
-            }
-
-            return {
-                id: m.id,
-                date: m.created_at,
-                quantity: Math.abs(rawQty), // UI expects positive quantity, logic handled by transaction_type
-                transaction_type: isIncoming ? 'in' : 'out',
-                original_type: dbType,
-                reference_type: m.reference_type,
-                source_user: (m.created_by as { email?: string })?.email || 'System',
-                source_name: sourceName,
-                document_number: docNumber,
-                notes: notes,
-                raw_quantity: rawQty // Keep for balance calculation
-            };
-        });
-
-        // 2. Calculate cumulative balance (Bottom to Top)
-        // Since database doesn't store balance_after, we must calculate it manually from the history
-        // Sort chronologically (oldest first) to calculate running total
-        const sortedMovements = [...movements].sort((a, b) =>
-            new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
-
-        let currentBalance = 0;
-        const movementsWithBalance = sortedMovements.map(m => {
-            currentBalance += m.raw_quantity;
-            return {
-                ...m,
-                balance_after: currentBalance
-            };
-        });
-
-        // 3. Return in original order (newest first)
-        return movementsWithBalance.reverse();
+        return data || [];
     },
 
     /**
@@ -403,7 +307,7 @@ export const productService = {
         const { data, error } = await supabase.rpc('get_similar_products', {
             p_name: name,
             p_company_id: companyId
-        } as never);
+        });
         if (error) throw error;
         return data || [];
     },
@@ -414,7 +318,7 @@ export const productService = {
     getPotentialDuplicates: async (companyId: string) => {
         const { data, error } = await supabase.rpc('get_potential_duplicates', {
             p_company_id: companyId
-        } as never);
+        });
         if (error) throw error;
         return data || [];
     }

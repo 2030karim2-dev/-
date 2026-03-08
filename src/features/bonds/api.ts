@@ -49,9 +49,9 @@ export const bondsApi = {
       p_description: data.description,
       p_payment_method: data.payment_method || 'cash',
       p_reference_number: data.reference_number || '',
-      p_currency_code: data.currency_code,
-      p_exchange_rate: data.exchange_rate,
-      p_foreign_amount: data.foreign_amount || null
+      ...(data.currency_code ? { p_currency_code: data.currency_code } : {}),
+      ...(data.exchange_rate ? { p_exchange_rate: data.exchange_rate } : {}),
+      ...(data.foreign_amount ? { p_foreign_amount: data.foreign_amount } : {})
     });
 
     if (error) {
@@ -64,9 +64,9 @@ export const bondsApi = {
 
   deleteBond: async (id: string) => {
     // Use void_bond RPC to create a reversal journal entry before voiding
-    const { error: rpcError } = await supabase.rpc('void_bond' as never, {
+    const { error: rpcError } = await supabase.rpc('void_bond', {
       p_payment_id: id
-    } as never);
+    });
 
     if (rpcError) {
       // Fallback: if RPC doesn't exist yet, do a soft delete
@@ -75,10 +75,14 @@ export const bondsApi = {
         .update({
           deleted_at: new Date().toISOString(),
           status: 'void'
-        } as never)
+        })
         .eq('id', id);
     }
 
     return { error: null };
+  },
+
+  getBondsStats: async (companyId: string) => {
+    return await supabase.rpc('get_bonds_stats', { p_company_id: companyId });
   }
 };

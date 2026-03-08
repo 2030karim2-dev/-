@@ -23,7 +23,6 @@ interface Props {
 const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) => {
   const { data: invoice, isLoading } = useInvoiceDetails(invoiceId);
   const { data: company } = useCompany();
-  const comp = company as any;
   const { user } = useAuthStore();
   const { } = useFeedbackStore();
   const [isExporting, setIsExporting] = useState(false);
@@ -40,11 +39,11 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
     if (!invoice) return null;
 
     // Extract actual payment amounts from the nested structure
-    const paymentsList = (invoice as any).payment_allocations?.map((pa: any) => pa.payments).filter(Boolean) || [];
+    const paymentsList = (invoice.payment_allocations as any[])?.map((pa) => pa.payments).filter(Boolean) || [];
     const paidFromAllocations = paymentsList.reduce((sum: number, p: any) => sum + (p.amount || 0), 0);
 
     // Use the higher of the sum of allocations or the invoice-level paid_amount (since RPC usually updates paid_amount)
-    const paidAmount = Math.max(paidFromAllocations, (invoice as any).paid_amount || 0);
+    const paidAmount = Math.max(paidFromAllocations, (invoice as Record<string, unknown>).paid_amount as number || 0);
     const remainingAmount = invoice.total_amount - paidAmount;
 
     // Fallback: If payment_method is cash and there are no payments but status is 'posted' or 'paid'
@@ -76,13 +75,14 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
 
   const handleExportExcel = () => {
     if (!invoice || !company) return;
+    const comp = company as Record<string, unknown>;
     exportInvoiceToExcel({
-      companyName: comp.name || 'الزهراء سمارت',
-      companyAddress: comp.address,
-      taxNumber: comp.tax_number,
+      companyName: (comp?.name || comp?.name_ar || 'الزهراء سمارت') as string,
+      companyAddress: (comp?.address || '') as string,
+      taxNumber: (comp?.tax_number || '') as string,
       invoiceNumber: invoice.invoice_number || '',
       issueDate: invoice.issue_date,
-      customerName: invoice.parties?.name || 'عميل نقدي',
+      customerName: (invoice.parties as any)?.name || 'عميل نقدي',
       issuedBy: issuedByName,
       items: (invoice.invoice_items || []).map((i: any) => ({
         name: i.description || i.name || '---',
@@ -90,8 +90,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
         unitPrice: i.unit_price,
         total: i.total,
       })),
-      subtotal: (invoice as any).subtotal || (invoice.total_amount - (invoice as any).tax_amount),
-      taxAmount: invoice.tax_amount || 0,
+      subtotal: (invoice as Record<string, unknown>).subtotal as number || (invoice.total_amount - ((invoice as Record<string, unknown>).tax_amount as number || 0)),
       totalAmount: invoice.total_amount,
     });
     setShowAlert({ type: 'success', message: 'تم تصدير ملف Excel بنجاح' });
@@ -257,18 +256,18 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-slate-700 dark:text-slate-300">الشركة:</span>
-                  <span className="text-slate-600 dark:text-slate-400">{comp?.name_ar || comp?.name || user?.company_name || 'الزهراء سمارت'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">{(company as any)?.name_ar || (company as any)?.name || user?.company_name || 'الزهراء سمارت'}</span>
                 </div>
-                {comp?.address && (
+                {(company as any)?.address && (
                   <div className="flex items-center gap-2 col-span-2">
                     <MapPin size={14} className="text-slate-500" />
-                    <span className="text-slate-600 dark:text-slate-400">{comp.address}</span>
+                    <span className="text-slate-600 dark:text-slate-400">{(company as any).address}</span>
                   </div>
                 )}
-                {comp?.phone && (
+                {(company as any)?.phone && (
                   <div className="flex items-center gap-2">
                     <Phone size={14} className="text-slate-500" />
-                    <span className="text-slate-600 dark:text-slate-400">{comp.phone}</span>
+                    <span className="text-slate-600 dark:text-slate-400">{(company as any).phone}</span>
                   </div>
                 )}
               </div>
@@ -488,7 +487,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
               <div className="w-64 space-y-2">
                 <div className="flex justify-between font-bold p-2 border-b border-gray-200 dark:border-slate-700">
                   <span>المجموع:</span>
-                  <span dir="ltr" className="font-mono">{formatCurrency((invoice as any).subtotal, invoice.currency_code || 'SAR')}</span>
+                  <span dir="ltr" className="font-mono">{formatCurrency(((invoice as Record<string, unknown>).subtotal) as number, invoice.currency_code || 'SAR')}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold bg-blue-600 text-white p-3 rounded-lg">
                   <span>الإجمالي:</span>

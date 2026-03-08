@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import {
   FileText, Plus, ArrowDownCircle, ArrowUpCircle, LayoutGrid, Table as TableIcon
 } from 'lucide-react';
-import { useBonds, useBondMutation } from './hooks';
+import { useBonds, useBondMutation, useBondsAnalytics } from './hooks';
 import { BondType } from './types';
 import MicroHeader from '../../ui/base/MicroHeader';
 import Button from '../../ui/base/Button';
@@ -27,63 +27,50 @@ const BondsPage: React.FC = () => {
   const { data: bonds, isLoading } = useBonds(activeTab);
   const { mutate: createBond, isPending: isCreating } = useBondMutation();
 
-  // Calculate analytics
+  // Fetch server-sided analytics instead of client-sided aggregation
+  const { data: serverAnalytics } = useBondsAnalytics();
+
+  // Map server response to component expected structure
   const analytics = useMemo(() => {
-    const allBonds = bonds || [];
-    const totalAmount = allBonds.reduce((sum, b) => sum + (b.base_amount || b.amount), 0);
-    const count = allBonds.length;
-    const avgAmount = count > 0 ? totalAmount / count : 0;
-
-    const byDate = allBonds.reduce((acc, bond) => {
-      const date = bond.date;
-      if (!acc[date]) acc[date] = { date, amount: 0, count: 0 };
-      acc[date].amount += bond.amount;
-      acc[date].count += 1;
-      return acc;
-    }, {} as Record<string, { date: string; amount: number; count: number }>);
-
-    // Fill gaps for the last 30 days
-    const chartData = [];
-    const now = new Date();
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-      chartData.push({
-        date: dateStr,
-        amount: byDate[dateStr]?.amount || 0,
-        count: byDate[dateStr]?.count || 0
-      });
+    if (!serverAnalytics) {
+      return {
+        totalAmount: 0,
+        count: 0,
+        avgAmount: 0,
+        chartData: [],
+        accountData: []
+      };
     }
-
-    const byAccount = allBonds.reduce((acc, bond) => {
-      const name = bond.account_name;
-      if (!acc[name]) acc[name] = { name, amount: 0, count: 0 };
-      acc[name].amount += (bond.base_amount || bond.amount);
-      acc[name].count += 1;
-      return acc;
-    }, {} as Record<string, { name: string; amount: number; count: number }>);
-
-    const accountData = Object.values(byAccount)
-      .sort((a, b) => b.amount - a.amount)
-      .slice(0, 5);
-
-    return { totalAmount, count, avgAmount, chartData, accountData };
-  }, [bonds]);
+    const safeAnalytics = serverAnalytics as Record<string, unknown>;
+    return {
+      totalAmount: safeAnalytics.totalAmount as number || 0,
+      count: safeAnalytics.count as number || 0,
+      avgAmount: safeAnalytics.avgAmount as number || 0,
+      chartData: safeAnalytics.chartData as { date: string; amount: number; count: number }[] || [],
+      accountData: safeAnalytics.accountData as { name: string; amount: number; count: number }[] || []
+    };
+  }, [serverAnalytics]);
 
   const totals = useMemo(() => {
-    const receipt = bonds?.filter(b => b.type === 'receipt') || [];
-    const payment = bonds?.filter(b => b.type === 'payment') || [];
-    const rSum = receipt.reduce((sum, b) => sum + (b.base_amount || b.amount), 0);
-    const pSum = payment.reduce((sum, b) => sum + (b.base_amount || b.amount), 0);
+    const safeAnalytics = serverAnalytics as Record<string, unknown> | null;
+    const safeTotals = (safeAnalytics?.totals as Record<string, number>) || {};
+    if (!safeTotals || Object.keys(safeTotals).length === 0) {
+      return {
+        receiptCount: 0,
+        receiptAmount: 0,
+        paymentCount: 0,
+        paymentAmount: 0,
+        netAmount: 0
+      };
+    }
     return {
-      receiptCount: receipt.length,
-      receiptAmount: rSum,
-      paymentCount: payment.length,
-      paymentAmount: pSum,
-      netAmount: rSum - pSum
+      receiptCount: safeTotals.receiptCount || 0,
+      receiptAmount: safeTotals.receiptAmount || 0,
+      paymentCount: safeTotals.paymentCount || 0,
+      paymentAmount: safeTotals.paymentAmount || 0,
+      netAmount: safeTotals.netAmount || 0
     };
-  }, [bonds]);
+  }, [serverAnalytics]);
 
   // Analytics View
   if (viewType === 'analytics') {

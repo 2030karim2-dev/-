@@ -374,11 +374,11 @@ export type Database = {
         Row: {
           activity_type: string
           assigned_to: string | null
-          company_id: string | null
+          company_id: string
           completed_at: string | null
           created_at: string | null
           created_by: string | null
-          customer_id: string | null
+          customer_id: string
           description: string | null
           duration_minutes: number | null
           id: string
@@ -392,11 +392,11 @@ export type Database = {
         Insert: {
           activity_type: string
           assigned_to?: string | null
-          company_id?: string | null
+          company_id: string
           completed_at?: string | null
           created_at?: string | null
           created_by?: string | null
-          customer_id?: string | null
+          customer_id: string
           description?: string | null
           duration_minutes?: number | null
           id?: string
@@ -410,11 +410,11 @@ export type Database = {
         Update: {
           activity_type?: string
           assigned_to?: string | null
-          company_id?: string | null
+          company_id?: string
           completed_at?: string | null
           created_at?: string | null
           created_by?: string | null
-          customer_id?: string | null
+          customer_id?: string
           description?: string | null
           duration_minutes?: number | null
           id?: string
@@ -465,31 +465,31 @@ export type Database = {
       }
       customer_notes: {
         Row: {
-          company_id: string | null
+          company_id: string
           content: string
           created_at: string | null
           created_by: string | null
-          customer_id: string | null
+          customer_id: string
           id: string
           is_important: boolean | null
           note_type: string | null
         }
         Insert: {
-          company_id?: string | null
+          company_id: string
           content: string
           created_at?: string | null
           created_by?: string | null
-          customer_id?: string | null
+          customer_id: string
           id?: string
           is_important?: boolean | null
           note_type?: string | null
         }
         Update: {
-          company_id?: string | null
+          company_id?: string
           content?: string
           created_at?: string | null
           created_by?: string | null
-          customer_id?: string | null
+          customer_id?: string
           id?: string
           is_important?: boolean | null
           note_type?: string | null
@@ -568,21 +568,21 @@ export type Database = {
       customer_tags: {
         Row: {
           color: string | null
-          company_id: string | null
+          company_id: string
           created_at: string | null
           id: string
           name: string
         }
         Insert: {
           color?: string | null
-          company_id?: string | null
+          company_id: string
           created_at?: string | null
           id?: string
           name: string
         }
         Update: {
           color?: string | null
-          company_id?: string | null
+          company_id?: string
           created_at?: string | null
           id?: string
           name?: string
@@ -958,6 +958,7 @@ export type Database = {
       }
       invoice_items: {
         Row: {
+          company_id: string | null
           cost_price: number
           description: string | null
           discount_amount: number
@@ -972,6 +973,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          company_id?: string | null
           cost_price?: number
           description?: string | null
           discount_amount?: number
@@ -986,6 +988,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          company_id?: string | null
           cost_price?: number
           description?: string | null
           discount_amount?: number
@@ -1000,6 +1003,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_invoice_items_company"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "invoice_items_invoice_id_fkey"
             columns: ["invoice_id"]
@@ -1214,6 +1224,7 @@ export type Database = {
       journal_entry_lines: {
         Row: {
           account_id: string
+          company_id: string | null
           credit_amount: number
           currency_code: string | null
           debit_amount: number
@@ -1228,6 +1239,7 @@ export type Database = {
         }
         Insert: {
           account_id: string
+          company_id?: string | null
           credit_amount?: number
           currency_code?: string | null
           debit_amount?: number
@@ -1242,6 +1254,7 @@ export type Database = {
         }
         Update: {
           account_id?: string
+          company_id?: string | null
           credit_amount?: number
           currency_code?: string | null
           debit_amount?: number
@@ -1255,6 +1268,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_journal_entry_lines_company"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "journal_entry_lines_account_id_fkey"
             columns: ["account_id"]
@@ -1976,6 +1996,7 @@ export type Database = {
       }
       product_stock: {
         Row: {
+          company_id: string | null
           id: string
           product_id: string
           quantity: number
@@ -1983,6 +2004,7 @@ export type Database = {
           warehouse_id: string
         }
         Insert: {
+          company_id?: string | null
           id?: string
           product_id: string
           quantity?: number
@@ -1990,6 +2012,7 @@ export type Database = {
           warehouse_id: string
         }
         Update: {
+          company_id?: string | null
           id?: string
           product_id?: string
           quantity?: number
@@ -1997,6 +2020,13 @@ export type Database = {
           warehouse_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_product_stock_company"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "product_stock_product_id_fkey"
             columns: ["product_id"]
@@ -2324,36 +2354,36 @@ export type Database = {
       }
       supplier_price_history: {
         Row: {
-          company_id: string | null
+          company_id: string
           created_at: string | null
           currency: string | null
           effective_date: string
           id: string
           notes: string | null
-          product_id: string | null
-          supplier_id: string | null
+          product_id: string
+          supplier_id: string
           unit_price: number
         }
         Insert: {
-          company_id?: string | null
+          company_id: string
           created_at?: string | null
           currency?: string | null
           effective_date: string
           id?: string
           notes?: string | null
-          product_id?: string | null
-          supplier_id?: string | null
+          product_id: string
+          supplier_id: string
           unit_price: number
         }
         Update: {
-          company_id?: string | null
+          company_id?: string
           created_at?: string | null
           currency?: string | null
           effective_date?: string
           id?: string
           notes?: string | null
-          product_id?: string | null
-          supplier_id?: string | null
+          product_id?: string
+          supplier_id?: string
           unit_price?: number
         }
         Relationships: [
@@ -2397,7 +2427,7 @@ export type Database = {
       supplier_ratings: {
         Row: {
           communication_rating: number | null
-          company_id: string | null
+          company_id: string
           created_at: string | null
           delivery_rating: number | null
           id: string
@@ -2407,11 +2437,11 @@ export type Database = {
           quality_rating: number | null
           rated_by: string | null
           rating_date: string | null
-          supplier_id: string | null
+          supplier_id: string
         }
         Insert: {
           communication_rating?: number | null
-          company_id?: string | null
+          company_id: string
           created_at?: string | null
           delivery_rating?: number | null
           id?: string
@@ -2421,11 +2451,11 @@ export type Database = {
           quality_rating?: number | null
           rated_by?: string | null
           rating_date?: string | null
-          supplier_id?: string | null
+          supplier_id: string
         }
         Update: {
           communication_rating?: number | null
-          company_id?: string | null
+          company_id?: string
           created_at?: string | null
           delivery_rating?: number | null
           id?: string
@@ -2435,7 +2465,7 @@ export type Database = {
           quality_rating?: number | null
           rated_by?: string | null
           rating_date?: string | null
-          supplier_id?: string | null
+          supplier_id?: string
         }
         Relationships: [
           {
@@ -3280,15 +3310,15 @@ export type Database = {
       }
       commit_expense_v2: {
         Args: {
-          p_amount: number
+          p_amount?: number
           p_cash_account_id?: string
           p_category_id: string
           p_company_id: string
           p_currency?: string
-          p_date: string
-          p_description: string
+          p_date?: string
+          p_description?: string
           p_exchange_rate?: number
-          p_payment_method: string
+          p_payment_method?: string
           p_user_id: string
           p_voucher_number?: string
         }
@@ -3305,7 +3335,9 @@ export type Database = {
           p_date?: string
           p_description?: string
           p_exchange_rate?: number
+          p_foreign_amount?: number
           p_payment_method?: string
+          p_reference_number?: string
           p_type: string
           p_user_id: string
         }
@@ -3357,7 +3389,9 @@ export type Database = {
         Args: {
           p_company_id: string
           p_currency?: string
+          p_discount_amount?: number
           p_exchange_rate?: number
+          p_issue_date?: string
           p_items: Json
           p_notes?: string
           p_party_id: string
@@ -3376,11 +3410,11 @@ export type Database = {
           p_counterparty_id: string
           p_counterparty_type: string
           p_currency_code?: string
-          p_date: string
+          p_date?: string
           p_description: string
           p_exchange_rate?: number
           p_foreign_amount?: number
-          p_reference_number?: string
+          p_invoice_id?: string
           p_user_id: string
         }
         Returns: Json
@@ -3397,11 +3431,22 @@ export type Database = {
         Args: { p_company_id: string; p_type: string }
         Returns: string
       }
+      get_account_ledger: {
+        Args: {
+          p_account_id: string
+          p_company_id: string
+          p_from?: string
+          p_to?: string
+        }
+        Returns: Json
+      }
       get_auth_companies: { Args: never; Returns: string[] }
       get_auth_company_id: { Args: never; Returns: string }
       get_auth_user_companies: { Args: never; Returns: string[] }
+      get_bonds_stats: { Args: { p_company_id: string }; Returns: Json }
       get_cash_liquidity: { Args: { p_company_id: string }; Returns: number }
       get_customer_stats: { Args: { p_company_id: string }; Returns: Json }
+      get_dashboard_totals: { Args: { p_company_id: string }; Returns: Json }
       get_dead_stock: {
         Args: { days_threshold?: number; p_limit?: number; p_offset?: number }
         Returns: {
@@ -3416,16 +3461,37 @@ export type Database = {
           total_value: number
         }[]
       }
-      get_low_stock_products: {
-        Args: never
+      get_expense_stats: { Args: { p_company_id: string }; Returns: Json }
+      get_inventory_valuation: { Args: { p_company_id: string }; Returns: Json }
+      get_item_movements_with_balance: {
+        Args: { p_company_id: string; p_product_id: string }
         Returns: {
+          balance_after: number
+          date: string
+          document_number: string
           id: string
-          image_url: string
+          notes: string
+          original_type: string
+          quantity: number
+          raw_quantity: number
+          reference_type: string
+          source_name: string
+          source_user: string
+          transaction_type: string
+        }[]
+      }
+      get_low_stock_products: {
+        Args: { p_company_id?: string }
+        Returns: {
+          category_name: string
+          cost_price: number
+          id: string
           min_stock_level: number
           name_ar: string
           part_number: string
+          sale_price: number
           sku: string
-          stock_quantity: number
+          total_stock: number
         }[]
       }
       get_next_invoice_number: {
@@ -3439,6 +3505,10 @@ export type Database = {
       get_next_sequence: {
         Args: { p_company_id: string; p_type: string }
         Returns: string
+      }
+      get_party_statement: {
+        Args: { p_company_id: string; p_party_id: string }
+        Returns: Json
       }
       get_potential_duplicates: {
         Args: { p_company_id: string }
@@ -3481,6 +3551,7 @@ export type Database = {
           year_start: number
         }[]
       }
+      get_purchase_stats: { Args: { p_company_id: string }; Returns: Json }
       get_sales_analytics: {
         Args: {
           p_company_id: string
@@ -3489,6 +3560,7 @@ export type Database = {
         }
         Returns: Json
       }
+      get_sales_stats: { Args: { p_company_id: string }; Returns: Json }
       get_similar_products: {
         Args: { p_company_id: string; p_name: string }
         Returns: {
@@ -3544,7 +3616,7 @@ export type Database = {
           p_date: string
           p_description: string
           p_exchange_rate?: number
-          p_lines?: Json
+          p_lines: Json
           p_reference_type?: string
           p_user_id: string
         }
@@ -3595,6 +3667,10 @@ export type Database = {
         Args: { p_product_id: string; p_warehouse_id: string }
         Returns: undefined
       }
+      report_balance_sheet: {
+        Args: { p_company_id: string; p_from?: string; p_to?: string }
+        Returns: Json
+      }
       report_cash_flow: {
         Args: { p_company_id: string; p_from?: string; p_to?: string }
         Returns: {
@@ -3603,6 +3679,11 @@ export type Database = {
           net: number
           outflow: number
         }[]
+      }
+      report_debt_aging: { Args: { p_company_id: string }; Returns: Json }
+      report_profit_loss: {
+        Args: { p_company_id: string; p_from?: string; p_to?: string }
+        Returns: Json
       }
       report_trial_balance: {
         Args: { p_company_id: string; p_from: string; p_to: string }
@@ -3637,6 +3718,9 @@ export type Database = {
         Args: { p_journal_entry_id: string }
         Returns: boolean
       }
+      void_bond: { Args: { p_payment_id: string }; Returns: undefined }
+      void_expense: { Args: { p_expense_id: string }; Returns: undefined }
+      void_invoice: { Args: { p_invoice_id: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never

@@ -44,10 +44,9 @@ export const useProfitAndLoss = (options: { enabled?: boolean } = {}) => {
         queryKey: ['profit_loss', user?.company_id],
         queryFn: async () => {
             if (!user?.company_id) return null;
-            const { data, error } = await supabase.rpc('report_trial_balance', {
-                p_company_id: user.company_id,
-                p_from: '2000-01-01',
-                p_to: new Date().toISOString().split('T')[0]
+            // ⚡ Server-side P&L via RPC — no frontend account code filtering
+            const { data, error } = await supabase.rpc('report_profit_loss', {
+                p_company_id: user.company_id
             });
 
             if (error) {
@@ -55,19 +54,13 @@ export const useProfitAndLoss = (options: { enabled?: boolean } = {}) => {
                 throw error;
             }
 
-            const rows = (data as TrialBalanceRow[] | null) || [];
-            const revenues = rows.filter((a) => a.account_code.startsWith('4'));
-            const expenses = rows.filter((a) => a.account_code.startsWith('5'));
-
-            const totalRevenues = revenues.reduce((s, a) => s + Math.abs(a.balance || 0), 0);
-            const totalExpenses = expenses.reduce((s, a) => s + Math.abs(a.balance || 0), 0);
-
+            const result = data as any;
             return {
-                revenues: revenues.map((r) => ({ id: r.account_id, name: r.account_name, netBalance: Math.abs(r.balance || 0) })),
-                expenses: expenses.map((e) => ({ id: e.account_id, name: e.account_name, netBalance: Math.abs(e.balance || 0) })),
-                totalRevenues,
-                totalExpenses,
-                netProfit: totalRevenues - totalExpenses
+                revenues: (result.revenues || []).map((r: any) => ({ id: r.id, name: r.name, netBalance: r.netBalance })),
+                expenses: (result.expenses || []).map((e: any) => ({ id: e.id, name: e.name, netBalance: e.netBalance })),
+                totalRevenues: result.totalRevenues || 0,
+                totalExpenses: result.totalExpenses || 0,
+                netProfit: result.netProfit || 0
             };
         },
         enabled: (options.enabled !== false) && !!user?.company_id,

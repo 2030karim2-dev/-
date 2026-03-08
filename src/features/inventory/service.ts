@@ -64,8 +64,8 @@ export const inventoryService = {
     return productService.getMinimalProducts(companyId);
   },
 
-  getItemMovement: async (productId: string, from?: string, to?: string) => {
-    return productService.getItemMovement(productId, from, to);
+  getItemMovement: async (productId: string, companyId: string) => {
+    return productService.getItemMovement(productId, companyId);
   },
 
   processImportFile: async (file: File, companyId: string, userId: string) => {

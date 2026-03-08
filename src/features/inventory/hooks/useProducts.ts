@@ -75,11 +75,12 @@ export const useMinimalProducts = () => {
 };
 
 export const useItemMovement = (productId: string | null) => {
+    const { user } = useAuthStore();
     return useQuery({
-        queryKey: ['item_movement', productId],
+        queryKey: ['item_movement', productId, user?.company_id],
         // Fix: Call getItemMovement which will be added to inventoryService
-        queryFn: () => productId ? inventoryService.getItemMovement(productId) : Promise.resolve([]),
-        enabled: !!productId
+        queryFn: () => (productId && user?.company_id) ? inventoryService.getItemMovement(productId, user.company_id) : Promise.resolve([]),
+        enabled: !!productId && !!user?.company_id
     });
 };
 

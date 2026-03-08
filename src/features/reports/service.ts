@@ -42,7 +42,7 @@ export const reportsService = {
     const { data, error } = await reportsApi.getTrialBalanceRPC(companyId, fromDate, toDate);
     if (error) throw error;
 
-    return (data || []).map((acc: any) => ({
+    return (data || []).map((acc: { account_id: string; account_code: string; account_name: string; account_type: string; total_debit: number; total_credit: number; balance: number }) => ({
       id: acc.account_id,
       code: acc.account_code,
       name: acc.account_name,
@@ -54,6 +54,9 @@ export const reportsService = {
     }));
   },
 
+  /**
+   * ⚡ Server-side P&L via RPC — no frontend aggregation
+   */
   getProfitAndLoss: async (companyId: string): Promise<{
     revenues: TrialBalanceItem[];
     expenses: TrialBalanceItem[];
@@ -61,24 +64,36 @@ export const reportsService = {
     totalExpenses: number;
     netProfit: number;
   }> => {
-    const accounts: TrialBalanceItem[] = await reportsService.getTrialBalance(companyId);
+    const { data, error } = await supabase.rpc('report_profit_loss', {
+      p_company_id: companyId
+    });
+    if (error) throw error;
 
-    const revenues = accounts.filter((a) => a.type === 'revenue');
-    const expenses = accounts.filter((a) => a.type === 'expense');
-
-    const totalRevenues = revenues.reduce((s: number, a) => s + Math.abs(a.netBalance), 0);
-    const totalExpenses = expenses.reduce((s: number, a) => s + Math.abs(a.netBalance), 0);
-
+    const result = data as {
+      revenues: { id: string; code: string; name: string; netBalance: number }[],
+      expenses: { id: string; code: string; name: string; netBalance: number }[],
+      totalRevenues: number,
+      totalExpenses: number,
+      netProfit: number
+    };
     return {
-      revenues: revenues.map((r) => ({ ...r, netBalance: Math.abs(r.netBalance) })),
-      expenses: expenses,
-      totalRevenues,
-      totalExpenses,
-      netProfit: totalRevenues - totalExpenses
+      revenues: (result.revenues || []).map((r) => ({
+        id: r.id, code: r.code, name: r.name, type: 'revenue',
+        totalDebit: 0, totalCredit: 0, netBalance: r.netBalance
+      })),
+      expenses: (result.expenses || []).map((e) => ({
+        id: e.id, code: e.code, name: e.name, type: 'expense',
+        totalDebit: 0, totalCredit: 0, netBalance: e.netBalance
+      })),
+      totalRevenues: result.totalRevenues || 0,
+      totalExpenses: result.totalExpenses || 0,
+      netProfit: result.netProfit || 0
     };
   },
 
-  // ⚡ Fix: getBalanceSheet no longer calls getProfitAndLoss separately (was causing double fetch)
+  /**
+   * ⚡ Server-side Balance Sheet via RPC — no frontend aggregation
+   */
   getBalanceSheet: async (companyId: string): Promise<{
     assets: TrialBalanceItem[];
     liabilities: TrialBalanceItem[];
@@ -86,55 +101,39 @@ export const reportsService = {
     totalAssets: number;
     totalLiabEquity: number;
   }> => {
-    const accounts: TrialBalanceItem[] = await reportsService.getTrialBalance(companyId);
-    const assets = accounts.filter((a) => a.type === 'asset');
-    const liabilities = accounts.filter((a) => a.type === 'liability');
-    const equity = accounts.filter((a) => a.type === 'equity');
+    const { data, error } = await supabase.rpc('report_balance_sheet', {
+      p_company_id: companyId
+    });
+    if (error) throw error;
 
-    // ⚡ Compute net profit inline instead of calling getProfitAndLoss (which would re-fetch trial balance)
-    const revenues = accounts.filter((a) => a.type === 'revenue');
-    const expenses = accounts.filter((a) => a.type === 'expense');
-    const totalRevenues = revenues.reduce((s: number, a) => s + Math.abs(a.netBalance), 0);
-    const totalExpenses = expenses.reduce((s: number, a) => s + Math.abs(a.netBalance), 0);
-    const netProfit = totalRevenues - totalExpenses;
-
-    const totalAssets = assets.reduce((s: number, a) => s + a.netBalance, 0);
-    const totalLiabilities = Math.abs(liabilities.reduce((s: number, a) => s + a.netBalance, 0));
-    const totalEquity = Math.abs(equity.reduce((s: number, a) => s + a.netBalance, 0)) + netProfit;
-
-    return {
-      assets,
-      liabilities,
-      equity,
-      totalAssets,
-      totalLiabEquity: totalLiabilities + totalEquity
-    };
-  },
-
-  getDebtReport: async (companyId: string): Promise<ReportsStats> => {
-    const { data: parties, error: pError } = await reportsApi.getPartiesWithBalances(companyId);
-    if (pError) throw pError;
-    // Don't throw if company currency is missing or fails, just fallback to SAR
-    const { data: company } = await reportsApi.getCompanyCurrency(companyId);
-
-    const currency = company?.base_currency || 'SAR';
-    const debts: PartyDebt[] = (parties || []).map((p: any) => ({
-      id: p.id,
-      name: p.name,
-      type: p.type as 'customer' | 'supplier',
-      currency: currency,
-      total_sales: 0,
-      paid_amount: 0,
-      remaining_amount: p.balance || 0
+    const result = data as any;
+    const mapItems = (items: any[], type: string) => (items || []).map((a: any) => ({
+      id: a.id, code: a.code, name: a.name, type,
+      totalDebit: 0, totalCredit: 0, netBalance: a.netBalance
     }));
 
     return {
-      summary: {
-        receivables: debts.filter((d) => d.type === 'customer' && d.remaining_amount > 0).reduce((sum: number, d) => sum + d.remaining_amount, 0),
-        payables: Math.abs(debts.filter((d) => d.type === 'supplier' && d.remaining_amount < 0).reduce((sum: number, d) => sum + d.remaining_amount, 0)),
-        currency
-      },
-      debts
+      assets: mapItems(result.assets, 'asset'),
+      liabilities: mapItems(result.liabilities, 'liability'),
+      equity: mapItems(result.equity, 'equity'),
+      totalAssets: result.totalAssets || 0,
+      totalLiabEquity: result.totalLiabEquity || 0
+    };
+  },
+
+  /**
+   * ⚡ Server-side Debt Report via RPC — no frontend aggregation
+   */
+  getDebtReport: async (companyId: string): Promise<ReportsStats> => {
+    const { data, error } = await supabase.rpc('report_debt_aging', {
+      p_company_id: companyId
+    });
+    if (error) throw error;
+
+    const result = data as any;
+    return {
+      summary: result.summary,
+      debts: (result.debts || []) as PartyDebt[]
     };
   },
 

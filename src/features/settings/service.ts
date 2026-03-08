@@ -180,5 +180,17 @@ export const settingsService = {
             settingsService.addBackupLog('System Data Restore', '0 KB', 'Error');
             throw err;
         }
+    },
+
+    /**
+     * تحديث أسعار الصرف من السوق عبر Edge Function
+     */
+    refreshMarketRates: async (companyId?: string) => {
+        try {
+            return await settingsApi.fetchMarketRates(companyId);
+        } catch (error) {
+            console.error('[Settings] Failed to refresh market rates:', error);
+            throw error;
+        }
     }
 };

@@ -19,7 +19,7 @@ export const useNextExpenseNumber = () => {
       const { data, error } = await supabase.rpc('get_next_sequence', {
         p_company_id: user.company_id,
         p_type: 'expense'
-      } as never);
+      });
 
       if (error) {
         console.warn('Failed to fetch sequence:', error);

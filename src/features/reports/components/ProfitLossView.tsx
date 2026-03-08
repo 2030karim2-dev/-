@@ -96,7 +96,7 @@ const ProfitLossView: React.FC = () => {
                   <span dir="ltr" className="text-sm font-bold font-mono text-emerald-700 dark:text-emerald-400">{formatCurrency(data?.totalRevenues || 0)}</span>
                </div>
                <div className="p-6 space-y-4 flex-1">
-                  {displayedRevenues?.map(rev => (
+                  {displayedRevenues?.map((rev: { id: string; name: string; netBalance: number }) => (
                      <div key={rev.id} className="group flex justify-between items-center p-3 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-colors border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/20">
                         <div className="flex items-center gap-3">
                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-300 group-hover:scale-150 transition-transform" />
@@ -130,7 +130,7 @@ const ProfitLossView: React.FC = () => {
                   <span dir="ltr" className="text-sm font-bold font-mono text-rose-700 dark:text-rose-400">{formatCurrency(data?.totalExpenses || 0)}</span>
                </div>
                <div className="p-6 space-y-4 flex-1">
-                  {displayedExpenses?.map(exp => (
+                  {displayedExpenses?.map((exp: { id: string; name: string; netBalance: number }) => (
                      <div key={exp.id} className="group flex justify-between items-center p-3 rounded-2xl hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors border border-transparent hover:border-rose-100 dark:hover:border-rose-900/20">
                         <div className="flex items-center gap-3">
                            <div className="w-1.5 h-1.5 rounded-full bg-rose-300 group-hover:scale-150 transition-transform" />

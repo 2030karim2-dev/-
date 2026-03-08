@@ -15,25 +15,25 @@ const InventoryMovementView: React.FC = () => {
     const [toDate, setToDate] = useState<string>('');
 
     const { data: allProducts } = useMinimalProducts();
-    const { data: movement, isLoading } = useItemMovement(selectedProductId || null, fromDate, toDate);
+    const { data: movement, isLoading } = useItemMovement(selectedProductId || null);
 
     const filteredProducts = useMemo(() => {
         if (!searchQuery) return [];
-        return allProducts?.filter((p: any) =>
+        return allProducts?.filter((p: { name: string; sku: string | null }) =>
             p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.sku.toLowerCase().includes(searchQuery.toLowerCase())
+            (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase()))
         ).slice(0, 10) || [];
     }, [allProducts, searchQuery]);
 
     const selectedProduct = useMemo(() => {
-        return allProducts?.find((p: any) => p.id === selectedProductId);
+        return allProducts?.find((p: { id: string }) => p.id === selectedProductId);
     }, [allProducts, selectedProductId]);
 
     const analysis = useMemo(() => {
-        const movementArr = movement as any[] || [];
+        const movementArr = (movement as { quantity: number; balance_after: number; entry_date?: string; type?: string; description?: string; unit_cost?: number; id?: string }[]) || [];
         if (!movementArr || movementArr.length === 0) return null;
-        const totalIn = movementArr.reduce((sum: number, m: any) => sum + (m.quantity > 0 ? m.quantity : 0), 0);
-        const totalOut = movementArr.reduce((sum: number, m: any) => sum + (m.quantity < 0 ? Math.abs(m.quantity) : 0), 0);
+        const totalIn = movementArr.reduce((sum, m) => sum + (m.quantity > 0 ? m.quantity : 0), 0);
+        const totalOut = movementArr.reduce((sum, m) => sum + (m.quantity < 0 ? Math.abs(m.quantity) : 0), 0);
         const startBalance = movementArr[0].balance_after - movementArr[0].quantity;
         const avgStock = (startBalance + movementArr[movementArr.length - 1].balance_after) / 2;
 
@@ -42,20 +42,20 @@ const InventoryMovementView: React.FC = () => {
             totalIn,
             totalOut,
             turnover: avgStock > 0 ? (totalOut / avgStock).toFixed(1) : 0,
-            lastMovement: new Date(movementArr[movementArr.length - 1].date).toLocaleDateString('ar-SA')
+            lastMovement: new Date(movementArr[movementArr.length - 1].entry_date || '').toLocaleDateString('ar-SA')
         };
     }, [movement]);
 
     const chartData = useMemo(() => {
         const movementArr = movement as any[] || [];
         return movementArr.map((m: any) => ({
-            date: new Date(m.date).toLocaleDateString('en-GB'),
+            date: new Date(m.entry_date).toLocaleDateString('en-GB'),
             balance: m.balance_after
         })).reverse();
     }, [movement]);
 
     const columns = [
-        { header: 'التاريخ المالي', accessor: (row: any) => <span dir="ltr" className="font-mono text-[10px] text-slate-500 font-bold">{new Date(row.date).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' })}</span> },
+        { header: 'التاريخ المالي', accessor: (row: any) => <span dir="ltr" className="font-mono text-[10px] text-slate-500 font-bold">{new Date(row.entry_date).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' })}</span> },
         {
             header: 'نوع الحركة', accessor: (row: any) => {
                 let icon = <CheckCircle2 size={12} />;
@@ -259,7 +259,7 @@ const InventoryMovementView: React.FC = () => {
                             <div className="h-full w-full">
                                 <ResponsiveContainer width="100%" height={200}>
                                     <AreaChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                                        <XAxis dataKey="date" hide />
+                                        <XAxis dataKey="entry_date" hide />
                                         <YAxis hide />
                                         <defs>
                                             <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">

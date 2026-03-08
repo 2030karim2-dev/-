@@ -2,76 +2,33 @@
 import { reportsApi } from '../api/index';
 import { TrialBalanceItem, LedgerEntry } from '../types/index';
 import { supabase } from '../../../lib/supabaseClient';
-import { logger } from '../../../core/utils/logger';
 
 
 export const reportService = {
+    // ⚡ Server-side ledger via RPC — no frontend running balance calculation
     getLedger: async (companyId: string, accountId: string, fromDate?: string, toDate?: string): Promise<LedgerEntry[]> => {
-        // Fix #14: Get account type to correctly compute running balance
-        const { data: accountData } = await supabase.from('accounts')
-            .select('type')
-            .eq('id', accountId)
-            .single();
-        const accountType = accountData?.type || 'asset';
-        const isDebitNature = ['asset', 'expense'].includes(accountType);
-
-        let query = supabase.from('journal_entry_lines')
-            .select(`
-            journal:journal_entries(entry_date, entry_number, status, company_id),
-            debit_amount, credit_amount, description,
-            currency_code, exchange_rate, foreign_amount
-        `)
-            .eq('account_id', accountId)
-            .eq('journal.company_id', companyId)
-            .eq('journal.status', 'posted');
-
-        if (fromDate) query = query.gte('journal.entry_date', fromDate);
-        if (toDate) query = query.lte('journal.entry_date', toDate);
-
-        const { data, error } = await query;
+        const { data, error } = await supabase.rpc('get_account_ledger', {
+            p_company_id: companyId,
+            p_account_id: accountId,
+            ...(fromDate ? { p_from: fromDate } : {}),
+            ...(toDate ? { p_to: toDate } : {})
+        });
         if (error) throw error;
 
-        // Calculate Opening Balance for the period before fromDate
-        let openingBalance = 0;
-        if (fromDate) {
-            const { data: beforeData } = await supabase.from('journal_entry_lines')
-                .select('debit_amount, credit_amount')
-                .eq('account_id', accountId)
-                .eq('journal.status', 'posted')
-                .lt('journal.entry_date', fromDate);
-
-            (beforeData || []).forEach(l => {
-                if (isDebitNature) {
-                    openingBalance += (Number(l.debit_amount) || 0) - (Number(l.credit_amount) || 0);
-                } else {
-                    openingBalance += (Number(l.credit_amount) || 0) - (Number(l.debit_amount) || 0);
-                }
-            });
-        }
-
-        let balance = openingBalance;
-        return (data || []).map((line) => {
-            // Debit-nature accounts (asset/expense): balance = debit - credit
-            // Credit-nature accounts (liability/equity/revenue): balance = credit - debit
-            if (isDebitNature) {
-                balance += (Number(line.debit_amount) || 0) - (Number(line.credit_amount) || 0);
-            } else {
-                balance += (Number(line.credit_amount) || 0) - (Number(line.debit_amount) || 0);
-            }
-            return {
-                date: line.journal?.entry_date,
-                journal_id: '',
-                journal_entry_id: '',
-                entry_number: line.journal?.entry_number,
-                description: line.description || '',
-                debit_amount: Number(line.debit_amount) || 0,
-                credit_amount: Number(line.credit_amount) || 0,
-                balance,
-                currency_code: line.currency_code || 'SAR',
-                exchange_rate: Number(line.exchange_rate),
-                foreign_amount: Number(line.foreign_amount)
-            };
-        });
+        const result = data as any;
+        return (result.entries || []).map((line: any) => ({
+            date: line.entry_date,
+            journal_id: '',
+            journal_entry_id: '',
+            entry_number: line.entry_number,
+            description: line.description || '',
+            debit_amount: Number(line.debit_amount) || 0,
+            credit_amount: Number(line.credit_amount) || 0,
+            balance: Number(line.balance) || 0,
+            currency_code: line.currency_code || 'SAR',
+            exchange_rate: Number(line.exchange_rate) || 1,
+            foreign_amount: Number(line.foreign_amount) || 0
+        }));
     },
 
     getTrialBalance: async (companyId: string, fromDate?: string, toDate?: string): Promise<TrialBalanceItem[]> => {
@@ -101,61 +58,53 @@ export const reportService = {
         }));
     },
 
+    // ⚡ Server-side financials via RPCs
     getFinancials: async (companyId: string, fromDate?: string, toDate?: string) => {
-        const tb = await reportService.getTrialBalance(companyId, fromDate, toDate);
+        // P&L from server
+        const { data: plData, error: plError } = await supabase.rpc('report_profit_loss', {
+            p_company_id: companyId,
+            ...(fromDate ? { p_from: fromDate } : {}),
+            ...(toDate ? { p_to: toDate } : {})
+        });
+        if (plError) throw plError;
+        const pl = plData as any;
 
-        const revenues = tb.filter(x => x.type === 'revenue');
-        const expenses = tb.filter(x => x.type === 'expense');
-        const assets = tb.filter(x => x.type === 'asset');
-        const liabilities = tb.filter(x => x.type === 'liability');
-        const equity = tb.filter(x => x.type === 'equity');
+        // Balance Sheet from server
+        const { data: bsData, error: bsError } = await supabase.rpc('report_balance_sheet', {
+            p_company_id: companyId,
+            ...(fromDate ? { p_from: fromDate } : {}),
+            ...(toDate ? { p_to: toDate } : {})
+        });
+        if (bsError) throw bsError;
+        const bs = bsData as any;
 
-        const totalRevenue = revenues.reduce((sum, x) => sum + Math.abs(x.net_balance), 0);
-        const totalExpense = expenses.reduce((sum, x) => sum + x.net_balance, 0);
-        const netIncome = totalRevenue - totalExpense;
-
-        // Calculate balance sheet totals
-        const totalAssets = assets.reduce((sum, x) => sum + x.net_balance, 0);
-        const totalLiabilities = Math.abs(liabilities.reduce((sum, x) => sum + x.net_balance, 0));
-        const totalEquityBeforeIncome = Math.abs(equity.reduce((sum, x) => sum + x.net_balance, 0));
-        const totalEquity = totalEquityBeforeIncome + netIncome;
-
-        // Validate balance sheet equation: Assets = Liabilities + Equity
-        const balanceDifference = Math.abs(totalAssets - (totalLiabilities + totalEquity));
-        const isBalanced = balanceDifference < 0.01;
-
-        if (!isBalanced) {
-            logger.warn('Accounting', 'Balance sheet is not balanced', {
-                totalAssets,
-                totalLiabilities,
-                totalEquity,
-                difference: balanceDifference,
-                companyId,
-                fromDate,
-                toDate
-            });
-        }
+        // Map account arrays to TrialBalanceItem format
+        const mapToTBI = (items: any[], type: string) => (items || []).map((a: any) => ({
+            account_id: a.id, code: a.code, name: a.name, type,
+            total_debit: 0, total_credit: 0,
+            net_balance: a.netBalance || 0, currency_code: 'SAR'
+        }));
 
         return {
             incomeStatement: {
-                revenues,
-                expenses,
-                netIncome,
-                totalRevenue,
-                totalExpense
+                revenues: mapToTBI(pl.revenues, 'revenue'),
+                expenses: mapToTBI(pl.expenses, 'expense'),
+                netIncome: pl.netProfit || 0,
+                totalRevenue: pl.totalRevenues || 0,
+                totalExpense: pl.totalExpenses || 0
             },
             balanceSheet: {
-                assets,
-                liabilities,
-                equity,
-                netIncome,
+                assets: mapToTBI(bs.assets, 'asset'),
+                liabilities: mapToTBI(bs.liabilities, 'liability'),
+                equity: mapToTBI(bs.equity, 'equity'),
+                netIncome: bs.netProfit || 0,
                 totals: {
-                    assets: totalAssets,
-                    liabilities: totalLiabilities,
-                    equity: totalEquity
+                    assets: bs.totalAssets || 0,
+                    liabilities: bs.totalLiabilities || 0,
+                    equity: bs.totalEquity || 0
                 },
-                isBalanced,
-                difference: balanceDifference
+                isBalanced: bs.isBalanced ?? true,
+                difference: bs.difference || 0
             }
         };
     },

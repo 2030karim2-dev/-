@@ -8,20 +8,6 @@ import { toBaseCurrency } from '../../core/utils/currencyUtils';
 import { validatePurchasePayload, assertValid } from '../../core/utils/validationUtils';
 import { logger } from '../../core/utils/logger';
 
-// Type for raw purchase data from Supabase
-interface RawPurchase {
-  id: string;
-  type: string;
-  invoice_number: string | null;
-  party_id: string | null;
-  party: { name?: string } | null;
-  total_amount: number | null;
-  payment_method: string | null;
-  currency_code: string | null;
-  exchange_rate: number | null;
-  issue_date: string;
-}
-
 export { purchasesApi };
 
 export const purchasesService = {
@@ -86,79 +72,40 @@ export const purchasesService = {
     return await purchasesApi.createPurchaseReturnRPC(companyId, userId, data);
   },
 
+  // ⚡ Server-side stats via RPC — no frontend aggregation
   getStats: async (companyId: string) => {
-    const { data, error } = await purchasesApi.getPurchases(companyId);
+    const { supabase } = await import('../../lib/supabaseClient');
+    const { data, error } = await supabase.rpc('get_purchase_stats', {
+      p_company_id: companyId
+    });
     if (error) {
       logger.error('PurchaseService', 'Error fetching purchase stats', { companyId, error });
       throw error;
     }
-    const purchases = (data || []).filter((p: RawPurchase) => p.type === 'purchase');
-
-    const totalPurchases = purchases.reduce((sum: number, p: RawPurchase) => sum + toBaseCurrency({
-      amount: Number(p.total_amount) || 0,
-      currency_code: p.currency_code || 'YER',
-      exchange_rate: Number(p.exchange_rate) || 1
-    }), 0);
-    const creditPurchases = purchases.filter((p: RawPurchase) => p.payment_method === 'credit');
+    const result = data as any;
     return {
-      invoiceCount: purchases.length,
-      totalPurchases,
-      pendingPaymentCount: creditPurchases.length,
-      totalDebt: creditPurchases.reduce((sum: number, p: RawPurchase) => sum + toBaseCurrency({
-        amount: Number(p.total_amount) || 0,
-        currency_code: p.currency_code || 'YER',
-        exchange_rate: Number(p.exchange_rate) || 1
-      }), 0)
+      invoiceCount: result.invoiceCount || 0,
+      totalPurchases: result.totalPurchases || 0,
+      pendingPaymentCount: result.pendingPaymentCount || 0,
+      totalDebt: result.totalDebt || 0
     };
   },
 
+  // ⚡ Server-side analytics via RPC — no frontend aggregation
   getAnalytics: async (companyId: string) => {
-    const { data, error } = await purchasesApi.getPurchases(companyId);
+    const { supabase } = await import('../../lib/supabaseClient');
+    const { data, error } = await supabase.rpc('get_purchase_stats', {
+      p_company_id: companyId
+    });
     if (error) {
       logger.error('PurchaseService', 'Error fetching purchase analytics', { companyId, error });
       return { topSuppliers: [], chartData: [] };
     }
-
-    const purchases = (data || []).filter((p: RawPurchase) => p.type === 'purchase');
-
-    // Top Suppliers — aggregate by party (supplier)
-    const supplierMap: Record<string, { name: string; total: number; count: number }> = {};
-    purchases.forEach((p: RawPurchase) => {
-      const name = p.party?.name || 'مورد غير معروف';
-      const id = p.party_id || 'unknown';
-      if (!supplierMap[id]) supplierMap[id] = { name, total: 0, count: 0 };
-      supplierMap[id].total += Number(p.total_amount) || 0;
-      supplierMap[id].count += 1;
-    });
-    // Daily Chart Data — group by date
-    const dateMap: Record<string, number> = {};
-    purchases.forEach((p: RawPurchase) => {
-      const date = p.issue_date;
-      if (date) {
-        dateMap[date] = (dateMap[date] || 0) + (Number(p.total_amount) || 0);
-      }
-    });
-
-    // Fill gaps for the last 30 days
-    const chartData = [];
-    const now = new Date();
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-      chartData.push({
-        date: dateStr,
-        amount: dateMap[dateStr] || 0
-      });
-    }
-
-    // Top Suppliers with 'value' key for the chart
-    const topSuppliers = Object.values(supplierMap)
-      .map(s => ({ name: s.name, value: s.total }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 5);
-
-    return { topSuppliers, chartData };
+    const result = data as any;
+    return {
+      topSuppliers: result.topSuppliers || [],
+      chartData: result.chartData || []
+    };
   },
 
   // Get purchase returns for the returns view

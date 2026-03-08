@@ -13,7 +13,7 @@ export const companyApi = {
 
   updateCompany: async (companyId: string, data: CompanyFormData) => {
     return await supabase.from('companies')
-      .update(data as never)
+      .update(data)
       .eq('id', companyId);
   }
 };

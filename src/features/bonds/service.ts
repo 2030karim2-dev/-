@@ -75,5 +75,11 @@ export const bondsService = {
   deleteBond: async (id: string) => {
     const { error } = await bondsApi.deleteBond(id);
     if (error) throw error;
+  },
+
+  getBondsStats: async (companyId: string) => {
+    const { data, error } = await bondsApi.getBondsStats(companyId);
+    if (error) throw error;
+    return data;
   }
 };

@@ -69,7 +69,8 @@ export const salesService = {
     if (finalTreasuryAccountId && payload.currency) {
       const { accountsService } = await import('../accounting/services/accountsService');
       const accounts = await accountsService.getAccounts(companyId);
-      const routed = routeToChildByCurrency(accounts as any[], finalTreasuryAccountId, payload.currency);
+      // 3. Resolve actual treasury account using the multi-currency router
+      const routed = routeToChildByCurrency(accounts as unknown as import('../../core/utils/accountRouting').RoutableAccount[], finalTreasuryAccountId, payload.currency);
       if (routed) {
         finalTreasuryAccountId = routed.id;
       }
@@ -100,25 +101,21 @@ export const salesService = {
     return result;
   },
 
+  // ⚡ Server-side stats via RPC — no frontend aggregation
   getStats: async (companyId: string) => {
-    const { data, error } = await salesApi.getInvoices(companyId);
-
+    const { supabase } = await import('../../lib/supabaseClient');
+    const { data, error } = await supabase.rpc('get_sales_stats', {
+      p_company_id: companyId
+    });
     if (error) {
       logger.error('SalesService', 'Failed to fetch sales stats', { companyId, error });
       throw error;
     }
-
-    const salesOnly = (data || []).filter((i: RawInvoice) => i.type === 'sale');
-    const total = salesOnly.reduce((sum: number, s: RawInvoice) => sum + toBaseCurrency({
-      amount: Number(s.total_amount) || 0,
-      currency_code: s.currency_code || 'SAR',
-      exchange_rate: Number(s.exchange_rate) || 1
-    }), 0);
-
+    const result = data as Record<string, number>;
     return {
-      totalSales: total,
-      invoiceCount: salesOnly.length,
-      avgSale: salesOnly.length > 0 ? total / salesOnly.length : 0
+      totalSales: result.totalSales || 0,
+      invoiceCount: result.invoiceCount || 0,
+      avgSale: result.avgSale || 0
     };
   }
 };

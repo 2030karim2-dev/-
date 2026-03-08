@@ -109,10 +109,11 @@ export const analyticsService = {
      * Get top selling products
      */
     getTopSellingProducts: async (companyId: string, limit: number = 10) => {
-        const { data, error } = await supabase.rpc('get_top_selling_products' as any, {
+        // @ts-expect-error RPC not in types yet
+        const { data, error } = await supabase.rpc('get_top_selling_products', {
             p_company_id: companyId,
             p_limit: limit
-        } as never);
+        });
         if (error) {
             // Fallback if RPC doesn't exist
             return [];

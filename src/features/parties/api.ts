@@ -1,21 +1,8 @@
 
 import { supabase } from '../../lib/supabaseClient';
 import { PartyFormData, PartyType } from './types';
+import { mapToInsert, mapToUpdate } from '../../core/utils/supabaseMappers';
 
-// Extended form data fields that may exist on PartyFormData at runtime
-interface PartyPayload {
-  company_id?: string;
-  type: string;
-  name: string;
-  phone: string | null;
-  email: string | null;
-  tax_number: string | null;
-  address: string | null;
-  status: string;
-  category_id: string | null;
-  balance?: number;
-  [key: string]: unknown;
-}
 
 /**
  * واجهة التفاعل مع جدول العملاء والموردين
@@ -31,9 +18,10 @@ export const partiesApi = {
       .order('name', { ascending: true });
   },
 
-  saveParty: async (companyId: string, data: PartyFormData, id?: string) => {
+  createParty: async (data: PartyFormData, companyId: string) => {
     const extended = data as unknown as Record<string, unknown>;
-    const payload: PartyPayload = {
+
+    const insertPayload = mapToInsert<'parties'>({
       company_id: companyId,
       type: data.type,
       name: data.name,
@@ -44,15 +32,24 @@ export const partiesApi = {
       status: (extended.status as string) || 'active',
       category_id: (extended.category_id as string) || null,
       balance: 0
-    };
+    });
+    return await supabase.from('parties').insert(insertPayload).select().single();
+  },
 
-    if (id) {
-      // Don't overwrite balance or company_id on updates
-      delete payload.balance;
-      delete payload.company_id;
-      return await supabase.from('parties').update(payload as never).eq('id', id).select().single();
-    }
-    return await supabase.from('parties').insert(payload as never).select().single();
+  updateParty: async (id: string, data: PartyFormData) => {
+    const extended = data as unknown as Record<string, unknown>;
+
+    const updatePayload = mapToUpdate<'parties'>({
+      type: data.type,
+      name: data.name,
+      phone: data.phone || null,
+      email: (extended.email as string) || null,
+      tax_number: (extended.tax_number as string) || null,
+      address: (extended.address as string) || null,
+      status: (extended.status as string) || 'active',
+      category_id: (extended.category_id as string) || null
+    });
+    return await supabase.from('parties').update(updatePayload).eq('id', id).select().single();
   },
 
   deleteParty: async (id: string) => {
@@ -64,7 +61,7 @@ export const partiesApi = {
     if (count && count > 0) {
       throw new Error('لا يمكن حذف طرف له فواتير مرتبطة. قم بحظره بدلاً من حذفه.');
     }
-    return await supabase.from('parties').update({ deleted_at: new Date().toISOString() } as never).eq('id', id);
+    return await supabase.from('parties').update({ deleted_at: new Date().toISOString() }).eq('id', id);
   },
 
   search: async (companyId: string, type: PartyType, query: string) => {

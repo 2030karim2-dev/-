@@ -20,7 +20,7 @@ export const auditService = {
                 title: data.title,
                 created_by: userId,
                 status: 'active'
-            } as never)
+            })
             .select()
             .single();
 
@@ -40,7 +40,7 @@ export const auditService = {
                 product_id: p.product_id,
                 expected_quantity: p.quantity
             }));
-            await supabase.from('audit_items').insert(auditItems as never[]);
+            await supabase.from('audit_items').insert(auditItems);
         }
 
         return session;
@@ -54,7 +54,7 @@ export const auditService = {
             p_session_id: sessionId,
             p_user_id: userId,
             p_items: items.map(i => ({ product_id: i.product_id, counted_quantity: i.counted_quantity }))
-        } as never);
+        });
         if (error) throw error;
     },
 
@@ -110,7 +110,7 @@ export const auditService = {
             id: i.id,
             counted_quantity: i.counted_quantity
         }));
-        const { error } = await supabase.from('audit_items').upsert(updates as never[]);
+        const { error } = await supabase.from('audit_items').upsert(updates as any); // using any for now since upsert requires full type OR we can map it.
         if (error) throw error;
     }
 };

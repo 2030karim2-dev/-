@@ -12,10 +12,10 @@ export const warehouseApi = {
   },
 
   upsertWarehouse: async (data: Record<string, unknown>) => {
-    return await supabase.from('warehouses').upsert(data as never).select().single();
+    return await supabase.from('warehouses').upsert(data as any).select().single();
   },
 
   deleteWarehouse: async (id: string) => {
-    return await supabase.from('warehouses').update({ deleted_at: new Date().toISOString() } as never).eq('id', id);
+    return await supabase.from('warehouses').update({ deleted_at: new Date().toISOString() }).eq('id', id);
   }
 };
