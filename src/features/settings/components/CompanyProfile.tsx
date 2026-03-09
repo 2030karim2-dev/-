@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Save, Building, Globe, Banknote, FileText, CheckCircle, Building2, Crown } from 'lucide-react';
+import { Save, Building, Globe, Banknote, FileText, CheckCircle, Building2, Crown, Percent } from 'lucide-react';
 import { useCompany, useCompanyMutation } from '../hooks';
 import { useFeedbackStore } from '../../feedback/store';
 import Input from '../../../ui/base/Input';
@@ -16,6 +16,7 @@ const CompanyProfile: React.FC = () => {
       name: '',
       english_name: '',
       base_currency: 'SAR',
+      is_tax_enabled: false,
     }
   });
 
@@ -28,16 +29,18 @@ const CompanyProfile: React.FC = () => {
         name: comp.name || comp.name_ar || '',
         english_name: comp.english_name || comp.name_en || '',
         base_currency: comp.base_currency || 'SAR',
+        is_tax_enabled: comp.is_tax_enabled ?? false,
       });
     }
   }, [company, reset]);
 
   const onSubmit = (data: any) => {
-    // أعمدة قاعدة البيانات: name_ar, name_en, tax_number, base_currency
+    // أعمدة قاعدة البيانات: name_ar, name_en, base_currency, is_tax_enabled
     const payload: Record<string, any> = {
       name_ar: data.name,
       name_en: data.english_name || null,
       base_currency: data.base_currency,
+      is_tax_enabled: Boolean(data.is_tax_enabled),
     };
 
     updateProfile(payload, {
@@ -158,6 +161,29 @@ const CompanyProfile: React.FC = () => {
                   <span className="text-[8px] md:text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase">
                     العملة الأساسية لقيد المعاملات
                   </span>
+                </div>
+              </div>
+
+              {/* Tax System Toggle */}
+              <div className="flex items-center justify-between p-3 md:p-4 bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 rounded-xl">
+                <div className="space-y-1 w-full flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg">
+                    <Percent size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-[11px] md:text-xs font-bold text-gray-800 dark:text-slate-200">
+                      تفعيل نظام الضرائب (VAT)
+                    </h4>
+                    <p className="text-[9px] md:text-[10px] font-bold text-gray-500 dark:text-slate-400 mt-1">
+                      إظهار خيارات وحقول الضرائب في واجهات الفواتير والمنتجات
+                    </p>
+                  </div>
+                  <div>
+                    <label className="relative inline-flex flex-col items-center cursor-pointer p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                      <input type="checkbox" {...register('is_tax_enabled')} className="sr-only peer" />
+                      <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[10px] after:left-[10px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
                 </div>
               </div>
 

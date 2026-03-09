@@ -9,7 +9,7 @@ export const analyticsApi = {
         unit_price,
         total,
         product_id,
-        products!inner(id, name_ar, sku, cost_price),
+        products!inner(id, name_ar, sku, purchase_price),
         invoices!inner(id, issue_date, type, status)
       `)
             .eq('invoices.company_id', companyId)

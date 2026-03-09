@@ -20,7 +20,7 @@ export const productsApi = {
                 category_id,
                 size,
                 description,
-                cost_price,
+                purchase_price,
                 sale_price,
                 min_stock_level,
                 unit,

@@ -11,7 +11,7 @@ import { mapToInsert, mapToUpdate } from '../../core/utils/supabaseMappers';
 export const partiesApi = {
   getParties: async (companyId: string, type: PartyType) => {
     return await supabase.from('parties')
-      .select('*, party_categories:category_id(id, name)')
+      .select('*, party_categories:category_id(id, name), balance:party_balances(balance)')
       .eq('company_id', companyId)
       .eq('type', type)
       .is('deleted_at', null)
@@ -30,8 +30,7 @@ export const partiesApi = {
       tax_number: (extended.tax_number as string) || null,
       address: (extended.address as string) || null,
       status: (extended.status as string) || 'active',
-      category_id: (extended.category_id as string) || null,
-      balance: 0
+      category_id: (extended.category_id as string) || null
     });
     return await supabase.from('parties').insert(insertPayload).select().single();
   },

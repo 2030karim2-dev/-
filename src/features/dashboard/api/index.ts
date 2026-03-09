@@ -19,9 +19,9 @@ export const dashboardApi = {
             // 2. Expenses (recent) - Removing exchange_operator which doesn't exist
             supabase.from('expenses').select('id, amount, expense_date, description, status, category_id, currency_code, exchange_rate, expense_categories(name)').eq('company_id', companyId).neq('status', 'void').order('expense_date', { ascending: false }).limit(1000),
             // 3. Customer Debts (Absolute Total)
-            supabase.from('parties').select('balance').eq('company_id', companyId).eq('type', 'customer').is('deleted_at', null).gt('balance', 0),
+            supabase.from('party_balances').select('balance').eq('company_id', companyId).eq('type', 'customer').gt('balance', 0),
             // 4. Supplier Debts (Absolute Total)
-            supabase.from('parties').select('balance').eq('company_id', companyId).eq('type', 'supplier').is('deleted_at', null).gt('balance', 0),
+            supabase.from('party_balances').select('balance').eq('company_id', companyId).eq('type', 'supplier').gt('balance', 0),
             // 5. Expense Categories
             supabase.from('expense_categories').select('id, name').eq('company_id', companyId),
         ]);

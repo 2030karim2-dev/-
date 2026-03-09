@@ -21,7 +21,7 @@ interface RawProduct {
     category_id?: string;
     size?: string;
     description?: string;
-    cost_price?: number | string;
+    purchase_price?: number | string;
     sale_price?: number | string;
     min_stock_level?: number | string;
     unit?: string;
@@ -66,7 +66,7 @@ export const productService = {
                 category_id: prod.category_id || null,
                 size: prod.size || '',
                 specifications: prod.description || '',
-                cost_price: Number(prod.cost_price) || 0,
+                cost_price: Number(prod.purchase_price) || 0,
                 sale_price: Number(prod.sale_price) || 0,
                 selling_price: Number(prod.sale_price) || 0,
                 stock_quantity: totalStock,
@@ -139,7 +139,6 @@ export const productService = {
             sku: data.sku || `SKU-${Date.now()}`,
             sale_price: Number(data.selling_price) || 0,
             purchase_price: Number(data.cost_price) || 0,
-            cost_price: Number(data.cost_price) || 0,
             min_stock_level: Number(data.min_stock_level) || 5,
             unit: data.unit || 'piece',
             part_number: data.part_number || null,
@@ -187,7 +186,6 @@ export const productService = {
             const payload: any = {
                 name_ar: data.name,
                 sale_price: Number(data.selling_price),
-                cost_price: Number(data.cost_price),
                 purchase_price: Number(data.cost_price),
                 min_stock_level: Number(data.min_stock_level),
                 unit: data.unit,

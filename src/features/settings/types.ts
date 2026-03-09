@@ -13,6 +13,7 @@ export interface Company {
   phone?: string | null;
   logo_url?: string | null;
   is_active: boolean;
+  is_tax_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -28,6 +29,7 @@ export interface CompanyFormData {
   phone?: string | null;
   logo_url?: string | null;
   is_active?: boolean;
+  is_tax_enabled?: boolean;
   [key: string]: unknown; // السماح بحقول إضافية للتوافق مع أعمدة DB المختلفة
 }
 

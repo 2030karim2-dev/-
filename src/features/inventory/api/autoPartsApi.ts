@@ -57,7 +57,7 @@ export const autoPartsApi = {
             .select(`
         *,
         component_product:products!component_product_id (
-          id, name_ar, name_en, sku, part_number, brand, cost_price, sale_price, unit
+          id, name_ar, name_en, sku, part_number, brand, purchase_price, sale_price, unit
         )
       `)
             .eq('kit_product_id', kitId);
