@@ -8,6 +8,7 @@ import { ExpenseAmountSection } from './components/ExpenseAmountSection';
 import { ExpenseCategorySection } from './components/ExpenseCategorySection';
 
 import { ExpenseFinancialSection } from './components/ExpenseFinancialSection';
+import { useFeedbackStore } from '../../../feedback/store';
 
 interface Props {
     isOpen: boolean;
@@ -31,6 +32,27 @@ const CreateExpenseModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubm
 
     const { register, handleSubmit, watch, setValue } = form;
 
+    const { showToast } = useFeedbackStore();
+
+    const onInvalidSubmit = (errors: any) => {
+        // Collect error messages
+        const errorMessages = Object.keys(errors).map(key => {
+            const fieldNames: Record<string, string> = {
+                category_id: 'التصنيف',
+                amount: 'المبلغ',
+                expense_date: 'تاريخ الصرف',
+                description: 'البيان',
+                exchange_rate: 'سعر الصرف'
+            };
+            return `حقل ${fieldNames[key] || key} مطلوب أو غير صالح`;
+        });
+
+        if (errorMessages.length > 0) {
+            showToast(errorMessages.join(' | '), 'error');
+        } else {
+            showToast('الرجاء التأكد من تعبئة جميع الحقول المطلوبة', 'error');
+        }
+    };
 
     const footer = (
         <div className="flex w-full gap-2 p-1">
@@ -42,7 +64,7 @@ const CreateExpenseModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubm
                 إلغاء
             </button>
             <Button
-                onClick={handleSubmit(onSubmit)}
+                onClick={handleSubmit(onSubmit, onInvalidSubmit)}
                 isLoading={isSubmitting}
                 className="flex-[2] rounded-none text-[11px] font-bold bg-rose-600 border-rose-700 shadow-xl uppercase tracking-widest"
                 leftIcon={<Save size={16} />}

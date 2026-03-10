@@ -178,7 +178,7 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
 
             <div className="h-48 w-full relative group" style={{ minHeight: '192px' }}>
                 {isMounted && (
-                    <ResponsiveContainer width="99%" height={192} debounce={1} minWidth={0} minHeight={192}>
+                    <ResponsiveContainer width="100%" height={192} debounce={1}>
                         <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="barRevenue" x1="0" y1="0" x2="0" y2="1">
