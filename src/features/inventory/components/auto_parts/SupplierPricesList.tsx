@@ -86,7 +86,7 @@ export const SupplierPricesList: React.FC<SupplierPricesListProps> = ({ product 
                                             <Building2 className="h-5 w-5 text-gray-400 ml-3" />
                                             <div>
                                                 <div className="text-sm font-medium text-gray-900">{price.supplier_name || 'مورد غير معروف'}</div>
-                                                <div className="text-xs text-gray-500">تم التحديث: {new Date(price.last_updated).toLocaleDateString('ar-SA')}</div>
+                                                <div className="text-xs text-gray-500">تم التحديث: {new Date(price.updated_at).toLocaleDateString('ar-SA')}</div>
                                             </div>
                                         </div>
                                     </td>

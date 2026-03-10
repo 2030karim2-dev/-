@@ -11,13 +11,13 @@ export const accountsService = {
     if (error) throw error;
 
     // تحويل البيانات من السكيما (snake_case) إلى النموذج المطلوب في الواجهة
-    return (data || []).map((acc) => ({
+    return (data || []).map((acc: any) => ({
       id: acc.id,
       company_id: acc.company_id,
       code: acc.code,
       name: acc.name_ar, // استخدام الحقل العربي
       type: acc.type as Account['type'],
-      balance: acc.balance, // الحقل الصحيح في السكيما هو balance وليس current_balance
+      balance: acc.balance || 0, // الحقل الصحيح في السكيما هو balance وليس current_balance
       currency_code: acc.currency_code || 'SAR',
       is_system: acc.is_system,
       parent_id: acc.parent_id ?? undefined
@@ -43,7 +43,7 @@ export const accountsService = {
       code: account.code,
       name: account.name_ar,
       type: account.type as Account['type'],
-      balance: account.balance,
+      balance: 0,
       currency_code: account.currency_code,
       is_system: account.is_system,
       parent_id: account.parent_id ?? undefined
@@ -103,8 +103,7 @@ export const accountsService = {
         type: 'asset' as const,
         currency_code: box.currency_code,
         parent_id: mainCashbox.id,
-        is_system: true,
-        balance: 0
+        is_system: true
       }));
 
     if (toInsert.length > 0) {
@@ -133,8 +132,7 @@ export const accountsService = {
         name_ar: 'شركات الصرافة',
         type: 'asset',
         currency_code: 'SAR',
-        is_system: true,
-        balance: 0
+        is_system: true
       }).select().single();
       if (parentError) throw parentError;
       if (!newParent) throw new Error("Failed to create parent account");
@@ -166,8 +164,7 @@ export const accountsService = {
         type: 'asset' as const,
         currency_code: ex.currency_code,
         parent_id: exchangeParent!.id,
-        is_system: false,
-        balance: 0
+        is_system: false
       }));
 
     if (toInsert.length > 0) {

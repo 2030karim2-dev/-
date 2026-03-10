@@ -11,6 +11,7 @@ export type Party = Database['public']['Tables']['parties']['Row'] & {
   email?: string;
   tax_number?: string;
   address?: string;
+  balance?: number;
 };
 
 export interface PartyFormData {
@@ -23,10 +24,6 @@ export interface PartyFormData {
   status: PartyStatus;
   category?: string;
   category_id?: string | null;
-  /**
-   * Fix: Added balance to PartyFormData to resolve API payload property errors
-   */
-  balance?: number;
 }
 
 export interface PartyStats {

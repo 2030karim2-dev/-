@@ -71,7 +71,7 @@ export interface ProductSupplierPrice {
   lead_time_days?: number | null;
   supplier_part_number?: string | null;
   notes?: string | null;
-  last_updated: string;
+  updated_at: string;
 }
 
 export interface Product {

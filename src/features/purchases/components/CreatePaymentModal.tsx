@@ -3,8 +3,8 @@ import { X, Loader2, Search, Banknote, Calendar, ShieldCheck } from 'lucide-reac
 import { useCreatePayment } from '../hooks';
 import { useParties } from '../../parties/hooks';
 import { useAuthStore } from '../../auth/store';
-import { Database } from '../../../core/database.types';
-type DbParty = Database['public']['Tables']['parties']['Row'];
+
+import { Party } from '../../parties/types';
 import { formatCurrency } from '../../../core/utils';
 
 interface CreatePaymentModalProps {
@@ -19,7 +19,7 @@ const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({ isOpen, onClose
     const [amount, setAmount] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [notes, setNotes] = useState('');
-    const [selectedSupplier, setSelectedSupplier] = useState<DbParty | null>(null);
+    const [selectedSupplier, setSelectedSupplier] = useState<Party | null>(null);
 
     const [supplierQuery, setSupplierQuery] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -81,7 +81,7 @@ const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({ isOpen, onClose
                                     <div>
                                         <div className="font-extrabold text-gray-800 dark:text-slate-100">{selectedSupplier.name}</div>
                                         <div dir="ltr" className="text-xs text-gray-500 dark:text-slate-500 font-bold mt-0.5">
-                                            الرصيد: <span className={selectedSupplier.balance < 0 ? 'text-red-500' : 'text-emerald-500'}>{formatCurrency(selectedSupplier.balance || 0)}</span>
+                                            الرصيد: <span className={(selectedSupplier.balance || 0) < 0 ? 'text-red-500' : 'text-emerald-500'}>{formatCurrency(selectedSupplier.balance || 0)}</span>
                                         </div>
                                     </div>
                                 </div>

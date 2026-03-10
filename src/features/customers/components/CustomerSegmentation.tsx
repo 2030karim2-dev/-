@@ -13,8 +13,8 @@ export const CustomerSegmentation: React.FC<CustomerSegmentationProps> = ({ comp
     }
 
     const totalCustomers = customers?.length || 0;
-    const activeCustomers = customers?.filter(c => c.balance > 0).length || 0;
-    const vipCustomers = customers?.filter(c => c.balance > 10000).length || 0;
+    const activeCustomers = customers?.filter(c => (c.balance || 0) > 0).length || 0;
+    const vipCustomers = customers?.filter(c => (c.balance || 0) > 10000).length || 0;
 
     return (
         <div className="bg-white rounded-lg shadow p-4">

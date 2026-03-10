@@ -301,7 +301,7 @@ export const CustomerMapper = {
             phone: row.phone,
             email: row.email,
             address: row.address,
-            balance: row.balance || 0,
+            balance: (row as any).balance || 0,
             status: (row.status as 'active' | 'blocked') || 'active',
         };
     },

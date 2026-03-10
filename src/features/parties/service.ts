@@ -24,7 +24,7 @@ export const partiesService = {
       ...p,
       category_id: p.category_id,
       category: (p.party_categories as Record<string, unknown>)?.name || 'عام',
-      balance: Array.isArray(p.balance) ? (p.balance[0] as any)?.balance || 0 : 0,
+      balance: Number(p.balance) || 0,
       status: p.status || 'active'
     })) as Party[];
   },

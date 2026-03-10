@@ -16,7 +16,7 @@ export type InvoiceType = 'sale' | 'purchase' | 'return_sale' | 'return_purchase
 
 export type InvoiceStatus = 'draft' | 'posted' | 'paid' | 'void';
 
-export type PaymentMethod = 'cash' | 'credit' | 'bank';
+export type PaymentMethod = 'cash' | 'credit' | 'bank' | 'check' | 'transfer';
 
 export type PartyType = 'customer' | 'supplier';
 
@@ -41,7 +41,7 @@ export interface NamedEntity extends BaseEntity {
 // ------------------------------------------
 // Product Types
 // ------------------------------------------
-export type ProductStatus = 'active' | 'inactive';
+export type ProductStatus = 'active' | 'inactive' | 'archived';
 
 export interface Product extends BaseEntity {
     company_id: string;
@@ -119,8 +119,7 @@ export interface Party extends BaseEntity {
 export interface PartyBalance {
     company_id: string;
     party_id: string;
-    total_debit: number;
-    total_credit: number;
+    type: string;
     balance: number;
 }
 
@@ -167,7 +166,7 @@ export interface Account extends BaseEntity {
     name_en?: string;
     type: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
     parent_id?: string;
-    balance: number;
+    balance?: number; // Computed — only available from active_accounts view
     is_active: boolean;
 }
 
@@ -317,7 +316,7 @@ export interface Warehouse {
     name_ar: string;
     location?: string;
     is_primary: boolean;
-    status: EntityStatus;
+    status: 'active' | 'inactive';
 }
 
 // ------------------------------------------

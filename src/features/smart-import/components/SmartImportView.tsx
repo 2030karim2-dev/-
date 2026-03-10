@@ -47,15 +47,10 @@ const SmartImportView: React.FC<Props> = ({ mode, onConfirm }) => {
     const [selectedWarehouseId, setSelectedWarehouseId] = useState<string>('');
 
     useEffect(() => {
-        // Auto-select primary warehouse if available, otherwise first one
+        // Auto-select first warehouse
         if (warehouses && warehouses.length > 0 && !selectedWarehouseId) {
-            const whArray = warehouses as { id: string; is_primary: boolean }[];
-            const primary = whArray.find(w => w.is_primary);
-            if (primary) {
-                setSelectedWarehouseId(primary.id);
-            } else {
-                setSelectedWarehouseId(whArray[0]?.id);
-            }
+            const whArray = warehouses as { id: string }[];
+            setSelectedWarehouseId(whArray[0]?.id);
         }
     }, [warehouses, selectedWarehouseId]);
 

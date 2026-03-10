@@ -148,7 +148,7 @@ export const reportsService = {
     const baseCurrency = company?.base_currency || 'SAR';
 
     // 2. Fetch all foreign currency accounts with their balances
-    const { data: accounts } = await supabase.from('accounts')
+    const { data: accounts } = await supabase.from('active_accounts')
       .select('id, name_ar, currency_code, balance')
       .eq('company_id', companyId)
       .not('currency_code', 'is', null)

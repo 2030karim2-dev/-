@@ -14,7 +14,7 @@ export const SupplierRatingCard: React.FC<SupplierRatingCardProps> = () => {
     }
 
     const topSuppliers = suppliers
-        ?.sort((a: any, b: any) => (b.balance || 0) - (a.balance || 0))
+        ?.sort((a: any, b: any) => (b.total_purchases_amount || 0) - (a.total_purchases_amount || 0))
         .slice(0, 5);
 
     return (
@@ -29,7 +29,7 @@ export const SupplierRatingCard: React.FC<SupplierRatingCardProps> = () => {
                         </div>
                         <div className="flex items-center gap-1">
                             <Star className="w-4 h-4 text-yellow-500" />
-                            <span className="text-sm">{supplier.balance?.toLocaleString() || 0}</span>
+                            <span className="text-sm">{(supplier as any).total_purchases_amount?.toLocaleString() || 0}</span>
                         </div>
                     </div>
                 ))}

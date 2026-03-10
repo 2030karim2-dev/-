@@ -44,7 +44,7 @@ export const warehouseApi = {
             .insert(stockData as any);
     },
 
-    updateStock: async (productId: string, warehouseId: string, quantity: number) => {
+    updateStock: async (companyId: string, productId: string, warehouseId: string, quantity: number) => {
         const { data } = await supabase.from('product_stock')
             .select('id')
             .eq('product_id', productId)
@@ -58,7 +58,7 @@ export const warehouseApi = {
                 .eq('warehouse_id', warehouseId);
         } else {
             return await supabase.from('product_stock')
-                .insert({ product_id: productId, warehouse_id: warehouseId, quantity });
+                .insert({ company_id: companyId, product_id: productId, warehouse_id: warehouseId, quantity });
         }
     },
 

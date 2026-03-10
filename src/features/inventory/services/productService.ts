@@ -225,7 +225,7 @@ export const productService = {
                     const warehouse = warehouses[0] as { id: string };
                     logger.debug('ProductService', `Updating stock in warehouse ${warehouse.id} to ${data.stock_quantity}`);
                     try {
-                        await inventoryApi.updateStock(id, warehouse.id, Number(data.stock_quantity));
+                        await inventoryApi.updateStock(companyId, id, warehouse.id, Number(data.stock_quantity));
                         logger.debug('ProductService', `Stock updated successfully`);
                     } catch (stockErr) {
                         logger.error('ProductService', `Failed to update stock, but metadata was saved`, stockErr);

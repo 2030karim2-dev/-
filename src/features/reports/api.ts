@@ -52,7 +52,7 @@ export const reportsApi = {
    * Fetch accounting data with journal lines
    */
   getAccountingData: async (companyId: string) => {
-    return await supabase.from('accounts')
+    return await supabase.from('active_accounts')
       .select(`
         id, code, name_ar, type, balance,
         journal_entry_lines (
@@ -114,10 +114,9 @@ export const reportsApi = {
   },
 
   getPartiesWithBalances: async (companyId: string) => {
-    return await supabase.from('parties')
+    return await supabase.from('active_parties')
       .select('id, name, type, balance')
-      .eq('company_id', companyId)
-      .is('deleted_at', null) as unknown as { data: PartyWithBalance[] | null; error: { message: string } | null };
+      .eq('company_id', companyId) as unknown as { data: PartyWithBalance[] | null; error: { message: string } | null };
   },
 
   getCompanyCurrency: async (companyId: string) => {
