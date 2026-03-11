@@ -190,7 +190,7 @@ export const StepIllustration: React.FC<{ step: number; className?: string }> = 
                         key={i}
                         initial={{ height: 0, y: 90 }}
                         whileInView={{ height: h, y: 90 - h }}
-                        transition={{ duration: 1, delay: i * 0.1, ease: "backOut" }}
+                        transition={{ duration: 1, delay: i * 0.1, ease: 'easeOut' }}
                         x={x} width="8" rx="3" className="fill-orange-500 shadow-sm" opacity={0.4 + i * 0.1}
                     />
                 ))}

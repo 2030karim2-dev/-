@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useInventoryAnalytics, useInventorySmartInsights } from '../../inventory/hooks';
-import { Download, AlertTriangle, Activity, Target, AlertCircle, Lightbulb, Zap, BrainCircuit, PackageX } from 'lucide-react';
+import { Download, Activity, Target, BrainCircuit, PackageX } from 'lucide-react';
 
 // UI Helpers
 import { formatCurrency } from '../../../core/utils';
@@ -19,7 +19,7 @@ const InventoryAnalyticsView: React.FC = () => {
     });
 
     const { data: analyticsData, isLoading: analyticsLoading } = useInventoryAnalytics(dateRange.from, dateRange.to);
-    const { data: aiInsights, isLoading: aiLoading } = useInventorySmartInsights(dateRange.from, dateRange.to);
+    useInventorySmartInsights(dateRange.from, dateRange.to);
 
     const handleExport = () => {
         if (!analyticsData) return;
@@ -112,97 +112,14 @@ const InventoryAnalyticsView: React.FC = () => {
                 </div>
             </div>
 
-            {/* AI Smart Insights Section */}
-            {aiLoading ? (
-                <div className="glass-panel bento-item p-12 flex flex-col items-center justify-center space-y-6 bg-blue-500/5 border-none shadow-sm">
-                    <div className="w-12 h-12 border-4 border-blue-500/10 border-t-blue-500 rounded-full animate-spin" />
-                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-[0.4em] animate-pulse">جاري معالجة الرؤى التنبؤية بالذكاء الاصطناعي...</p>
+            {/* AI Smart Insights Section - Stubbed */}
+            <div className="glass-panel bento-item p-12 flex flex-col items-center justify-center space-y-4 bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 shadow-sm">
+                <BrainCircuit size={40} className="text-slate-400" />
+                <div className="text-center">
+                    <h4 className="text-lg font-bold text-slate-800 dark:text-white">الرؤى الذكية قيد التطوير</h4>
+                    <p className="text-xs text-slate-500 max-w-sm">يتم حالياً إعادة بناء محرك التحليل الذكي لتقديم توصيات أكثر دقة بناءً على أنماط التوريد الخاصة بك.</p>
                 </div>
-            ) : aiInsights ? (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Health Score Card - Bento Left */}
-                    <div className="lg:col-span-4 glass-panel bento-item p-10 bg-white dark:bg-slate-900 border-none shadow-xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 dark:bg-slate-800 rounded-full blur-2xl -mr-12 -mt-12 transition-all duration-700 group-hover:scale-150" />
-
-                        <div className="relative z-10">
-                            <h3 className="text-[10px] font-bold tracking-[0.3em] text-slate-400 uppercase mb-8 flex items-center gap-2">
-                                <Target size={16} className="text-blue-500" />
-                                كشف صحة المستودعات
-                            </h3>
-
-                            <div className="flex flex-col items-center justify-center space-y-6">
-                                <div className="relative w-44 h-44 flex items-center justify-center">
-                                    <svg className="w-full h-full transform -rotate-90">
-                                        <circle cx="88" cy="88" r="74" className="text-slate-50 dark:text-slate-800" strokeWidth="12" stroke="currentColor" fill="transparent" />
-                                        <circle
-                                            cx="88" cy="88" r="74"
-                                            className={`${aiInsights.health_score >= 80 ? 'text-emerald-500' : aiInsights.health_score >= 50 ? 'text-amber-500' : 'text-rose-500'} transition-all duration-1000 ease-out drop-shadow-[0_0_10px_rgba(16,185,129,0.3)]`}
-                                            strokeWidth="12"
-                                            strokeDasharray={464.95}
-                                            strokeDashoffset={464.95 - (464.95 * aiInsights.health_score) / 100}
-                                            strokeLinecap="round"
-                                            stroke="currentColor"
-                                            fill="transparent"
-                                        />
-                                    </svg>
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className="text-5xl font-bold text-slate-900 dark:text-white tracking-tighter">{aiInsights.health_score}</span>
-                                        <span className="text-[11px] font-bold text-slate-400 tracking-widest uppercase">Index Score</span>
-                                    </div>
-                                </div>
-
-                                <div className="text-center space-y-2">
-                                    <h4 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">{aiInsights.title}</h4>
-                                    <p className="text-xs text-slate-400 dark:text-slate-500 font-medium leading-relaxed px-4">
-                                        {aiInsights.summary}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* AI Opportunities & Risks - Bento Right */}
-                    <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Risks Card */}
-                        <div className="glass-panel bento-item p-8 bg-rose-50/10 dark:bg-rose-950/5 border-none shadow-xl flex flex-col">
-                            <h3 className="text-[10px] font-bold text-rose-500 tracking-[0.3em] uppercase mb-6 flex items-center gap-3">
-                                <AlertTriangle size={18} />
-                                تحليل المخاطر التشغيلية
-                            </h3>
-                            <div className="space-y-4 flex-1">
-                                {aiInsights.risk_analysis.length > 0 ? aiInsights.risk_analysis.map((risk: any, i: number) => (
-                                    <div key={i} className="flex gap-4 items-start glass-card p-4 bg-white/50 dark:bg-slate-800/40 rounded-[1.5rem] border-none shadow-sm transition-transform hover:-translate-y-1">
-                                        <div className={cn("p-2 rounded-xl shrink-0 mt-0.5", risk.severity === 'critical' ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400')}>
-                                            <AlertCircle size={16} />
-                                        </div>
-                                        <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-bold italic">{risk.risk}</p>
-                                    </div>
-                                )) : (
-                                    <div className="p-6 text-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-dashed border-emerald-500/30">تحليل آمن - لا توجد مخاطر مؤكدة</div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Suggestions Card */}
-                        <div className="glass-panel bento-item p-8 bg-emerald-50/10 dark:bg-emerald-950/5 border-none shadow-xl flex flex-col">
-                            <h3 className="text-[10px] font-bold text-emerald-500 tracking-[0.3em] uppercase mb-6 flex items-center gap-3">
-                                <Lightbulb size={18} />
-                                مقترحات التميز التجاري
-                            </h3>
-                            <div className="space-y-4 flex-1">
-                                {aiInsights.recommendations.map((rec: string, i: number) => (
-                                    <div key={i} className="flex gap-4 items-start glass-card p-4 bg-white/50 dark:bg-slate-800/40 rounded-[1.5rem] border-none shadow-sm transition-transform hover:-translate-y-1">
-                                        <div className="p-2 bg-emerald-500 text-white rounded-xl shrink-0 mt-0.5 shadow-lg shadow-emerald-500/30 rotate-12">
-                                            <Zap size={16} />
-                                        </div>
-                                        <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-bold italic">{rec}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ) : null}
+            </div>
 
             {/* High Impact Core Metrics Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -215,7 +132,7 @@ const InventoryAnalyticsView: React.FC = () => {
                         ].reduce((sum: number, item: any) => sum + ((item.cost_price || 0) * (item.stock_quantity || 0)), 0)), icon: Activity, color: 'blue'
                     },
                     { label: 'أصناف النخبة النوع A', val: `${analyticsData?.abcAnalysis?.A?.length || 0} صنف`, icon: Target, color: 'emerald' },
-                    { label: 'تنبيهات العجز الحرج', val: `${analyticsData?.stockAlerts?.length || 0} صنف`, icon: AlertTriangle, color: 'rose' },
+                    { label: 'تنبيهات العجز الحرج', val: `${analyticsData?.stockAlerts?.length || 0} صنف`, icon: Target, color: 'rose' },
                     { label: 'أصناف قيد الركود', val: `${analyticsData?.stagnant?.length || 0} صنف`, icon: PackageX, color: 'amber' }
                 ].map((stat, i) => (
                     <div key={i} className="glass-card bento-item p-6 flex flex-col justify-between min-h-[140px] shadow-lg border-none hover:-translate-y-1 transition-transform group">

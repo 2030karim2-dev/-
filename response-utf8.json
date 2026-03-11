@@ -1,0 +1,16 @@
+﻿{
+    "articleNo":  "C 2029",
+    "countArticles":  1,
+    "articles":  [
+                     {
+                         "articleId":  6159438,
+                         "articleNo":  "C 2029",
+                         "articleProductName":  "Air Filter",
+                         "supplierName":  "MANN-FILTER",
+                         "supplierId":  4,
+                         "articleMediaType":  "JPG",
+                         "articleMediaFileName":  "5e27f118885fa0253374358b3585240c6c9a53af.webp",
+                         "s3image":  "https://fsn1.your-objectstorage.com/tecdoc2025/media_files/images/4/5e27f118885fa0253374358b3585240c6c9a53af.webp"
+                     }
+                 ]
+}

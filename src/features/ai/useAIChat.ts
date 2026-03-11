@@ -1,87 +1,10 @@
-
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { ChatMessage, sendChatMessage } from './chatService';
-import { parseActions, executeAIAction } from './aiActions';
-import { useProfitAndLoss, useDebtReport, useCashFlow } from '../reports/hooks';
-import { useProducts } from '../inventory/hooks';
-import { partiesService } from '../parties/service';
-import { useAuthStore } from '../auth/store';
-import { formatCurrency } from '../../core/utils';
-import { memoryService, MemoryEntry } from './memoryService';
 
-export const useAIChat = (options: { enabled?: boolean } = {}) => {
-    const isEnabled = options.enabled !== false;
+export const useAIChat = (_options: { enabled?: boolean } = {}) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [memories, setMemories] = useState<MemoryEntry[]>([]);
-    const [partiesContext, setPartiesContext] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    const { user } = useAuthStore();
-    const { data: pl } = useProfitAndLoss({ enabled: isEnabled });
-    const { data: debt } = useDebtReport({ enabled: isEnabled });
-    const { data: cashFlow } = useCashFlow({ enabled: isEnabled });
-    const { stats } = useProducts('', { enabled: isEnabled });
-
-    // Load memories and parties on mount
-    useEffect(() => {
-        if (user?.company_id && user?.id) {
-            memoryService.getMemories(user.company_id, user.id).then(m => setMemories(m));
-
-            // Fetch basic party stats for context with better resilience
-            Promise.allSettled([
-                partiesService.getParties(user.company_id, 'customer'),
-                partiesService.getParties(user.company_id, 'supplier')
-            ]).then((results) => {
-                const customers = results[0].status === 'fulfilled' ? results[0].value : [];
-                const suppliers = results[1].status === 'fulfilled' ? results[1].value : [];
-
-                const topC = customers.slice(0, 3).map(c => c.name).join(', ');
-                const topS = suppliers.slice(0, 3).map(s => s.name).join(', ');
-                setPartiesContext(`إجمالي العملاء: ${customers.length} (أبرزهم: ${topC || 'لا يوجد'})\nإجمالي الموردين: ${suppliers.length} (أبرزهم: ${topS || 'لا يوجد'})`);
-
-                if (results.some(r => r.status === 'rejected')) {
-                    import('../../core/utils/logger').then(({ logger }) => {
-                        logger.warn('AI', 'Some party contexts failed to load', results.filter(r => r.status === 'rejected'));
-                    });
-                }
-            });
-        }
-    }, [user?.company_id, user?.id]);
-
-    const buildContext = useCallback(() => {
-        const parts: string[] = [];
-
-        if (pl) {
-            parts.push(`الإيرادات: ${formatCurrency(pl.totalRevenues || 0)}`);
-            parts.push(`المصروفات: ${formatCurrency(pl.totalExpenses || 0)}`);
-            parts.push(`صافي الربح: ${formatCurrency(pl.netProfit || 0)}`);
-        }
-
-        if (debt?.summary) {
-            parts.push(`مستحقات العملاء: ${formatCurrency(debt.summary.receivables || 0)}`);
-            parts.push(`التزامات الموردين: ${formatCurrency(debt.summary.payables || 0)}`);
-        }
-
-        if (cashFlow) {
-            parts.push(`السيولة النقدية: ${formatCurrency(cashFlow.currentLiquidity || 0)}`);
-        }
-
-        if (stats) {
-            parts.push(`عدد المنتجات: ${stats.count || 0}`);
-            parts.push(`قيمة المخزون: ${formatCurrency(stats.totalValue || 0)}`);
-            parts.push(`منتجات منخفضة المخزون: ${stats.lowStockCount || 0}`);
-        }
-
-        if (partiesContext) {
-            parts.push(partiesContext);
-        }
-
-        parts.push(`التاريخ: ${new Date().toLocaleDateString('ar-SA')}`);
-        parts.push(`المستخدم: ${user?.full_name || user?.email || 'غير محدد'}`);
-
-        return parts.join('\n');
-    }, [pl, debt, cashFlow, stats, user]);
 
     const sendMessage = useCallback(async (text: string) => {
         if (!text.trim() || isLoading) return;
@@ -98,47 +21,13 @@ export const useAIChat = (options: { enabled?: boolean } = {}) => {
         setError(null);
 
         try {
-            const context = buildContext();
-            const memoryCtx = memoryService.buildMemoryContext(memories);
-            const response = await sendChatMessage(text.trim(), context, messages, memoryCtx);
-
-            // Parse response for actions
-            const { text: cleanText, actions } = parseActions(response);
-
-            // Check if response indicates a user preference (simple heuristic)
-            if (user?.company_id && user?.id && cleanText.includes('تم حفظ هذا التفضيل')) {
-                await memoryService.savePreference(user.company_id, user.id, text.trim());
-                // Refresh memories
-                const updatedMemories = await memoryService.getMemories(user.company_id, user.id);
-                setMemories(updatedMemories);
-            }
-
-            // Execute auto-actions immediately, keep transactional ones pending
-            const actionResults: string[] = [];
-            const pendingActions = [];
-            const AUTO_EXECUTE = ['search_product', 'navigate_to', 'toggle_theme'];
-
-            for (const action of actions) {
-                if (AUTO_EXECUTE.includes(action.action)) {
-                    if (user?.company_id) {
-                        const result = await executeAIAction(action, user.company_id, user.id || '');
-                        actionResults.push(result);
-                    }
-                } else {
-                    pendingActions.push(action);
-                }
-            }
-
-            const finalContent = actionResults.length > 0
-                ? `${cleanText}\n\n${actionResults.join('\n')}`
-                : cleanText;
+            const response = await sendChatMessage(text.trim(), '', messages, '');
 
             const assistantMsg: ChatMessage = {
                 id: `ai-${Date.now()}`,
                 role: 'assistant',
-                content: finalContent,
+                content: response,
                 timestamp: new Date(),
-                ...(pendingActions.length > 0 ? { pendingActions } : {}),
             };
 
             setMessages(prev => [...prev, assistantMsg]);
@@ -148,74 +37,20 @@ export const useAIChat = (options: { enabled?: boolean } = {}) => {
         } finally {
             setIsLoading(false);
         }
-    }, [isLoading, buildContext, messages, user, memories]);
+    }, [isLoading, messages]);
 
-    const executePendingAction = useCallback(async (messageId: string, actionIndex: number) => {
-        const msg = messages.find(m => m.id === messageId);
-        if (!msg || !msg.pendingActions || !msg.pendingActions[actionIndex] || isLoading || !user?.company_id) return;
+    const executePendingAction = useCallback(async (_messageId: string, _actionIndex: number) => {
+        // Obsolete
+    }, []);
 
-        const actionToRun = msg.pendingActions[actionIndex];
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const result = await executeAIAction(actionToRun, user.company_id, user.id || '');
-
-            setMessages(prev => prev.map(m => {
-                if (m.id === messageId) {
-                    const newPending = [...(m.pendingActions || [])];
-                    newPending.splice(actionIndex, 1);
-                    const msgUpdate: Partial<ChatMessage> = {
-                        content: m.content + '\n\n' + result
-                    };
-                    if (newPending.length > 0) {
-                        msgUpdate.pendingActions = newPending;
-                    } else {
-                        // Note: with exactOptionalPropertyTypes, we can't set to undefined
-                        // but since it's a spread in the return, we handle it there
-                    }
-
-                    return {
-                        ...m,
-                        ...msgUpdate,
-                        ...(newPending.length === 0 ? { pendingActions: [] } : { pendingActions: newPending })
-                    };
-                }
-                return m;
-            }));
-        } catch (e: unknown) {
-            const err = e as Error;
-            setError(err.message || 'فشل تنفيذ الإجراء');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [messages, user, isLoading]);
-
-    const cancelPendingAction = useCallback((messageId: string, actionIndex: number) => {
-        setMessages(prev => prev.map(m => {
-            if (m.id === messageId) {
-                const newPending = [...(m.pendingActions || [])];
-                const canceledAction = newPending.splice(actionIndex, 1)[0];
-                return {
-                    ...m,
-                    pendingActions: newPending.length > 0 ? newPending : undefined,
-                    content: m.content + `\n\n❌ تم إلغاء: ${canceledAction.confirmation || canceledAction.action}`
-                };
-            }
-            return m;
-        }));
+    const cancelPendingAction = useCallback((_messageId: string, _actionIndex: number) => {
+        // Obsolete
     }, []);
 
     const clearChat = useCallback(async () => {
-        if (messages.length > 0 && user?.company_id && user?.id) {
-            // Background summarize and store before clearing
-            memoryService.summarizeAndStore(user.company_id, user.id, messages).then(() => {
-                memoryService.getMemories(user!.company_id!, user!.id!).then(m => setMemories(m));
-            });
-        }
         setMessages([]);
         setError(null);
-    }, [messages, user]);
+    }, []);
 
     return {
         messages,
@@ -223,7 +58,7 @@ export const useAIChat = (options: { enabled?: boolean } = {}) => {
         error,
         sendMessage,
         clearChat,
-        executePendingAction,
-        cancelPendingAction
+        executePendingAction, // kept for interface compatibility with UI for now
+        cancelPendingAction   // kept for interface compatibility with UI for now
     };
 };

@@ -11,7 +11,8 @@ import {
   BarChart3,
   Settings,
   Package,
-  Brain
+  Brain,
+  Car
 } from 'lucide-react';
 import { MenuItem } from './types';
 import { ROUTES } from './routes/paths';
@@ -23,6 +24,7 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 'clients', labelKey: 'customers', icon: Users, path: ROUTES.DASHBOARD.CLIENTS, color: 'emerald' },
   { id: 'suppliers', labelKey: 'suppliers', icon: Users, path: ROUTES.DASHBOARD.SUPPLIERS, color: 'blue' },
   { id: 'inventory', labelKey: 'products', icon: Wrench, path: ROUTES.DASHBOARD.INVENTORY, color: 'orange' },
+  { id: 'vehicle-compatibility', labelKey: 'vehicle_compatibility_search', icon: Car, path: ROUTES.DASHBOARD.VEHICLE_COMPATIBILITY, color: 'indigo' },
   { id: 'expenses', labelKey: 'expenses', icon: Receipt, path: ROUTES.DASHBOARD.EXPENSES, color: 'red' },
   { id: 'accounting', labelKey: 'accounting', icon: Calculator, path: ROUTES.DASHBOARD.ACCOUNTING, color: 'indigo' },
   { id: 'pos', labelKey: 'pos', icon: Package, path: ROUTES.DASHBOARD.POS, color: 'pink' },
