@@ -313,5 +313,6 @@
     "days_elapsed": "Days Elapsed",
     "days": "Days",
     "excellent_no_dead_stock": "Excellent! No dead stock found",
-    "all_products_moving": "All products are moving well within the last {days} days"
+    "all_products_moving": "All products are moving well within the last {days} days",
+    "vehicle_compatibility_search": "Vehicle Compatibility Search"
 }

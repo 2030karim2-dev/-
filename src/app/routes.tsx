@@ -26,6 +26,7 @@ const SalesPage = lazy(() => import('../features/sales/pages/SalesPage'));
 const AccountingPage = lazy(() => import('../features/accounting/AccountingPage'));
 const PurchasesPage = lazy(() => import('../features/purchases/pages/PurchasesPage'));
 const VehiclesPage = lazy(() => import('../features/vehicles/VehiclesPage'));
+const VehicleCompatibilityPage = lazy(() => import('../features/inventory/pages/VehicleCompatibilityPage'));
 const ExpensesPage = lazy(() => import('../features/expenses/pages/ExpensesPage'));
 const SettingsPage = lazy(() => import('../features/settings/SettingsPage'));
 const AppearancePage = lazy(() => import('../features/appearance/AppearancePage'));
@@ -78,6 +79,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.DASHBOARD.ACCOUNTING} element={<Suspense fallback={<PageLoader />}><AccountingPage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.PURCHASES} element={<Suspense fallback={<PageLoader />}><PurchasesPage /></Suspense>} />
         <Route path="/vehicles" element={<Suspense fallback={<PageLoader />}><VehiclesPage /></Suspense>} />
+        <Route path={ROUTES.DASHBOARD.VEHICLE_COMPATIBILITY} element={<Suspense fallback={<PageLoader />}><VehicleCompatibilityPage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.EXPENSES} element={<Suspense fallback={<PageLoader />}><ExpensesPage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.SETTINGS} element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.APPEARANCE} element={<Suspense fallback={<PageLoader />}><AppearancePage /></Suspense>} />

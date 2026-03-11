@@ -183,66 +183,8 @@ export const useInventoryAnalytics = (from?: string, to?: string) => {
     });
 };
 
-import { aiService } from '../ai/service';
-import { InventoryDataSnapshot } from '../ai/types';
-
-export const useInventorySmartInsights = (from?: string, to?: string) => {
-    const { user } = useAuthStore();
-
-    // First, fetch the raw analytics data
-    const { data: analyticsData, isSuccess: analyticsLoaded } = useInventoryAnalytics(from, to);
-
-    // Then, use that data to get AI insights
-    return useQuery({
-        queryKey: ['inventory_smart_insights', user?.company_id, from, to],
-        queryFn: async () => {
-            if (!user?.company_id || !analyticsData) return null;
-
-            // M3: Compute merged array once instead of repeating 4 times
-            const allProducts = [
-                ...(analyticsData.abcAnalysis?.A || []),
-                ...(analyticsData.abcAnalysis?.B || []),
-                ...(analyticsData.abcAnalysis?.C || [])
-            ];
-
-            const totalValuation = allProducts.reduce((sum: number, item: any) => sum + ((Number(item.cost || item.cost_price) || 0) * (Number(item.stock_quantity) || 0)), 0);
-            const totalItems = allProducts.reduce((sum: number, item) => sum + (Number(item.stock_quantity) || 0), 0);
-            const totalUnique = allProducts.length;
-            const outOfStock = allProducts.filter((item) => (Number(item.stock_quantity) || 0) <= 0).length;
-
-            const snapshot: InventoryDataSnapshot = {
-                total_valuation: totalValuation,
-                total_products: totalUnique,
-                total_qty: totalItems,
-                low_stock_count: analyticsData.stockAlerts?.length || 0,
-                out_of_stock_count: outOfStock,
-                abc_summary: {
-                    a_items: analyticsData.abcAnalysis?.A?.length || 0,
-                    b_items: analyticsData.abcAnalysis?.B?.length || 0,
-                    c_items: analyticsData.abcAnalysis?.C?.length || 0,
-                },
-                top_moving: (analyticsData.mostActive || []).slice(0, 5).map((p) => ({
-                    name: p.name,
-                    qtySold: p.qtySold,
-                    revenue: p.revenue
-                })),
-                stagnant_items: (analyticsData.stagnant || []).slice(0, 10).map((p: any) => ({
-                    name: p.name,
-                    days_stagnant: p.days_stagnant || p.daysStagnant || 90,
-                    stock: p.stock_quantity || 0
-                })),
-                critical_alerts: (analyticsData.stockAlerts || []).slice(0, 5).map((p) => ({
-                    name: p.name,
-                    stock: p.stock_quantity,
-                    velocity: p.dailyVelocity || 0,
-                    days_remaining: p.daysRemaining || 0
-                }))
-            };
-
-            return aiService.generateInventoryAnalysis(snapshot);
-        },
-        enabled: !!user?.company_id && analyticsLoaded,
-    });
+export const useInventorySmartInsights = (_from?: string, _to?: string) => {
+    return { data: null, isPending: false, isError: false, refetch: () => {} };
 };
 
 export const useProductMutations = () => {

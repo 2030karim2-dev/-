@@ -12,6 +12,7 @@ import { inventoryApi } from '../api';
 import StatCard from './product_detail/StatCard';
 import StockStatusBadge from './product_detail/StockStatusBadge';
 import AlternativesSection from './product_detail/AlternativesSection';
+import { VehicleCompatibilityList } from './auto_parts/VehicleCompatibilityList';
 
 interface Props {
   product: Product | null;
@@ -186,27 +187,8 @@ const ProductDetailPane: React.FC<Props> = ({ product, onEdit, onDelete, onClose
           </div>
         </div>
 
-        {/* Vehicle Compatibility */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border dark:border-slate-800 shadow-sm">
-          <h4 className="text-[10px] font-bold text-gray-400 uppercase mb-4 tracking-widest flex items-center gap-1.5">
-            <Car size={12} className="text-indigo-500" /> التوافق مع المركبات
-          </h4>
-          <div className="space-y-2">
-            {product.compatibility && product.compatibility.length > 0 ? (
-              product.compatibility.map((c, i) => (
-                <div key={i} className="flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900/30 transition-all">
-                  <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{c.make} {c.model}</span>
-                  <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 rounded-lg">{c.years.join(', ')}</span>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-6 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-800 text-slate-400">
-                <Car size={32} strokeWidth={1} className="mx-auto mb-2 opacity-20" />
-                <p className="text-[10px] font-bold uppercase tracking-widest">لا توجد بيانات توافق</p>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Vehicle Compatibility Dynamic Search */}
+        <VehicleCompatibilityList product={product} />
 
         {/* Extension Sections */}
         <div className="space-y-4">

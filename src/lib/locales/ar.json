@@ -343,5 +343,6 @@
     "general": "عام",
     "phone_number": "رقم الهاتف",
     "email_address": "البريد الإلكتروني",
-    "address": "العنوان"
+    "address": "العنوان",
+    "vehicle_compatibility_search": "بحث التوافق مع المركبات"
 }

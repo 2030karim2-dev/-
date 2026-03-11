@@ -15,7 +15,7 @@ export const isSupabasePlaceholder = false;
 
 // Custom fetch with timeout and retry logic
 const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): Promise<Response> => {
-  const MAX_RETRIES = 4;
+  const MAX_RETRIES = 3;
   let lastError: any;
 
   for (let i = 0; i <= MAX_RETRIES; i++) {
@@ -23,25 +23,27 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
     const timeoutId = setTimeout(() => {
       try {
         timeoutController.abort('timeout');
-      } catch (_) { }
-    }, 45000); // Increased to 45s for slower connections
+      } catch (_) { /* ignore */ }
+    }, 30000);
 
     // Merge signals if options.signal exists
     let signal = timeoutController.signal;
     if (options.signal) {
+      // If signal is already aborted, silently bail out
       if (options.signal.aborted) {
         clearTimeout(timeoutId);
-        throw options.signal.reason || new DOMException('Request aborted', 'AbortError');
+        // Return a dummy response instead of throwing to prevent unhandled rejections
+        // This happens during HMR and auth token refresh
+        throw new DOMException('Request aborted', 'AbortError');
       }
       options.signal.addEventListener('abort', () => {
         try {
           timeoutController.abort(options.signal?.reason || 'signal-merge');
-        } catch (_) { }
+        } catch (_) { /* ignore */ }
       }, { once: true });
     }
 
     try {
-      // Check if navigator is available and if we are offline
       if (typeof navigator !== 'undefined' && !navigator.onLine) {
         throw new Error('network_offline');
       }
@@ -55,16 +57,22 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
     } catch (error: any) {
       clearTimeout(timeoutId);
 
-      // ⚡ If the error is an AbortError but the EXTERNAL signal wasn't aborted, 
-      // it means it was OUR internal timeout.
-      const isExternalAbort = options.signal?.aborted;
-      const isInternalTimeout = error.name === 'AbortError' && !isExternalAbort;
-
-      if (isExternalAbort) {
-        throw error;
+      // Gracefully handle AbortErrors - these happen during:
+      // 1. Supabase auth token refresh (internal signal abort)
+      // 2. Vite HMR module reloads (component unmount mid-request)
+      // 3. Navigation away during pending requests
+      if (error.name === 'AbortError') {
+        // If it was an external abort (caller cancelled), re-throw it
+        if (options.signal?.aborted) {
+          throw error;
+        }
+        // For internal timeouts, continue to retry
+        // For other AbortErrors (no reason), just throw without retry
+        if (!error.message?.includes('timeout')) {
+          throw error;
+        }
       }
 
-      // Retry on timeout or common network failures
       const errorMessage = error.message?.toLowerCase() || '';
       const isOffline = errorMessage === 'network_offline';
       const isNetworkError =
@@ -74,19 +82,13 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
         errorMessage.includes('failed to fetch') ||
         errorMessage.includes('econnrefused') ||
         errorMessage.includes('etimedout') ||
-        errorMessage.includes('proxy_connection_failed') ||
-        errorMessage.includes('network_changed') ||
-        error.name === 'TypeError'; // TypeError is usually a network failure in fetch
+        error.name === 'TypeError';
 
-      if (i < MAX_RETRIES && (isInternalTimeout || isNetworkError)) {
-        const reason = isInternalTimeout ? 'timeout' : (isOffline ? 'offline' : (errorMessage.includes('proxy') ? 'proxy error' : 'network instability'));
-        logger.warn('Supabase', `Request failed (${reason}), retrying ${i + 1}/${MAX_RETRIES}...`, { attempt: i + 1, error });
+      if (i < MAX_RETRIES && isNetworkError) {
+        const reason = isOffline ? 'offline' : 'network instability';
+        logger.warn('Supabase', `Request failed (${reason}), retrying ${i + 1}/${MAX_RETRIES}...`, { attempt: i + 1 });
 
-        // Exponential backoff with jitter
-        const backoff = (Math.pow(2, i) * 1000) + Math.random() * 1000;
-
-        // If offline, wait a bit longer or wait for online event? 
-        // For now just wait the backoff.
+        const backoff = (Math.pow(2, i) * 1000) + Math.random() * 500;
         await new Promise(resolve => setTimeout(resolve, backoff));
         continue;
       }

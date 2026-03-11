@@ -11,6 +11,7 @@ import FitmentSection from './product_detail/FitmentSection';
 import AlternativesSection from './product_detail/AlternativesSection';
 import HistorySection from './product_detail/HistorySection';
 import StockStatusBadge from './product_detail/StockStatusBadge';
+import { VehicleCompatibilityList } from './auto_parts/VehicleCompatibilityList';
 
 interface Props {
     product: Product | null;
@@ -171,7 +172,10 @@ const ProductDetailModal: React.FC<Props> = ({ product, onClose, onEdit }) => {
                                     </div>
                                 </div>
 
-                                <FitmentSection productId={product.id} />
+                                <div className="space-y-6">
+                                    <FitmentSection productId={product.id} />
+                                    <VehicleCompatibilityList product={product} />
+                                </div>
                             </div>
                         </div>
                     </div>
