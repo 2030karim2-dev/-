@@ -21,20 +21,31 @@ const PurchaseMeta: React.FC = () => {
     const { data: suppliers } = useSupplierSearch(query);
     const { data: cashAccounts } = usePaymentAccounts();
     const { currencies, rates } = useCurrencies();
+    const prevCurrency = React.useRef(currency);
+    const ratesLoaded = React.useRef(false);
 
     React.useEffect(() => {
+        const currencyChanged = prevCurrency.current !== currency;
+        const ratesJustLoaded = !ratesLoaded.current && !!rates.data;
+
         // 1. Handle Exchange Rate
-        if (currency === 'SAR') {
-            setMetadata('exchangeRate', 1);
-        } else if (rates.data) {
-            const rateObj = rates.data.find((r: any) => r.currency_code === currency);
-            if (rateObj) {
-                setMetadata('exchangeRate', rateObj.rate_to_base);
+        if ((currencyChanged || ratesJustLoaded) && rates.data) {
+            if (currency === 'SAR') {
+                setMetadata('exchangeRate', 1);
+            } else {
+                const rateObj = rates.data.find((r: any) => r.currency_code === currency);
+                if (rateObj) {
+                    setMetadata('exchangeRate', rateObj.rate_to_base);
+                }
             }
         }
 
+        if (rates.data) {
+            ratesLoaded.current = true;
+        }
+
         // 2. Handle Auto-Treasury (Cashbox) Selection
-        if (cashAccounts && cashAccounts.length > 0) {
+        if (currencyChanged && cashAccounts && cashAccounts.length > 0) {
             const searchTerms = currency === 'SAR' ? ['SAR', 'سعودي', 'ريال سعودي'] : ['YER', 'يمني', 'ريال يمني'];
             const matchingAccount = cashAccounts.find(acc =>
                 acc.currency_code === currency ||
@@ -45,6 +56,8 @@ const PurchaseMeta: React.FC = () => {
                 setMetadata('cashboxId', matchingAccount.id);
             }
         }
+
+        prevCurrency.current = currency;
     }, [currency, cashAccounts, rates.data]);
 
     const currencyObj = currencies.data?.find((c: any) => c.code === currency);

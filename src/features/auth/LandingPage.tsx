@@ -56,22 +56,22 @@ const LandingPage: React.FC = () => {
 
                 {/* Dynamic animated blobs */}
                 <motion.div
-                    animate={shouldReduceMotion ? undefined : {
+                    animate={shouldReduceMotion ? {} : {
                         x: [0, 50, 0],
                         y: [0, -30, 0],
                         scale: [1, 1.1, 1]
                     }}
-                    transition={shouldReduceMotion ? undefined : { duration: 20, repeat: Infinity, ease: "linear" }}
+                    transition={shouldReduceMotion ? {} : { duration: 20, repeat: Infinity, ease: "linear" }}
                     className="absolute top-[15%] right-[5%] w-[600px] h-[600px] bg-blue-400/10 dark:bg-blue-600/5 rounded-full blur-[120px]"
                     style={{ willChange: 'transform' }}
                 />
                 <motion.div
-                    animate={shouldReduceMotion ? undefined : {
+                    animate={shouldReduceMotion ? {} : {
                         x: [0, -40, 0],
                         y: [0, 60, 0],
                         scale: [1, 0.9, 1]
                     }}
-                    transition={shouldReduceMotion ? undefined : { duration: 25, repeat: Infinity, ease: "linear" }}
+                    transition={shouldReduceMotion ? {} : { duration: 25, repeat: Infinity, ease: "linear" }}
                     className="absolute bottom-[10%] left-[5%] w-[500px] h-[500px] bg-emerald-400/10 dark:bg-emerald-600/5 rounded-full blur-[100px]"
                     style={{ willChange: 'transform' }}
                 />

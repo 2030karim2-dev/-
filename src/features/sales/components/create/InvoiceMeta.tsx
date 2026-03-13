@@ -62,11 +62,13 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
     const { data: warehouses } = useWarehouses();
     const { currencies, rates } = useCurrencies();
     const prevCurrency = React.useRef(currency);
+    const ratesLoaded = React.useRef(false);
 
     React.useEffect(() => {
         const currencyChanged = prevCurrency.current !== currency;
+        const ratesJustLoaded = !ratesLoaded.current && !!rates.data;
 
-        if (currencyChanged && rates.data) {
+        if ((currencyChanged || ratesJustLoaded) && rates.data) {
             if (currency === 'SAR') {
                 setMetadata('exchangeRate', 1);
                 setMetadata('exchangeOperator', 'multiply');
@@ -80,6 +82,10 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
                     }
                 }
             }
+        }
+
+        if (rates.data) {
+            ratesLoaded.current = true;
         }
 
         // 2. Handle Auto-Treasury (Cashbox) Selection (Only on currency change)
@@ -140,11 +146,11 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
                             <input
                                 type="number"
                                 step="0.00001"
-                                value={exchangeRate || ''}
+                                value={exchangeRate ? (exchangeOperator === 'divide' ? parseFloat((1 / exchangeRate).toFixed(5)) : exchangeRate) : ''}
                                 onChange={(e) => {
                                     const val = parseFloat(e.target.value);
                                     if (!val) return;
-                                    setMetadata('exchangeRate', val);
+                                    setMetadata('exchangeRate', exchangeOperator === 'divide' ? (1 / val) : val);
                                 }}
                                 className="bg-transparent text-sm font-bold text-amber-600 dark:text-amber-400 font-mono outline-none w-full"
                             />
