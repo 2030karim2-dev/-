@@ -172,7 +172,7 @@ const DebtAgingReport: React.FC = () => {
                 <div className="bg-white dark:bg-slate-900 rounded-lg border dark:border-slate-800 p-4 shadow-sm">
                     <h4 className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">توزيع الديون حسب العمر</h4>
                     <div style={{ width: '100%', height: 200 }}>
-                        <ResponsiveContainer>
+                        <ResponsiveContainer width="100%" height={200} minWidth={0}>
                             <BarChart data={data?.chartData || []} layout="vertical">
                                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                                 <XAxis type="number" tick={{ fontSize: 9 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />

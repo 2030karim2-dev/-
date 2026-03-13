@@ -239,7 +239,7 @@ const ExpensesAnalyticsView: React.FC<ExpensesAnalyticsViewProps> = ({ expenses 
                 </div>
 
                 <div className="h-64">
-                    <ResponsiveContainer width="100%" height={256}>
+                    <ResponsiveContainer width="100%" height={256} minWidth={0}>
                         <BarChart data={analytics.paymentData} layout="vertical" margin={{ left: 30, right: 30 }}>
                             <XAxis type="number" hide />
                             <YAxis

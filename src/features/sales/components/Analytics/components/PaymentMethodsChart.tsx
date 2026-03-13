@@ -30,6 +30,8 @@ export const PaymentMethodsChart: React.FC<PaymentMethodsChartProps> = ({
 }) => {
     const { dictionary: t } = useI18nStore();
     const total = salesByPaymentMethod.reduce((sum, p) => sum + p.amount, 0);
+    const [isMounted, setIsMounted] = React.useState(false);
+    React.useEffect(() => { setIsMounted(true); }, []);
 
     const getMethodInfo = (method: string) => {
         switch (method) {
@@ -70,60 +72,62 @@ export const PaymentMethodsChart: React.FC<PaymentMethodsChartProps> = ({
                 {t.payment_methods}
             </h4>
             <div className="h-56 relative group w-full" dir="ltr">
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <defs>
-                            {GRADIENTS.map((g, i) => (
-                                <linearGradient key={`grad-${i}`} id={`pieGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor={g.start} />
-                                    <stop offset="100%" stopColor={g.end} />
-                                </linearGradient>
-                            ))}
-                        </defs>
-                        <Pie
-                            data={salesByPaymentMethod}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={70}
-                            outerRadius={90}
-                            paddingAngle={4}
-                            dataKey="amount"
-                            nameKey="method"
-                            stroke="none"
-                            cornerRadius={6}
-                            activeShape={renderActiveShape}
-                        >
-                            {salesByPaymentMethod.map((_entry, index) => (
-                                <Cell key={`cell-${index}`} fill={`url(#pieGrad-${index % GRADIENTS.length})`} />
-                            ))}
-                        </Pie>
-                        <Tooltip
-                            content={({ active, payload }: any) => {
-                                if (active && payload && payload.length) {
-                                    const data = payload[0].payload;
-                                    const info = getMethodInfo(data.method);
-                                    return (
-                                        <div className="p-3 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-2xl transition-all duration-300">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <div className={cn("p-1.5 rounded-lg", info.bg)}>
-                                                    <info.icon size={12} className={info.color} />
+                {isMounted && (
+                    <ResponsiveContainer width="100%" height={224} minWidth={0}>
+                        <PieChart>
+                            <defs>
+                                {GRADIENTS.map((g, i) => (
+                                    <linearGradient key={`grad-${i}`} id={`pieGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor={g.start} />
+                                        <stop offset="100%" stopColor={g.end} />
+                                    </linearGradient>
+                                ))}
+                            </defs>
+                            <Pie
+                                data={salesByPaymentMethod}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={70}
+                                outerRadius={90}
+                                paddingAngle={4}
+                                dataKey="amount"
+                                nameKey="method"
+                                stroke="none"
+                                cornerRadius={6}
+                                activeShape={renderActiveShape}
+                            >
+                                {salesByPaymentMethod.map((_entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={`url(#pieGrad-${index % GRADIENTS.length})`} />
+                                ))}
+                            </Pie>
+                            <Tooltip
+                                content={({ active, payload }: any) => {
+                                    if (active && payload && payload.length) {
+                                        const data = payload[0].payload;
+                                        const info = getMethodInfo(data.method);
+                                        return (
+                                            <div className="p-3 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-2xl transition-all duration-300">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className={cn("p-1.5 rounded-lg", info.bg)}>
+                                                        <info.icon size={12} className={info.color} />
+                                                    </div>
+                                                    <span className="text-xs font-bold text-slate-800 dark:text-white">{info.label}</span>
                                                 </div>
-                                                <span className="text-xs font-bold text-slate-800 dark:text-white">{info.label}</span>
+                                                <div className="text-lg font-bold font-mono text-slate-900 dark:text-slate-100">
+                                                    {formatCurrency(data.amount)}
+                                                </div>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase mt-1">
+                                                    {Math.round((data.amount / total) * 100)}% من الإجمالي
+                                                </div>
                                             </div>
-                                            <div className="text-lg font-bold font-mono text-slate-900 dark:text-slate-100">
-                                                {formatCurrency(data.amount)}
-                                            </div>
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase mt-1">
-                                                {Math.round((data.amount / total) * 100)}% من الإجمالي
-                                            </div>
-                                        </div>
-                                    );
-                                }
-                                return null;
-                            }}
-                        />
-                    </PieChart>
-                </ResponsiveContainer>
+                                        );
+                                    }
+                                    return null;
+                                }}
+                            />
+                        </PieChart>
+                    </ResponsiveContainer>
+                )}
 
                 {/* Center Content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
