@@ -82,7 +82,7 @@ const VehiclesPage: React.FC = () => {
             />
 
             <div className="flex-1 overflow-y-auto px-4 pt-4 pb-20 custom-scrollbar">
-                <div className="max-w-[1600px] mx-auto space-y-4">
+                <div className="max-w-none mx-auto space-y-4">
                     {activeTab === 'list' ? (
                         <>
                             {isLoading ? (

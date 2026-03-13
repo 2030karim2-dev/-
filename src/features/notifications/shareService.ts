@@ -4,6 +4,7 @@
 // ============================================
 
 import { messagingApi } from './messagingApi';
+import { supabase } from '../../lib/supabaseClient';
 
 export type ShareContentType =
     | 'sale_invoice'
@@ -53,7 +54,7 @@ export const shareService = {
         try {
             const imageBase64 = await elementToBase64(element);
 
-            const { data: { session } } = await (await import('../../lib/supabaseClient')).supabase.auth.getSession();
+            const { data: { session } } = await supabase.auth.getSession();
 
             const response = await fetch(
                 `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification`,

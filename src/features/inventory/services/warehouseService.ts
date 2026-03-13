@@ -18,26 +18,32 @@ export const warehouseService = {
     getProductsForWarehouse: async (warehouseId: string) => {
         const { data, error } = await supabase
             .from('product_stock')
-            .select('*, products(*)')
+            .select('product_id, quantity')
             .eq('warehouse_id', warehouseId);
         if (error) throw error;
 
-        interface StockRecord {
-            quantity: number;
-            products: {
-                name_ar: string;
-                sale_price: number;
-                [key: string]: unknown;
-            };
-        }
+        const stockRows = (data || []) as Array<{ product_id: string; quantity: number }>;
+        const productIds = stockRows.map((stock) => stock.product_id).filter(Boolean);
 
-        return (data || []).map((s: unknown) => {
-            const stock = s as StockRecord;
+        if (productIds.length === 0) return [];
+
+        const { data: products, error: productsError } = await supabase
+            .from('products')
+            .select('*')
+            .in('id', productIds)
+            .is('deleted_at', null);
+
+        if (productsError) throw productsError;
+
+        const productsMap = new Map((products || []).map((product) => [product.id, product as Record<string, unknown>]));
+
+        return stockRows.map((stock) => {
+            const product = productsMap.get(stock.product_id) || {};
             return {
-                ...stock.products,
+                ...product,
                 stock_quantity: stock.quantity,
-                name_ar: stock.products.name_ar,
-                sale_price: stock.products.sale_price
+                name_ar: (product.name_ar as string | undefined) || '',
+                sale_price: Number(product.sale_price) || 0,
             };
         });
     }

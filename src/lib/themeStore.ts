@@ -49,6 +49,10 @@ interface ThemeState {
 }
 
 const applyTheme = (mode: ThemeMode): 'light' | 'dark' => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return mode === 'dark' ? 'dark' : 'light';
+  }
+
   const themeToApply = mode === 'system'
     ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
     : mode;
@@ -56,16 +60,20 @@ const applyTheme = (mode: ThemeMode): 'light' | 'dark' => {
   return themeToApply;
 };
 
-const applyAccent = (color: string) => document.documentElement.style.setProperty('--accent', color);
-const applyFont = (font: string) => document.documentElement.style.setProperty('--font-sans', font);
-const applyRadius = (radius: number) => document.documentElement.style.setProperty('--radius', `${radius}rem`);
-const applyFontSize = (size: number) => document.documentElement.style.fontSize = `${size}px`;
-const applyShadowStrength = (strength: number) => document.documentElement.style.setProperty('--shadow-strength', strength.toString());
-const applyGlassBlur = (blur: number) => document.documentElement.style.setProperty('--glass-blur', `${blur}px`);
-const applyGlassOpacity = (opacity: number) => document.documentElement.style.setProperty('--glass-opacity', opacity.toString());
+const applyAccent = (color: string) => typeof document !== 'undefined' && document.documentElement.style.setProperty('--accent', color);
+const applyFont = (font: string) => typeof document !== 'undefined' && document.documentElement.style.setProperty('--font-sans', font);
+const applyRadius = (radius: number) => typeof document !== 'undefined' && document.documentElement.style.setProperty('--radius', `${radius}rem`);
+const applyFontSize = (size: number) => typeof document !== 'undefined' && document.documentElement.style.setProperty('--app-font-size', `${size}px`);
+const applyShadowStrength = (strength: number) => typeof document !== 'undefined' && document.documentElement.style.setProperty('--shadow-strength', strength.toString());
+const applyGlassBlur = (blur: number) => typeof document !== 'undefined' && document.documentElement.style.setProperty('--glass-blur', `${blur}px`);
+const applyGlassOpacity = (opacity: number) => typeof document !== 'undefined' && document.documentElement.style.setProperty('--glass-opacity', opacity.toString());
+
+let themeMediaQueryCleanup: (() => void) | null = null;
 
 // تطبيق CSS variables الخاصة بالثيم على DOM
 const applyPresetCSSVars = (presetId: string, currentTheme: 'light' | 'dark') => {
+  if (typeof document === 'undefined') return;
+
   const preset = THEME_PRESETS.find(p => p.id === presetId);
   if (!preset) return;
 
@@ -113,15 +121,20 @@ export const useThemeStore = create<ThemeState>()(
           draftSettings: { accentColor, font, radius, fontSize, shadowStrength, glassBlur, glassOpacity }
         });
 
+        themeMediaQueryCleanup?.();
+
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        mediaQuery.addEventListener('change', (e) => {
+        const handleThemeChange = (e: MediaQueryListEvent) => {
           if (get().mode === 'system') {
             const newTheme = e.matches ? 'dark' : 'light';
             document.documentElement.classList.toggle('dark', e.matches);
             applyPresetCSSVars(get().activePresetId, newTheme);
             set({ theme: newTheme });
           }
-        });
+        };
+
+        mediaQuery.addEventListener('change', handleThemeChange);
+        themeMediaQueryCleanup = () => mediaQuery.removeEventListener('change', handleThemeChange);
       },
 
       setMode: (mode) => {
@@ -148,9 +161,11 @@ export const useThemeStore = create<ThemeState>()(
           applyAccent(preset.accent);
         }
 
+        const nextMode = isProTheme ? get().mode : (preset.isDark ? 'dark' : 'light');
+
         set({
           activePresetId: id,
-          mode: preset.isDark ? 'dark' : 'light',
+          mode: nextMode,
           theme: newTheme,
           ...(preset.accent ? {
             accentColor: preset.accent,

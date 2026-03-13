@@ -23,7 +23,7 @@ const BackupPage: React.FC = () => {
     };
 
     return (
-        <div className="p-3 md:p-6 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-6xl mx-auto space-y-6 pb-24">
+        <div className="p-3 md:p-6 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-none mx-auto space-y-6 pb-24">
             <input
                 type="file"
                 ref={fileInputRef}

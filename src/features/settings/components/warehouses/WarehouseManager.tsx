@@ -35,7 +35,7 @@ const WarehouseManager: React.FC = () => {
   if (isLoading) return <div className="p-10 text-center animate-pulse">جاري تحميل...</div>;
 
   return (
-    <div className="p-3 md:p-4 animate-in fade-in max-w-5xl mx-auto">
+    <div className="p-3 md:p-4 animate-in fade-in max-w-none mx-auto">
       <div className="flex items-center justify-between mb-3">
         <div>
           <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100">المستودعات والفروع</h2>

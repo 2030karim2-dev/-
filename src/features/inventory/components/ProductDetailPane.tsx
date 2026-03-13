@@ -28,8 +28,8 @@ const ProductDetailPane: React.FC<Props> = ({ product, onEdit, onDelete, onClose
     queryFn: async () => {
       if (!product?.id) return null;
       const { data, error } = await inventoryApi.getProductAnalytics(product.id);
-      const safeData = data as unknown as Record<string, unknown>[];
-      if (!error && safeData && safeData.length > 0) return safeData[0];
+      const safeData = data as Record<string, unknown> | null;
+      if (!error && safeData) return safeData;
 
       // Fallback to movements if RPC fails
       const { data: txs } = await inventoryApi.getProductMovements(product.id);
@@ -56,7 +56,7 @@ const ProductDetailPane: React.FC<Props> = ({ product, onEdit, onDelete, onClose
   }
 
   const stats = {
-    total_sales: (analytics as any)?.total_sales_qty ?? product.total_sales_qty ?? 0,
+    total_sales: (analytics as any)?.total_quantity_sold ?? (analytics as any)?.total_sales_qty ?? product.total_sales_qty ?? 0,
     total_purchases: (analytics as any)?.total_purchases_qty ?? product.total_purchases_qty ?? 0,
     profit: (analytics as any)?.total_profit ?? product.total_profit ?? 0,
   };

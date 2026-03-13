@@ -5,6 +5,7 @@
 
 import { Component, ReactNode } from 'react';
 import { AppError, ErrorCode, UnknownRecord } from '../types/common';
+import { logger } from '../utils/logger';
 
 interface Props {
     children: ReactNode;
@@ -46,7 +47,7 @@ export class ErrorBoundary extends Component<Props, State> {
             ? error
             : new AppError(error.message, ErrorCode.UNKNOWN, 500);
 
-        console.error('[ErrorBoundary] Caught error:', appError, errorInfo);
+        logger.error('ErrorBoundary', 'Caught error', { appError, errorInfo });
 
         // Handle dynamic import / chunk load failures (common after new deployments)
         const isChunkError =
@@ -55,7 +56,7 @@ export class ErrorBoundary extends Component<Props, State> {
             error.name === 'ChunkLoadError';
 
         if (isChunkError) {
-            console.warn('[ErrorBoundary] Detected chunk load error. Attempting to recover by reloading...');
+            logger.warn('ErrorBoundary', 'Detected chunk load error. Attempting to recover by reloading...');
 
             // Try to auto-reload once per session to fix the version mismatch
             const lastReload = sessionStorage.getItem('last_chunk_error_reload');

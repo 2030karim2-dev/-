@@ -72,7 +72,7 @@ const BalanceSheet: React.FC<Props> = ({ dateRange }) => {
     const isBalanced = Math.abs(totalAssets - totalLiabEquity) < 1;
 
     return (
-        <div className="max-w-[1600px] mx-auto space-y-4 pb-12 print-area animate-in slide-in-from-bottom-4 duration-500">
+        <div className="max-w-none mx-auto space-y-4 pb-12 print-area animate-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
             <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 rounded-none text-center shadow-sm flex justify-between items-center">
                 <div>

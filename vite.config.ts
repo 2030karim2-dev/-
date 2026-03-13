@@ -83,10 +83,12 @@ export default defineConfig({
             return 'vendor-icons';
           }
           // 4. فصل المكتبات الثقيلة جداً (PDF, Excel) لتتحمل فقط عند الحاجة
-          if (id.includes('node_modules/xlsx-js-style') ||
-            id.includes('node_modules/jspdf') ||
+          if (id.includes('node_modules/xlsx-js-style')) {
+            return 'vendor-xlsx';
+          }
+          if (id.includes('node_modules/jspdf') ||
             id.includes('node_modules/html2canvas')) {
-            return 'vendor-heavy-utils';
+            return 'vendor-export';
           }
         },
       },

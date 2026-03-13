@@ -51,7 +51,7 @@ const ExpensesPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-y-auto px-2 pt-2 pb-24 custom-scrollbar">
-        <div className="max-w-[1600px] mx-auto space-y-2">
+        <div className="max-w-none mx-auto space-y-2">
           <ExpenseStats customStats={stats} />
 
           {viewMode === 'analytics' ? (

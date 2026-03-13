@@ -1,6 +1,6 @@
 
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 // import { Users, Truck, Building2, UserPlus, FileText, LayoutGrid, Package, ShoppingCart, Receipt, Wallet, PiggyBank, Settings, Palette, Link2, BarChart3 } from 'lucide-react';
 import MainLayout from '../ui/layout/MainLayout';
 import { ROUTES } from '../core/routes/paths';
@@ -38,12 +38,14 @@ const AIBrainPage = lazy(() => import('../features/ai/AIBrainPage'));
 
 const NotFoundPage: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
   return (
-    <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-slate-600 bg-[#f8fafc] dark:bg-slate-950 py-20">
+    <div className="flex flex-col items-center justify-center h-full text-[var(--app-text-secondary)] bg-[var(--app-bg)] py-20">
       <div className="text-6xl mb-4 opacity-20">🧭</div>
-      <h2 className="text-2xl font-bold text-gray-600 dark:text-slate-400">{t('page_not_found_title')}</h2>
-      <p className="mt-2 text-sm">{t('page_not_found_desc')}</p>
-      <button onClick={() => window.location.href = '/'} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">
+      <h2 className="text-2xl font-bold text-[var(--app-text)]">{t('page_not_found_title')}</h2>
+      <p className="mt-2 text-sm text-[var(--app-text-secondary)]">{t('page_not_found_desc')}</p>
+      <button onClick={() => navigate(ROUTES.DASHBOARD.ROOT)} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">
         {t('back_to_home')}
       </button>
     </div>

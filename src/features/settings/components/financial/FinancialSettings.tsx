@@ -13,7 +13,7 @@ const FinancialSettings: React.FC = () => {
    useDefaultExchangeRates();
 
    return (
-      <div className="p-2 md:p-3 animate-in fade-in duration-500 max-w-5xl mx-auto space-y-6 pb-20">
+      <div className="p-2 md:p-3 animate-in fade-in duration-500 max-w-none mx-auto space-y-6 pb-20">
          {/* Header Section */}
          <div className="flex flex-row justify-between items-center gap-4 border-b dark:border-slate-800 pb-4">
             <div className="flex items-center gap-2.5">

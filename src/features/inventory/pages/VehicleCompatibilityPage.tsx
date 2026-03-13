@@ -31,7 +31,7 @@ const VehicleCompatibilityPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 lg:p-8">
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="max-w-none mx-auto space-y-6">
           
           {/* Header & Modes Selection */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-2">

@@ -166,6 +166,7 @@ export const productService = {
             if (warehouses && warehouses.length > 0) {
                 const warehouse = warehouses[0] as { id: string };
                 await inventoryApi.initializeStock({
+                    company_id: companyId,
                     product_id: product.id,
                     warehouse_id: warehouse.id,
                     quantity: Number(data.stock_quantity) || 0
@@ -306,6 +307,26 @@ export const productService = {
             p_name: name,
             p_company_id: companyId
         });
+
+        const code = error?.code || '';
+        const message = error?.message?.toLowerCase() || '';
+
+        if (error && (code === 'PGRST202' || message.includes('could not find the function') || message.includes('404'))) {
+            const { data: fallbackData, error: fallbackError } = await supabase
+                .from('products')
+                .select('id, name_ar, sku')
+                .eq('company_id', companyId)
+                .ilike('name_ar', `%${name}%`)
+                .limit(5);
+
+            if (fallbackError) throw fallbackError;
+
+            return (fallbackData || []).map((product) => ({
+                ...product,
+                similarity: 0.5,
+            }));
+        }
+
         if (error) throw error;
         return data || [];
     },

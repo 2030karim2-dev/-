@@ -12,11 +12,14 @@ import { useLocalizationSettings } from '../../features/settings/settingsStore';
 import { useSoundStore } from '../../features/notifications/store';
 import { logger } from '../utils/logger';
 import { useRealtimeSync } from '../../lib/hooks/useRealtimeSync';
+
+let hasBootstrappedSystem = false;
+
 export const useSystemInitialization = () => {
   const { initialize } = useAuth();
   const { user } = useAuthStore();
   const { openPalette } = useCommandPalette();
-  const { initializeLang, setLang } = useI18nStore();
+  const { lang, initializeLang, setLang } = useI18nStore();
   const queryClient = useQueryClient();
   const { showToast } = useFeedbackStore();
   const localizationSettings = useLocalizationSettings();
@@ -47,16 +50,19 @@ export const useSystemInitialization = () => {
 
   // 1. Initialize Auth & Language once on mount
   useEffect(() => {
+    if (hasBootstrappedSystem) return;
+
+    hasBootstrappedSystem = true;
     initialize();
     initializeLang();
   }, [initialize, initializeLang]);
 
   // 2. Apply localization settings when they change
   useEffect(() => {
-    if (localizationSettings?.default_language) {
+    if (localizationSettings?.default_language && localizationSettings.default_language !== lang) {
       setLang(localizationSettings.default_language);
     }
-  }, [localizationSettings?.default_language, setLang]);
+  }, [lang, localizationSettings?.default_language, setLang]);
 
   // 2. Smart Notifications & Health Check
   useEffect(() => {

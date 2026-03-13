@@ -104,7 +104,7 @@ const BondsAnalyticsView: React.FC<Props> = ({ analytics, totals, onSwitchToList
             />
 
             <div className="flex-1 overflow-y-auto p-8 pb-20 scrollbar-hide">
-                <div className="max-w-[1600px] mx-auto space-y-10">
+                <div className="max-w-none mx-auto space-y-10">
                     {/* KPI Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="bg-gradient-to-br from-emerald-600 to-teal-700 p-8 rounded-[2.5rem] text-white shadow-2xl shadow-emerald-500/30 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-500">

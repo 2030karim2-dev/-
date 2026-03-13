@@ -239,7 +239,7 @@ const InventoryPage: React.FC = () => {
             />
 
             <div className="flex-1 overflow-hidden p-2 flex flex-col">
-                <div className="max-w-[1600px] mx-auto h-full w-full flex flex-col">
+                <div className="max-w-none mx-auto h-full w-full flex flex-col">
                     {error ? <ErrorDisplay error={error?.message || null} onRetry={refetch} variant="full" /> : renderActiveView()}
                 </div>
             </div>

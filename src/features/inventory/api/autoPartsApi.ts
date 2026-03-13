@@ -2,28 +2,44 @@ import { supabase } from '../../../lib/supabaseClient';
 import { ProductCrossReference, ProductKitItem, ProductSupplierPrice } from '../types';
 import { TableInsert } from '@/core/types/supabase-helpers';
 
+const fetchProductsByIds = async (productIds: string[]) => {
+    if (productIds.length === 0) return new Map<string, Record<string, unknown>>();
+
+    const { data, error } = await supabase
+        .from('products')
+        .select('id, name_ar, name_en, sku, part_number, brand, purchase_price, sale_price, unit, image_url')
+        .in('id', productIds);
+
+    if (error) throw error;
+
+    return new Map((data || []).map((product) => [product.id, product as Record<string, unknown>]));
+};
+
 export const autoPartsApi = {
     // --- Cross References ---
     async getCrossReferences(productId: string) {
         const { data, error } = await supabase
             .from('product_cross_references')
-            .select(`
-        *,
-        alternative_product:products!alternative_product_id (
-          id, name_ar, name_en, sku, part_number, brand, sale_price, image_url
-        )
-      `)
+            .select('*')
             .eq('base_product_id', productId);
 
         if (error) throw error;
+
+        const alternativeProductIds = (data || [])
+            .map((item) => item.alternative_product_id)
+            .filter((id): id is string => typeof id === 'string');
+
+        const productsMap = await fetchProductsByIds(alternativeProductIds);
+
         // Map camelCase for frontend where necessary
         return data?.map((req) => {
             type AltProduct = { name_ar?: string; name_en?: string };
-            const alt = req.alternative_product as unknown as AltProduct | null;
+            const alternativeProduct = productsMap.get(req.alternative_product_id) || null;
+            const alt = alternativeProduct as AltProduct | null;
             return {
                 ...req,
                 alternative_product: {
-                    ...(req.alternative_product as object || {}),
+                    ...(alternativeProduct || {}),
                     name: alt?.name_ar || alt?.name_en
                 }
             };
@@ -54,22 +70,25 @@ export const autoPartsApi = {
     async getKitComponents(kitId: string) {
         const { data, error } = await supabase
             .from('product_kit_items')
-            .select(`
-        *,
-        component_product:products!component_product_id (
-          id, name_ar, name_en, sku, part_number, brand, purchase_price, sale_price, unit
-        )
-      `)
+            .select('*')
             .eq('kit_product_id', kitId);
 
         if (error) throw error;
+
+        const componentProductIds = (data || [])
+            .map((item) => item.component_product_id)
+            .filter((id): id is string => typeof id === 'string');
+
+        const productsMap = await fetchProductsByIds(componentProductIds);
+
         return data?.map((req) => {
             type CompProduct = { name_ar?: string; name_en?: string };
-            const comp = req.component_product as unknown as CompProduct | null;
+            const componentProduct = productsMap.get(req.component_product_id) || null;
+            const comp = componentProduct as CompProduct | null;
             return {
                 ...req,
                 component_product: {
-                    ...(req.component_product as object || {}),
+                    ...(componentProduct || {}),
                     name: comp?.name_ar || comp?.name_en
                 }
             };

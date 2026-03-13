@@ -12,9 +12,13 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, dir } = useTranslation();
 
-  const currentRoute = MENU_ITEMS.find(item => item.path === location.pathname);
+  const currentRoute = MENU_ITEMS.find((item) => (
+    item.path === '/'
+      ? location.pathname === item.path
+      : location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)
+  ));
   const title = currentRoute ? t(currentRoute.labelKey) : 'الرئيسية';
 
   return (
@@ -22,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       {/* Left side: Logo/Title (Mobile) / Page Title (Desktop) */}
       <div className="flex items-center gap-3 flex-1 md:flex-none">
         {/* Mobile Menu Button */}
-        <button onClick={onMenuClick} className="md:hidden p-2 -ms-2 text-gray-500 dark:text-slate-400" aria-label="Open mobile menu">
+        <button onClick={onMenuClick} className="md:hidden p-2 -ms-2 text-gray-500 dark:text-slate-400" aria-label={t('menu') || 'فتح القائمة'}>
           <Menu size={24} />
         </button>
         <div
@@ -44,9 +48,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           <input
             type="text"
             placeholder={t('global_search_placeholder')}
-            className="w-full bg-[var(--app-bg)] border border-[var(--app-border)] rounded-xl py-3 pr-12 pl-5 text-sm text-[var(--app-text)] placeholder:text-[var(--app-text-secondary)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
+            autoComplete="off"
+            aria-label={t('global_search_placeholder')}
+            className="w-full bg-[var(--app-bg)] border border-[var(--app-border)] rounded-xl py-3 ps-12 pe-5 text-sm text-[var(--app-text)] placeholder:text-[var(--app-text-secondary)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
           />
-          <Search className="absolute right-4 top-3.5 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 transition-colors" size={20} />
+          <Search className={`absolute top-3.5 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 transition-colors ${dir === 'rtl' ? 'right-4' : 'left-4'}`} size={20} />
         </div>
       </div>
 

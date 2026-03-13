@@ -31,7 +31,7 @@ interface SidebarNavProps {
 const SidebarNav: React.FC<SidebarNavProps> = ({ isCollapsed }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, dir } = useTranslation();
   const { user } = useAuthStore();
 
   const filteredItems = MENU_ITEMS.filter(item => {
@@ -48,7 +48,9 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ isCollapsed }) => {
   return (
     <nav className="flex-1 overflow-y-auto p-2 md:p-3 space-y-0.5 md:space-y-1 scrollbar-hide">
       {filteredItems.map((item) => {
-        const isActive = location.pathname === item.path;
+        const isActive = item.path === '/'
+          ? location.pathname === item.path
+          : location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
         const theme = buttonThemes[item.color];
 
         return (
@@ -58,10 +60,11 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ isCollapsed }) => {
             title={isCollapsed ? t(item.labelKey) : ''}
             aria-label={t(item.labelKey)}
             className={cn(
-              'w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-1.5 md:py-2.5 rounded-xl text-[10px] md:text-xs font-semibold transition-all duration-300 group active:scale-95 hover:translate-x-1',
+              'w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-1.5 md:py-2.5 rounded-xl text-[10px] md:text-xs font-semibold transition-all duration-300 group active:scale-95',
               isActive
                 ? `${theme.active} text-white`
                 : `text-[var(--app-text-secondary)] ${theme.hover}`,
+              !isActive && (dir === 'rtl' ? 'hover:-translate-x-1' : 'hover:translate-x-1'),
               isCollapsed ? 'justify-center px-0' : ''
             )}
           >

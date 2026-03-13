@@ -3,6 +3,7 @@ import { expensesApi } from './api';
 import { Expense, ExpenseFormData, ExpenseCategorySummary, ExpenseStats } from './types';
 import { messagingService } from '../notifications/messagingService';
 import { toBaseCurrency } from '../../core/utils/currencyUtils';
+import { supabase } from '../../lib/supabaseClient';
 
 export const expensesService = {
   getExpensesList: async (companyId: string): Promise<Expense[]> => {
@@ -55,7 +56,6 @@ export const expensesService = {
 
   // ⚡ Server-side stats via RPC — no frontend aggregation
   getStatsFromServer: async (companyId: string): Promise<ExpenseStats> => {
-    const { supabase } = await import('../../lib/supabaseClient');
     const { data, error } = await supabase.rpc('get_expense_stats', {
       p_company_id: companyId
     });

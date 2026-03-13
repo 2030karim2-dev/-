@@ -16,11 +16,12 @@ interface FloatingInputProps {
     endIcon?: React.ReactNode;
     onEndIconClick?: () => void;
     autoFocus?: boolean;
+    autoComplete?: string;
 }
 
 export const FloatingInput: React.FC<FloatingInputProps> = ({
     id, label, type = 'text', value, onChange, icon, dir, required,
-    minLength, error, endIcon, onEndIconClick, autoFocus
+    minLength, error, endIcon, onEndIconClick, autoFocus, autoComplete
 }) => {
     const [focused, setFocused] = useState(false);
     const isActive = focused || value.length > 0;
@@ -44,6 +45,9 @@ export const FloatingInput: React.FC<FloatingInputProps> = ({
                     required={required}
                     minLength={minLength}
                     autoFocus={autoFocus}
+                    autoComplete={autoComplete}
+                    aria-label={label}
+                    aria-invalid={Boolean(error)}
                     dir={dir}
                     placeholder=" "
                     className={`

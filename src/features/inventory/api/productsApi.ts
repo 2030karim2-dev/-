@@ -109,7 +109,7 @@ export const productsApi = {
         if (!sanitized.trim()) return { data: [], error: null };
 
         return await supabase.from('products')
-            .select('id, name_ar, sku, sale_price, part_number, alternative_numbers, quantity:product_stock(quantity)')
+            .select('id, name_ar, sku, sale_price, part_number, alternative_numbers, brand')
             .eq('company_id', companyId)
             .eq('status', 'active')
             .or(`name_ar.ilike.%${sanitized}%,sku.ilike.%${sanitized}%,part_number.ilike.%${sanitized}%,alternative_numbers.ilike.%${sanitized}%,brand.ilike.%${sanitized}%,size.ilike.%${sanitized}%,description.ilike.%${sanitized}%`)

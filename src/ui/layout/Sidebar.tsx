@@ -1,40 +1,67 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 import SidebarLogo from './sidebar/SidebarLogo';
 import SidebarNav from './sidebar/SidebarNav';
 import SidebarFooter from './sidebar/SidebarFooter';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import { cn } from '../../core/utils';
+import { useDevice } from '../../lib/hooks/useDevice';
+import { useOrientation } from '../../lib/hooks/useOrientation';
+import { useCurrentBreakpoint } from '../../lib/hooks/useBreakpoint';
+import { getCollapsedSidebarWidth, getExpandedSidebarWidth } from './sidebarSizing';
 
 interface SidebarProps {
   isCollapsed: boolean;
   toggleSidebar: () => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
+  sidebarWidth?: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   toggleSidebar,
   isMobileOpen,
-  onCloseMobile
+  onCloseMobile,
+  sidebarWidth = 'w-20'
 }) => {
-  const { dir } = useTranslation();
+  const { dir, t } = useTranslation();
+  const { isIPad } = useDevice();
+  const { isTabletLandscape } = useOrientation();
+  const breakpoint = useCurrentBreakpoint();
 
   const ChevronForward = dir === 'rtl' ? ChevronLeft : ChevronRight;
   const ChevronBack = dir === 'rtl' ? ChevronRight : ChevronLeft;
+  const isWideDesktop = breakpoint === '3xl' || breakpoint === '4xl' || breakpoint === '5xl';
+
+  // Dynamic sidebar width based on screen size
+  const dynamicWidth = useMemo(() => {
+    const computedWidth = getCollapsedSidebarWidth({
+      breakpoint,
+      isIPad,
+      isTabletLandscape,
+    });
+
+    return computedWidth || sidebarWidth;
+  }, [breakpoint, isIPad, isTabletLandscape, sidebarWidth]);
+
+  // Expanded width for large screens
+  const expandedWidth = useMemo(() => {
+    return getExpandedSidebarWidth({
+      breakpoint,
+      isIPad,
+      isTabletLandscape,
+    });
+  }, [breakpoint, isIPad, isTabletLandscape]);
 
   return (
     <>
       {/* Desktop Sidebar */}
       <aside
-        className={cn(`
-          hidden md:flex flex-col
-          fixed inset-y-0 z-20
-          bg-[var(--app-surface)]/80 backdrop-blur-xl h-screen border-[var(--app-border)]
-          transition-all duration-300 ease-in-out shadow-2xl`,
+        className={cn(
+          'hidden md:flex flex-col fixed inset-y-0 z-20 bg-[var(--app-surface)]/80 backdrop-blur-xl h-screen border-[var(--app-border)] transition-all duration-300 ease-in-out shadow-2xl',
           dir === 'rtl' ? 'right-0 border-l' : 'left-0 border-r',
-          isCollapsed ? 'w-20' : 'w-64'
+          isCollapsed ? dynamicWidth : expandedWidth
         )}
       >
         <SidebarLogo isCollapsed={isCollapsed} />
@@ -45,23 +72,25 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         <SidebarFooter isCollapsed={isCollapsed} />
 
-        {/* Toggle Button */}
-        <button
-          onClick={toggleSidebar}
-          className={cn(
-            "absolute top-20 bg-[var(--app-surface)] text-[var(--app-text-secondary)] border border-[var(--app-border)] w-7 h-7 flex items-center justify-center rounded-md shadow-lg hover:bg-[var(--app-surface-hover)] hover:text-blue-600 transition-colors z-30",
-            dir === 'rtl' ? '-left-3.5' : '-right-3.5'
-          )}
-          title={isCollapsed ? 'Expand' : 'Collapse'}
-        >
-          {isCollapsed ? <ChevronForward size={14} strokeWidth={3} /> : <ChevronBack size={14} strokeWidth={3} />}
-        </button>
+        {/* Toggle Button - hide on very large screens when expanded */}
+        {isWideDesktop && !isCollapsed ? null : (
+          <button
+            onClick={toggleSidebar}
+            className={cn(
+              "absolute top-20 bg-[var(--app-surface)] text-[var(--app-text-secondary)] border border-[var(--app-border)] w-7 h-7 flex items-center justify-center rounded-md shadow-lg hover:bg-[var(--app-surface-hover)] hover:text-blue-600 transition-colors z-30",
+              dir === 'rtl' ? '-left-3.5' : '-right-3.5'
+            )}
+            title={isCollapsed ? (t('expand') || 'توسيع القائمة') : (t('collapse') || 'طي القائمة')}
+          >
+            {isCollapsed ? <ChevronForward size={14} strokeWidth={3} /> : <ChevronBack size={14} strokeWidth={3} />}
+          </button>
+        )}
       </aside>
 
       {/* Mobile Drawer */}
       <aside
         className={cn(
-          `fixed inset-y-0 w-48 bg-[var(--app-surface)] h-screen flex flex-col border-[var(--app-border)] z-[100] 
+          `fixed inset-y-0 w-48 bg-[var(--app-surface)] h-screen flex flex-col border-[var(--app-border)] z-[60] 
           transform transition-transform duration-300 ease-out md:hidden shadow-2xl`,
           // Fix: In RTL, anchor to Right. In LTR, anchor to Left.
           dir === 'rtl' ? 'right-0 border-l' : 'left-0 border-r',

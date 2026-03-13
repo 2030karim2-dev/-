@@ -20,7 +20,7 @@ const HeaderActions: React.FC = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useThemeStore();
   const { user } = useAuthStore();
-  const { lang, setLang } = useI18nStore();
+  const { lang, dir, setLang } = useI18nStore();
   const { t } = useTranslation();
   const status = useNetworkStatus();
   const [pendingCount, setPendingCount] = useState(0);
@@ -68,7 +68,7 @@ const HeaderActions: React.FC = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isNotifOpen]);
+  }, [isNotifOpen, isProfileOpen]);
 
   // const { logout } = useAuthStore();
 
@@ -97,7 +97,8 @@ const HeaderActions: React.FC = () => {
       <button
         onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
         className="hidden sm:flex w-10 h-10 items-center justify-center rounded-xl bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)] transition-all border border-[var(--app-border)] font-sans text-xs font-semibold uppercase tracking-tighter focus:ring-2 focus:ring-blue-500/40"
-        title="Change Language"
+        title={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
+        aria-label={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
       >
         {lang === 'ar' ? 'En' : 'ع'}
       </button>
@@ -125,7 +126,10 @@ const HeaderActions: React.FC = () => {
           title={`${pendingCount} عمليات بانتظار المزامنة`}
         >
           <RefreshCw size={16} className={cn("md:size-18", pendingCount > 0 && "animate-spin-slow")} />
-          <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] bg-amber-600 text-white text-[10px] font-bold rounded-full border-2 border-[var(--app-surface)] shadow-sm">
+          <span className={cn(
+            "absolute -top-1 flex items-center justify-center min-w-[18px] h-[18px] bg-amber-600 text-white text-[10px] font-bold rounded-full border-2 border-[var(--app-surface)] shadow-sm",
+            dir === 'rtl' ? '-left-1' : '-right-1'
+          )}>
             {pendingCount}
           </span>
         </button>
@@ -149,7 +153,10 @@ const HeaderActions: React.FC = () => {
         >
           <Bell size={16} className="md:size-18 transition-transform duration-200" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center px-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-bold rounded-full border-2 border-[var(--app-surface)] shadow-sm animate-in fade-in zoom-in duration-200">
+            <span className={cn(
+              "absolute -top-1 min-w-[18px] h-[18px] flex items-center justify-center px-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-bold rounded-full border-2 border-[var(--app-surface)] shadow-sm animate-in fade-in zoom-in duration-200",
+              dir === 'rtl' ? '-left-1' : '-right-1'
+            )}>
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
@@ -171,16 +178,20 @@ const HeaderActions: React.FC = () => {
           </div>
           {/* Connectivity Status Indicator */}
           <span className={cn(
-            "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-[var(--app-surface)] rounded-full transition-colors duration-500",
+            "absolute -bottom-0.5 w-3.5 h-3.5 border-2 border-[var(--app-surface)] rounded-full transition-colors duration-500",
+            dir === 'rtl' ? '-left-0.5' : '-right-0.5',
             status.isOnline
               ? (status.isPoorConnection ? "bg-amber-500 animate-pulse" : "bg-emerald-500")
               : "bg-rose-500"
-          )} title={status.isOnline ? (status.isPoorConnection ? "Poor Connection" : "Online") : "Offline"}></span>
+          )} title={status.isOnline ? (status.isPoorConnection ? 'اتصال ضعيف' : 'متصل') : 'غير متصل'}></span>
         </button>
 
         {/* Dropdown Menu */}
         {isProfileOpen && (
-          <div className="absolute left-0 mt-2 w-56 origin-top-left bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-2xl shadow-gray-200/50 dark:shadow-black/50 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className={cn(
+            "absolute mt-2 w-56 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-2xl shadow-gray-200/50 dark:shadow-black/50 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200",
+            dir === 'rtl' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'
+          )}>
             {/* User Info Header */}
             <div className="p-4 bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800">
               <p className="text-xs font-black text-gray-800 dark:text-white truncate">{user?.full_name}</p>

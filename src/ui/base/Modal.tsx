@@ -30,15 +30,15 @@ const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   const sizeClasses = {
-    sm: 'md:max-w-sm',
-    md: 'md:max-w-md',
-    lg: 'md:max-w-xl',
-    xl: 'md:max-w-4xl',
-    '2xl': 'md:max-w-5xl',
-    '3xl': 'md:max-w-6xl',
-    '4xl': 'md:max-w-[1400px]',
-    '5xl': 'md:max-w-[1600px]',
-    full: 'md:max-w-[96vw]'
+    sm: 'md:max-w-md',
+    md: 'md:max-w-2xl',
+    lg: 'md:max-w-4xl',
+    xl: 'md:max-w-6xl',
+    '2xl': 'md:max-w-[1800px]',
+    '3xl': 'md:max-w-[2200px]',
+    '4xl': 'md:max-w-[90vw]',
+    '5xl': 'md:max-w-[95vw]',
+    full: 'md:max-w-[98vw]'
   };
 
   const sizeOrder: Array<'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'full'> = ['sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', 'full'];

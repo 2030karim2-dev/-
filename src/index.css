@@ -15,6 +15,7 @@
     --app-text: #1e293b;
     --app-text-secondary: #64748b;
     --accent: #3b82f6;
+    --app-font-size: 16px;
   }
 
   /* Dark mode overrides */
@@ -30,13 +31,15 @@
 
   html {
     scrollbar-gutter: stable;
+    /* Base scaling for different screen sizes */
+    font-size: clamp(var(--app-font-size), calc(var(--app-font-size) + 0.16vw - 0.5px), 22px);
   }
 
   /* تطبيق ألوان الثيم على الخلفية الأساسية */
   body {
     background-color: var(--app-bg);
     color: var(--app-text);
-    line-height: 1.6;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -88,76 +91,76 @@
    ============================================================ */
 
 /* خلفيات الصفحات */
-.bg-gray-50,
-.bg-\[\#f8fafc\] {
+[data-theme-scope] .bg-gray-50,
+[data-theme-scope] .bg-\[\#f8fafc\] {
   background-color: var(--app-bg) !important;
 }
 
-.dark .dark\:bg-slate-950 {
+.dark [data-theme-scope] .dark\:bg-slate-950 {
   background-color: var(--app-bg) !important;
 }
 
 /* خلفيات الأسطح (كروت، سايدبار، هيدر) */
-.bg-white\/80,
-.bg-white\/40 {
+[data-theme-scope] .bg-white\/80,
+[data-theme-scope] .bg-white\/40 {
   background-color: color-mix(in srgb, var(--app-surface) 80%, transparent) !important;
 }
 
-.dark .dark\:bg-slate-900\/80 {
+.dark [data-theme-scope] .dark\:bg-slate-900\/80 {
   background-color: color-mix(in srgb, var(--app-surface) 80%, transparent) !important;
 }
 
-.dark .dark\:bg-slate-950\/40 {
+.dark [data-theme-scope] .dark\:bg-slate-950\/40 {
   background-color: color-mix(in srgb, var(--app-surface) 40%, transparent) !important;
 }
 
 /* أسطح بيضاء صافية */
-.bg-white {
+[data-theme-scope] .bg-white {
   background-color: var(--app-surface) !important;
 }
 
-.dark .dark\:bg-slate-900 {
+.dark [data-theme-scope] .dark\:bg-slate-900 {
   background-color: var(--app-surface) !important;
 }
 
 /* حدود */
-.border-gray-100,
-.border-gray-200 {
+[data-theme-scope] .border-gray-100,
+[data-theme-scope] .border-gray-200 {
   border-color: var(--app-border) !important;
 }
 
-.dark .dark\:border-slate-800 {
+.dark [data-theme-scope] .dark\:border-slate-800 {
   border-color: var(--app-border) !important;
 }
 
 /* خلفيات عناصر تفاعلية */
-.bg-gray-50\/50,
-.bg-\[\#f3f4f6\] {
+[data-theme-scope] .bg-gray-50\/50,
+[data-theme-scope] .bg-\[\#f3f4f6\] {
   background-color: var(--app-surface-hover) !important;
 }
 
-.dark .dark\:bg-slate-900\/50,
-.dark .dark\:bg-slate-900\/30,
-.dark .dark\:bg-slate-800 {
+.dark [data-theme-scope] .dark\:bg-slate-900\/50,
+.dark [data-theme-scope] .dark\:bg-slate-900\/30,
+.dark [data-theme-scope] .dark\:bg-slate-800 {
   background-color: var(--app-surface-hover) !important;
 }
 
 /* نصوص */
-.text-gray-800 {
+[data-theme-scope] .text-gray-800 {
   color: var(--app-text) !important;
 }
 
-.dark .dark\:text-slate-100 {
+.dark [data-theme-scope] .dark\:text-slate-100 {
   color: var(--app-text) !important;
 }
 
-.text-gray-500,
-.text-gray-400 {
+[data-theme-scope] .text-gray-500,
+[data-theme-scope] .text-gray-400 {
   color: var(--app-text-secondary) !important;
 }
 
-.dark .dark\:text-slate-400,
-.dark .dark\:text-slate-500 {
+.dark [data-theme-scope] .dark\:text-slate-400,
+.dark [data-theme-scope] .dark\:text-slate-500 {
   color: var(--app-text-secondary) !important;
 }
 
@@ -255,13 +258,13 @@ a:focus-visible {
 .landing-particle {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(59,130,246,0.35), transparent);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.35), transparent);
   animation: landingFloat linear infinite;
   pointer-events: none;
 }
 
 .dark .landing-particle {
-  background: radial-gradient(circle, rgba(59,130,246,0.15), transparent);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent);
 }
 
 @keyframes landingFloat {
@@ -269,8 +272,15 @@ a:focus-visible {
     transform: translateY(0) translateX(0) scale(1);
     opacity: 0;
   }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
   100% {
     transform: translateY(-120px) translateX(30px) scale(0.5);
     opacity: 0;
@@ -286,5 +296,257 @@ a:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   Large Screen Styles - Mac displays (1920px+)
+   ============================================================ */
+
+/* Large screens (1920px - MacBook Pro 14/16") */
+@media (min-width: 1920px) {
+  :root {
+    --spacing-base: 1.25rem;
+    --font-size-base: 1.125rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 1.875rem;
+  }
+
+  /* Larger cards on big screens */
+  [data-theme-scope] .card-responsive,
+  [data-theme-scope] .theme-card-responsive {
+    padding: 2rem;
+    border-radius: 1.5rem;
+  }
+
+  /* Sidebar content spacing */
+  .sidebar-content {
+    padding: 1.5rem;
+  }
+
+  /* Larger table cells */
+  .excel-table td,
+  .excel-table th {
+    padding: 1.25rem 1.5rem;
+  }
+
+  /* Larger buttons */
+  [data-theme-scope] .btn-lg {
+    padding: 1rem 2rem;
+  }
+
+  /* Larger inputs */
+  [data-theme-scope] .field-responsive {
+    padding: 1rem 1.25rem;
+  }
+
+  /* Stats cards larger */
+  .stat-card {
+    padding: 1.5rem;
+  }
+
+  .stat-card .value {
+    font-size: 2rem;
+  }
+}
+
+/* Extra large screens (2560px - iMac 24") */
+@media (min-width: 2560px) {
+  :root {
+    --spacing-base: 1.25rem;
+    --font-size-base: 1.125rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.375rem;
+    --font-size-2xl: 1.75rem;
+  }
+
+  /* Ultra-wide layouts */
+  .layout-ultra-wide {
+    max-width: 2800px;
+    margin: 0 auto;
+  }
+
+  /* Extra large cards */
+  [data-theme-scope] .card-responsive,
+  [data-theme-scope] .theme-card-responsive {
+    padding: 2rem;
+    border-radius: 1.5rem;
+  }
+
+  /* Sidebar */
+  .sidebar-content {
+    padding: 1.5rem;
+  }
+
+  /* Larger table cells */
+  .excel-table td,
+  .excel-table th {
+    padding: 1.25rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* Stats cards */
+  .stat-card .value {
+    font-size: 2.5rem;
+  }
+
+  /* Dashboard grid */
+  .dashboard-grid {
+    gap: 1.5rem;
+  }
+}
+
+/* ============================================================
+   Tablet Specific Styles
+   ============================================================ */
+
+/* iPad and similar tablets (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .tablet-layout {
+    /* Tablet specific styles */
+  }
+
+  /* Sidebar behavior on tablet */
+  .sidebar-tablet {
+    width: 5rem;
+  }
+
+  /* Table card view on tablet */
+  .excel-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Tablet landscape (iPad Air/Pro landscape) */
+@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
+  .tablet-landscape .main-content {
+    margin-left: 5rem;
+  }
+
+  .sidebar-mini {
+    width: 5rem;
+  }
+
+  .sidebar-mini .nav-label {
+    display: none;
+  }
+}
+
+/* Tablet portrait */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .tablet-portrait .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .tablet-portrait .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* ============================================================
+   Phone Specific Styles
+   ============================================================ */
+
+/* Compact landscape mode for phones */
+@media (max-height: 500px) and (orientation: landscape) {
+  .landscape-compact .nav-items {
+    gap: 0.5rem;
+  }
+
+  .landscape-compact .header {
+    height: 3rem;
+    padding: 0.5rem;
+  }
+
+  .landscape-compact .bottom-nav {
+    height: 3rem;
+  }
+
+  .landscape-compact .main-content {
+    padding-bottom: 3.5rem;
+  }
+
+  .landscape-compact .stat-card {
+    padding: 0.5rem;
+  }
+
+  .landscape-compact .stat-card .label {
+    font-size: 0.625rem;
+  }
+
+  .landscape-compact .stat-card .value {
+    font-size: 1rem;
+  }
+}
+
+/* Phone portrait */
+@media (max-width: 480px) {
+  .phone-portrait .stat-card {
+    padding: 1rem;
+  }
+
+  .phone-portrait .stat-card .value {
+    font-size: 1.5rem;
+  }
+
+  .phone-portrait .excel-table {
+    font-size: 0.75rem;
+  }
+
+  .phone-portrait .excel-table td,
+  .phone-portrait .excel-table th {
+    padding: 0.5rem;
+  }
+}
+
+/* ============================================================
+   HiDPI / Retina Display Styles
+   ============================================================ */
+
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+
+  /* Sharper text on HiDPI displays */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Sharper borders */
+  .border-1,
+  .border {
+    border-width: 0.5px;
+  }
+
+  /* Crisp icons */
+  .icon-crisp {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+}
+
+/* ============================================================
+   Print Styles
+   ============================================================ */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-full-width {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .print-break-before {
+    page-break-before: always;
+  }
+
+  .print-break-after {
+    page-break-after: always;
   }
 }

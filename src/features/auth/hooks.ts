@@ -44,6 +44,7 @@ export const useLogin = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { login: setStoreUser } = useAuthStore();
+    const navigate = useNavigate();
 
     const login = async (email: string, pass: string) => {
         setIsLoading(true);
@@ -63,10 +64,7 @@ export const useLogin = () => {
 
                 if (profile) {
                     setStoreUser(profile as AuthUser);
-                    // 🚀 Force a clean page navigation to the dashboard to avoid React Router / Suspense conflicts
-                    window.location.assign(window.location.origin + window.location.pathname + '#/');
-                    // Add a tiny delay to prevent the button from returning to normal state before the redirect fires
-                    await new Promise((resolve) => setTimeout(resolve, 500));
+                    navigate(ROUTES.DASHBOARD.ROOT, { replace: true });
                 } else {
                     throw new Error("حسابك موجود ولكن ملف التعريف غير مكتمل. يرجى التواصل مع الدعم.");
                 }
@@ -86,6 +84,7 @@ export const useRegister = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
+    const navigate = useNavigate();
 
     const register = async (email: string, pass: string, companyName: string, fullName: string) => {
         setIsLoading(true);
@@ -116,8 +115,7 @@ export const useRegister = () => {
             if (data.user) {
                 // Check if session exists (Auto login vs Email Confirmation)
                 if (data.session) {
-                    window.location.assign(window.location.origin + window.location.pathname + '#/');
-                    await new Promise((resolve) => setTimeout(resolve, 500));
+                    navigate(ROUTES.DASHBOARD.ROOT, { replace: true });
                 } else {
                     setIsSuccess(true);
                 }

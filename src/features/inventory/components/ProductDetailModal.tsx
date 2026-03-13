@@ -27,10 +27,9 @@ const ProductDetailModal: React.FC<Props> = ({ product, onClose, onEdit }) => {
         queryKey: ['product_analytics', product.id],
         queryFn: async () => {
             const { data, error } = await inventoryApi.getProductAnalytics(product.id);
-            const safeData = data as unknown as Record<string, unknown>[];
-            if (!error && safeData && safeData.length > 0) return safeData[0];
+            const safeData = data as Record<string, unknown> | null;
+            if (!error && safeData) return safeData;
 
-            console.warn("RPC failed or empty, using fallback calculation");
             const { data: txs } = await inventoryApi.getProductMovements(product.id);
             if (!txs) return null;
 
@@ -43,7 +42,7 @@ const ProductDetailModal: React.FC<Props> = ({ product, onClose, onEdit }) => {
     });
 
     const stats = {
-        total_sales: analytics?.total_sales_qty ?? product.total_sales_qty ?? 0,
+        total_sales: (analytics as any)?.total_quantity_sold ?? analytics?.total_sales_qty ?? product.total_sales_qty ?? 0,
         total_purchases: analytics?.total_purchases_qty ?? product.total_purchases_qty ?? 0,
         profit: analytics?.total_profit ?? product.total_profit ?? 0,
         loss: product.total_loss ?? 0,

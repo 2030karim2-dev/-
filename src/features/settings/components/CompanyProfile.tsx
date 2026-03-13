@@ -66,7 +66,7 @@ const CompanyProfile: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="p-3 md:p-6 animate-in fade-in duration-500">
-      <div className="max-w-4xl mx-auto space-y-5">
+      <div className="max-w-none mx-auto space-y-5">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

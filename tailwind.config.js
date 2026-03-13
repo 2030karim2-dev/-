@@ -8,6 +8,22 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      screens: {
+        // Mobile - Small
+        'xs': '480px',
+        // Mobile - Standard
+        'sm': '640px',
+        // Tablet
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        // Desktop
+        '2xl': '1536px',
+        // Mac Large Screens
+        '3xl': '1920px',
+        '4xl': '2560px',
+        '5xl': '3440px',
+      },
       fontFamily: {
         sans: ['var(--font-sans, "Cairo")', 'sans-serif'],
       },
@@ -33,6 +49,16 @@ export default {
           blue: '#0ea5e9',
         },
       },
+      maxWidth: {
+        'app': '1920px',
+        'mac': '2560px',
+        'ultra': '3440px',
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
+      },
       stat: {
         red: '#fee2e2',
         redText: '#ef4444',
@@ -45,12 +71,15 @@ export default {
       }
     },
     borderRadius: {
+      none: '0',
       sm: 'calc(var(--radius, 0.5rem) - 0.2rem)',
       DEFAULT: 'var(--radius, 0.5rem)',
+      md: 'calc(var(--radius, 0.5rem) + 0.1rem)',
       lg: 'calc(var(--radius, 0.5rem) + 0.2rem)',
       xl: 'calc(var(--radius, 0.5rem) + 0.4rem)',
       '2xl': 'calc(var(--radius, 0.5rem) + 0.6rem)',
       '3xl': 'calc(var(--radius, 0.5rem) + 1rem)',
+      full: '9999px',
     },
     boxShadow: {
       sm: '0 1px 2px 0 rgb(0 0 0 / calc(var(--shadow-strength, 0.05) * 1))',
@@ -63,6 +92,5 @@ export default {
       'sharp': '2px 2px 0 0 var(--tw-shadow-color, #000)',
     }
   },
-  plugins: [],
   plugins: [],
 }

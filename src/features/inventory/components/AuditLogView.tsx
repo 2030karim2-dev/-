@@ -37,7 +37,7 @@ const AuditLogView: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col gap-6 animate-in fade-in duration-500 max-w-5xl mx-auto">
+        <div className="flex flex-col gap-6 animate-in fade-in duration-500 max-w-none mx-auto">
             {/* Searchable Product Picker */}
             <div className="relative" ref={dropdownRef}>
                 <div className={cn(

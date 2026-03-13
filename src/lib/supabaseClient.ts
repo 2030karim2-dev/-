@@ -4,14 +4,15 @@ import { Database } from '../core/database.types';
 import { logger } from '../core/utils/logger';
 
 // تكوين الاتصال من متغيرات البيئة
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
+// Allow app to work without Supabase for development
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in environment variables.');
+  console.warn('[Supabase] Missing environment variables. App will run in offline/demo mode.');
 }
 
-export const isSupabasePlaceholder = false;
+export const isSupabasePlaceholder = !supabaseUrl || !supabaseAnonKey;
 
 // Custom fetch with timeout and retry logic
 const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): Promise<Response> => {
@@ -101,32 +102,53 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
   throw lastError;
 };
 
-export const supabase = createClient<Database>(
-  supabaseUrl,
-  supabaseAnonKey,
-  {
+// Create a mock client for development without Supabase
+const createMockClient = () => {
+  return {
+    from: () => ({
+      select: () => Promise.resolve({ data: [], error: null }),
+      insert: () => Promise.resolve({ data: null, error: null }),
+      update: () => Promise.resolve({ data: null, error: null }),
+      delete: () => Promise.resolve({ data: null, error: null }),
+    }),
     auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-      storageKey: 'alz_auth_session',
+      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+      signInWithPassword: () => Promise.resolve({ data: null, error: null }),
+      signOut: () => Promise.resolve({ error: null }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
     },
-    global: {
-      fetch: customFetch,
-      headers: {
-        'x-application-name': 'alzahra-smart-erp-v5-prod',
+  };
+};
+
+// Export mock client when Supabase is not configured
+export const supabase = isSupabasePlaceholder
+  ? createMockClient() as any
+  : createClient<Database>(
+    supabaseUrl,
+    supabaseAnonKey,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+        storageKey: 'alz_auth_session',
       },
-    },
-    db: {
-      schema: 'public',
-    },
-    // Add retry configuration
-    realtime: {
-      timeout: 45000,
-    },
-  }
-);
+      global: {
+        fetch: customFetch,
+        headers: {
+          'x-application-name': 'alzahra-smart-erp-v5-prod',
+        },
+      },
+      db: {
+        schema: 'public',
+      },
+      // Add retry configuration
+      realtime: {
+        timeout: 45000,
+      },
+    }
+  );
 
 // Export a helper function to handle auth errors gracefully
 export const handleSupabaseError = (error: any): { message: string; isAuthError: boolean } => {

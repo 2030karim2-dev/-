@@ -6,6 +6,8 @@ import { toBaseCurrency } from '../../core/utils/currencyUtils';
 import { validateSalePayload, assertValid } from '../../core/utils/validationUtils';
 import { routeToChildByCurrency } from '../../core/utils/accountRouting';
 import { logger } from '../../core/utils/logger';
+import { accountsService } from '../accounting/services/accountsService';
+import { supabase } from '../../lib/supabaseClient';
 
 // Type for raw invoice data from Supabase
 interface RawInvoice {
@@ -67,7 +69,6 @@ export const salesService = {
 
     // M1: Use shared smart routing utility
     if (finalTreasuryAccountId && payload.currency) {
-      const { accountsService } = await import('../accounting/services/accountsService');
       const accounts = await accountsService.getAccounts(companyId);
       // 3. Resolve actual treasury account using the multi-currency router
       const routed = routeToChildByCurrency(accounts as unknown as import('../../core/utils/accountRouting').RoutableAccount[], finalTreasuryAccountId, payload.currency);
@@ -103,7 +104,6 @@ export const salesService = {
 
   // ⚡ Server-side stats via RPC — no frontend aggregation
   getStats: async (companyId: string) => {
-    const { supabase } = await import('../../lib/supabaseClient');
     const { data, error } = await supabase.rpc('get_sales_stats', {
       p_company_id: companyId
     });

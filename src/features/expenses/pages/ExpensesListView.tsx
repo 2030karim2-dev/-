@@ -17,7 +17,7 @@ const ExpensesListView: React.FC<ExpensesListViewProps> = ({ expenses, isLoading
     const breakdownData = useMemo(() => expensesService.getCategoryBreakdown(expenses), [expenses]);
 
     return (
-        <div className="max-w-[1600px] mx-auto space-y-6">
+        <div className="max-w-none mx-auto space-y-6">
             <ExpenseStats customStats={stats} />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-500">

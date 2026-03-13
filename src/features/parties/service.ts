@@ -31,7 +31,6 @@ export const partiesService = {
 
   // ⚡ Server-side party statement via RPC — no frontend aggregation
   getStatement: async (partyId: string, _type: PartyType) => {
-    const { supabase } = await import('../../lib/supabaseClient');
     const { data: userData } = await supabase.auth.getUser();
     const { data: role } = await supabase.from('user_company_roles')
       .select('company_id')

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, type Variants } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion';
 import {
     Car, Mail, Package, FileText,
     BarChart3, Sun, Moon, Shield, Zap, ArrowLeft, ArrowRight,
@@ -19,6 +19,7 @@ const LandingPage: React.FC = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { dir } = useTranslation();
     const { theme, toggleTheme } = useThemeStore();
+    const shouldReduceMotion = useReducedMotion();
     const authRef = useRef<HTMLDivElement>(null);
     const featuresRef = useRef<HTMLDivElement>(null);
     const howItWorksRef = useRef<HTMLDivElement>(null);
@@ -42,6 +43,7 @@ const LandingPage: React.FC = () => {
 
     return (
         <div
+            data-theme-scope="landing"
             dir={dir}
             className="min-h-screen bg-white dark:bg-slate-950 font-sans transition-colors duration-500 overflow-x-hidden selection:bg-blue-100 selection:text-blue-600 dark:selection:bg-blue-500/30 dark:selection:text-blue-200"
         >
@@ -54,24 +56,32 @@ const LandingPage: React.FC = () => {
 
                 {/* Dynamic animated blobs */}
                 <motion.div
-                    animate={{
+                    animate={shouldReduceMotion ? undefined : {
                         x: [0, 50, 0],
                         y: [0, -30, 0],
                         scale: [1, 1.1, 1]
                     }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    transition={shouldReduceMotion ? undefined : { duration: 20, repeat: Infinity, ease: "linear" }}
                     className="absolute top-[15%] right-[5%] w-[600px] h-[600px] bg-blue-400/10 dark:bg-blue-600/5 rounded-full blur-[120px]"
+                    style={{ willChange: 'transform' }}
                 />
                 <motion.div
-                    animate={{
+                    animate={shouldReduceMotion ? undefined : {
                         x: [0, -40, 0],
                         y: [0, 60, 0],
                         scale: [1, 0.9, 1]
                     }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                    transition={shouldReduceMotion ? undefined : { duration: 25, repeat: Infinity, ease: "linear" }}
                     className="absolute bottom-[10%] left-[5%] w-[500px] h-[500px] bg-emerald-400/10 dark:bg-emerald-600/5 rounded-full blur-[100px]"
+                    style={{ willChange: 'transform' }}
                 />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03] dark:opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none" />
+                <div
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03] dark:opacity-[0.02] text-slate-900 dark:text-slate-100 pointer-events-none"
+                    style={{
+                        backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
+                        backgroundSize: '28px 28px'
+                    }}
+                />
             </div>
 
             {/* ─── Header ──────────────────────────────────────────── */}
@@ -81,7 +91,7 @@ const LandingPage: React.FC = () => {
                 transition={{ duration: 0.8, ease: "circOut" }}
                 className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
             >
-                <div className="max-w-[1600px] mx-auto px-4 py-6">
+                <div className="max-w-none mx-auto px-4 py-6">
                     <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/20 dark:border-slate-800/50 rounded-[2rem] shadow-2xl shadow-blue-500/5 px-6 h-20 flex items-center justify-between">
                         <div className="flex items-center gap-4 group cursor-pointer">
                             <motion.div
@@ -117,6 +127,7 @@ const LandingPage: React.FC = () => {
                         <div className="flex items-center gap-2 sm:gap-4">
                             <button
                                 onClick={toggleTheme}
+                                aria-label={theme === 'dark' ? 'تفعيل الوضع النهاري' : 'تفعيل الوضع الليلي'}
                                 className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gray-100/50 dark:bg-slate-800/50 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 transition-all border border-transparent hover:border-gray-200 dark:hover:border-slate-600 shadow-sm"
                             >
                                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -126,6 +137,7 @@ const LandingPage: React.FC = () => {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={scrollToAuth}
+                                aria-label="سجل الآن"
                                 className="hidden sm:flex px-6 sm:px-8 h-10 sm:h-11 bg-blue-600 text-white rounded-2xl text-sm font-black shadow-xl shadow-blue-500/30 hover:bg-blue-700 transition-all border border-blue-400/20 items-center"
                             >
                                 سجل الآن
@@ -134,6 +146,7 @@ const LandingPage: React.FC = () => {
                             {/* Mobile Menu Toggle */}
                             <button
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                aria-label={mobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
                                 className="md:hidden w-10 h-10 rounded-2xl bg-gray-100/50 dark:bg-slate-800/50 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm"
                             >
                                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -183,7 +196,7 @@ const LandingPage: React.FC = () => {
 
             {/* ─── Hero Section ────────────────────────────────────── */}
             <section className="relative pt-32 lg:pt-0 pb-20 px-4 z-10 lg:flex lg:items-center lg:min-h-screen">
-                <div className="max-w-[1600px] mx-auto w-full">
+                <div className="max-w-none mx-auto w-full">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
                         {/* Hero Text */}
                         <motion.div
@@ -213,6 +226,7 @@ const LandingPage: React.FC = () => {
                             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 justify-center lg:justify-start">
                                 <button
                                     onClick={scrollToAuth}
+                                    aria-label="ابدأ مجاناً الآن"
                                     className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-2xl font-black flex items-center justify-center gap-3 text-base sm:text-lg shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-1 transition-all active:scale-95 border border-white/10"
                                 >
                                     ابدأ مجاناً الآن
@@ -220,6 +234,7 @@ const LandingPage: React.FC = () => {
                                 </button>
                                 <button
                                     onClick={() => featuresRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                                    aria-label="مشاهدة المميزات"
                                     className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md text-gray-700 dark:text-white border-2 border-gray-100 dark:border-slate-800 rounded-2xl font-black hover:border-blue-500 hover:bg-white dark:hover:bg-slate-900 transition-all active:scale-95 shadow-sm text-sm sm:text-base"
                                 >
                                     مشاهدة المميزات
@@ -260,7 +275,7 @@ const LandingPage: React.FC = () => {
 
             {/* ─── Features Section ────────────────────────────────── */}
             <section ref={featuresRef} className="relative py-32 px-4 z-10 bg-gray-50/50 dark:bg-transparent overflow-hidden">
-                <div className="max-w-[1600px] mx-auto">
+                <div className="max-w-none mx-auto">
                     <SectionHeader
                         badge="ميزات متقدمة"
                         title="كل ما تحتاجه لإدارة تجارتك باحترافية"
@@ -339,7 +354,7 @@ const LandingPage: React.FC = () => {
 
             {/* ─── How It Works ────────────────────────────────────── */}
             <section ref={howItWorksRef} className="relative py-32 px-4 z-10 overflow-hidden">
-                <div className="max-w-[1600px] mx-auto">
+                <div className="max-w-none mx-auto">
                     <SectionHeader
                         badge="خطوات بسيطة"
                         title="ابدأ العمل خلال دقائق معدودة"
@@ -387,7 +402,7 @@ const LandingPage: React.FC = () => {
                 <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/20 blur-[150px]" />
                 <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-emerald-600/10 blur-[150px]" />
 
-                <div className="max-w-[1600px] mx-auto">
+                <div className="max-w-none mx-auto">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
                         {/* CTA Content */}
                         <motion.div
@@ -449,8 +464,11 @@ const LandingPage: React.FC = () => {
                                         <button
                                             key={tab}
                                             onClick={() => setAuthTab(tab)}
-                                            className={`relative flex - 1 py - 5 text - sm font - black transition - colors z - 10
-                        ${authTab === tab ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'} `}
+                                            aria-pressed={authTab === tab}
+                                            className={`relative flex-1 py-5 text-sm font-black transition-colors z-10 rounded-t-[1.5rem]
+                        ${authTab === tab
+                                                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-slate-800/70'
+                                                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-slate-300'}`}
                                         >
                                             {tab === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
                                         </button>
@@ -498,7 +516,7 @@ const LandingPage: React.FC = () => {
             <footer className="relative bg-slate-950 pt-32 pb-12 overflow-hidden border-t border-slate-900">
                 <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
 
-                <div className="max-w-[1600px] mx-auto px-4">
+                <div className="max-w-none mx-auto px-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-24">
                         <div className="lg:col-span-1">
                             <div className="flex items-center gap-4 mb-8">
@@ -516,8 +534,12 @@ const LandingPage: React.FC = () => {
                                 <span className="text-blue-400 mt-2 block">الجمهورية اليمنية - المهرة</span>
                             </p>
                             <div className="flex gap-4">
-                                {[Globe, Mail, Users].map((Icon, i) => (
-                                    <button key={i} className="w-11 h-11 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500 hover:text-blue-400 hover:border-blue-500/30 transition-all shadow-sm group">
+                                {[
+                                    { icon: Globe, label: 'زيارة الموقع التعريفي' },
+                                    { icon: Mail, label: 'إرسال بريد إلكتروني' },
+                                    { icon: Users, label: 'التواصل مع فريق الدعم' },
+                                ].map(({ icon: Icon, label }) => (
+                                    <button key={label} aria-label={label} className="w-11 h-11 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500 hover:text-blue-400 hover:border-blue-500/30 transition-all shadow-sm group">
                                         <Icon size={18} className="group-hover:scale-110 transition-transform" />
                                     </button>
                                 ))}
@@ -550,10 +572,13 @@ const LandingPage: React.FC = () => {
                             <div className="relative">
                                 <input
                                     type="email"
-                                    placeholder="your@email.com"
+                                    placeholder="بريدك@مثال.com"
+                                    autoComplete="email"
+                                    aria-label="البريد الإلكتروني للنشرة البريدية"
+                                    dir="ltr"
                                     className="w-full px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-700 text-white shadow-inner"
                                 />
-                                <button className="absolute left-2 top-2 bottom-2 px-6 bg-blue-600 text-white rounded-[0.9rem] font-black text-sm hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20">
+                                <button aria-label="الاشتراك في النشرة البريدية" className="absolute ltr:left-2 rtl:right-2 top-2 bottom-2 px-6 bg-blue-600 text-white rounded-[0.9rem] font-black text-sm hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20">
                                     اشترك
                                 </button>
                             </div>

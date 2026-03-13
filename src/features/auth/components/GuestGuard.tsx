@@ -10,9 +10,9 @@ interface GuestGuardProps {
 }
 
 export const GuestGuard: React.FC<GuestGuardProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isReady } = useAuth();
 
-  if (isLoading) {
+  if (!isReady || isLoading) {
     return <PageLoader />;
   }
 

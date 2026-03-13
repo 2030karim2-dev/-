@@ -1,0 +1,101 @@
+
+> al-zahra-smart-erp@1.0.0 dev
+> vite
+
+Port 8081 is in use, trying another one...
+Port 8082 is in use, trying another one...
+Port 8083 is in use, trying another one...
+
+  VITE v5.4.21  ready in 221 ms
+
+  ➜  Local:   http://localhost:8084/
+  ➜  Network: use --host to expose
+9:31:33 PM [vite] hmr update /src/features/auth/LandingPage.tsx, /src/index.css
+9:31:45 PM [vite] page reload tailwind.config.js
+9:32:02 PM [vite] page reload tailwind.config.js
+9:32:17 PM [vite] hmr update /src/features/dashboard/DashboardPage.tsx, /src/index.css
+9:32:36 PM [vite] hmr update /src/features/auth/LandingPage.tsx, /src/index.css
+9:32:52 PM [vite] hmr update /src/ui/layout/Header.tsx, /src/index.css
+9:33:04 PM [vite] hmr update /src/app/routes.tsx, /src/index.css
+9:39:55 PM [vite] hmr update /src/ui/layout/MainLayout.tsx, /src/index.css
+9:39:55 PM [vite] hmr update /src/ui/layout/MainLayout.tsx, /src/index.css
+9:39:58 PM [vite] hmr update /src/ui/layout/MainLayout.tsx, /src/index.css
+9:40:01 PM [vite] hmr update /src/ui/layout/Sidebar.tsx, /src/index.css
+9:40:04 PM [vite] hmr update /src/features/auth/LandingPage.tsx, /src/index.css
+9:40:07 PM [vite] hmr update /src/features/auth/components/FloatingInput.tsx, /src/index.css
+9:40:09 PM [vite] hmr update /src/features/auth/components/LoginForm.tsx, /src/index.css
+9:40:09 PM [vite] hmr update /src/features/auth/components/LoginForm.tsx, /src/index.css
+9:40:11 PM [vite] hmr update /src/features/auth/components/RegisterForm.tsx, /src/index.css
+9:40:13 PM [vite] hmr update /src/ui/layout/Header.tsx, /src/index.css
+9:40:15 PM [vite] hmr update /src/index.css
+9:43:56 PM [vite] hmr update /src/ui/layout/MainLayout.tsx, /src/index.css
+9:56:15 PM [vite] hmr update /src/ui/layout/MainLayout.tsx, /src/index.css
+9:56:17 PM [vite] hmr update /src/index.css, /src/App.tsx, /src/features/auth/ForgotPasswordPage.tsx, /src/features/auth/components/AuthGuard.tsx, /src/features/auth/components/GuestGuard.tsx, /src/features/auth/UpdatePasswordPage.tsx, /src/features/auth/components/LoginForm.tsx, /src/features/auth/components/RegisterForm.tsx, /src/ui/layout/header/HeaderActions.tsx, /src/ui/layout/sidebar/SidebarFooter.tsx
+9:56:17 PM [vite] hmr update /src/index.css, /src/App.tsx, /src/features/auth/ForgotPasswordPage.tsx, /src/features/auth/components/AuthGuard.tsx, /src/features/auth/components/GuestGuard.tsx, /src/features/auth/UpdatePasswordPage.tsx, /src/features/auth/components/LoginForm.tsx, /src/features/auth/components/RegisterForm.tsx, /src/ui/layout/header/HeaderActions.tsx, /src/ui/layout/sidebar/SidebarFooter.tsx
+9:56:21 PM [vite] hmr update /src/features/auth/components/GuestGuard.tsx, /src/index.css
+9:56:25 PM [vite] hmr update /src/index.css, /src/App.tsx, /src/ui/base/CommandPalette.tsx, /src/ui/layout/MainLayout.tsx, /src/features/auth/LandingPage.tsx, /src/ui/layout/header/HeaderActions.tsx
+9:56:28 PM [vite] hmr update /src/ui/layout/Header.tsx, /src/index.css
+9:56:31 PM [vite] hmr update /src/ui/layout/header/HeaderActions.tsx, /src/index.css
+9:56:34 PM [vite] hmr update /src/ui/layout/sidebar/SidebarNav.tsx, /src/index.css
+9:56:35 PM [vite] hmr update /src/ui/layout/sidebar/SidebarNav.tsx, /src/index.css
+9:56:37 PM [vite] hmr update /src/index.css
+9:56:42 PM [vite] hmr update /src/core/lib/react-query.tsx, /src/index.css
+9:56:43 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+9:56:43 PM [vite] page reload src/core/lib/react-query.tsx
+9:56:48 PM [vite] hmr update /src/index.css, /src/ui/layout/MainLayout.tsx, /src/ui/layout/Sidebar.tsx
+9:56:51 PM [vite] hmr update /src/index.css, /src/ui/layout/MainLayout.tsx, /src/ui/layout/Sidebar.tsx
+9:56:51 PM [vite] hmr update /src/index.css, /src/ui/layout/MainLayout.tsx, /src/ui/layout/Sidebar.tsx
+9:56:54 PM [vite] hmr update /src/app/routes.tsx, /src/index.css
+9:58:52 PM [vite] hmr update /src/ui/layout/MainLayout.tsx, /src/index.css
+9:58:56 PM [vite] page reload src/index.tsx
+9:58:56 PM [vite] page reload src/index.tsx
+9:59:02 PM [vite] hmr update /src/core/components/ErrorBoundary.tsx, /src/index.css
+9:59:02 PM [vite] hmr invalidate /src/core/components/ErrorBoundary.tsx Could not Fast Refresh ("useErrorBoundary" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+9:59:02 PM [vite] hmr update /src/App.tsx, /src/index.css, /src/ui/common/GlobalErrorBoundary.tsx
+9:59:07 PM [vite] hmr update /src/App.tsx, /src/index.css
+9:59:07 PM [vite] hmr update /src/App.tsx, /src/index.css
+10:00:32 PM [vite] hmr update /src/ui/layout/sidebar/SidebarNav.tsx, /src/index.css
+10:00:35 PM [vite] hmr update /src/ui/layout/Header.tsx, /src/index.css
+10:00:38 PM [vite] hmr update /src/ui/layout/Sidebar.tsx, /src/index.css
+10:00:39 PM [vite] hmr update /src/ui/layout/Sidebar.tsx, /src/index.css
+10:00:42 PM [vite] hmr update /src/ui/layout/header/HeaderActions.tsx, /src/index.css
+10:00:45 PM [vite] hmr update /src/app/routes.tsx, /src/index.css
+10:03:30 PM [vite] hmr update /src/App.tsx, /src/index.css
+10:03:33 PM [vite] vite.config.ts changed, restarting server...
+10:03:33 PM [vite] server restarted.
+10:06:53 PM [vite] hmr update /src/index.css, /src/core/services/OfflineManager.tsx, /src/core/lib/react-query.tsx, /src/App.tsx
+10:06:55 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+10:06:55 PM [vite] page reload src/core/lib/react-query.tsx
+10:06:59 PM [vite] hmr update /src/index.css, /src/core/lib/react-query.tsx
+10:07:02 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+10:07:02 PM [vite] page reload src/core/lib/react-query.tsx
+10:07:05 PM [vite] hmr update /src/index.css, /src/core/lib/react-query.tsx
+10:07:05 PM [vite] hmr update /src/index.css, /src/core/lib/react-query.tsx
+10:07:10 PM [vite] hmr update /src/index.css, /src/core/lib/react-query.tsx
+10:07:11 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+10:07:11 PM [vite] page reload src/core/lib/react-query.tsx
+10:07:16 PM [vite] page reload src/features/notifications/shareService.ts
+10:07:17 PM [vite] page reload src/features/notifications/shareService.ts
+10:20:06 PM [vite] hmr update /src/index.css, /src/core/lib/react-query.tsx, /src/App.tsx, /src/core/services/OfflineManager.tsx
+10:20:09 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+10:20:09 PM [vite] page reload src/core/lib/react-query.tsx
+10:20:15 PM [vite] hmr update /src/index.css, /src/core/lib/react-query.tsx, /src/App.tsx, /src/core/services/OfflineManager.tsx
+10:20:17 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+10:20:17 PM [vite] page reload src/core/lib/react-query.tsx
+10:20:23 PM [vite] hmr update /src/index.css, /src/core/services/OfflineManager.tsx, /src/core/lib/react-query.tsx
+10:20:24 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+10:20:24 PM [vite] page reload src/core/lib/react-query.tsx
+10:25:07 PM [vite] page reload src/features/inventory/components/AddProductModal.tsx
+10:25:14 PM [vite] hmr update /src/index.css, /src/core/lib/react-query.tsx, /src/App.tsx, /src/core/services/OfflineManager.tsx
+10:25:16 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+10:25:16 PM [vite] page reload src/core/lib/react-query.tsx
+10:25:19 PM [vite] hmr update /src/index.css, /src/core/services/OfflineManager.tsx, /src/core/lib/react-query.tsx
+10:25:21 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+10:25:21 PM [vite] page reload src/core/lib/react-query.tsx
+10:27:34 PM [vite] page reload src/features/inventory/components/ProductDetailPane.tsx
+10:27:42 PM [vite] page reload src/features/inventory/components/ProductDetailModal.tsx
+10:27:42 PM [vite] page reload src/features/inventory/components/ProductDetailModal.tsx
+10:27:49 PM [vite] hmr update /src/index.css, /src/core/lib/react-query.tsx, /src/App.tsx, /src/core/services/OfflineManager.tsx
+10:27:50 PM [vite] hmr update /src/index.css, /src/core/lib/react-query.tsx, /src/App.tsx, /src/core/services/OfflineManager.tsx
+10:27:51 PM [vite] hmr invalidate /src/core/lib/react-query.tsx Could not Fast Refresh ("QUERY_CONFIG" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+10:27:51 PM [vite] page reload src/core/lib/react-query.tsx

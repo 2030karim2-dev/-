@@ -1,5 +1,4 @@
 
-// import { supabase } from '../../lib/supabaseClient';
 import { purchasesApi } from './api';
 import { CreatePurchaseDTO, PurchaseInvoiceResponse } from './types';
 import { purchaseAccountingService } from './services/purchaseAccounting';
@@ -7,6 +6,7 @@ import { messagingService } from '../notifications/messagingService';
 import { toBaseCurrency } from '../../core/utils/currencyUtils';
 import { validatePurchasePayload, assertValid } from '../../core/utils/validationUtils';
 import { logger } from '../../core/utils/logger';
+import { supabase } from '../../lib/supabaseClient';
 
 export { purchasesApi };
 
@@ -74,7 +74,6 @@ export const purchasesService = {
 
   // ⚡ Server-side stats via RPC — no frontend aggregation
   getStats: async (companyId: string) => {
-    const { supabase } = await import('../../lib/supabaseClient');
     const { data, error } = await supabase.rpc('get_purchase_stats', {
       p_company_id: companyId
     });
@@ -93,7 +92,6 @@ export const purchasesService = {
 
   // ⚡ Server-side analytics via RPC — no frontend aggregation
   getAnalytics: async (companyId: string) => {
-    const { supabase } = await import('../../lib/supabaseClient');
     const { data, error } = await supabase.rpc('get_purchase_stats', {
       p_company_id: companyId
     });

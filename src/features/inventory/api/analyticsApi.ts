@@ -33,7 +33,47 @@ export const analyticsApi = {
     },
 
     getProductAnalytics: async (productId: string) => {
-        return await supabase.rpc('get_product_analytics', { p_product_id: productId });
+        const { data, error } = await supabase
+            .from('invoice_items')
+            .select(`
+                quantity,
+                total,
+                invoices!inner(issue_date, type, status)
+            `)
+            .eq('product_id', productId)
+            .neq('invoices.status', 'void');
+
+        if (error) return { data: null, error };
+
+        const rows = (data || []) as Array<{
+            quantity?: number | null;
+            total?: number | null;
+            invoices?: { issue_date?: string | null; type?: string | null } | null;
+        }>;
+
+        let totalQuantitySold = 0;
+        let totalRevenue = 0;
+        let lastSaleDate: string | null = null;
+
+        rows.forEach((row) => {
+            const multiplier = row.invoices?.type === 'return_sale' ? -1 : 1;
+            totalQuantitySold += (Number(row.quantity) || 0) * multiplier;
+            totalRevenue += (Number(row.total) || 0) * multiplier;
+
+            if (row.invoices?.issue_date && (!lastSaleDate || row.invoices.issue_date > lastSaleDate)) {
+                lastSaleDate = row.invoices.issue_date;
+            }
+        });
+
+        return {
+            data: {
+                total_quantity_sold: totalQuantitySold,
+                total_revenue: totalRevenue,
+                transaction_count: rows.length,
+                last_sale_date: lastSaleDate,
+            },
+            error: null,
+        };
     },
 
     getLowStockProducts: async (companyId: string) => {

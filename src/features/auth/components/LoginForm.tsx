@@ -44,6 +44,7 @@ export const LoginForm: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 icon={<Mail size={20} />}
                 dir="ltr"
+                autoComplete="email"
                 required
             />
 
@@ -56,6 +57,7 @@ export const LoginForm: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     icon={<Lock size={20} />}
                     dir="ltr"
+                    autoComplete="current-password"
                     required
                     endIcon={showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     onEndIconClick={() => setShowPassword(!showPassword)}

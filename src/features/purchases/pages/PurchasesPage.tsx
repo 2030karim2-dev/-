@@ -175,7 +175,7 @@ const PurchasesPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-y-auto px-2 pt-0 pb-16 custom-scrollbar">
-        <div className="max-w-[1600px] mx-auto space-y-3 pt-2 h-full">
+        <div className="space-y-3 pt-2 h-full">
           {activeTab !== 'analytics' && activeTab !== 'create' && activeTab !== 'smart_import' && <PurchaseStats />}
           <div className="animate-in fade-in slide-in-from-bottom-1 h-full">
             {renderContent()}

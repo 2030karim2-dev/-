@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense, useRef } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -9,15 +9,25 @@ import { useThemeStore } from '../../lib/themeStore';
 import { ErrorBoundary } from '../base/ErrorBoundary';
 import PageLoader from '../base/PageLoader';
 import { cn } from '../../core/utils';
-import { useBreakpoint } from '../../lib/hooks/useBreakpoint';
+import { getBreakpointValue, useBreakpoint, useCurrentBreakpoint } from '../../lib/hooks/useBreakpoint';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import { useNetworkStatus } from '../../lib/hooks/useNetworkStatus';
+import { useDevice } from '../../lib/hooks/useDevice';
+import { useOrientation } from '../../lib/hooks/useOrientation';
+import { getCollapsedSidebarWidth, getMainLayoutOffsetClasses } from './sidebarSizing';
 
 const MainLayout: React.FC = () => {
   const isDesktop = useBreakpoint('md');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isDesktop);
+  const breakpoint = useCurrentBreakpoint();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth >= getBreakpointValue('md');
+  });
+  const previousIsDesktop = useRef(isDesktop);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { isOnline } = useNetworkStatus();
+  const { deviceCategory, isIPad } = useDevice();
+  const { isTabletLandscape, isTabletPortrait } = useOrientation();
 
   const { dir } = useI18nStore();
   const location = useLocation();
@@ -25,13 +35,40 @@ const MainLayout: React.FC = () => {
   const { initializeTheme } = useThemeStore();
   const { t } = useTranslation();
 
+  // Dynamic sidebar width based on screen size and device
+  const sidebarWidth = useMemo(() => getCollapsedSidebarWidth({
+    breakpoint,
+    isIPad,
+    isTabletLandscape,
+  }), [breakpoint, isIPad, isTabletLandscape]);
+
+  // Dynamic content max-width for large screens
+  const contentMaxWidth = useMemo(() => {
+    if (breakpoint === '5xl') return 'max-w-none px-16';
+    if (breakpoint === '4xl') return 'max-w-none px-12';
+    if (breakpoint === '3xl') return 'max-w-none px-8';
+    if (breakpoint === '2xl') return 'max-w-none px-6';
+    if (breakpoint === 'xl') return 'max-w-none px-4';
+    return 'max-w-full';
+  }, [breakpoint]);
+
+  // Padding bottom for main content (to account for mobile nav)
+  const mainPaddingBottom = useMemo(() => {
+    if (deviceCategory === 'phone') return 'pb-20';
+    if (isIPad && isTabletPortrait) return 'pb-16';
+    return 'pb-4';
+  }, [deviceCategory, isIPad, isTabletPortrait]);
+
+  useEffect(() => {
+    if (previousIsDesktop.current !== isDesktop) {
+      setIsSidebarCollapsed(isDesktop);
+      previousIsDesktop.current = isDesktop;
+    }
+  }, [isDesktop]);
+
   useEffect(() => {
     initializeTheme();
   }, [initializeTheme]);
-
-  useEffect(() => {
-    setIsSidebarCollapsed(isDesktop);
-  }, [isDesktop]);
 
   // تحديث تلقائي للقائمة الجانبية في الموبايل عند تغيير المسار
   useEffect(() => {
@@ -46,7 +83,7 @@ const MainLayout: React.FC = () => {
   ];
 
   return (
-    <div className="h-screen bg-[var(--app-bg)] overflow-hidden font-sans" dir={dir}>
+    <div data-theme-scope="app" className="h-screen bg-[var(--app-bg)] overflow-hidden font-sans" dir={dir}>
       {/* Network Alert Overlay */}
       {!isOnline && (
         <div className="fixed top-0 left-0 right-0 h-1 bg-rose-500 z-[300] animate-pulse"></div>
@@ -55,7 +92,7 @@ const MainLayout: React.FC = () => {
       {/* Mobile Sidebar Overlay */}
       {isMobileSidebarOpen && (
         <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[90] md:hidden animate-in fade-in duration-300"
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 md:hidden animate-in fade-in duration-300"
           onClick={() => setIsMobileSidebarOpen(false)}
         ></div>
       )}
@@ -65,13 +102,19 @@ const MainLayout: React.FC = () => {
         toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        sidebarWidth={sidebarWidth}
       />
 
       <div className={cn(
         "flex-1 flex flex-col h-full overflow-hidden relative transition-all duration-300 ease-in-out",
-        isDesktop && (isSidebarCollapsed
-          ? (dir === 'rtl' ? 'md:mr-20' : 'md:ml-20')
-          : (dir === 'rtl' ? 'md:mr-64' : 'md:ml-64'))
+        contentMaxWidth,
+        isDesktop && getMainLayoutOffsetClasses({
+          breakpoint,
+          dir,
+          isCollapsed: isSidebarCollapsed,
+          isIPad,
+          isTabletLandscape,
+        })
       )}>
         <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
 
@@ -82,7 +125,10 @@ const MainLayout: React.FC = () => {
           </div>
         )}
 
-        <main className="flex-1 overflow-y-auto custom-scrollbar relative pb-20 md:pb-4 scroll-smooth">
+        <main className={cn(
+          "flex-1 overflow-y-auto custom-scrollbar relative scroll-smooth",
+          mainPaddingBottom
+        )}>
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Outlet />
@@ -91,7 +137,7 @@ const MainLayout: React.FC = () => {
         </main>
 
         {/* Tactical Mobile Navigation */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--app-surface)]/95 backdrop-blur-md border-t-2 border-[var(--app-border)] h-16 flex items-center justify-around z-[80] px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--app-surface)]/95 backdrop-blur-md border-t-2 border-[var(--app-border)] h-16 flex items-center justify-around z-40 px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (

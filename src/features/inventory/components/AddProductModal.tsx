@@ -12,6 +12,7 @@ import { useAuthStore } from '../../auth/store';
 import productService from '../services/productService';
 import SimilarityAdvisor from './SimilarityAdvisor';
 import { useDebounce } from 'use-debounce';
+import { logger } from '../../../core/utils/logger';
 
 // Modular Form Components
 import ProductImageUploader from './product_form/ProductImageUploader';
@@ -91,7 +92,8 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
         const results = await productService.getSimilarProducts(debouncedName, user.company_id);
         setSimilarProducts(results);
       } catch (err) {
-        console.error('Similarity check failed:', err);
+        logger.warn('AddProductModal', 'Similarity check failed', err);
+        setSimilarProducts([]);
       } finally {
         setIsCheckingSimilarity(false);
       }

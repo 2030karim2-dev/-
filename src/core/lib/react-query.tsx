@@ -3,7 +3,7 @@
 // React Query Configuration
 // ============================================
 
-import React, { ReactNode, useState, useEffect } from 'react';
+import React, { ReactNode, useState, useEffect, useRef } from 'react';
 import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createIndexedDBPersister } from './persistence';
@@ -67,7 +67,7 @@ export const queryKeys = {
         all: ['purchases'] as const,
         invoices: () => [...queryKeys.purchases.all, 'invoices'] as const,
         invoice: (id: string) => [...queryKeys.purchases.invoices(), id] as const,
-        returns: () => [...queryKeys.sales.all, 'returns'] as const, // Fix: use purchases.all if intended
+        returns: () => [...queryKeys.purchases.all, 'returns'] as const,
         stats: () => [...queryKeys.purchases.all, 'stats'] as const,
     },
 
@@ -160,6 +160,7 @@ interface ReactQueryProviderProps {
  */
 const useSyncQueue = (queryClient: QueryClient) => {
     const { isOnline } = useNetworkStatus();
+    const isProcessingRef = useRef(false);
 
     useEffect(() => {
         if (isOnline) {
@@ -168,28 +169,35 @@ const useSyncQueue = (queryClient: QueryClient) => {
     }, [isOnline]);
 
     const processQueue = async () => {
+        if (isProcessingRef.current) return;
+
         const pending = await syncStore.getPending();
         if (pending.length === 0) return;
 
+        isProcessingRef.current = true;
+
         logger.info('SyncModule', `Starting sync for ${pending.length} pending operations...`);
 
-        for (const mutation of pending) {
-            try {
-                // We use mutationCache directly to avoid creating new observers
-                await queryClient.getMutationCache().build(queryClient, {
-                    mutationKey: mutation.mutationKey,
-                    mutationFn: async (variables) => {
-                        return processSyncMutation(mutation.mutationKey, variables);
-                    }
-                }).execute(mutation.variables);
+        try {
+            for (const mutation of pending) {
+                try {
+                    // We use mutationCache directly to avoid creating new observers
+                    await queryClient.getMutationCache().build(queryClient, {
+                        mutationKey: mutation.mutationKey,
+                        mutationFn: async (variables) => {
+                            return processSyncMutation(mutation.mutationKey, variables);
+                        }
+                    }).execute(mutation.variables);
 
-                await syncStore.dequeue(mutation.id);
-            } catch (error) {
-                logger.error('SyncModule', `Sync failed for mutation ${mutation.id}`, error);
-                await syncStore.incrementRetry(mutation.id);
-                // Stop processing on error to wait for next trigger or retry
-                break;
+                    await syncStore.dequeue(mutation.id);
+                } catch (error) {
+                    logger.error('SyncModule', `Sync failed for mutation ${mutation.id}`, error);
+                    await syncStore.incrementRetry(mutation.id);
+                    break;
+                }
             }
+        } finally {
+            isProcessingRef.current = false;
         }
     };
 };

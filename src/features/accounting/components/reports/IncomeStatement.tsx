@@ -57,7 +57,7 @@ const IncomeStatement: React.FC<Props> = ({ dateRange }) => {
     const totalExpense = expenses.reduce((s: number, r: any) => s + r.net_balance, 0);
 
     return (
-        <div className="max-w-6xl mx-auto space-y-4 pb-12 print-area animate-in slide-in-from-bottom-4 duration-500">
+        <div className="max-w-none mx-auto space-y-4 pb-12 print-area animate-in slide-in-from-bottom-4 duration-500">
             {/* Report Header */}
             <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 rounded-none text-center shadow-sm flex justify-between items-center">
                 <div className="text-right">

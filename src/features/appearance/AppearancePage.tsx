@@ -240,7 +240,7 @@ const AppearancePage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar pb-24">
-        <div className="max-w-5xl mx-auto space-y-6 md:space-y-8">
+        <div className="max-w-none mx-auto space-y-6 md:space-y-8">
 
           <div className="bg-white dark:bg-slate-900 p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border-2 border-gray-100 dark:border-slate-800 shadow-sm">
             <div className="flex items-center gap-2 mb-3 md:mb-4 px-1">

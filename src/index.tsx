@@ -79,7 +79,7 @@ if (import.meta.env.DEV) {
 // ----------------------------------------
 // This ensures that any previous buggy service workers are removed immediately
 // to prevent "Failed to fetch" errors caused by SW interception.
-if ('serviceWorker' in navigator) {
+if (import.meta.env.DEV && 'serviceWorker' in navigator) {
   try {
     navigator.serviceWorker.getRegistrations().then(registrations => {
       for (const registration of registrations) {

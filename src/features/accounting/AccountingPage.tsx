@@ -125,8 +125,8 @@ const AccountingPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 custom-scrollbar">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-700">
+        <div className="max-w-none mx-auto">
+          <div className="max-w-none mx-auto space-y-4 pb-12 print-area animate-in slide-in-from-bottom-4 duration-500">
             <Suspense fallback={<PageLoader />}>
               {renderContent()}
             </Suspense>

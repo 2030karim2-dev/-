@@ -137,7 +137,7 @@ const BondsPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-16 custom-scrollbar">
-        <div className={displayMode === 'table' ? "w-full overflow-x-auto" : "max-w-[1600px] mx-auto"}>
+        <div className={displayMode === 'table' ? "w-full overflow-x-auto" : "max-w-none mx-auto"}>
           <BondsList
             bonds={bonds || []}
             isLoading={isLoading}
