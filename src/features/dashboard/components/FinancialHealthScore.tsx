@@ -64,10 +64,11 @@ const FinancialHealthScore: React.FC<FinancialHealthProps> = ({
     const debtRatio = sales > 0 ? Math.max(0, 100 - (debts / sales) * 100) : 0;
     const debtScore = Math.min(20, debtRatio * 0.2);
 
-    const healthScore = Math.max(5, Math.min(100, Math.round(profitScore + collectionScore + cashScore + debtScore)));
+    const healthScore = Math.min(100, Math.round(profitScore + collectionScore + cashScore + debtScore));
     const animatedScore = useCountUp(healthScore, 2000);
 
     const getScoreColor = () => {
+        if (healthScore === 0) return { main: '#94a3b8', glow: 'rgba(148, 163, 184, 0.4)', label: 'نشاط جديد' };
         if (healthScore >= 75) return { main: '#10b981', glow: 'rgba(16, 185, 129, 0.4)', label: 'ممتاز' };
         if (healthScore >= 50) return { main: '#3b82f6', glow: 'rgba(59, 130, 246, 0.4)', label: 'جيد' };
         if (healthScore >= 25) return { main: '#f59e0b', glow: 'rgba(245, 158, 11, 0.4)', label: 'متوسط' };
