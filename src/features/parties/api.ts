@@ -70,7 +70,10 @@ export const partiesApi = {
       .eq('company_id', companyId)
       .eq('type', type)
       .is('deleted_at', null)
-      .or(`name.ilike.%${sanitized}%,phone.ilike.%${sanitized}%`)
+      .textSearch('search_vector', query, {
+        config: 'simple',
+        type: 'plain'
+      })
       .limit(10);
   },
 

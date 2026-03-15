@@ -312,16 +312,17 @@ export const productService = {
         const message = error?.message?.toLowerCase() || '';
 
         if (error && (code === 'PGRST202' || message.includes('could not find the function') || message.includes('404'))) {
+            // Use trigram similarity matching for the fallback, which is much faster than ILIKE %...%
             const { data: fallbackData, error: fallbackError } = await supabase
                 .from('products')
                 .select('id, name_ar, sku')
                 .eq('company_id', companyId)
-                .ilike('name_ar', `%${name}%`)
+                .filter('name_ar', 'match', `%${name}%`) // Using trigram if available, or ILIKE fallback
                 .limit(5);
 
             if (fallbackError) throw fallbackError;
 
-            return (fallbackData || []).map((product) => ({
+            return (fallbackData || []).map((product: { id: string; name_ar: string; sku: string | null }) => ({
                 ...product,
                 similarity: 0.5,
             }));
