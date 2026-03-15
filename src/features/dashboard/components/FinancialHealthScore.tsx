@@ -64,10 +64,11 @@ const FinancialHealthScore: React.FC<FinancialHealthProps> = ({
     const debtRatio = sales > 0 ? Math.max(0, 100 - (debts / sales) * 100) : 0;
     const debtScore = Math.min(20, debtRatio * 0.2);
 
-    let healthScore = Math.min(100, Math.round(profitScore + collectionScore + cashScore + debtScore));
+    const totalComponentsScore = profitScore + collectionScore + cashScore + debtScore;
+    let healthScore = Math.min(100, Math.round(totalComponentsScore));
     
-    // Strict zero-state: If there are no sales and no expenses, it's a new activity
-    if (sales === 0 && expenses === 0 && totalFlow === 0) {
+    // Strict zero-state: If there are no sales and no expenses, or if all component scores are zero
+    if ((sales === 0 && expenses === 0 && totalFlow === 0) || totalComponentsScore === 0) {
         healthScore = 0;
     }
 

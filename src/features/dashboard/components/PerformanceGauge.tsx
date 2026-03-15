@@ -98,7 +98,7 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
                 />
 
                 {isMounted && (
-                    <ResponsiveContainer width="100%" height={160} minWidth={0} minHeight={160}>
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={160}>
                         <PieChart>
                             <defs>
                                 <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">

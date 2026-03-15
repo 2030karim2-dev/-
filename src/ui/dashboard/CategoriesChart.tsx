@@ -52,10 +52,10 @@ const CategoriesChart: React.FC<CategoriesChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="h-full min-h-[300px] w-full relative group">
+    <div className="h-[300px] min-h-[300px] w-full relative group">
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent dark:from-slate-800/20 rounded-3xl pointer-events-none" />
       {isMounted && (
-        <ResponsiveContainer width="99%" height={300} minWidth={0}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
           <PieChart>
             <defs>
               {COLORS.map((color, index) => (
