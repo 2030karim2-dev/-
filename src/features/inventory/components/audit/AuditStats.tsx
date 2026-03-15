@@ -14,11 +14,11 @@ interface Props {
 }
 
 const StatBox: React.FC<{ icon: any, label: string, value: number, color: string}> = ({ icon: Icon, label, value, color }) => (
-    <div className={`bg-white dark:bg-slate-900 p-3 border-l-4 ${color.replace('text-','border-')} flex items-center gap-3`}>
-        <Icon size={20} className={color} />
+    <div className={`bg-white dark:bg-slate-900 p-4 border-l-4 ${color.replace('text-','border-')} flex items-center gap-4`}>
+        <Icon size={24} className={color} />
         <div>
-            <h4 className="text-xl font-bold font-mono text-gray-800 dark:text-slate-100">{formatNumberDisplay(value)}</h4>
-            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{label}</p>
+            <h4 className="text-2xl font-bold font-mono text-gray-800 dark:text-slate-100">{formatNumberDisplay(value)}</h4>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</p>
         </div>
     </div>
 );
@@ -26,14 +26,14 @@ const StatBox: React.FC<{ icon: any, label: string, value: number, color: string
 const AuditStats: React.FC<Props> = ({ stats, session }) => {
     return (
         <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 shadow-sm grid grid-cols-2 md:grid-cols-5">
-            <div className="col-span-2 md:col-span-1 p-3 flex flex-col justify-center bg-gray-50/50 dark:bg-slate-950/50 border-l dark:border-slate-800">
+            <div className="col-span-2 md:col-span-1 p-4 flex flex-col justify-center bg-gray-50/50 dark:bg-slate-950/50 border-l dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                    <Warehouse size={14} className="text-blue-500" />
-                    <h3 className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
+                    <Warehouse size={16} className="text-blue-500" />
+                    <h3 className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
                         المستودع: {session.warehouses?.name}
                     </h3>
                 </div>
-                 <p className="text-[9px] text-gray-400 font-bold mt-1">
+                 <p className="text-xs text-gray-400 font-bold mt-1.5">
                     تاريخ البدء: {new Date(session.created_at).toLocaleDateString('ar-SA')}
                  </p>
             </div>

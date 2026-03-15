@@ -120,6 +120,15 @@ export const useAuditSession = (sessionId: string | undefined) => {
     return query;
 };
 
+export const useInventoryCategories = () => {
+    const { user } = useAuthStore();
+    return useQuery({
+        queryKey: ['inventory_categories', user?.company_id],
+        queryFn: () => user?.company_id ? inventoryService.getInventoryCategories(user.company_id) : Promise.resolve([]),
+        enabled: !!user?.company_id
+    });
+};
+
 export const useInventoryMutations = () => {
     const queryClient = useQueryClient();
     const { user } = useAuthStore();
@@ -152,12 +161,12 @@ export const useInventoryMutations = () => {
     const audit = useMutation({
         mutationFn: (data: any) => {
             if (!user?.company_id || !user.id) throw new Error("Auth error");
-            // Fix: Pass userId as the 3rd argument to match the service definition
             return inventoryService.startAudit(data, user.company_id, user.id);
         },
-        onSuccess: () => {
+        onSuccess: (newSession: any) => {
             queryClient.invalidateQueries({ queryKey: ['audit_sessions'] });
             showToast("تم بدء جلسة الجرد", 'success');
+            return newSession;
         },
         onError: (err: any, variables) => {
             if (!navigator.onLine || err.message?.includes('Failed to fetch') || err.status === 0) {
