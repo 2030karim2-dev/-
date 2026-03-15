@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '../core/database.types';
 import { logger } from '../core/utils/logger';
+import { useConnectionStore } from '../core/store/connectionStore';
 
 // تكوين الاتصال من متغيرات البيئة
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
@@ -25,7 +26,7 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
       try {
         timeoutController.abort('timeout');
       } catch (_) { /* ignore */ }
-    }, 30000);
+    }, 45000);
 
     // Merge signals if options.signal exists
     let signal = timeoutController.signal;
@@ -54,9 +55,20 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
         signal,
       });
       clearTimeout(timeoutId);
+      
+      // Notify store of success
+      useConnectionStore.getState().reportSuccess();
+      
       return response;
     } catch (error: any) {
       clearTimeout(timeoutId);
+
+      const isTimeout = error.name === 'AbortError' && (error.message?.includes('timeout') || signal.reason === 'timeout');
+      if (isTimeout) {
+        useConnectionStore.getState().reportTimeout();
+      } else if (error.name !== 'AbortError') {
+        useConnectionStore.getState().reportFailure();
+      }
 
       // Gracefully handle AbortErrors - these happen during:
       // 1. Supabase auth token refresh (internal signal abort)

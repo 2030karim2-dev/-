@@ -15,6 +15,8 @@ import { useNetworkStatus } from '../../lib/hooks/useNetworkStatus';
 import { useDevice } from '../../lib/hooks/useDevice';
 import { useOrientation } from '../../lib/hooks/useOrientation';
 import { getCollapsedSidebarWidth, getMainLayoutOffsetClasses } from './sidebarSizing';
+import { useConnectionStore } from '../../core/store/connectionStore';
+import { Activity } from 'lucide-react';
 
 const MainLayout: React.FC = () => {
   const isDesktop = useBreakpoint('md');
@@ -26,6 +28,7 @@ const MainLayout: React.FC = () => {
   const previousIsDesktop = useRef(isDesktop);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { isOnline } = useNetworkStatus();
+  const { isUnstable } = useConnectionStore();
   const { deviceCategory, isIPad } = useDevice();
   const { isTabletLandscape, isTabletPortrait } = useOrientation();
 
@@ -117,6 +120,13 @@ const MainLayout: React.FC = () => {
         })
       )}>
         <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
+
+        {isOnline && isUnstable && (
+          <div className="bg-amber-500 text-white text-[9px] font-black py-1.5 flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg animate-in slide-in-from-top duration-500">
+            <Activity size={11} className="animate-pulse" />
+            <span>Connection unstable - Retrying background tasks</span>
+          </div>
+        )}
 
         {!isOnline && (
           <div className="bg-rose-500 text-white text-[9px] font-black py-1.5 flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg animate-in slide-in-from-top duration-500">

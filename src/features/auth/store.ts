@@ -20,8 +20,8 @@ interface AuthState {
 }
 
 //_TIMEOUT for session check
-const SESSION_CHECK_TIMEOUT = 15000;
-const PROFILE_FETCH_TIMEOUT = 15000;
+const SESSION_CHECK_TIMEOUT = 45000;
+const PROFILE_FETCH_TIMEOUT = 45000;
 
 // Singleton flag to prevent concurrent initialization
 let isInitializingGlobal = false;
@@ -164,7 +164,7 @@ export const useAuthStore = create<AuthState>()(
           if (prev) prev.unsubscribe();
 
           // 4. الاستماع لتغييرات الجلسة مع معالجة جميع الأحداث
-          const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
             try {
               logger.debug('Auth', 'State change event', { event });
 
