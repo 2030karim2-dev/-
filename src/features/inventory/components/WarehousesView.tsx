@@ -6,6 +6,9 @@ import { Loader2, Edit, Trash2, Eye, Warehouse } from 'lucide-react';
 import ExcelTable from '../../../ui/common/ExcelTable';
 import Button from '../../../ui/base/Button';
 import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
+import FullscreenContainer from '../../../ui/base/FullscreenContainer';
+import { Maximize2 } from 'lucide-react';
+import { cn } from '../../../core/utils';
 
 const WarehousesView: React.FC = () => {
     const { data: warehouses, isLoading } = useWarehouses();
@@ -14,6 +17,7 @@ const WarehousesView: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingWarehouse, setEditingWarehouse] = useState<any | null>(null);
     const { saveWarehouse, deleteWarehouse, isSaving } = useWarehouseMutations();
+    const [isMaximized, setIsMaximized] = useState(false);
 
     const handleSave = (data: any) => {
         const payload = editingWarehouse ? { ...data, id: editingWarehouse.id } : data;
@@ -93,7 +97,12 @@ const WarehousesView: React.FC = () => {
     if (isLoading) return <div className="p-20 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto mb-4" size={32} /></div>;
 
     return (
-        <div className="animate-in fade-in duration-500 h-full flex flex-col">
+        <FullscreenContainer isMaximized={isMaximized} onToggleMaximize={() => setIsMaximized(false)}>
+        <div className={cn(
+            "animate-in fade-in duration-500 h-full flex flex-col",
+            isMaximized && "bg-[var(--app-bg)] p-4 md:p-8"
+        )}>
+
             {viewMode === 'list' ? (
                 <div className="space-y-4 h-full flex flex-col">
                     <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-none border border-gray-100 dark:border-slate-800 shadow-sm shrink-0">
@@ -101,12 +110,24 @@ const WarehousesView: React.FC = () => {
                             <h2 className="text-xl font-bold text-gray-800 dark:text-white">إدارة المستودعات والفروع</h2>
                             <p className="text-xs font-bold text-gray-500 mt-1">عرض جميع المستودعات وحالة المخزون بها</p>
                         </div>
-                        <Button
-                            onClick={() => { setEditingWarehouse(null); setIsModalOpen(true); }}
-                            className="h-10 px-6 rounded-xl font-bold text-sm shadow-md shadow-blue-500/20"
-                        >
-                            إضافة مستودع جديد
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            {!isMaximized && (
+                                <button
+                                    onClick={() => setIsMaximized(true)}
+                                    className="h-10 px-4 bg-white dark:bg-slate-800 text-gray-500 border border-gray-100 dark:border-slate-800 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-95 flex items-center gap-2"
+                                    title="Full Screen"
+                                >
+                                    <Maximize2 size={18} />
+                                    <span>ملئ الشاشة</span>
+                                </button>
+                            )}
+                            <Button
+                                onClick={() => { setEditingWarehouse(null); setIsModalOpen(true); }}
+                                className="h-10 px-6 rounded-xl font-bold text-sm shadow-md shadow-blue-500/20"
+                            >
+                                إضافة مستودع جديد
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="bg-white dark:bg-slate-900 rounded-none border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden flex-1">
@@ -146,6 +167,7 @@ const WarehousesView: React.FC = () => {
                 initialData={editingWarehouse}
             />
         </div>
+        </FullscreenContainer>
     );
 };
 

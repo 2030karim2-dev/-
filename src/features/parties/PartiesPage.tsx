@@ -14,6 +14,7 @@ import Button from '../../ui/base/Button';
 import Avatar from '../../ui/base/Avatar';
 import { formatCurrency, cn } from '../../core/utils';
 import { useTranslation } from '../../lib/hooks/useTranslation';
+import FullscreenContainer from '../../ui/base/FullscreenContainer';
 
 interface PartiesPageProps {
     partyType: PartyType;
@@ -34,6 +35,8 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
         handleAddNew,
         handleCloseModal
     } = usePartiesView();
+    const [isMaximized, setIsMaximized] = useState(false);
+    const [isZenMode, setIsZenMode] = useState(false);
 
     const { data: parties, isLoading, stats } = useParties(partyType, searchTerm);
     const { saveParty, deleteParty, isSaving } = usePartyMutations(partyType);
@@ -201,26 +204,37 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#f8fafc] dark:bg-slate-950 font-cairo">
-            <MicroHeader
-                title={displayTitle}
-                icon={displayIcon}
-                iconColor={displayIconColor}
-                actions={headerActions}
-                searchPlaceholder={t('search_by_name_phone_category')}
-                searchValue={searchTerm}
-                onSearchChange={setSearchTerm}
-                tabs={[
-                    { id: 'list', label: t('records'), icon: Users },
-                    { id: 'statements', label: t('account_statements'), icon: FileText },
-                    { id: 'categories', label: t('categories'), icon: LayoutGrid }
-                ]}
-                activeTab={activeView}
-                onTabChange={(id) => setActiveView(id as PartyView)}
-            />
+        <FullscreenContainer isMaximized={isMaximized} onToggleMaximize={() => { setIsMaximized(false); setIsZenMode(false); }} isZenMode={isZenMode}>
+            <div className="flex flex-col h-full bg-[#f8fafc] dark:bg-slate-950 font-cairo">
+                <MicroHeader
+                    title={displayTitle}
+                    icon={displayIcon}
+                    iconColor={displayIconColor}
+                    actions={headerActions}
+                    searchPlaceholder={t('search_by_name_phone_category')}
+                    searchValue={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    tabs={[
+                        { id: 'list', label: t('records'), icon: Users },
+                        { id: 'statements', label: t('account_statements'), icon: FileText },
+                        { id: 'categories', label: t('categories'), icon: LayoutGrid }
+                    ]}
+                    activeTab={activeView}
+                    onTabChange={(id) => setActiveView(id as PartyView)}
+                    isMaximized={isMaximized}
+                    onToggleMaximize={() => {
+                        setIsMaximized(!isMaximized);
+                        if (isMaximized) setIsZenMode(false);
+                    }}
+                    isZenMode={isZenMode}
+                    onToggleZen={() => setIsZenMode(!isZenMode)}
+                />
 
-            <div className="flex-1 overflow-y-auto px-2 pt-2 pb-24 custom-scrollbar">
-                <div className="w-full">
+            <div className={cn(
+                "flex-1 overflow-hidden flex flex-col relative z-20",
+                isZenMode ? "bg-white dark:bg-slate-900" : ""
+            )}>
+                <div className="flex-1 overflow-y-auto px-2 md:px-4 pt-5 md:pt-6 pb-24 custom-scrollbar">
                     {renderContent()}
                 </div>
             </div>
@@ -250,6 +264,7 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                 customer={selectedCustomer}
             />
         </div>
+        </FullscreenContainer>
     );
 };
 

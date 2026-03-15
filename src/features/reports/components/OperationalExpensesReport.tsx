@@ -162,7 +162,7 @@ const OperationalExpensesReport: React.FC = () => {
                     <div className="bg-white dark:bg-slate-900 rounded-lg border dark:border-slate-800 p-4 shadow-sm">
                         <h4 className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">توزيع المصروفات</h4>
                         <div style={{ width: '100%', height: 250 }}>
-                            <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={250}>
+                            <ResponsiveContainer width="100%" height={250} minWidth={1} minHeight={250}>
                                 <PieChart>
                                     <Pie
                                         data={data?.chartData || []}

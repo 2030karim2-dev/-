@@ -1,7 +1,7 @@
 import React from 'react';
-import { LucideIcon, ArrowRight, ArrowLeft, Search, X } from 'lucide-react';
+import { LucideIcon, ArrowRight, ArrowLeft, Search, X, Maximize2, Minimize2, Eye, EyeOff } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-// import { cn } from '../../core/utils';
+import { cn } from '../../core/utils';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import { AdvancedTabBar, TabItem } from '../components/AdvancedTabBar';
 
@@ -22,6 +22,10 @@ interface MicroHeaderProps {
   enableDragDrop?: boolean;
   enableKeyboardNav?: boolean;
   enable3D?: boolean;
+  isMaximized?: boolean;
+  onToggleMaximize?: () => void;
+  isZenMode?: boolean;
+  onToggleZen?: () => void;
 }
 
 const MicroHeader: React.FC<MicroHeaderProps> = ({
@@ -41,6 +45,10 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
   enableDragDrop = false,
   enableKeyboardNav = true,
   enable3D = true,
+  isMaximized = false,
+  onToggleMaximize,
+  isZenMode = false,
+  onToggleZen,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,14 +63,10 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
 
   const BackIcon = dir === 'rtl' ? ArrowRight : ArrowLeft;
 
-  const triggerSearch = () => {
-    if (onSearchChange) {
-      onSearchChange(localSearch);
-    }
-  };
+  if (isMaximized) return null;
 
   return (
-    <div className="sticky top-0 z-40 bg-[var(--app-surface)]/70 backdrop-blur-2xl border-b border-[var(--app-border)] shadow-sm transition-all no-print supports-[backdrop-filter]:bg-[var(--app-surface)]/50">
+    <div className="flex-none bg-[var(--app-surface)] border-b border-[var(--app-border)] shadow-sm transition-all no-print z-40">
       <div className="max-w-none mx-auto">
         {/* Main Row */}
         <div className="flex h-10 md:h-14 lg:h-16 items-center justify-between px-2 md:px-5 lg:px-6">
@@ -83,13 +87,39 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5 md:gap-2 lg:gap-3">
+            {isMaximized && onToggleZen && (
+              <button
+                onClick={onToggleZen}
+                className={cn(
+                  "p-2 rounded-xl border transition-all active:scale-95 shadow-sm",
+                  "bg-white dark:bg-slate-800 text-gray-500 hover:text-indigo-500 border-[var(--app-border)]"
+                )}
+                title={isZenMode ? "Show Header" : "Zen Mode (Hide Header)"}
+              >
+                {isZenMode ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            )}
+            {onToggleMaximize && (
+              <button
+                onClick={onToggleMaximize}
+                className={cn(
+                  "p-2 rounded-xl border transition-all active:scale-95 shadow-sm",
+                  isMaximized 
+                    ? "bg-rose-500 text-white border-rose-400 hover:bg-rose-600 shadow-rose-500/20" 
+                    : "bg-white dark:bg-slate-800 text-gray-500 hover:text-blue-500 border-[var(--app-border)]"
+                )}
+                title={isMaximized ? "Minimize" : "Maximize"}
+              >
+                {isMaximized ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+              </button>
+            )}
             {actions}
           </div>
         </div>
 
         {/* Unified Search & Tab Row - MERGED TO SAVE SPACE */}
         {(tabs || onSearchChange || extraRow) && (
-          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 p-2 md:px-4 bg-[var(--app-bg)]/50 border-t border-[var(--app-border)]">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 p-2 md:px-4 bg-[var(--app-surface)] border-t border-[var(--app-border)]">
             {/* Tabs Section */}
             {tabs && onTabChange && activeTab && (
               <div className="flex-1 w-full overflow-x-auto no-scrollbar min-w-0">

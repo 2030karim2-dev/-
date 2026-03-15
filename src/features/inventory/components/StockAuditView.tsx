@@ -5,10 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import StartAuditModal from './StartAuditModal';
 import MicroListItem from '../../../ui/common/MicroListItem';
 import { useAuditSessions } from '../hooks/useInventoryManagement';
+import FullscreenContainer from '../../../ui/base/FullscreenContainer';
+import { Maximize2 } from 'lucide-react';
+import { cn } from '../../../core/utils';
 
 const StockAuditView: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: audits, isLoading } = useAuditSessions();
+  const [isMaximized, setIsMaximized] = useState(false);
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -16,7 +20,25 @@ const StockAuditView: React.FC = () => {
   }
 
   return (
-    <div className="space-y-3">
+    <FullscreenContainer isMaximized={isMaximized} onToggleMaximize={() => setIsMaximized(false)}>
+    <div className={cn(
+        "space-y-3 flex flex-col h-full",
+        isMaximized && "bg-[var(--app-bg)] p-4 md:p-8"
+    )}>
+      <div className="flex items-center justify-between mb-1">
+        <h3 className={cn("font-black text-gray-800 dark:text-white", isMaximized ? "text-xl" : "text-sm")}>
+            سجلات الجرد الميداني
+        </h3>
+        {!isMaximized && (
+            <button 
+               onClick={() => setIsMaximized(true)}
+               className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all"
+            >
+                <Maximize2 size={18} />
+            </button>
+        )}
+      </div>
+
       <button 
         onClick={() => setIsModalOpen(true)}
         className="w-full bg-white dark:bg-slate-900 border-2 border-dashed border-blue-200 dark:border-blue-900/30 rounded-2xl p-4 text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2 hover:bg-blue-50/50 transition-colors"
@@ -43,6 +65,7 @@ const StockAuditView: React.FC = () => {
 
       <StartAuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
+    </FullscreenContainer>
   );
 };
 

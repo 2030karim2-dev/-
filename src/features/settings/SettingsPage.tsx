@@ -283,8 +283,8 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar bg-white/20 dark:bg-slate-950/20">
-          <div className="animate-in fade-in duration-300 pb-8">
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-white/20 dark:bg-slate-950/20 h-full">
+          <div className="animate-in fade-in duration-300 h-full flex flex-col">
             {renderActiveSection()}
           </div>
         </div>

@@ -91,7 +91,7 @@ const ExpensesAnalyticsView: React.FC<ExpensesAnalyticsViewProps> = ({ expenses 
                     </div>
 
                     <div className="h-[280px] relative">
-                        <ResponsiveContainer width="100%" height={280} minWidth={0}>
+                        <ResponsiveContainer width="100%" height={280} minWidth={1} minHeight={1}>
                             <AreaChart data={analytics.chartData}>
                                 <defs>
                                     <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
@@ -178,7 +178,7 @@ const ExpensesAnalyticsView: React.FC<ExpensesAnalyticsViewProps> = ({ expenses 
                     </div>
 
                     <div className="h-[200px] mb-8">
-                        <ResponsiveContainer width="100%" height={200} minWidth={0}>
+                        <ResponsiveContainer width="100%" height={200} minWidth={1} minHeight={1}>
                             <PieChart>
                                 <Pie
                                     data={analytics.categoryData}
@@ -239,7 +239,7 @@ const ExpensesAnalyticsView: React.FC<ExpensesAnalyticsViewProps> = ({ expenses 
                 </div>
 
                 <div className="h-64">
-                    <ResponsiveContainer width="100%" height={256} minWidth={0}>
+                    <ResponsiveContainer width="100%" height={256} minWidth={1} minHeight={1}>
                         <BarChart data={analytics.paymentData} layout="vertical" margin={{ left: 30, right: 30 }}>
                             <XAxis type="number" hide />
                             <YAxis

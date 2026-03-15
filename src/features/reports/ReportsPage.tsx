@@ -5,6 +5,7 @@ import {
   LayoutGrid, FileText, Activity, Layers
 } from 'lucide-react';
 import MicroHeader from '../../ui/base/MicroHeader';
+import FullscreenContainer from '../../ui/base/FullscreenContainer';
 import { ReportTab } from './types';
 import DebtReportView from './components/DebtReportView';
 import TrialBalanceView from './components/TrialBalanceView';
@@ -27,6 +28,8 @@ const ReportsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ReportTab>('daily_sales');
   const [activeCategory, setActiveCategory] = useState<ReportCategory>('all');
   const { t } = useTranslation();
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [isZenMode, setIsZenMode] = useState(false);
 
   const categories: { id: ReportCategory; label: string; icon: any; color: string }[] = [
     { id: 'all', label: 'الكل', icon: LayoutGrid, color: 'text-slate-500' },
@@ -46,7 +49,7 @@ const ReportsPage: React.FC = () => {
     { id: 'cash_flow', label: t('cash_flow'), icon: Droplets, category: 'financial' },
     { id: 'currency_diff', label: t('currency_differences'), icon: RefreshCw, category: 'accounting' },
     { id: 'p_and_l', label: t('profit_and_loss'), icon: PieChart, category: 'financial' },
-    { id: 'balance_sheet', label: t('balance_sheet'), icon: Landmark, category: 'financial' },
+    { id: 'balance_sheet', label: t('バランスシート'), icon: Landmark, category: 'financial' },
   ];
 
   const filteredTabs = useMemo(() => {
@@ -72,42 +75,55 @@ const ReportsPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#f8fafc] dark:bg-slate-950 transition-colors duration-300">
-      <MicroHeader
-        title={t('reports_center_title')}
-        icon={BarChart3}
-        tabs={filteredTabs}
-        activeTab={activeTab}
-        onTabChange={(id) => setActiveTab(id as ReportTab)}
-        extraRow={
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all whitespace-nowrap text-[10px] font-bold uppercase tracking-tight",
-                  activeCategory === cat.id
-                    ? "bg-slate-900 text-white border-slate-900 shadow-lg scale-105"
-                    : "bg-white dark:bg-slate-900 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-slate-400"
-                )}
-              >
-                <cat.icon size={14} className={activeCategory === cat.id ? "text-white" : cat.color} />
-                {cat.label}
-              </button>
-            ))}
-          </div>
-        }
-      />
+    <FullscreenContainer isMaximized={isMaximized} onToggleMaximize={() => { setIsMaximized(false); setIsZenMode(false); }} isZenMode={isZenMode}>
+      <div className="flex flex-col h-full bg-[#f8fafc] dark:bg-slate-950 transition-colors duration-300">
+        <MicroHeader
+          title={t('reports_center_title')}
+          icon={BarChart3}
+          tabs={filteredTabs}
+          activeTab={activeTab}
+          onTabChange={(id) => setActiveTab(id as ReportTab)}
+          isMaximized={isMaximized}
+          onToggleMaximize={() => {
+            setIsMaximized(!isMaximized);
+            if (isMaximized) setIsZenMode(false);
+          }}
+          isZenMode={isZenMode}
+          onToggleZen={() => setIsZenMode(!isZenMode)}
+          extraRow={
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all whitespace-nowrap text-[10px] font-bold uppercase tracking-tight",
+                    activeCategory === cat.id
+                      ? "bg-slate-900 text-white border-slate-900 shadow-lg scale-105"
+                      : "bg-white dark:bg-slate-900 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-slate-400"
+                  )}
+                >
+                  <cat.icon size={14} className={activeCategory === cat.id ? "text-white" : cat.color} />
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          }
+        />
 
-      <div className="flex-1 overflow-y-auto px-4 md:px-6 pt-4 pb-24 custom-scrollbar">
-        <div className="max-w-[1400px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-          {renderContent()}
+        <div className={cn(
+          "flex-1 overflow-hidden flex flex-col relative z-20",
+          isZenMode ? "bg-white dark:bg-slate-900" : ""
+        )}>
+          <div className="flex-1 overflow-y-auto px-2 md:px-4 pt-5 md:pt-6 pb-24 custom-scrollbar">
+            <div className="max-w-none mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+               {renderContent()}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </FullscreenContainer>
   );
 };
 
 export default ReportsPage;
-

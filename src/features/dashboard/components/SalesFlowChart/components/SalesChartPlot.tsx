@@ -158,7 +158,7 @@ export const SalesChartPlot: React.FC<SalesChartPlotProps> = ({
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-blue-500/5 dark:from-blue-500/10 to-transparent pointer-events-none rounded-b-3xl" />
 
             {isMounted && (
-                <ResponsiveContainer width="100%" height={300} minWidth={0} minHeight={300} debounce={1}>
+                <ResponsiveContainer width="100%" height={300} minWidth={1} minHeight={300} debounce={1}>
                     <ChartComponent {...commonProps}>
                         {gradients}
                         <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.3} />

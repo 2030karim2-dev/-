@@ -136,8 +136,8 @@ const BondsPage: React.FC = () => {
         onSearchChange={setSearchTerm}
       />
 
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-16 custom-scrollbar">
-        <div className={displayMode === 'table' ? "w-full overflow-x-auto" : "max-w-none mx-auto"}>
+      <div className="flex-1 overflow-hidden flex flex-col relative z-20">
+        <div className="flex-1 overflow-y-auto px-2 md:px-4 pt-5 md:pt-6 pb-24 custom-scrollbar">
           <BondsList
             bonds={bonds || []}
             isLoading={isLoading}

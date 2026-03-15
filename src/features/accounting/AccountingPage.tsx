@@ -7,6 +7,9 @@ import MicroHeader from '../../ui/base/MicroHeader';
 import PageLoader from '../../ui/base/PageLoader';
 // import { cn } from '../../core/utils';
 import { useTranslation } from '../../lib/hooks/useTranslation';
+import FullscreenContainer from '../../ui/base/FullscreenContainer';
+import { useState } from 'react';
+import { cn } from '../../core/utils';
 
 // Lazy loading for components
 const AccountingOverview = lazy(() => import('./components/layout/AccountingOverview'));
@@ -29,6 +32,8 @@ const AccountingPage: React.FC = () => {
     setDateRange,
   } = useAccountingView();
   const { t } = useTranslation();
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [isZenMode, setIsZenMode] = useState(false);
 
   const { createJournal, isCreating } = useJournalMutation();
 
@@ -113,25 +118,34 @@ const AccountingPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#f8fafc] dark:bg-slate-950 font-cairo">
-      <MicroHeader
-        title={t('accounting_center_title')}
-        icon={Calculator}
-        actions={headerActions}
-        tabs={TABS}
-        activeTab={activeView}
-        onTabChange={(id) => setActiveView(id as AccountingView)}
-        extraRow={dateFilterRow}
-      />
+    <FullscreenContainer isMaximized={isMaximized} onToggleMaximize={() => { setIsMaximized(false); setIsZenMode(false); }} isZenMode={isZenMode}>
+      <div className="flex flex-col h-full bg-[#f8fafc] dark:bg-slate-950 font-cairo">
+        <MicroHeader
+          title={t('accounting_center_title')}
+          icon={Calculator}
+          actions={headerActions}
+          tabs={TABS}
+          activeTab={activeView}
+          onTabChange={(id) => setActiveView(id as AccountingView)}
+          extraRow={dateFilterRow}
+          isMaximized={isMaximized}
+          onToggleMaximize={() => {
+            setIsMaximized(!isMaximized);
+            if (isMaximized) setIsZenMode(false);
+          }}
+          isZenMode={isZenMode}
+          onToggleZen={() => setIsZenMode(!isZenMode)}
+        />
 
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 custom-scrollbar">
-        <div className="max-w-none mx-auto">
-          <div className="max-w-none mx-auto space-y-4 pb-12 print-area animate-in slide-in-from-bottom-4 duration-500">
-            <Suspense fallback={<PageLoader />}>
-              {renderContent()}
-            </Suspense>
+      <div className={cn(
+        "flex-1 overflow-hidden flex flex-col relative z-20",
+        isZenMode ? "bg-white dark:bg-slate-900" : ""
+      )}>
+        <Suspense fallback={<PageLoader />}>
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-2 md:p-4 pt-5 md:pt-6 print-area animate-in slide-in-from-bottom-4 duration-500">
+             {renderContent()}
           </div>
-        </div>
+        </Suspense>
       </div>
 
       <Suspense fallback={null}>
@@ -143,6 +157,7 @@ const AccountingPage: React.FC = () => {
         />
       </Suspense>
     </div>
+    </FullscreenContainer>
   );
 };
 

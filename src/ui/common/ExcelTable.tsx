@@ -7,6 +7,7 @@ import { useTableSelection } from './hooks/useTableSelection';
 import { ExcelTableHeader } from './ExcelTableHeader';
 import { ExcelTableBody } from './ExcelTableBody';
 import { ExcelTablePagination } from './ExcelTablePagination';
+import FullscreenContainer from '../base/FullscreenContainer';
 
 export interface Column<T> {
   header: string;
@@ -409,7 +410,11 @@ function ExcelTable<T>({
   };
 
   return (
-    <div className={cn("w-full flex flex-col gap-2 transition-all duration-300", isZoomed && "fixed inset-2 md:inset-4 z-[100] bg-white dark:bg-slate-950 p-2 md:p-4 shadow-2xl rounded-xl")}>
+    <FullscreenContainer isMaximized={isZoomed} onToggleMaximize={() => setIsZoomed(false)}>
+      <div className={cn(
+        "w-full flex flex-col gap-2 transition-all duration-300 relative", 
+        isZoomed ? "h-full bg-white dark:bg-slate-950 p-4 md:p-6" : "h-full"
+      )}>
       <div className="flex flex-col sm:flex-row justify-between items-center gap-2 px-1">
         <div className="flex items-center gap-3 w-full sm:w-auto">
           {title && (
@@ -666,7 +671,8 @@ function ExcelTable<T>({
           currentTheme={currentTheme}
         />
       </div>
-    </div >
+      </div>
+    </FullscreenContainer>
   );
 }
 

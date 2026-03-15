@@ -6,6 +6,8 @@ import { useProducts } from '../hooks/useProducts';
 import ExcelTable from '../../../ui/common/ExcelTable';
 import EmptyState from '../../../ui/base/EmptyState';
 import TableSkeleton from '../../../ui/base/TableSkeleton';
+import FullscreenContainer from '../../../ui/base/FullscreenContainer';
+import { Maximize2 } from 'lucide-react';
 import { cn } from '../../../core/utils';
 
 interface SmartSuggestion {
@@ -28,6 +30,7 @@ const TransfersView: React.FC = () => {
   const { data: warehouses } = useWarehouses();
   const { products } = useProducts('');
   const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
+  const [isMaximized, setIsMaximized] = useState(false);
 
   /** 
    * Smart suggestions engine:
@@ -165,7 +168,11 @@ const TransfersView: React.FC = () => {
   if (isLoading) return <TableSkeleton rows={5} cols={6} />;
 
   return (
-    <div className="space-y-4">
+    <FullscreenContainer isMaximized={isMaximized} onToggleMaximize={() => setIsMaximized(false)}>
+      <div className={cn(
+        "space-y-4 flex flex-col h-full",
+        isMaximized && "bg-[var(--app-bg)] p-4 md:p-8"
+      )}>
       {/* Stats Bar */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
@@ -246,10 +253,20 @@ const TransfersView: React.FC = () => {
       )}
 
       {/* Action Button + Table */}
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        {!isMaximized && (
+          <button
+            onClick={() => setIsMaximized(true)}
+            className="bg-white dark:bg-slate-800 text-gray-500 border border-gray-100 dark:border-slate-800 px-4 py-2.5 rounded-xl text-[11px] font-bold active:scale-95 flex items-center gap-2 shadow-sm transition-all"
+            title="Full Screen"
+          >
+            <Maximize2 size={16} />
+            <span>عرض بملئ الشاشة</span>
+          </button>
+        )}
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-[11px] font-bold active:scale-95 flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-[11px] font-bold active:scale-95 flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all font-cairo"
         >
           <Plus size={16} strokeWidth={3} />
           <span>مناقلة جديدة</span>
@@ -274,6 +291,7 @@ const TransfersView: React.FC = () => {
 
       <NewTransferModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
+    </FullscreenContainer>
   );
 };
 

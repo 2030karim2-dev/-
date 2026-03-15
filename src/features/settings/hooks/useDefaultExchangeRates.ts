@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useCurrencies, useCurrencyMutation } from '../hooks';
 import { useAuthStore } from '../../auth/store';
 
@@ -25,27 +25,28 @@ const CORRECT_RATES: Record<string, number> = {
     CNY: 0.5150,
 };
 
+let hasTriggeredCurrencySync = false;
+
 export function useDefaultExchangeRates() {
     const { rates } = useCurrencies();
     const { setRate, refreshRates } = useCurrencyMutation();
     const { user } = useAuthStore();
-    const processed = useRef(false);
 
     useEffect(() => {
         if (
-            processed.current ||
+            hasTriggeredCurrencySync ||
             rates.isLoading ||
             !rates.data ||
             !user?.company_id
         ) return;
 
-        processed.current = true;
+        hasTriggeredCurrencySync = true;
 
         // If no rates exist at all, trigger an initial market fetch
-        if (!rates.data || rates.data.length === 0) {
+        if (rates.data.length === 0) {
             console.log("[Currency] No rates found, triggering initial market sync...");
             refreshRates();
-            return;
+            // Do not return here so fallback rates can be immediately inserted to unblock UI
         }
 
         const existingRates = (rates.data || []) as Array<{ currency_code: string, effective_date: string, created_at?: string, rate_to_base: number }>;

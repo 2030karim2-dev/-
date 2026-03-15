@@ -5,6 +5,8 @@ import { inventoryApi } from '../inventory/api';
 import { Vehicle } from '../inventory/types';
 import MicroHeader from '../../ui/base/MicroHeader';
 import { useTranslation } from '../../lib/hooks/useTranslation';
+import FullscreenContainer from '../../ui/base/FullscreenContainer';
+import { cn } from '../../core/utils';
 
 // Decomposed components
 import VehicleModal from './components/VehicleModal';
@@ -20,6 +22,8 @@ const VehiclesPage: React.FC = () => {
     const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
     const [editVehicle, setEditVehicle] = useState<Vehicle | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isMaximized, setIsMaximized] = useState(false);
+    const [isZenMode, setIsZenMode] = useState(false);
     const { t } = useTranslation();
     const queryClient = useQueryClient();
 
@@ -67,68 +71,82 @@ const VehiclesPage: React.FC = () => {
     });
 
     return (
-        <div className="flex flex-col h-full bg-gray-50 dark:bg-slate-950 font-cairo">
-            <MicroHeader
-                title={t('vehicle_management')}
-                icon={Car}
-                iconColor="text-indigo-600"
-                actions={headerActions}
-                tabs={TABS}
-                activeTab={activeTab}
-                onTabChange={(id) => setActiveTab(id as ViewTab)}
-                searchPlaceholder={t('search_vehicles')}
-                searchValue={searchTerm}
-                onSearchChange={setSearchTerm}
-            />
-
-            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-20 custom-scrollbar">
-                <div className="max-w-none mx-auto space-y-4">
-                    {activeTab === 'list' ? (
-                        <>
-                            {isLoading ? (
-                                <div className="text-center py-20 text-gray-400 text-sm">{t('loading')}</div>
-                            ) : filteredVehicles.length === 0 ? (
-                                <div className="text-center py-20 text-gray-400">
-                                    <Car size={48} className="mx-auto mb-4 opacity-30" />
-                                    <p className="text-lg font-bold">{t('no_data_available')}</p>
-                                    <p className="text-sm mt-2">{t('add_new_entity', { entity: t('common_vehicles') })}</p>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {filteredVehicles.map((v: Vehicle) => (
-                                        <VehicleCard
-                                            key={v.id}
-                                            vehicle={v}
-                                            isSelected={selectedVehicle?.id === v.id}
-                                            onSelect={() => setSelectedVehicle(selectedVehicle?.id === v.id ? null : v)}
-                                            onEdit={() => { setEditVehicle(v); setIsModalOpen(true); }}
-                                            onDelete={() => deleteMutation.mutate(v.id)}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-
-                            {selectedVehicle && (
-                                <CompatibleProductsList
-                                    vehicleId={selectedVehicle.id}
-                                    vehicleName={`${selectedVehicle.make} ${selectedVehicle.model}`}
-                                />
-                            )}
-                        </>
-                    ) : (
-                        <VINLookupTab />
-                    )}
-                </div>
-            </div>
-
-            {isModalOpen && (
-                <VehicleModal
-                    vehicle={editVehicle}
-                    onClose={() => { setIsModalOpen(false); setEditVehicle(null); }}
-                    onSave={(v) => upsertMutation.mutate(editVehicle ? { ...v, id: editVehicle.id } : v)}
+        <FullscreenContainer isMaximized={isMaximized} onToggleMaximize={() => { setIsMaximized(false); setIsZenMode(false); }} isZenMode={isZenMode}>
+            <div className="flex flex-col h-full bg-gray-50 dark:bg-slate-950 font-cairo">
+                <MicroHeader
+                    title={t('vehicle_management')}
+                    icon={Car}
+                    iconColor="text-indigo-600"
+                    actions={headerActions}
+                    tabs={TABS}
+                    activeTab={activeTab}
+                    onTabChange={(id) => setActiveTab(id as ViewTab)}
+                    searchPlaceholder={t('search_vehicles')}
+                    searchValue={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    isMaximized={isMaximized}
+                    onToggleMaximize={() => {
+                        setIsMaximized(!isMaximized);
+                        if (isMaximized) setIsZenMode(false);
+                    }}
+                    isZenMode={isZenMode}
+                    onToggleZen={() => setIsZenMode(!isZenMode)}
                 />
-            )}
-        </div>
+
+                <div className={cn(
+                    "flex-1 overflow-hidden flex flex-col relative z-20",
+                    isZenMode ? "bg-white dark:bg-slate-900" : ""
+                )}>
+                    <div className="flex-1 overflow-y-auto px-2 md:px-4 pt-5 md:pt-6 pb-24 custom-scrollbar">
+                        {activeTab === 'list' ? (
+                            <>
+                                {isLoading ? (
+                                    <div className="text-center py-20 text-gray-400 text-sm">{t('loading')}</div>
+                                ) : filteredVehicles.length === 0 ? (
+                                    <div className="text-center py-20 text-gray-400">
+                                        <Car size={48} className="mx-auto mb-4 opacity-30" />
+                                        <p className="text-lg font-bold">{t('no_data_available')}</p>
+                                        <p className="text-sm mt-2">{t('add_new_entity', { entity: t('common_vehicles') })}</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {filteredVehicles.map((v: Vehicle) => (
+                                            <VehicleCard
+                                                key={v.id}
+                                                vehicle={v}
+                                                isSelected={selectedVehicle?.id === v.id}
+                                                onSelect={() => setSelectedVehicle(selectedVehicle?.id === v.id ? null : v)}
+                                                onEdit={() => { setEditVehicle(v); setIsModalOpen(true); }}
+                                                onDelete={() => deleteMutation.mutate(v.id)}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+
+                                {selectedVehicle && (
+                                    <div className="mt-4">
+                                        <CompatibleProductsList
+                                            vehicleId={selectedVehicle.id}
+                                            vehicleName={`${selectedVehicle.make} ${selectedVehicle.model}`}
+                                        />
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <VINLookupTab />
+                        )}
+                    </div>
+                </div>
+
+                {isModalOpen && (
+                    <VehicleModal
+                        vehicle={editVehicle}
+                        onClose={() => { setIsModalOpen(false); setEditVehicle(null); }}
+                        onSave={(v) => upsertMutation.mutate(editVehicle ? { ...v, id: editVehicle.id } : v)}
+                    />
+                )}
+            </div>
+        </FullscreenContainer>
     );
 };
 

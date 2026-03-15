@@ -95,7 +95,12 @@ export const useTableKeyboardNavigation = <T,>({
         // Scroll cell into view
         setTimeout(() => {
             const cell = tableRef.current?.querySelector(`[data-row-index='${newRow}'][data-col-index='${newCol}']`);
-            cell?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+            if (cell) {
+                cell.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+                
+                // Fix for possible range issue: if something tries to select this cell's content
+                // we should ensure it's actually in the DOM first.
+            }
         }, 0);
     }, [tableRef, maxRow, maxCol]);
 

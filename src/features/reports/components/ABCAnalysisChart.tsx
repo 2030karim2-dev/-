@@ -73,7 +73,7 @@ export const ABCAnalysisChart: React.FC<ABCAnalysisChartProps> = ({ data }) => {
 
             <div className="h-[240px] w-full flex items-center justify-center overflow-hidden relative" style={{ minHeight: '240px' }}>
                 {isMounted && (
-                    <ResponsiveContainer width="100%" height={240} minWidth={0} debounce={1}>
+                    <ResponsiveContainer width="100%" height={240} minWidth={1} debounce={1} minHeight={1}>
                         <PieChart>
                             <defs>
                                 {data.map((entry, index) => (

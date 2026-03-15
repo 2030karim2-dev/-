@@ -73,7 +73,7 @@ export const PaymentMethodsChart: React.FC<PaymentMethodsChartProps> = ({
             </h4>
             <div className="h-56 relative group w-full" dir="ltr">
                 {isMounted && (
-                    <ResponsiveContainer width="100%" height={224} minWidth={0}>
+                    <ResponsiveContainer width="100%" height={224} minWidth={1} minHeight={1}>
                         <PieChart>
                             <defs>
                                 {GRADIENTS.map((g, i) => (
