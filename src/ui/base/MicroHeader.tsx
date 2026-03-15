@@ -65,7 +65,7 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
     <div className="sticky top-0 z-40 bg-[var(--app-surface)]/70 backdrop-blur-2xl border-b border-[var(--app-border)] shadow-sm transition-all no-print supports-[backdrop-filter]:bg-[var(--app-surface)]/50">
       <div className="max-w-none mx-auto">
         {/* Main Row */}
-        <div className="flex h-10 md:h-14 items-center justify-between px-2 md:px-5">
+        <div className="flex h-10 md:h-14 lg:h-16 items-center justify-between px-2 md:px-5 lg:px-6">
           <div className="flex items-center gap-1.5 md:gap-2.5 overflow-hidden">
             {!isRoot && (
               <button
@@ -78,11 +78,11 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
             )}
             <div className="flex items-center gap-2 md:gap-3 bg-[var(--app-bg)]/50 px-2.5 md:px-4 py-1 md:py-1.5 rounded-full border border-[var(--app-border)]">
               <Icon className={iconColor} size={16} />
-              <h1 className="text-xs md:text-sm font-bold text-[var(--app-text)] whitespace-nowrap">{title}</h1>
+              <h1 className="text-xs md:text-sm lg:text-base font-bold text-[var(--app-text)] whitespace-nowrap">{title}</h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 md:gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2 lg:gap-3">
             {actions}
           </div>
         </div>

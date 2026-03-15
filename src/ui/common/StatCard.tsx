@@ -26,18 +26,18 @@ const StatCard: React.FC<StatCardProps> = ({
   trend
 }) => {
   return (
-    <div className="bg-[var(--app-surface)] p-4 rounded-xl border border-[var(--app-border)] shadow-sm transition-all duration-300 flex flex-col justify-between overflow-hidden group hover:shadow-md hover:border-blue-500/20">
+    <div className="bg-[var(--app-surface)] p-3 md:p-4 lg:p-5 xl:p-6 rounded-xl lg:rounded-2xl border border-[var(--app-border)] shadow-sm transition-all duration-300 flex flex-col justify-between overflow-hidden group hover:shadow-md hover:border-blue-500/20 stat-card">
       <div className="flex justify-between items-start mb-2">
         <div className="flex flex-col">
           <span className="text-xs font-medium text-[var(--app-text-secondary)] leading-none mb-1.5">
             {title}
           </span>
-          <h3 className={cn("text-2xl font-bold font-mono leading-none tracking-tight truncate", colorClass)}>
+          <h3 className={cn("text-xl md:text-2xl lg:text-3xl font-bold font-mono leading-none tracking-tight truncate", colorClass)}>
             {value}
           </h3>
         </div>
-        <div className={cn("p-2 rounded-lg transition-transform group-hover:scale-110", iconBgClass + " bg-opacity-10")}>
-          <Icon size={18} className={colorClass} />
+        <div className={cn("p-2 lg:p-3 rounded-lg lg:rounded-xl transition-transform group-hover:scale-110", iconBgClass + " bg-opacity-10")}>
+          <Icon size={18} className={cn(colorClass, "md:w-5 md:h-5 lg:w-6 lg:h-6")} />
         </div>
       </div>
 
