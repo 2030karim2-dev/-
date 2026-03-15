@@ -141,7 +141,7 @@ const InventoryPage: React.FC = () => {
             default: // Products View
                 if (isDesktop) {
                     return (
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 h-full overflow-hidden">
                             <div className={`h-full overflow-hidden flex flex-col transition-all duration-300 ${selectedProduct ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
                                 <ProductExcelGrid
                                     products={products}
@@ -152,7 +152,7 @@ const InventoryPage: React.FC = () => {
                                 />
                             </div>
                             {selectedProduct && (
-                                <div className="lg:col-span-5 h-full overflow-y-auto custom-scrollbar animate-in slide-in-from-right-4 fade-in duration-300">
+                                <div className="lg:col-span-5 h-full overflow-y-auto custom-scrollbar animate-in slide-in-from-right-4 fade-in duration-300 bg-white dark:bg-slate-900 border-l border-[var(--app-border)]">
                                     <ProductDetailPane
                                         product={selectedProduct}
                                         onEdit={handleEdit}
@@ -261,8 +261,8 @@ const InventoryPage: React.FC = () => {
                 isZenMode ? "bg-white dark:bg-slate-900" : ""
             )}>
                 <div className={cn(
-                    "flex-1 overflow-y-auto px-2 md:px-4 pt-4 pb-24 custom-scrollbar transition-all duration-500",
-                    isZenMode ? "pt-2" : "pt-4"
+                    "flex-1 overflow-hidden px-1 md:px-2 pt-1 transition-all duration-500",
+                    isZenMode ? "pt-0" : "pt-1"
                 )}>
                     {error ? <ErrorDisplay error={error?.message || null} onRetry={refetch} variant="full" /> : renderActiveView()}
                 </div>

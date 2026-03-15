@@ -629,11 +629,11 @@ function ExcelTable<T>({
         </div>
 
         {/* Status Bar */}
-        <div className="p-2 border-t border-[var(--app-border)] bg-[var(--app-bg)] flex flex-col sm:flex-row justify-between items-center gap-2 select-none">
-          <div className="flex items-center gap-3 text-[10px] text-[var(--app-text-secondary)]">
+        <div className="p-1 px-2 border-t border-[var(--app-border)] bg-[var(--app-bg)] flex flex-col sm:flex-row justify-between items-center gap-1.5 select-none">
+          <div className="flex items-center gap-2 text-[10px] text-[var(--app-text-secondary)]">
             <span className="font-mono">{getStatusText()}</span>
             {selection && (
-              <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-bold">
+              <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-[9px] font-bold">
                 تحديد: {Math.abs(selection.end.row - selection.start.row) + 1} × {Math.abs(selection.end.col - selection.start.col) + 1}
               </span>
             )}
