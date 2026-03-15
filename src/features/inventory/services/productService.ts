@@ -37,7 +37,7 @@ export const productService = {
     /**
      * Get all products for a company
      */
-    getProducts: async (companyId: string, page: number = 1, limitNum: number = 500): Promise<Product[]> => {
+    getProducts: async (companyId: string, page: number = 1, limitNum: number = 10000): Promise<Product[]> => {
         const { data, error } = await inventoryApi.getProducts(companyId, page, limitNum);
         if (error) throw error;
 

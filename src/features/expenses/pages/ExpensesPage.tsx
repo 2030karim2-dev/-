@@ -20,7 +20,7 @@ const ExpensesPage: React.FC = () => {
   const [period, setPeriod] = useState<PeriodType>('month');
 
   const { expenses, isLoading, stats } = useExpensesData(searchTerm);
-  const { createExpense, isCreating } = useExpenseActions();
+  const { createExpense, isCreating, deleteExpense } = useExpenseActions();
 
   const periodLabels: Record<PeriodType, string> = {
     today: 'اليوم',
@@ -106,7 +106,12 @@ const ExpensesPage: React.FC = () => {
       />
 
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28 custom-scrollbar">
-        <ExpensesListView expenses={expenses || []} isLoading={isLoading} stats={stats} />
+        <ExpensesListView 
+          expenses={expenses || []} 
+          isLoading={isLoading} 
+          stats={stats} 
+          onDelete={deleteExpense}
+        />
       </div>
 
       <CreateExpenseModal

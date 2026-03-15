@@ -22,7 +22,8 @@ import ProductDetailPane from './components/ProductDetailPane';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import { useFeedbackStore } from '../feedback/store';
 import ErrorDisplay from '../../ui/base/ErrorDisplay';
-// import { cn } from '../../core/utils';
+import FullscreenContainer from '../../ui/base/FullscreenContainer';
+import { cn } from '../../core/utils';
 import DeduplicationTool from './components/DeduplicationTool';
 
 const InventoryPage: React.FC = () => {
@@ -46,9 +47,11 @@ const InventoryPage: React.FC = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [isDedupeOpen, setIsDedupeOpen] = useState(false);
     const { t } = useTranslation();
-    const { products, isLoading, error, refetch, } = useProducts(searchTerm);
+    const { products, isLoading, error, refetch, } = useProducts(searchTerm, { limitNum: 10000 });
     const { deleteProduct, saveProduct, isSaving } = useProductMutations();
     const isDesktop = useBreakpoint('lg');
+    const [isMaximized, setIsMaximized] = useState(false);
+    const [isZenMode, setIsZenMode] = useState(false);
     const { showToast } = useFeedbackStore();
 
     const { rates } = useCurrencies();
@@ -181,10 +184,25 @@ const InventoryPage: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#f8fafc] dark:bg-slate-950 font-cairo">
-            <MicroHeader
-                title={t('inventory_management')}
-                icon={Database}
+        <FullscreenContainer 
+            isMaximized={isMaximized} 
+            onToggleMaximize={() => {
+                setIsMaximized(false);
+                setIsZenMode(false);
+            }}
+            isZenMode={isZenMode}
+        >
+            <div className="flex flex-col h-full bg-[#f8fafc] dark:bg-slate-950 font-cairo">
+                <MicroHeader
+                    title={t('inventory_management')}
+                    icon={Database}
+                    isMaximized={isMaximized}
+                    onToggleMaximize={() => {
+                        setIsMaximized(!isMaximized);
+                        if (isMaximized) setIsZenMode(false); // Reset Zen when minimizing
+                    }}
+                    isZenMode={isZenMode}
+                    onToggleZen={() => setIsZenMode(!isZenMode)}
                 actions={
                     <div className="flex gap-2">
                         <button
@@ -238,8 +256,14 @@ const InventoryPage: React.FC = () => {
                 onTabChange={setActiveView}
             />
 
-            <div className="flex-1 overflow-hidden p-2 flex flex-col">
-                <div className="max-w-none mx-auto h-full w-full flex flex-col">
+            <div className={cn(
+                "flex-1 overflow-hidden flex flex-col relative z-20 transition-all duration-500",
+                isZenMode ? "bg-white dark:bg-slate-900" : ""
+            )}>
+                <div className={cn(
+                    "flex-1 overflow-y-auto px-2 md:px-4 pt-4 pb-24 custom-scrollbar transition-all duration-500",
+                    isZenMode ? "pt-2" : "pt-4"
+                )}>
                     {error ? <ErrorDisplay error={error?.message || null} onRetry={refetch} variant="full" /> : renderActiveView()}
                 </div>
             </div>
@@ -277,6 +301,7 @@ const InventoryPage: React.FC = () => {
                 }}
             />
         </div>
+    </FullscreenContainer>
     );
 };
 

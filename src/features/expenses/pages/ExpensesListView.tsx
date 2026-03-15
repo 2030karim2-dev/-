@@ -11,9 +11,10 @@ interface ExpensesListViewProps {
     expenses: Expense[];
     isLoading: boolean;
     stats: any;
+    onDelete: (id: string) => void;
 }
 
-const ExpensesListView: React.FC<ExpensesListViewProps> = ({ expenses, isLoading, stats }) => {
+const ExpensesListView: React.FC<ExpensesListViewProps> = ({ expenses, isLoading, stats, onDelete }) => {
     const breakdownData = useMemo(() => expensesService.getCategoryBreakdown(expenses), [expenses]);
 
     return (
@@ -44,7 +45,7 @@ const ExpensesListView: React.FC<ExpensesListViewProps> = ({ expenses, isLoading
             </div>
 
             <div className="animate-in fade-in slide-in-from-bottom-2">
-                <ExpenseTable expenses={expenses} isLoading={isLoading} onDelete={() => { }} />
+                <ExpenseTable expenses={expenses} isLoading={isLoading} onDelete={onDelete} />
             </div>
         </div>
     );

@@ -5,7 +5,7 @@ import { TableInsert, TableUpdate } from '@/core/types/supabase-helpers';
 
 /** Products CRUD and search */
 export const productsApi = {
-    getProducts: async (companyId: string, page: number = 1, limitNum: number = 500) => {
+    getProducts: async (companyId: string, page: number = 1, limitNum: number = 10000) => {
         const from = (page - 1) * limitNum;
         const to = from + limitNum - 1;
 

@@ -43,13 +43,18 @@ const ProductExcelGrid: React.FC<Props> = ({ products, isLoading, onDelete, onVi
   const confirmDelete = async () => {
     if (!deleteConfirm) return;
 
-    if (deleteConfirm.type === 'bulk') {
-      await bulkDeleteProducts(deleteConfirm.id as string[]);
-      setSelectedRowIds(new Set());
-    } else {
-      await onDelete(deleteConfirm.id as string);
+    try {
+      if (deleteConfirm.type === 'bulk') {
+        await bulkDeleteProducts(deleteConfirm.id as string[]);
+        setSelectedRowIds(new Set());
+      } else {
+        await onDelete(deleteConfirm.id as string);
+      }
+      setDeleteConfirm(null);
+    } catch (err: any) {
+      showToast(err?.message || 'تعذر حذف المنتج. تأكد من عدم وجود فواتير مرتبطة به.', 'error');
+      setDeleteConfirm(null);
     }
-    setDeleteConfirm(null);
   };
 
   const generateShareText = () => {
@@ -256,7 +261,7 @@ const ProductExcelGrid: React.FC<Props> = ({ products, isLoading, onDelete, onVi
         title="المنتجات"
         subtitle={`${products.length} منتج في المستودع`}
         colorTheme="indigo"
-        pageSize={500}
+        pageSize={1000}
         onRowDoubleClick={onViewDetails}
         onOrderChange={handleOrderChange}
         onCellUpdate={handleCellUpdate}
