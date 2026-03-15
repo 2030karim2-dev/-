@@ -70,15 +70,15 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
             {!isRoot && (
               <button
                 onClick={() => navigate(-1)}
-                className="p-1 hover:bg-[var(--app-surface-hover)] rounded-lg transition-transform active:scale-90"
+                className="p-1.5 hover:bg-[var(--app-surface-hover)] rounded-lg transition-transform active:scale-90"
                 aria-label="Go back"
               >
-                <BackIcon size={16} className="text-[var(--app-text-secondary)]" />
+                <BackIcon size={18} className="text-[var(--app-text-secondary)]" />
               </button>
             )}
-            <div className="flex items-center gap-1.5 md:gap-2 bg-[var(--app-bg)]/50 px-2 md:px-3 py-0.5 md:py-1 rounded-full border border-[var(--app-border)]">
-              <Icon className={iconColor} size={12} />
-              <h1 className="text-[10px] md:text-xs font-bold text-[var(--app-text)] whitespace-nowrap">{title}</h1>
+            <div className="flex items-center gap-2 md:gap-3 bg-[var(--app-bg)]/50 px-2.5 md:px-4 py-1 md:py-1.5 rounded-full border border-[var(--app-border)]">
+              <Icon className={iconColor} size={16} />
+              <h1 className="text-xs md:text-sm font-bold text-[var(--app-text)] whitespace-nowrap">{title}</h1>
             </div>
           </div>
 
@@ -122,26 +122,22 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
             {(onSearchChange || extraRow) && (
               <div className={`flex items-center gap-2 w-full ${searchWidth} shrink-0`}>
                 {onSearchChange && (
-                  <div className="relative flex-1 group">
-                    <button
-                      onClick={triggerSearch}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 hover:text-blue-600 transition-colors z-10"
-                    >
-                      <Search size={14} />
-                    </button>
-                    <input
-                      type="text"
-                      placeholder={searchPlaceholder ? `${searchPlaceholder} (اضغط Enter)` : "بحث... (اضغط Enter)"}
-                      value={localSearch}
-                      onChange={(e) => setLocalSearch(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          triggerSearch();
-                        }
-                      }}
-                      className="w-full bg-[var(--app-surface)] border border-[var(--app-border)] rounded-lg py-1.5 pr-10 pl-10 text-xs font-medium outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:opacity-50"
-                      aria-label={searchPlaceholder || "Search"}
-                    />
+                    <div className="relative flex-1 group">
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 transition-colors z-10 pointer-events-none">
+                        <Search size={16} />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder={searchPlaceholder || "بحث..."}
+                        value={localSearch}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setLocalSearch(val);
+                          if (onSearchChange) onSearchChange(val);
+                        }}
+                        className="w-full bg-[var(--app-surface)] border border-[var(--app-border)] rounded-lg py-2.5 pr-10 pl-10 text-sm font-medium outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                        aria-label={searchPlaceholder || "Search"}
+                      />
                     {localSearch && (
                       <button
                         onClick={() => {

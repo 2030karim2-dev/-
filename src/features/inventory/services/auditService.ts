@@ -86,17 +86,26 @@ export const auditService = {
         const session = sessionRaw as Record<string, unknown>;
 
         const { data: items, error: iError } = await supabase.from('audit_items')
-            .select('*, products(name_ar, sku)')
+            .select('*, products(*, product_categories(name))')
             .eq('session_id', sessionId);
         if (iError) throw iError;
 
         return {
             session: { ...session, warehouse_name: (session?.warehouses as { name_ar?: string })?.name_ar } as Record<string, unknown>,
             items: (items || []).map((i: Record<string, unknown>) => {
-                const p = i.products as { name_ar?: string; sku?: string } | undefined;
+                const pRaw = i.products as any;
+                const p = Array.isArray(pRaw) ? pRaw[0] : pRaw;
+                
                 return {
                     ...i,
-                    products: { name: p?.name_ar, sku: p?.sku }
+                    products: { 
+                        name: p?.name_ar || 'بدون اسم', 
+                        sku: p?.sku || '---',
+                        part_number: p?.part_number || null,
+                        brand: p?.brand || null,
+                        size: p?.size || null,
+                        category: p?.product_categories?.name || 'عام'
+                    }
                 };
             })
         };
