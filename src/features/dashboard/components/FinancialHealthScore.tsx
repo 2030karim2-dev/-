@@ -64,7 +64,13 @@ const FinancialHealthScore: React.FC<FinancialHealthProps> = ({
     const debtRatio = sales > 0 ? Math.max(0, 100 - (debts / sales) * 100) : 0;
     const debtScore = Math.min(20, debtRatio * 0.2);
 
-    const healthScore = Math.min(100, Math.round(profitScore + collectionScore + cashScore + debtScore));
+    let healthScore = Math.min(100, Math.round(profitScore + collectionScore + cashScore + debtScore));
+    
+    // Strict zero-state: If there are no sales and no expenses, it's a new activity
+    if (sales === 0 && expenses === 0 && totalFlow === 0) {
+        healthScore = 0;
+    }
+
     const animatedScore = useCountUp(healthScore, 2000);
 
     const getScoreColor = () => {
