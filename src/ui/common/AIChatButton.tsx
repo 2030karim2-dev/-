@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Bot, Mic } from 'lucide-react';
 import { useAuthStore } from '../../features/auth/store';
-import AIChatPanel from './AIChatPanel';
+import AICommandCenter from '../../features/ai/AICommandCenter';
 
 const AIChatButton: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +47,7 @@ const AIChatButton: React.FC = () => {
             )}
 
             {/* Chat Panel */}
-            <AIChatPanel isOpen={isOpen} onClose={() => setIsOpen(false)} />
+            <AICommandCenter isOpen={isOpen} onClose={() => setIsOpen(false)} />
         </>
     );
 };

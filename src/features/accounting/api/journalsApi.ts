@@ -14,15 +14,23 @@ export const journalsApi = {
       .select(`
         *,
         journal_entry_lines (
+          id,
           debit_amount,
           credit_amount,
-          account:accounts(name_ar, code)
+          description,
+          account_id,
+          account:accounts (
+            id,
+            name_ar,
+            code
+          )
         ),
         created_by_profile:profiles(id, full_name)
       `)
       .eq('company_id', companyId)
       .is('deleted_at', null)
       .order('entry_date', { ascending: false })
+      .order('entry_number', { ascending: false })
       .range(from, to);
   },
 

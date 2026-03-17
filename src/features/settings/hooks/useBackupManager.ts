@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useBackupActions } from '../hooks.ts';
+import { useBackupActions } from '../hooks';
 import { settingsService } from '../service';
 import { AutoBackupConfig } from '../types.ts';
 import { useFeedbackStore } from '../../feedback/store';

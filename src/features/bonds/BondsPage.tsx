@@ -10,6 +10,7 @@ import CreateBondModal from './components/CreateBondModal';
 import BondsList from './components/BondsList';
 import BondsAnalyticsView from './components/BondsAnalyticsView';
 import { useTranslation } from '../../lib/hooks/useTranslation';
+import { useAIPrefillStore } from '../ai/store';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -29,6 +30,20 @@ const BondsPage: React.FC = () => {
 
   // Fetch server-sided analytics instead of client-sided aggregation
   const { data: serverAnalytics } = useBondsAnalytics();
+
+  // AI Prefill: consume pending bond intent
+  const consumePrefill = useAIPrefillStore((s: any) => s.consumePrefill);
+  React.useEffect(() => {
+    const aiData = consumePrefill(['create_bond_receipt', 'create_bond_payment']);
+    if (aiData) {
+      if (aiData.intent === 'create_bond_receipt') {
+        setActiveTab('receipt');
+      } else {
+        setActiveTab('payment');
+      }
+      setIsModalOpen(true);
+    }
+  }, [consumePrefill]);
 
   // Map server response to component expected structure
   const analytics = useMemo(() => {

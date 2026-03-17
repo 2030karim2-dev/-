@@ -87,6 +87,7 @@ const TabButton: React.FC<TabButtonProps> = ({
                 isActive && 'advanced-tab--active',
                 isDragging && 'advanced-tab--dragging',
                 isDropTarget && 'advanced-tab--drop-target',
+                size === 'micro' && 'advanced-tab--micro',
                 size === 'sm' && 'advanced-tab--sm',
                 size === 'lg' && 'advanced-tab--lg'
             )}

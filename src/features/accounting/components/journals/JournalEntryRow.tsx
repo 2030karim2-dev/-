@@ -56,6 +56,7 @@ const JournalEntryRow: React.FC<JournalEntryRowProps> = ({ entry }) => {
                             'receipt_voucher': 'سند قبض',
                             'expense': 'مصروفات',
                             'expenses': 'مصروفات',
+                            'expense_void': 'إلغاء مصروف',
                             'transfer': 'تحويل داخلي',
                             'opening_balance': 'رصيد افتتاحي',
                             'correction': 'تصحيح قيد',

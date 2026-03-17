@@ -28,18 +28,18 @@ interface ExcelTableProps<T> {
   subtitle?: string;
   emptyMessage?: string;
   colorTheme?: 'blue' | 'green' | 'orange' | 'indigo';
-  onExport?: () => void;
+  onExport?: (() => void) | undefined;
   showSearch?: boolean;
-  onRowClick?: (row: T) => void;
-  onRowDoubleClick?: (row: T) => void;
-  onOrderChange?: (reorderedData: T[]) => void;
-  onCellUpdate?: (rowIndex: number, accessorKey: string, value: any) => void | Promise<void>;
+  onRowClick?: ((row: T) => void) | undefined;
+  onRowDoubleClick?: ((row: T) => void) | undefined;
+  onOrderChange?: ((reorderedData: T[]) => void) | undefined;
+  onCellUpdate?: ((rowIndex: number, accessorKey: string, value: any) => void | Promise<void>) | undefined;
   enablePagination?: boolean;
   pageSize?: number;
   enableSelection?: boolean;
   selectedRowIds?: Set<string>;
-  onSelectionChange?: (selectedIds: Set<string>) => void;
-  getRowId?: (row: T) => string;
+  onSelectionChange?: ((selectedIds: Set<string>) => void) | undefined;
+  getRowId?: ((row: T) => string) | undefined;
   isRTL?: boolean;
   showShortcutsPanel?: boolean;
   enableResize?: boolean;
@@ -48,7 +48,7 @@ interface ExcelTableProps<T> {
 }
 
 function ExcelTable<T>({
-  columns, data, title, subtitle, emptyMessage, colorTheme = 'blue',
+  columns, data, title, emptyMessage, colorTheme = 'blue',
   onExport, showSearch = true, onRowClick, onRowDoubleClick, onOrderChange,
   onCellUpdate, enablePagination = true, pageSize = 20,
   enableSelection = false, selectedRowIds = new Set(), onSelectionChange, getRowId,
@@ -412,18 +412,16 @@ function ExcelTable<T>({
   return (
     <FullscreenContainer isMaximized={isZoomed} onToggleMaximize={() => setIsZoomed(false)}>
       <div className={cn(
-        "w-full flex flex-col gap-2 transition-all duration-300 relative", 
-        isZoomed ? "h-full bg-white dark:bg-slate-950 p-4 md:p-6" : "h-full"
+        "w-full flex flex-col transition-all duration-300 relative", 
+        isZoomed ? "h-full bg-white dark:bg-slate-950 p-4" : "h-full"
       )}>
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-2 px-1">
+      {/* Table Header Controls - Minimized */}
+      <div className="flex flex-col sm:flex-row justify-between items-center px-1 py-0.5 border-b border-[var(--app-border)] bg-gray-50/50 dark:bg-slate-900/50">
         <div className="flex items-center gap-3 w-full sm:w-auto">
           {title && (
-            <div className="flex flex-col">
-              <h3 className="text-xs font-bold text-[var(--app-text-secondary)] tracking-tight flex items-center gap-2">
-                <span className={cn("w-1.5 h-4 rounded-full", currentTheme.accent)}></span>
-                {title}
-              </h3>
-              {subtitle && <p className="text-[10px] text-[var(--app-text-secondary)] pr-3.5 font-medium">{subtitle}</p>}
+            <div className="flex items-center gap-2">
+              <span className={cn("w-1 h-3 rounded-full", currentTheme.accent)}></span>
+              <h3 className="text-[10px] font-bold text-[var(--app-text-secondary)] uppercase tracking-tight">{title}</h3>
             </div>
           )}
           <div className="flex items-center gap-1 bg-[var(--app-bg)] p-1 rounded-lg">
@@ -563,8 +561,8 @@ function ExcelTable<T>({
           <table
             style={{ fontSize: `${zoomLevel * 11}px` }}
             className={cn(
-              "w-full border-collapse table-auto min-w-[800px]",
-              isRTL ? "text-left" : "text-right"
+              "w-full border-collapse table-auto min-w-[800px] border-l border-t border-[var(--app-border)]",
+              isRTL ? "text-right" : "text-left"
             )}
           >
             <ExcelTableHeader

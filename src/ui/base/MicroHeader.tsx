@@ -69,48 +69,48 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
     <div className="flex-none bg-[var(--app-surface)] border-b border-[var(--app-border)] shadow-sm transition-all no-print z-40">
       <div className="max-w-none mx-auto">
         {/* Main Row */}
-        <div className="flex h-10 md:h-12 items-center justify-between px-2 md:px-5 lg:px-6">
-          <div className="flex items-center gap-1.5 md:gap-2.5 overflow-hidden">
+        <div className="flex h-8 md:h-9 items-center justify-between px-2 md:px-4">
+          <div className="flex items-center gap-1.5 overflow-hidden">
             {!isRoot && (
               <button
                 onClick={() => navigate(-1)}
-                className="p-1 hover:bg-[var(--app-surface-hover)] rounded-lg transition-transform active:scale-90"
+                className="p-1 hover:bg-[var(--app-surface-hover)] rounded-md transition-transform active:scale-90"
                 aria-label="Go back"
               >
-                <BackIcon size={16} className="text-[var(--app-text-secondary)]" />
+                <BackIcon size={14} className="text-[var(--app-text-secondary)]" />
               </button>
             )}
-            <div className="flex items-center gap-1.5 md:gap-2.5 bg-[var(--app-bg)]/50 px-2 md:px-3 py-1 rounded-full border border-[var(--app-border)]">
-              <Icon className={iconColor} size={14} />
-              <h1 className="text-[10px] md:text-xs lg:text-sm font-bold text-[var(--app-text)] whitespace-nowrap">{title}</h1>
+            <div className="flex items-center gap-1.5 bg-[var(--app-bg)]/50 px-2 py-0.5 rounded-full border border-[var(--app-border)]">
+              <Icon className={iconColor} size={12} />
+              <h1 className="text-[9px] md:text-[10px] font-black text-[var(--app-text)] whitespace-nowrap uppercase tracking-widest">{title}</h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 md:gap-2 lg:gap-3">
+          <div className="flex items-center gap-1 md:gap-1.5">
             {isMaximized && onToggleZen && (
               <button
                 onClick={onToggleZen}
                 className={cn(
-                  "p-1.5 rounded-lg border transition-all active:scale-95 shadow-sm",
+                  "p-1 rounded-md border transition-all active:scale-95 shadow-sm",
                   "bg-white dark:bg-slate-800 text-gray-500 hover:text-indigo-500 border-[var(--app-border)]"
                 )}
                 title={isZenMode ? "Show Header" : "Zen Mode (Hide Header)"}
               >
-                {isZenMode ? <EyeOff size={16} /> : <Eye size={16} />}
+                {isZenMode ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             )}
             {onToggleMaximize && (
               <button
                 onClick={onToggleMaximize}
                 className={cn(
-                  "p-1.5 rounded-lg border transition-all active:scale-95 shadow-sm",
+                  "p-1 rounded-md border transition-all active:scale-95 shadow-sm",
                   isMaximized 
                     ? "bg-rose-500 text-white border-rose-400 hover:bg-rose-600 shadow-rose-500/20" 
                     : "bg-white dark:bg-slate-800 text-gray-500 hover:text-blue-500 border-[var(--app-border)]"
                 )}
                 title={isMaximized ? "Minimize" : "Maximize"}
               >
-                {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
               </button>
             )}
             {actions}
@@ -153,8 +153,8 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
               <div className={`flex items-center gap-2 w-full ${searchWidth} shrink-0`}>
                 {onSearchChange && (
                     <div className="relative flex-1 group">
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 transition-colors z-10 pointer-events-none">
-                        <Search size={16} />
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 transition-colors z-10 pointer-events-none">
+                        <Search size={14} />
                       </div>
                       <input
                         type="text"
@@ -165,7 +165,7 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
                           setLocalSearch(val);
                           if (onSearchChange) onSearchChange(val);
                         }}
-                        className="w-full bg-[var(--app-surface)] border border-[var(--app-border)] rounded-lg py-2.5 pr-10 pl-10 text-sm font-medium outline-none focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                        className="w-full bg-[var(--app-surface)] border border-[var(--app-border)] rounded-md py-1.5 pr-8 pl-8 text-[11px] font-bold outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:font-bold"
                         aria-label={searchPlaceholder || "Search"}
                       />
                     {localSearch && (

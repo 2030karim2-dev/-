@@ -1,4 +1,4 @@
 
 // import InventoryPage from './InventoryPage';
 export * from './types';
-export * from './hooks';
+export * from './hooks/index';

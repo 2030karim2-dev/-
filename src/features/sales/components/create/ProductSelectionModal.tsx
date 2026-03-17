@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Box } from 'lucide-react';
-import { useProducts } from '../../../inventory/hooks';
+import { useProducts } from '../../../inventory/hooks/index';
 import { Product } from '../../../inventory/types';
 import Modal from '../../../../ui/base/Modal';
 // import { formatCurrency } from '../../../../core/utils';

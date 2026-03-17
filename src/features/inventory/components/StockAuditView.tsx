@@ -20,31 +20,36 @@ const StockAuditView: React.FC = () => {
   }
 
   return (
-    <FullscreenContainer isMaximized={isMaximized} onToggleMaximize={() => setIsMaximized(false)}>
+    <FullscreenContainer isMaximized={isMaximized} onToggleMaximize={() => { setIsMaximized(false); }}>
     <div className={cn(
         "space-y-3 flex flex-col h-full",
         isMaximized && "bg-[var(--app-bg)] p-4 md:p-8"
     )}>
       <div className="flex items-center justify-between mb-1">
-        <h3 className={cn("font-black text-gray-800 dark:text-white", isMaximized ? "text-xl" : "text-sm")}>
-            سجلات الجرد الميداني
-        </h3>
+        <div className="flex items-center gap-2">
+           <div className="p-1.5 bg-blue-600/10 text-blue-600 rounded-lg">
+              <ClipboardCheck size={16} />
+           </div>
+           <h3 className="font-black text-gray-800 dark:text-white text-[11px] uppercase tracking-tighter">
+              سجلات الجرد الميداني
+           </h3>
+        </div>
         {!isMaximized && (
             <button 
-               onClick={() => setIsMaximized(true)}
-               className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all"
+               onClick={() => { setIsMaximized(true); }}
+               className="p-1.5 text-gray-400 hover:text-blue-500 rounded-lg transition-all"
             >
-                <Maximize2 size={18} />
+                <Maximize2 size={14} />
             </button>
         )}
       </div>
 
       <button 
-        onClick={() => setIsModalOpen(true)}
-        className="w-full bg-white dark:bg-slate-900 border-2 border-dashed border-blue-200 dark:border-blue-900/30 rounded-2xl p-4 text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2 hover:bg-blue-50/50 transition-colors"
+        onClick={() => { setIsModalOpen(true); }}
+        className="w-full bg-white dark:bg-slate-900 border border-dashed border-blue-200 dark:border-blue-900/30 rounded-xl p-3 text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2 hover:bg-blue-50/50 transition-colors shadow-sm"
       >
-        <Plus size={16} strokeWidth={3} />
-        <span className="text-xs font-bold">بدء جلسة جرد ميداني جديدة</span>
+        <Plus size={14} strokeWidth={3} />
+        <span className="text-[10px] font-black uppercase tracking-widest">بدء جلسة جرد ميداني</span>
       </button>
 
       {audits?.map((ad: any) => (
@@ -63,7 +68,7 @@ const StockAuditView: React.FC = () => {
         />
       ))}
 
-      <StartAuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <StartAuditModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); }} />
     </div>
     </FullscreenContainer>
   );

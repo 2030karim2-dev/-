@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Sparkles, RefreshCw, Loader2, Brain, Share2 } from 'lucide-react';
 import { generateAIContent } from '../../../features/ai/aiProvider';
 import { useProfitAndLoss, useDebtReport, useCashFlow } from '../../../features/reports/hooks';
-import { useProducts } from '../../../features/inventory/hooks';
+import { useProducts } from '../../../features/inventory/hooks/index';
 import { formatCurrency } from '../../../core/utils';
 
 const SmartDailySummary: React.FC = () => {

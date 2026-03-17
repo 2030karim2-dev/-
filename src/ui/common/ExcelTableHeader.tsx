@@ -50,7 +50,10 @@ export function ExcelTableHeader<T>({
                         key={idx}
                         style={{ width: columnWidths[idx] ? `${columnWidths[idx]}px` : col.width }}
                         onClick={() => !isLoading && col.sortKey && handleSort(col.sortKey as string)}
-                        className={cn("relative p-2", !isLoading && col.sortKey ? "cursor-pointer select-none hover:bg-[var(--app-surface-hover)]" : "")}
+                        className={cn(
+                            "relative p-2 border-r border-gray-300 dark:border-slate-700/50",
+                            !isLoading && col.sortKey ? "cursor-pointer select-none hover:bg-[var(--app-surface-hover)]" : ""
+                        )}
                     >
                         <div className={cn(
                             "flex items-center gap-1",

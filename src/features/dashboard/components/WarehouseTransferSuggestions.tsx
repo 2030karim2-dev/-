@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ArrowRightLeft, Package, AlertTriangle, Truck, MapPin } from 'lucide-react';
 import { cn } from '../../../core/utils';
-import { useProducts, useWarehouses } from '../../inventory/hooks';
+import { useProducts, useWarehouses } from '../../inventory/hooks/index';
 import { Product, Warehouse } from '../../inventory/types';
 
 interface TransferSuggestion {

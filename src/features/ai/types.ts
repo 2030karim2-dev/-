@@ -1,15 +1,5 @@
 /**
- * AI Feature Types
- * Minimal types for the AI rebuild.
+ * @deprecated — Use imports from './core/types' instead.
+ * This file is kept for backward compatibility.
  */
-
-export interface Message {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-}
-
-export interface ChatState {
-  messages: Message[];
-  isLoading: boolean;
-  error: string | null;
-}
+export type { Message, ChatState } from './core/types';

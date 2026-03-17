@@ -16,10 +16,11 @@ interface PartyModalProps {
   onSubmit: (data: PartyFormData) => void;
   isSubmitting: boolean;
   initialData?: Party | null;
+  prefillData?: Partial<PartyFormData> | null;
   partyType: PartyType;
 }
 
-const PartyModal: React.FC<PartyModalProps> = ({ isOpen, onClose, onSubmit, isSubmitting, initialData, partyType }) => {
+const PartyModal: React.FC<PartyModalProps> = ({ isOpen, onClose, onSubmit, isSubmitting, initialData, prefillData, partyType }) => {
   const { t } = useTranslation();
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<PartyFormData>();
   const { data: categories } = useCategories(partyType);
@@ -39,6 +40,17 @@ const PartyModal: React.FC<PartyModalProps> = ({ isOpen, onClose, onSubmit, isSu
           type: partyType,
           status: initialData.status || 'active',
           category_id: initialData.category_id || ''
+        });
+      } else if (prefillData) {
+        reset({
+          type: partyType,
+          name: prefillData.name || '',
+          phone: prefillData.phone || '',
+          email: prefillData.email || '',
+          tax_number: prefillData.tax_number || '',
+          address: prefillData.address || '',
+          status: prefillData.status || 'active',
+          category_id: prefillData.category_id || ''
         });
       } else {
         reset({ type: partyType, name: '', phone: '', email: '', tax_number: '', address: '', status: 'active', category_id: '' });

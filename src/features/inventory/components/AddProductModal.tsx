@@ -6,13 +6,10 @@ import { ProductFormData, Product } from '../types';
 import { productFormSchema } from '../schema';
 import Modal from '../../../ui/base/Modal';
 import Button from '../../../ui/base/Button';
-// import Input from '../../../ui/base/Input';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 import { useAuthStore } from '../../auth/store';
-import productService from '../services/productService';
 import SimilarityAdvisor from './SimilarityAdvisor';
-import { useDebounce } from 'use-debounce';
-import { logger } from '../../../core/utils/logger';
+import { useSimilarityCheck } from '../hooks/useSimilarityCheck';
 
 // Modular Form Components
 import ProductImageUploader from './product_form/ProductImageUploader';
@@ -34,8 +31,6 @@ interface Props {
 const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitting, initialData }) => {
   const { t } = useTranslation();
   const { user } = useAuthStore();
-  const [similarProducts, setSimilarProducts] = React.useState<any[]>([]);
-  const [_isCheckingSimilarity, setIsCheckingSimilarity] = React.useState(false);
 
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema) as any,
@@ -45,6 +40,9 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
       min_stock_level: 5
     }
   });
+
+  const productName = watch('name');
+  const { similarProducts, setSimilarProducts } = useSimilarityCheck(productName, user?.company_id, !!initialData);
 
   useEffect(() => {
     if (isOpen) {
@@ -69,38 +67,24 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
       } else {
         const autoSku = `AZ-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
         reset({
-          name: '', sku: autoSku, part_number: '', brand: '', size: '', specifications: '',
-          alternative_numbers: '', image_url: null, cost_price: '', selling_price: '',
-          min_stock_level: 5, stock_quantity: 0, unit: 'piece', category: ''
+          name: '',
+          sku: autoSku,
+          part_number: '',
+          brand: '',
+          size: '',
+          specifications: '',
+          alternative_numbers: '',
+          image_url: null,
+          cost_price: '',
+          selling_price: '',
+          min_stock_level: 5,
+          stock_quantity: 0,
+          unit: 'piece',
+          category: ''
         });
       }
     }
   }, [isOpen, initialData, reset]);
-
-  const productName = watch('name');
-  const [debouncedName] = useDebounce(productName, 600);
-
-  useEffect(() => {
-    const checkSimilarity = async () => {
-      if (!debouncedName || debouncedName.length < 3 || !user?.company_id || initialData) {
-        setSimilarProducts([]);
-        return;
-      }
-
-      setIsCheckingSimilarity(true);
-      try {
-        const results = await productService.getSimilarProducts(debouncedName, user.company_id);
-        setSimilarProducts(results);
-      } catch (err) {
-        logger.warn('AddProductModal', 'Similarity check failed', err);
-        setSimilarProducts([]);
-      } finally {
-        setIsCheckingSimilarity(false);
-      }
-    };
-
-    checkSimilarity();
-  }, [debouncedName, user?.company_id, initialData]);
 
   const footer = (
     <div className="flex w-full gap-2 p-1">
@@ -132,7 +116,6 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
       footer={footer}
     >
       <div className="flex flex-col">
-        {/* القسم الأول: الصورة، الكود، والتصنيف */}
         <div className="p-5 bg-white dark:bg-slate-900 border-b dark:border-slate-800 flex flex-row gap-6">
           <div className="flex flex-col gap-2 w-32 shrink-0">
             <ProductImageUploader setValue={setValue} watch={watch} />
@@ -150,7 +133,6 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
           </div>
         </div>
 
-        {/* القسم الثاني: بيانات الصنف الأساسية */}
         <div className="p-5 border-b dark:border-slate-800 bg-gray-50/30 dark:bg-slate-950/30">
           <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 px-1 mb-4">
             <Zap size={14} className="text-blue-500" />
@@ -160,11 +142,13 @@ const AddProductModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubmitt
           <SimilarityAdvisor
             isVisible={similarProducts.length > 0}
             similarProducts={similarProducts}
-            onApplyName={(name) => setValue('name', name)}
+            onApplyName={(name) => {
+              setValue('name', name);
+              setSimilarProducts([]);
+            }}
           />
         </div>
 
-        {/* القسم الثالث: المالية والمخزون والتفاصيل */}
         <div className="p-5 space-y-6 bg-white dark:bg-slate-900">
           <div className="grid grid-cols-2 gap-x-6">
             <div className="space-y-3">

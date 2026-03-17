@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import {  ClipboardCheck, Database,  CheckCircle2,  Info } from 'lucide-react';
-import { useWarehouses, useInventoryMutations } from '../hooks';
+import { useWarehouses, useInventoryMutations } from '../hooks/index';
 import Button from '../../../ui/base/Button';
 import Modal from '../../../ui/base/Modal';
 import { cn } from '../../../core/utils';

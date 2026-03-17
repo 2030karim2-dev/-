@@ -3,7 +3,7 @@ import { UseFormRegister, UseFormWatch, UseFormSetValue } from 'react-hook-form'
 import { ProductFormData } from '../../types';
 import { Layers } from 'lucide-react';
 import { cn } from '../../../../core/utils';
-import { useInventoryCategories } from '../../hooks';
+import { useInventoryCategories } from '../../hooks/index';
 import { useTranslation } from '../../../../lib/hooks/useTranslation';
 
 interface Props {

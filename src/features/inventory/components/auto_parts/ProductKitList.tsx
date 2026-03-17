@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Product } from '../../types';
-import { useKitComponents, useKitMutations } from '../../hooks';
-import { Plus, Package, Trash2, Box, Layers } from 'lucide-react';
+import { useKitComponents, useKitMutations } from '../../hooks/index';
+import { Plus, Package, Trash2, Box, Layers, X } from 'lucide-react';
 import ProductSearch from '../../../../features/sales/components/CreateInvoice/ProductSearch';
+import { cn } from '../../../../core/utils';
 
 interface ProductKitListProps {
     product: Product;
@@ -27,131 +28,107 @@ export const ProductKitList: React.FC<ProductKitListProps> = ({ product }) => {
         setQuantity(1);
     }
 
-    // Determine if this product feels like a kit/package based on it having kit components
     const isAKit = kitItems && kitItems.length > 0;
 
-    if (isLoading) {
-        return <div className="animate-pulse space-y-4 py-1"><div className="h-4 bg-gray-200 rounded w-full"></div><div className="h-4 bg-gray-200 rounded w-5/6"></div></div>;
-    }
-
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900 border-r-4 border-indigo-500 pr-3">مكونات الباقة (Kit)</h3>
+        <div className="flex flex-col h-full bg-white dark:bg-slate-950">
+            {/* Toolbar */}
+            <div className="flex justify-between items-center px-4 py-1.5 border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-800/80 shrink-0">
+                <h4 className="text-[9px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                    <Layers size={11} className="text-indigo-500" /> مكونات الباقة (Kit)
+                </h4>
                 <button
-                    onClick={() => setIsAdding(true)}
-                    className="btn-secondary text-sm flex items-center gap-2"
+                    onClick={() => setIsAdding(!isAdding)}
+                    className={cn(
+                        "flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded transition-colors",
+                        isAdding ? "bg-rose-50 text-rose-600 dark:bg-rose-900/20" : "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 hover:bg-indigo-100"
+                    )}
                 >
-                    <Plus className="w-4 h-4" />
-                    إضافة قطعة
+                    {isAdding ? <><X size={10} /> إلغاء</> : <><Plus size={10} /> إضافة</>}
                 </button>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4">
-                يُستخدم هذا التبويب لتجميع عدة قطع في منتج واحد للبيع (مثل مجموعة صيانات 10 آلاف كيلو).
-            </p>
-
-            {isAKit ? (
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">اسم القطعة (المكون)</th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الكمية في الباقة</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">إجراءات</span></th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {kitItems.map((item) => (
-                                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <Layers className="h-5 w-5 text-indigo-400 ml-3" />
-                                            <div>
-                                                <div className="text-sm font-medium text-gray-900">{item.component_product?.name_ar || item.component_product?.name || 'منتج غير معروف'}</div>
-                                                <div className="text-xs text-gray-500">SKU: {item.component_product?.sku}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                            {item.quantity} ×
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-                                        <button
-                                            onClick={() => {
-                                                if (window.confirm('هل أنت متأكد من إزالة هذا المكون من الباقة؟')) {
-                                                    removeKitComponent(item.id)
-                                                }
-                                            }}
-                                            className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"
-                                            title="حذف المكون"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            ) : (
-                <div className="text-center py-8 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                    <Package className="mx-auto h-12 w-12 text-gray-400 mb-3 opacity-50" />
-                    <h3 className="text-sm font-medium text-gray-900 mb-1">ليس منتجاً تجميعياً</h3>
-                    <p className="text-sm text-gray-500">
-                        أضف قطع غيار داخل هذا المنتج لتحويله إلى باقة متكاملة.
-                    </p>
-                </div>
-            )}
-
+            {/* Add Section */}
             {isAdding && (
-                <div className="mt-6 p-5 border border-indigo-200 bg-indigo-50 rounded-xl space-y-4">
-                    <div className="flex justify-between items-center border-b border-indigo-100 pb-3">
-                        <h4 className="font-semibold text-indigo-900">إضافة قطعة للباقة</h4>
-                        <button onClick={() => { setIsAdding(false); setSelectedProduct(null); }} className="text-gray-500 hover:text-gray-700">إلغاء</button>
-                    </div>
-
+                <div className="p-2 bg-indigo-50/20 dark:bg-indigo-900/10 border-b border-slate-200 dark:border-slate-800 animate-in slide-in-from-top-1">
                     {!selectedProduct ? (
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">البحث عن القطعة</label>
+                        <div className="scale-90 origin-top">
                             <ProductSearch onSelectProduct={setSelectedProduct} />
                         </div>
                     ) : (
-                        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                            <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-indigo-100">
-                                <div className="flex items-center gap-3">
-                                    <Box className="w-10 h-10 p-2 bg-indigo-50 text-indigo-600 rounded" />
-                                    <div>
-                                        <p className="font-bold text-gray-900">{selectedProduct.name}</p>
-                                        <p className="text-xs text-gray-500">SKU: {selectedProduct.sku}</p>
-                                    </div>
-                                </div>
-                                <button onClick={() => setSelectedProduct(null)} className="text-sm text-red-500 font-medium">تغيير</button>
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between bg-white dark:bg-slate-900 px-2 py-1 border border-indigo-100 dark:border-indigo-800">
+                                <span className="text-[9px] font-bold text-slate-700 dark:text-slate-300">{selectedProduct.name}</span>
+                                <button onClick={() => setSelectedProduct(null)} className="text-[8px] font-bold text-rose-500 uppercase">تغيير</button>
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">الكمية المطلوبة في الباقة</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        value={quantity}
-                                        onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                                        className="w-full px-3 py-2 border rounded-lg bg-white"
-                                    />
-                                </div>
-                                <div>
-                                    <button onClick={handleSave} disabled={isSaving} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors w-full">
-                                        {isSaving ? 'جاري الإضافة...' : 'اعتماد الكمية وإضافة القطعة'}
-                                    </button>
-                                </div>
+                            <div className="flex gap-1.5">
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={quantity}
+                                    onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                                    placeholder="الكمية"
+                                    className="w-20 text-[9px] font-bold px-1.5 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none h-7"
+                                />
+                                <button onClick={handleSave} disabled={isSaving} className="flex-1 bg-indigo-600 text-white text-[9px] font-bold py-1 hover:bg-indigo-700 transition-colors">
+                                    {isSaving ? 'جاري الحفظ...' : 'اعتماد الكمية'}
+                                </button>
                             </div>
                         </div>
                     )}
                 </div>
             )}
+
+            {/* Main Table */}
+            <div className="flex-1 overflow-auto">
+                <table className="w-full border-collapse">
+                    <thead className="sticky top-0 bg-slate-50 dark:bg-slate-900 z-10 border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                            <th className="text-right px-4 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-tight">القطعة (المكون)</th>
+                            <th className="text-right px-4 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-tight w-20">الكمية</th>
+                            <th className="w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-900">
+                        {isLoading ? (
+                            <tr><td colSpan={3} className="text-center py-6 text-[9px] text-slate-400 font-bold uppercase tracking-widest">جاري التحميل...</td></tr>
+                        ) : !isAKit ? (
+                            <tr>
+                                <td colSpan={3} className="text-center py-10 text-slate-300">
+                                    <Package size={20} className="mx-auto mb-1.5 opacity-20" />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">ليس منتج تجميعي</span>
+                                </td>
+                            </tr>
+                        ) : (
+                            kitItems.map((item) => (
+                                <tr key={item.id} className="group hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
+                                    <td className="px-4 py-1.5">
+                                        <div className="text-[10px] font-bold text-slate-900 dark:text-white capitalize leading-tight">
+                                            {item.component_product?.name_ar || item.component_product?.name}
+                                        </div>
+                                        <div className="text-[8px] text-slate-400 font-mono font-bold uppercase tracking-tight">
+                                            SKU: {item.component_product?.sku}
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-1.5 whitespace-nowrap">
+                                        <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                                            {item.quantity} ×
+                                        </span>
+                                    </td>
+                                    <td className="px-2 py-1.5 text-left">
+                                        <button
+                                            onClick={() => { if (window.confirm('إزالة من الباقة؟')) removeKitComponent(item.id) }}
+                                            className="opacity-0 group-hover:opacity-100 p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded transition-all"
+                                        >
+                                            <Trash2 size={11} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

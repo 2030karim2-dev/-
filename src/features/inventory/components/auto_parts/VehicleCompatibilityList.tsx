@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Car, Search, Loader2 } from 'lucide-react';
 import { useVehicleCompatibility } from '../../hooks/useVehicleCompatibility';
 import { Product } from '../../types';
+import { cn } from '../../../../core/utils';
 
 interface Props {
   product: Product;
@@ -15,7 +16,6 @@ export const VehicleCompatibilityList: React.FC<Props> = ({ product }) => {
   const vehicles = data?.vehicles ?? [];
 
   useEffect(() => {
-    // If the product changes, update the initial searchTerm
     setSearchTerm(product.part_number || product.sku || '');
     setActiveSearch(product.part_number || product.sku || '');
   }, [product.part_number, product.sku]);
@@ -28,92 +28,74 @@ export const VehicleCompatibilityList: React.FC<Props> = ({ product }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border dark:border-slate-800 shadow-sm relative overflow-hidden group">
-      {/* Search Header */}
-      <form onSubmit={handleSearch} className="flex items-center gap-2 mb-4">
-        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 shrink-0">
-          <Car size={12} className="text-indigo-500" /> التوافق مع المركبات
-        </h4>
-        <div className="flex-1 mx-2 relative">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-950">
+      {/* Search Toolbar */}
+      <form onSubmit={handleSearch} className="flex items-center gap-2 px-4 py-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="flex-1 relative">
           <input 
             type="text" 
-            placeholder="ابحث برقم القطعة (Article No)" 
+            placeholder="البحث برقم القطعة (Article No)" 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full text-xs bg-gray-50 dark:bg-slate-800 border border-transparent focus:border-indigo-300 dark:focus:border-indigo-700/50 rounded-lg py-1.5 px-3 pr-8 outline-none transition-all dark:text-slate-200"
+            className="w-full text-[10px] font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-indigo-400 outline-none px-2 py-1 rounded transition-all transition-all"
           />
-          <Search size={12} className="absolute right-2.5 top-2 text-gray-400" />
+          <Search size={10} className="absolute left-2 top-2 text-gray-400" />
         </div>
         <button 
           type="submit" 
           disabled={isLoading || !searchTerm.trim()}
-          className="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 text-xs px-3 py-1.5 rounded-lg font-bold transition-all disabled:opacity-50"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-3 py-1 rounded transition-all disabled:opacity-50"
         >
-          بحث
+          {isLoading ? <Loader2 size={12} className="animate-spin" /> : 'بحث'}
         </button>
       </form>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="text-center py-6 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-slate-400 gap-2">
-          <Loader2 size={24} className="animate-spin text-indigo-400" />
-          <p className="text-[10px] font-bold uppercase tracking-widest mt-1">جاري جلب البيانات من RapidAPI...</p>
-        </div>
-      )}
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-auto">
+        <table className="w-full border-collapse">
+            <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800 z-10">
+                <tr className="border-b border-slate-200 dark:border-slate-800">
+                    <th className="text-right px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-tight">{activeSearch ? 'المركبة (RapidAPI)' : 'بيانات محلية'}</th>
+                    <th className="text-right px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-tight">سنوات الصنع</th>
+                </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-900 text-[11px]">
+                {/* API Results */}
+                {vehicles && vehicles.length > 0 ? (
+                    vehicles.map((c, i) => (
+                        <tr key={`api-${i}`} className="hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-colors">
+                            <td className="px-4 py-2 font-bold text-slate-700 dark:text-slate-300">{c.make} {c.model}</td>
+                            <td className="px-4 py-2 font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                                {c.years.join(', ') || 'كل الموديلات'}
+                            </td>
+                        </tr>
+                    ))
+                ) : null}
 
-      {/* Error State */}
-      {isError && (
-        <div className="text-center py-4 bg-rose-50 dark:bg-rose-900/20 rounded-2xl border border-rose-100 dark:border-rose-900/30 text-rose-500">
-          <p className="text-[10px] font-bold mt-1">حدث خطأ أثناء الاتصال بـ API.</p>
-          <p className="text-[9px] text-rose-400 mt-0.5">{error?.message || 'تأكد من إعدادات المفتاح والشبكة'}</p>
-        </div>
-      )}
+                {/* Local Fallback */}
+                {!isLoading && vehicles.length === 0 && product.compatibility && product.compatibility.length > 0 && (
+                    product.compatibility.map((c, i) => (
+                        <tr key={`local-${i}`} className="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors opacity-70 italic">
+                            <td className="px-4 py-2 font-bold text-slate-600 dark:text-slate-400">{c.make} {c.model} (محلي)</td>
+                            <td className="px-4 py-2 font-mono">{c.years.join(', ')}</td>
+                        </tr>
+                    ))
+                )}
 
-      {/* Success State */}
-      {!isLoading && !isError && vehicles && vehicles.length > 0 && (
-        <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
-          {vehicles.map((c, i) => (
-            <div key={i} className="flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900/30 transition-all">
-              <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{c.make} {c.model}</span>
-              <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 rounded-lg text-center max-w-[120px] truncate leading-tight" title={c.years.join(', ')}>
-                {c.years.join(', ') || 'كل الموديلات'}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && !isError && (!vehicles || vehicles.length === 0) && activeSearch && (
-        <div className="text-center py-6 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-800 text-slate-400">
-          <Car size={32} strokeWidth={1} className="mx-auto mb-2 opacity-20" />
-          <p className="text-[10px] font-bold uppercase tracking-widest">لم يتم العثور على مركبات متوافقة</p>
-        </div>
-      )}
-      
-      {/* Empty State (No Search Term) */}
-      {!activeSearch && (
-        <div className="text-center py-6 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-800 text-slate-400">
-          <Car size={32} strokeWidth={1} className="mx-auto mb-2 opacity-20" />
-          <p className="text-[10px] font-bold uppercase tracking-widest">أدخل رقم القطعة للتبحث عن توافق متقدم</p>
-        </div>
-      )}
-
-      {/* Fallback Display if product has static fallback from DB but API failed / no search */}
-      {!activeSearch && product.compatibility && product.compatibility.length > 0 && (
-        <div className="mt-4 pt-4 border-t dark:border-slate-800">
-          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1 text-center">بيانات التوافق المحفوظة محلياً</p>
-          <div className="space-y-2 opacity-80">
-            {product.compatibility.map((c, i) => (
-              <div key={`local-${i}`} className="flex justify-between items-center bg-gray-100 dark:bg-slate-800/30 p-2 rounded-xl border border-transparent transition-all">
-                <span className="text-[11px] font-bold text-gray-600 dark:text-slate-400">{c.make} {c.model}</span>
-                <span className="text-[9px] font-bold text-slate-500 bg-slate-200 dark:bg-slate-700/50 px-2 py-0.5 rounded-lg">{c.years.join(', ')}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
+                {/* Status States */}
+                {!isLoading && vehicles.length === 0 && (!product.compatibility || product.compatibility.length === 0) && (
+                    <tr>
+                        <td colSpan={2} className="text-center py-12 text-slate-300">
+                            <Car size={24} className="mx-auto mb-2 opacity-20" />
+                            <p className="text-[10px] font-bold uppercase tracking-widest">
+                                {isError ? 'خطأ في الاتصال بـ API' : 'لا توجد بيانات توافق المتقدمة'}
+                            </p>
+                        </td>
+                    </tr>
+                )}
+            </tbody>
+        </table>
+      </div>
     </div>
   );
 };

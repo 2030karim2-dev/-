@@ -92,7 +92,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.DASHBOARD.PARTIES_CUSTOMERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="customer" /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.PARTIES_SUPPLIERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="supplier" /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.REPORTS} element={<Suspense fallback={<PageLoader />}><ReportsPage /></Suspense>} />
-        <Route path="/ai-center" element={<Suspense fallback={<PageLoader />}><AICommandCenter /></Suspense>} />
+        <Route path="/ai-center" element={<Suspense fallback={<PageLoader />}><AICommandCenter isOpen={true} onClose={() => {}} /></Suspense>} />
         <Route path="/ai-brain" element={<Suspense fallback={<PageLoader />}><AIBrainPage /></Suspense>} />
 
         {/* 404 Fallback */}

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useProducts } from '../../inventory/hooks';
+import { useProducts } from '../../inventory/hooks/index';
 import { valuationService } from '../../inventory/services/valuationService';
 import { formatCurrency } from '../../../core/utils';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';

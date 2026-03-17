@@ -1,7 +1,5 @@
-// Empty file - ready for rebuild
-export const STRICT_DATA_RULES = ``;
-export const STRICT_SYSTEM_ROLE = ``;
-
-export function buildRealDataContext(): string {
-    return '';
-}
+/**
+ * @deprecated — Use imports from './core/prompts' instead.
+ * This file is kept for backward compatibility.
+ */
+export { STRICT_SYSTEM_ROLE, buildRealDataContext } from './core/prompts';

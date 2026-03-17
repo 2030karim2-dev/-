@@ -3,7 +3,7 @@ import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useProductMutations } from './hooks';
+import { useProductMutations } from './hooks/index';
 import { inventoryService } from './service';
 import { useAuthStore } from '../auth/store';
 

@@ -9,6 +9,7 @@ import MicroHeader from '../../../ui/base/MicroHeader';
 import Button from '../../../ui/base/Button';
 import ExpensesAnalyticsView from './ExpensesAnalyticsView';
 import ExpensesListView from './ExpensesListView';
+import { useAIPrefillStore } from '../../ai/store';
 
 type PeriodType = 'today' | 'week' | 'month' | 'quarter' | 'year';
 type ViewType = 'list' | 'analytics';
@@ -21,6 +22,15 @@ const ExpensesPage: React.FC = () => {
 
   const { expenses, isLoading, stats } = useExpensesData(searchTerm);
   const { createExpense, isCreating, deleteExpense } = useExpenseActions();
+
+  // AI Prefill: consume pending expense intent
+  const consumePrefill = useAIPrefillStore((s: any) => s.consumePrefill);
+  React.useEffect(() => {
+    const aiData = consumePrefill('create_expense');
+    if (aiData) {
+      setIsModalOpen(true);
+    }
+  }, [consumePrefill]);
 
   const periodLabels: Record<PeriodType, string> = {
     today: 'اليوم',

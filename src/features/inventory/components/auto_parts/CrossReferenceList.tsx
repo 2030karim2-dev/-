@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Product } from '../../types';
-import { useCrossReferences, useCrossReferenceMutations } from '../../hooks';
-import { Plus, Link as LinkIcon, Trash2, Box, AlertTriangle, CheckCircle } from 'lucide-react';
+import { useCrossReferences, useCrossReferenceMutations } from '../../hooks/index';
+import { Plus, Link as LinkIcon, Trash2, Box, AlertTriangle, CheckCircle, X } from 'lucide-react';
 import ProductSearch from '../../../../features/sales/components/CreateInvoice/ProductSearch';
+import { cn } from '../../../../core/utils';
 
 interface CrossReferenceListProps {
     product: Product;
@@ -19,17 +20,17 @@ export const CrossReferenceList: React.FC<CrossReferenceListProps> = ({ product 
 
     const getMatchQualityDetails = (quality: string) => {
         switch (quality) {
-            case 'exact': return { color: 'text-green-600 bg-green-50', icon: CheckCircle, label: 'مطابق تماماً' };
-            case 'partial': return { color: 'text-yellow-600 bg-yellow-50', icon: AlertTriangle, label: 'جزئي / يتطلب تعديل' };
-            case 'interchangeable': return { color: 'text-blue-600 bg-blue-50', icon: Box, label: 'تبادلي' };
-            default: return { color: 'text-gray-600 bg-gray-50', icon: LinkIcon, label: quality };
+            case 'exact': return { color: 'text-emerald-600 dark:text-emerald-400', label: 'مطابق' };
+            case 'partial': return { color: 'text-amber-600 dark:text-amber-400', label: 'جزئي' };
+            case 'interchangeable': return { color: 'text-blue-600 dark:text-blue-400', label: 'تبادلي' };
+            default: return { color: 'text-slate-600 dark:text-slate-400', label: quality };
         }
     }
 
     const handleSave = async () => {
         if (!selectedProduct) return;
         await addCrossReference({
-            alternative_product_id: selectedProduct.productId, // ProductSearch outputs CartItem format
+            alternative_product_id: selectedProduct.productId,
             match_quality: matchQuality,
             notes: notes
         });
@@ -38,155 +39,116 @@ export const CrossReferenceList: React.FC<CrossReferenceListProps> = ({ product 
         setNotes('');
     }
 
-    if (isLoading) {
-        return <div className="animate-pulse flex space-x-4"><div className="flex-1 space-y-4 py-1"><div className="h-4 bg-gray-200 rounded w-3/4"></div></div></div>;
-    }
-
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900 border-r-4 border-primary-500 pr-3">البدائل والتوافق المتقاطع</h3>
+        <div className="flex flex-col h-full bg-white dark:bg-slate-950">
+            {/* Toolbar */}
+            <div className="flex justify-between items-center px-4 py-1.5 border-b border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-800/80 shrink-0">
+                <h4 className="text-[9px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                    <LinkIcon size={11} className="text-blue-500" /> البدائل والارتباطات
+                </h4>
                 <button
-                    onClick={() => setIsAdding(true)}
-                    className="btn-secondary text-sm flex items-center gap-2"
+                    onClick={() => setIsAdding(!isAdding)}
+                    className={cn(
+                        "flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded transition-colors",
+                        isAdding ? "bg-rose-50 text-rose-600 dark:bg-rose-900/20" : "bg-blue-50 text-blue-600 dark:bg-blue-900/20 hover:bg-blue-100"
+                    )}
                 >
-                    <Plus className="w-4 h-4" />
-                    إضافة بديل
+                    {isAdding ? <><X size={10} /> إلغاء</> : <><Plus size={10} /> إضافة</>}
                 </button>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4">
-                الأرقام البديلة للمنتج ({product.sku}): {product.alternative_numbers || 'لا توجد أرقام مسجلة'}
-            </p>
-
-            {references && references.length > 0 ? (
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">المنتج البديل</th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">درجة التوافق</th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">ملاحظات الفني</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">إجراءات</span></th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {references.map((ref) => {
-                                const QualityInfo = getMatchQualityDetails(ref.match_quality);
-                                const Icon = QualityInfo.icon;
-                                return (
-                                    <tr key={ref.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center">
-                                                <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-gray-100 rounded-lg">
-                                                    <Box className="h-5 w-5 text-gray-500" />
-                                                </div>
-                                                <div className="mr-4">
-                                                    <div className="text-sm border-b pb-1 font-medium text-gray-900">{ref.alternative_product?.name_ar || ref.alternative_product?.name || 'منتج غير معروف'}</div>
-                                                    <div className="text-sm text-gray-500 flex gap-4 mt-1">
-                                                        <span><span className="text-gray-400">SKU:</span> {ref.alternative_product?.sku}</span>
-                                                        {ref.alternative_product?.part_number && <span><span className="text-gray-400">PN:</span> {ref.alternative_product?.part_number}</span>}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${QualityInfo.color}`}>
-                                                <Icon className="w-3.5 h-3.5" />
-                                                {QualityInfo.label}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                            {ref.notes || '-'}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-                                            <button
-                                                onClick={() => {
-                                                    if (window.confirm('هل أنت متأكد من فك ارتباط هذا المنتج؟')) {
-                                                        removeCrossReference(ref.id)
-                                                    }
-                                                }}
-                                                className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"
-                                                title="فك الارتباط"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                    <LinkIcon className="mx-auto h-12 w-12 text-gray-400 mb-4 opacity-50" />
-                    <h3 className="text-sm font-medium text-gray-900 mb-1">لا توجد بدائل مرتبطة</h3>
-                    <p className="text-sm text-gray-500">
-                        يمكنك ربط هذا المنتج بمنتجات أخرى مشابهة لتسهيل عملية البيع للموظفين.
-                    </p>
-                </div>
-            )}
-
+            {/* Add Section */}
             {isAdding && (
-                <div className="mt-6 p-5 border border-primary-200 bg-primary-50 rounded-xl space-y-4">
-                    <div className="flex justify-between items-center border-b border-primary-100 pb-3">
-                        <h4 className="font-semibold text-primary-900">ربط منتج جديد كبديل</h4>
-                        <button onClick={() => { setIsAdding(false); setSelectedProduct(null); }} className="text-gray-500 hover:text-gray-700">إلغاء</button>
-                    </div>
-
+                <div className="p-2 bg-blue-50/20 dark:bg-blue-900/10 border-b border-slate-200 dark:border-slate-800 animate-in slide-in-from-top-1">
                     {!selectedProduct ? (
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">البحث عن المنتج البديل</label>
+                        <div className="scale-90 origin-top">
                             <ProductSearch onSelectProduct={setSelectedProduct} />
                         </div>
                     ) : (
-                        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                            <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-primary-100">
-                                <div className="flex items-center gap-3">
-                                    <Box className="w-10 h-10 p-2 bg-primary-50 text-primary-600 rounded" />
-                                    <div>
-                                        <p className="font-bold text-gray-900">{selectedProduct.name}</p>
-                                        <p className="text-xs text-gray-500">SKU: {selectedProduct.sku}</p>
-                                    </div>
-                                </div>
-                                <button onClick={() => setSelectedProduct(null)} className="text-sm text-red-500 font-medium">تغيير</button>
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between bg-white dark:bg-slate-900 px-2 py-1 border border-blue-100 dark:border-blue-800">
+                                <span className="text-[9px] font-bold text-slate-700 dark:text-slate-300">{selectedProduct.name}</span>
+                                <button onClick={() => setSelectedProduct(null)} className="text-[8px] font-bold text-rose-500 uppercase">تغيير</button>
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">نوع المطابقة (التوافق)</label>
-                                    <select
-                                        value={matchQuality}
-                                        onChange={(e) => setMatchQuality(e.target.value)}
-                                        className="w-full px-3 py-2 border rounded-lg bg-white"
-                                    >
-                                        <option value="exact">مطابق تماماً (Exact Fit)</option>
-                                        <option value="partial">تعديل بسيط مطلوب (Partial)</option>
-                                        <option value="interchangeable">تبادلي (Interchangeable)</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">ملاحظات لفني التركيب (اختياري)</label>
-                                    <input
-                                        type="text"
-                                        value={notes}
-                                        onChange={(e) => setNotes(e.target.value)}
-                                        placeholder="مثال: يحتاج لتغيير الفيش"
-                                        className="w-full px-3 py-2 border rounded-lg bg-white"
-                                    />
-                                </div>
+                            <div className="grid grid-cols-2 gap-1.5">
+                                <select
+                                    value={matchQuality}
+                                    onChange={(e) => setMatchQuality(e.target.value)}
+                                    className="text-[9px] font-bold px-1.5 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none h-7"
+                                >
+                                    <option value="exact">مطابق تماماً</option>
+                                    <option value="partial">تعديل بسيط</option>
+                                    <option value="interchangeable">تبادلي</option>
+                                </select>
+                                <input
+                                    type="text"
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    placeholder="ملاحظات..."
+                                    className="text-[9px] font-bold px-1.5 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none h-7"
+                                />
                             </div>
-
-                            <div className="flex justify-end pt-2">
-                                <button onClick={handleSave} disabled={isSaving} className="btn-primary w-full md:w-auto">
-                                    {isSaving ? 'جاري الحفظ...' : 'اعتماد و ربط المنتج'}
-                                </button>
-                            </div>
+                            <button onClick={handleSave} disabled={isSaving} className="w-full bg-blue-600 text-white text-[9px] font-bold py-1 hover:bg-blue-700 transition-colors">
+                                {isSaving ? 'جاري الحفظ...' : 'حفظ الارتباط'}
+                            </button>
                         </div>
                     )}
                 </div>
             )}
+
+            {/* Main Table */}
+            <div className="flex-1 overflow-auto">
+                <table className="w-full border-collapse">
+                    <thead className="sticky top-0 bg-slate-50 dark:bg-slate-900 z-10 border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                            <th className="text-right px-4 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-tight">المنتج البديل</th>
+                            <th className="text-right px-4 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-tight">التوافق</th>
+                            <th className="w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-900">
+                        {isLoading ? (
+                            <tr><td colSpan={3} className="text-center py-6 text-[9px] text-slate-400 font-bold uppercase tracking-widest">جاري التحميل...</td></tr>
+                        ) : !references || references.length === 0 ? (
+                            <tr>
+                                <td colSpan={3} className="text-center py-10 text-slate-300">
+                                    <LinkIcon size={20} className="mx-auto mb-1.5 opacity-20" />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">لا توجد بدائل</span>
+                                </td>
+                            </tr>
+                        ) : (
+                            references.map((ref) => {
+                                const quality = getMatchQualityDetails(ref.match_quality);
+                                return (
+                                    <tr key={ref.id} className="group hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
+                                        <td className="px-4 py-1.5">
+                                            <div className="text-[10px] font-bold text-slate-900 dark:text-white capitalize leading-tight">
+                                                {ref.alternative_product?.name_ar || ref.alternative_product?.name}
+                                            </div>
+                                            <div className="text-[8px] text-slate-400 font-mono font-bold uppercase tracking-tight">
+                                                SKU: {ref.alternative_product?.sku}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-1.5 whitespace-nowrap">
+                                            <span className={cn("inline-flex items-center px-1.5 py-0.5 text-[8px] font-bold border border-transparent", quality.color)}>
+                                                {quality.label}
+                                            </span>
+                                        </td>
+                                        <td className="px-2 py-1.5 whitespace-nowrap text-left">
+                                            <button
+                                                onClick={() => { if (window.confirm('فك الارتباط؟')) removeCrossReference(ref.id) }}
+                                                className="opacity-0 group-hover:opacity-100 p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded transition-all"
+                                            >
+                                                <Trash2 size={11} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )
+                            })
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

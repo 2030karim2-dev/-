@@ -1,6 +1,6 @@
 
 import { journalsApi } from '../api/journalsApi';
-import { JournalEntry, JournalEntryFormData } from '../types/models';
+import { UIJournalEntry, JournalEntryFormData } from '../types/models';
 import { PostTransactionUsecase } from '../../../core/usecases/accounting/PostTransactionUsecase';
 
 // Typed raw shapes from Supabase join query
@@ -48,7 +48,7 @@ export const journalService = {
   /**
    * تنسيق البيانات القادمة من الـ API لتناسب العرض
    */
-  formatJournalsForUI: async (companyId: string, pageParam: number = 0): Promise<JournalEntry[]> => {
+  formatJournalsForUI: async (companyId: string, pageParam: number = 0): Promise<UIJournalEntry[]> => {
     const { data: rawData, error } = await journalsApi.fetchJournals(companyId, pageParam);
     if (error) throw error;
 
@@ -71,49 +71,31 @@ export const journalService = {
         company_id: j.company_id,
         entry_number: j.entry_number,
         entry_date: j.entry_date,
-        description: j.description,
+        description: j.description || '',
         reference_type: j.reference_type,
         reference_id: j.reference_id,
-        status: j.status,
+        status: j.status as any,
         created_at: j.created_at,
-        created_by: j.created_by,
+        created_by: j.created_by || '',
         journal_entry_lines: lines.map((l) => ({
-          debit_amount: l.debit_amount,
-          credit_amount: l.credit_amount,
+          debit_amount: l.debit_amount || 0,
+          credit_amount: l.credit_amount || 0,
           description: l.description || '',
-          account_name: l.account?.name_ar,
-          account_id: l.account_id || '',
-          account_code: l.account?.code
+          account: l.account ? {
+            name_ar: l.account.name_ar,
+            name: l.account.name_ar,
+            code: l.account.code
+          } : undefined
         })),
         total_amount: (() => {
-          // Calculate a smart total amount for the UI
-          // Prioritize lines hitting Cash, Bank, Receivable, or Payable accounts
-          // These typically represent the "face value" of the transaction (Invoice total, Payment total)
-          const transactionLines = lines.filter(l => {
-            const code = l.account?.code || '';
-            return code.startsWith('101') || // Cash
-              code.startsWith('102') || // Bank
-              code.startsWith('110') || // Receivables
-              code.startsWith('210');   // Payables
-          });
-
-          if (transactionLines.length > 0) {
-            // Sum the first matching group of lines (either all debits or all credits)
-            return Math.max(
-              transactionLines.reduce((sum, l) => sum + (l.debit_amount || 0), 0),
-              transactionLines.reduce((sum, l) => sum + (l.credit_amount || 0), 0)
-            );
-          }
-
-          // Fallback: Just return the max debit or credit of all lines
           return Math.max(
             lines.reduce((sum, l) => sum + (l.debit_amount || 0), 0),
             lines.reduce((sum, l) => sum + (l.credit_amount || 0), 0)
           );
         })(),
         created_by_profile: j.created_by_profile || null,
-        party_name: partyName
+        party_name: partyName || undefined
       };
-    }) as JournalEntry[];
+    }) as unknown as UIJournalEntry[];
   }
 };

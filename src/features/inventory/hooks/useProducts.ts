@@ -8,14 +8,14 @@ import { supabase } from '../../../lib/supabaseClient';
 import { logger } from '../../../core/utils/logger';
 import { syncStore } from '../../../core/lib/sync-store';
 
-export const useProducts = (searchTerm: string = '') => {
+export const useProducts = (searchTerm: string = '', options: { limitNum?: number, enabled?: boolean } = {}) => {
     const { user } = useAuthStore();
     const companyId = user?.company_id;
 
     const query = useQuery({
-        queryKey: ['products', companyId],
-        queryFn: () => companyId ? inventoryService.getProducts(companyId) : Promise.resolve([]),
-        enabled: !!companyId,
+        queryKey: ['products', companyId, options.limitNum],
+        queryFn: () => companyId ? inventoryService.getProducts(companyId, 1, options.limitNum || 10000) : Promise.resolve([]),
+        enabled: (options.enabled !== undefined ? options.enabled : true) && !!companyId,
     });
 
     // Realtime channel for product and stock updates
@@ -68,9 +68,8 @@ export const useMinimalProducts = () => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['products_minimal', user?.company_id],
-        // Fix: Call getMinimalProducts which will be added to inventoryService
         queryFn: () => user?.company_id ? inventoryService.getMinimalProducts(user.company_id) : Promise.resolve([]),
-        enabled: !!user?.company_id
+        enabled: !!user?.company_id,
     });
 };
 
@@ -78,9 +77,8 @@ export const useItemMovement = (productId: string | null) => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['item_movement', productId, user?.company_id],
-        // Fix: Call getItemMovement which will be added to inventoryService
         queryFn: () => (productId && user?.company_id) ? inventoryService.getItemMovement(productId, user.company_id) : Promise.resolve([]),
-        enabled: !!productId && !!user?.company_id
+        enabled: !!productId && !!user?.company_id,
     });
 };
 

@@ -3,7 +3,7 @@ import { Layers, Trash2, TrendingUp, AlertCircle, Package, Box, BarChart3 } from
 import { formatNumberDisplay } from '../../../core/utils';
 import { cn } from '../../../core/utils';
 import ExcelTable, { Column } from '../../../ui/common/ExcelTable';
-import { useInventoryCategoryMutations } from '../hooks';
+import { useInventoryCategoryMutations } from '../hooks/index';
 
 interface Category {
     id: string;

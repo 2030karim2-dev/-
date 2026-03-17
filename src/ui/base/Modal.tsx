@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, LucideIcon, Expand, Shrink } from 'lucide-react';
 import { cn } from '../../core/utils';
 
@@ -173,7 +174,7 @@ const Modal: React.FC<ModalProps> = ({
     position: 'fixed',
     top: 0,
     left: 0,
-    zIndex: 1000
+    zIndex: 9999
   } : {
     ...(position ? { 
       position: 'fixed', 
@@ -190,10 +191,11 @@ const Modal: React.FC<ModalProps> = ({
     } : {})
   };
 
-  return (
+  return createPortal(
     <div
       className={cn(
-        "fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4 transition-all duration-300 animate-in fade-in",
+        "fixed inset-0 flex items-end md:items-center justify-center p-0 md:p-4 transition-all duration-300 animate-in fade-in",
+        (isMaximized || size === 'full') ? "z-[9999]" : "z-[100]",
         !isMaximized && "bg-slate-950/40 backdrop-blur-[2px]"
       )}
       onClick={onClose}
@@ -261,7 +263,10 @@ const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Content Segment */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 lg:p-10 bg-[var(--app-bg)]">
+        <div className={cn(
+          "flex-1 overflow-y-auto custom-scrollbar bg-[var(--app-bg)]",
+          (isMaximized || size === 'full') ? "p-1 md:p-2 lg:p-3" : "p-4 md:p-8 lg:p-10"
+        )}>
           {children}
         </div>
 
@@ -270,7 +275,8 @@ const Modal: React.FC<ModalProps> = ({
           {footer}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

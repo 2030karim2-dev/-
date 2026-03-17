@@ -49,7 +49,7 @@ const SmartImportView: React.FC<Props> = ({ mode, onConfirm }) => {
     useEffect(() => {
         // Auto-select first warehouse
         if (warehouses && warehouses.length > 0 && !selectedWarehouseId) {
-            const whArray = warehouses as { id: string }[];
+            const whArray = warehouses as Array<{ id: string }>;
             setSelectedWarehouseId(whArray[0]?.id);
         }
     }, [warehouses, selectedWarehouseId]);
@@ -60,7 +60,7 @@ const SmartImportView: React.FC<Props> = ({ mode, onConfirm }) => {
 
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
-            reader.onload = (e) => setFilePreview(e.target?.result as string);
+            reader.onload = (e) => { setFilePreview(e.target?.result as string); };
             reader.readAsDataURL(file);
         }
 
@@ -113,7 +113,7 @@ const SmartImportView: React.FC<Props> = ({ mode, onConfirm }) => {
         },
         {
             header: ' ',
-            accessor: (row: ExtractedItem) => <button onClick={() => setExtractedItems(prev => prev.filter(i => i !== row))} className="p-1 hover:bg-rose-50 rounded text-rose-400"><X size={12} /></button>,
+            accessor: (row: ExtractedItem) => <button onClick={() => { setExtractedItems(prev => prev.filter(i => i !== row)); }} className="p-1 hover:bg-rose-50 rounded text-rose-400"><X size={12} /></button>,
             width: 'w-8'
         }
     ] : [
@@ -132,7 +132,7 @@ const SmartImportView: React.FC<Props> = ({ mode, onConfirm }) => {
         },
         {
             header: ' ',
-            accessor: (row: ExtractedItem) => <button onClick={() => setExtractedItems(prev => prev.filter(i => i !== row))} className="p-1 hover:bg-rose-50 rounded text-rose-400"><X size={12} /></button>,
+            accessor: (row: ExtractedItem) => <button onClick={() => { setExtractedItems(prev => prev.filter(i => i !== row)); }} className="p-1 hover:bg-rose-50 rounded text-rose-400"><X size={12} /></button>,
             width: 'w-8'
         }
     ];
@@ -175,37 +175,36 @@ const SmartImportView: React.FC<Props> = ({ mode, onConfirm }) => {
                 </div>
             ) : (
                 <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-[1.5rem] border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    <div className="bg-slate-900 text-white p-3 flex flex-wrap justify-between items-center gap-3 z-20">
+                    <div className="bg-slate-900 text-white px-4 py-2 flex flex-wrap justify-between items-center gap-2 z-20 shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="p-1.5 bg-blue-600 rounded-lg shadow-lg"><Sparkles size={16} /></div>
+                            <div className="p-1 bg-blue-600 rounded-lg shadow-lg"><Sparkles size={14} /></div>
                             <div>
-                                <h3 className="text-[11px] font-bold uppercase tracking-tight">مراجعة البيانات المستخرجة</h3>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                    <User size={10} className="text-blue-400" />
+                                <h3 className="text-[10px] font-black uppercase tracking-tight">مراجعة البيانات</h3>
+                                <div className="flex items-center gap-2">
+                                    <User size={8} className="text-blue-400" />
                                     <input
                                         value={detectedSupplier}
-                                        onChange={(e) => setDetectedSupplier(e.target.value)}
-                                        placeholder="اسم المورد المكتشف..."
-                                        className="bg-transparent text-[9px] font-bold text-gray-300 border-none outline-none focus:text-white w-48"
+                                        onChange={(e) => { setDetectedSupplier(e.target.value); }}
+                                        placeholder="المورد..."
+                                        className="bg-transparent text-[8px] font-black text-gray-300 border-none outline-none focus:text-white w-32"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                             <div className="flex items-center bg-slate-800 rounded-lg px-2 py-1 border border-slate-700">
-                                <DollarSign size={12} className="text-emerald-400 mr-1" />
-                                <select value={detectedCurrency} onChange={(e) => setDetectedCurrency(e.target.value)} className="bg-transparent text-[10px] font-bold text-white outline-none appearance-none cursor-pointer">
+                                <DollarSign size={10} className="text-emerald-400" />
+                                <select value={detectedCurrency} onChange={(e) => { setDetectedCurrency(e.target.value); }} className="bg-transparent text-[9px] font-black text-white outline-none appearance-none cursor-pointer">
                                     {currencies.data?.map((c: { code: string }) => <option key={c.code} value={c.code}>{c.code}</option>)}
                                 </select>
                             </div>
                             <div className="flex items-center bg-slate-800 rounded-lg px-2 py-1 border border-slate-700">
-                                <Warehouse size={12} className="text-blue-400 mr-1" />
-                                <select value={selectedWarehouseId} onChange={(e) => setSelectedWarehouseId(e.target.value)} className="bg-transparent text-[10px] font-bold text-white outline-none appearance-none cursor-pointer max-w-[100px]">
+                                <Warehouse size={10} className="text-blue-400" />
+                                <select value={selectedWarehouseId} onChange={(e) => { setSelectedWarehouseId(e.target.value); }} className="bg-transparent text-[9px] font-black text-white outline-none appearance-none cursor-pointer max-w-[80px]">
                                     {warehouses?.map((w: any) => <option key={w.id} value={w.id}>{w.name || w.name_ar}</option>)}
                                 </select>
                             </div>
-
                         </div>
                     </div>
 

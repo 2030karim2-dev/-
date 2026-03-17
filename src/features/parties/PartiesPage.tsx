@@ -3,6 +3,7 @@ import { Users, UserPlus, FileText, LayoutGrid, Edit, Trash2, History, LucideIco
 import { useNavigate } from 'react-router-dom';
 import { useParties, usePartyMutations, usePartiesView } from './hooks';
 import { Party, PartyView, PartyType, PartyFormData } from './types';
+import { useAIPrefillStore } from '../ai/store';
 import MicroHeader from '../../ui/base/MicroHeader';
 import PartiesStats from './components/PartiesStats';
 import ExcelTable, { Column } from '../../ui/common/ExcelTable';
@@ -44,6 +45,20 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
     // Timeline modal state
     const [selectedCustomer, setSelectedCustomer] = useState<Party | null>(null);
     const [isTimelineOpen, setIsTimelineOpen] = useState(false);
+    // AI Prefill Logic
+    const consumePrefill = useAIPrefillStore(s => s.consumePrefill);
+    const [prefillData, setPrefillData] = useState<Partial<PartyFormData> | null>(null);
+
+    React.useEffect(() => {
+        const intent = partyType === 'customer' ? 'create_customer' : 'create_supplier';
+        const aiData = consumePrefill(intent);
+        if (aiData && aiData.entities) {
+            setPrefillData({
+                name: aiData.entities.partyName || ''
+            });
+            handleAddNew();
+        }
+    }, [partyType, consumePrefill, handleAddNew]);
 
     const defaultTitle = partyType === 'customer' ? t('customer_management') : t('supplier_management');
     const displayTitle = title || defaultTitle;
@@ -247,10 +262,14 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                     if (editingParty?.id) {
                         (payload as any).id = editingParty.id;
                     }
-                    saveParty(payload as any, { onSuccess: () => handleCloseModal() });
+                    saveParty(payload as any, { onSuccess: () => {
+                        handleCloseModal();
+                        setPrefillData(null);
+                    }});
                 }}
                 isSubmitting={isSaving}
                 initialData={editingParty}
+                prefillData={prefillData}
                 partyType={partyType}
             />
 

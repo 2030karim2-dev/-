@@ -3,7 +3,7 @@ import { inventoryService } from '../service';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
 import { inventoryApi } from '../api';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { logger } from '../../../core/utils/logger';
 import { syncStore } from '../../../core/lib/sync-store';
@@ -12,7 +12,6 @@ export const useWarehouses = () => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['warehouses', user?.company_id],
-        // Fix: Call getWarehouses which is now available in inventoryService
         queryFn: () => user?.company_id ? inventoryService.getWarehouses(user.company_id) : Promise.resolve([]),
         enabled: !!user?.company_id
     });
@@ -22,7 +21,6 @@ export const useWarehouseProducts = (warehouseId: string | null) => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['warehouse_products', warehouseId],
-        // Fix: Call getProductsForWarehouse which is now available in inventoryService
         queryFn: () => (user?.company_id && warehouseId)
             ? inventoryService.getProductsForWarehouse(user.company_id, warehouseId)
             : Promise.resolve([]),
@@ -68,7 +66,6 @@ export const useTransfers = () => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['transfers', user?.company_id],
-        // Fix: Call getTransfers which is now available in inventoryService
         queryFn: () => user?.company_id ? inventoryService.getTransfers(user.company_id) : Promise.resolve([]),
         enabled: !!user?.company_id
     });
@@ -78,7 +75,6 @@ export const useAuditSessions = () => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['audit_sessions', user?.company_id],
-        // Fix: Call getAuditSessions which is now available in inventoryService
         queryFn: () => user?.company_id ? inventoryService.getAuditSessions(user.company_id) : Promise.resolve([]),
         enabled: !!user?.company_id
     });
@@ -91,7 +87,6 @@ export const useAuditSession = (sessionId: string | undefined) => {
         enabled: !!sessionId
     });
 
-    // Realtime sync for collaborative auditing
     useEffect(() => {
         if (!sessionId) return;
 
@@ -137,7 +132,6 @@ export const useInventoryMutations = () => {
     const transfer = useMutation({
         mutationFn: (data: any) => {
             if (!user?.company_id || !user.id) throw new Error("Auth error");
-            // Fix: Call createTransfer which is now available in inventoryService
             return inventoryService.createTransfer({ ...data, company_id: user.company_id, user_id: user.id });
         },
         onSuccess: () => {
@@ -205,7 +199,6 @@ export const useInventoryMutations = () => {
                     mutationKey: ['inventory', 'save_audit_progress'],
                     variables: { items }
                 });
-                // No toast for silent progress save
                 return;
             }
         }
@@ -221,4 +214,110 @@ export const useInventoryMutations = () => {
         saveAuditProgress: saveProgress.mutate,
         isSavingProgress: saveProgress.isPending,
     };
+};
+
+export const useInventoryCategoryMutations = () => {
+    const queryClient = useQueryClient();
+    const { user } = useAuthStore();
+    const { showToast } = useFeedbackStore();
+
+    const create = useMutation({
+        mutationFn: (name: string) => {
+            if (!user?.company_id) throw new Error("جلسة العمل منتهية");
+            return inventoryService.createCategory(user.company_id, name);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['inventory_categories'] });
+            showToast("تمت إضافة تصنيف الصنف بنجاح", 'success');
+        }
+    });
+
+    const remove = useMutation({
+        mutationFn: (id: string) => inventoryService.deleteCategory(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['inventory_categories'] });
+            showToast("تم حذف التصنيف", 'info');
+        }
+    });
+
+    return { createCategory: create.mutate, deleteCategory: remove.mutate, isCreating: create.isPending };
+};
+
+export const useInventoryAnalytics = (from?: string, to?: string) => {
+    const { user } = useAuthStore();
+    return useQuery({
+        queryKey: ['inventory_analytics', user?.company_id, from, to],
+        queryFn: () => user?.company_id ? inventoryService.getInventoryAnalytics(user.company_id, from, to) : Promise.resolve({
+            mostActive: [],
+            mostProfitable: [],
+            stagnant: [],
+            abcAnalysis: { A: [], B: [], C: [] },
+            stockAlerts: []
+        }),
+        enabled: !!user?.company_id,
+    });
+};
+
+export const useInventorySmartInsights = (from?: string, to?: string) => {
+    const { data: analytics } = useInventoryAnalytics(from, to);
+
+    return useMemo(() => {
+        if (!analytics) return { data: [], isLoading: true };
+
+        const insights = [];
+
+        if (analytics.stockAlerts?.length > 0) {
+            const topCritical = analytics.stockAlerts[0];
+            insights.push({
+                id: 'critical_reorder',
+                type: 'critical',
+                title: 'إعادة طلب عاجلة',
+                message: `الصنف "${topCritical.name}" يستهلك بسرعة وسينفد خلال ${topCritical.daysRemaining} أيام.`,
+                action: 'تجهيز طلب شراء',
+                impact: 'high'
+            });
+        }
+
+        const deadStockValue = analytics.stagnant?.reduce((sum: number, p: any) => sum + (p.cost_price * p.stock_quantity), 0) || 0;
+        if (deadStockValue > 0) {
+            insights.push({
+                id: 'stagnant_capital',
+                type: 'warning',
+                title: 'رأس مال مجمد',
+                message: `لديك أصناف راكدة بقيمة تقديرية ${Math.round(deadStockValue).toLocaleString()} ريال لم تتحرك منذ 90 يوماً.`,
+                action: 'عمل تصفية أو عروض',
+                impact: 'medium'
+            });
+        }
+
+        const classA = analytics.abcAnalysis?.A || [];
+        if (classA.length > 0) {
+            const mostProfitable = [...classA].sort((a, b) => b.profit - a.profit)[0];
+            if (mostProfitable) {
+                insights.push({
+                    id: 'profit_opportunity',
+                    type: 'success',
+                    title: 'فرصة نمو الربحية',
+                    message: `الصنف "${mostProfitable.name}" يمثل أعلى هامش ربح في الفئة A. تأكد من توفره الدائم.`,
+                    action: 'تحليل الموردين',
+                    impact: 'high'
+                });
+            }
+        }
+
+        const totalItems = (analytics.abcAnalysis?.A?.length || 0) + (analytics.abcAnalysis?.B?.length || 0) + (analytics.abcAnalysis?.C?.length || 0);
+        const aCount = analytics.abcAnalysis?.A?.length || 0;
+        if (totalItems > 0 && (aCount / totalItems) < 0.1) {
+            insights.push({
+                id: 'strategic_imbalance',
+                type: 'info',
+                title: 'توازن المخزون',
+                message: 'فئة النخبة (A) تشكل أقل من 10% من أصنافك. قد تكون هناك فرصة لتوسيع الأصناف الأكثر مبيعاً.',
+                action: 'مراجعة الكتالوج',
+                impact: 'low'
+            });
+        }
+
+        return { data: insights, isLoading: false };
+    }, [analytics]);
 };

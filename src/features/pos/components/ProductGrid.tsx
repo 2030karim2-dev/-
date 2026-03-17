@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Package } from 'lucide-react';
-import { useProducts, useInventoryCategories } from '../../inventory/hooks';
+import { useProducts, useInventoryCategories } from '../../inventory/hooks/index';
 import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
 import { Product } from '../../inventory/types';
 import { useSoundStore } from '../../notifications/store';

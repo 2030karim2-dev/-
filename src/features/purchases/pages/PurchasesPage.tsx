@@ -18,6 +18,7 @@ import { purchaseFixesService } from '../services/maintenance/purchaseFixes';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
 import PurchaseReturnsView from '../components/Returns/PurchaseReturnsView';
+import { useAIPrefillStore } from '../../ai/store';
 
 const PurchasesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'create' | 'list' | 'returns' | 'analytics' | 'smart_import'>('list');
@@ -41,6 +42,35 @@ const PurchasesPage: React.FC = () => {
     { id: 'returns', label: t('supplier_returns'), icon: RefreshCw },
     { id: 'analytics', label: t('financial_analytics'), icon: BarChart3 }
   ];
+
+  // AI Prefill: consume pending purchase invoice intent
+  const consumePrefill = useAIPrefillStore((s: any) => s.consumePrefill);
+  React.useEffect(() => {
+    const aiData = consumePrefill(['create_purchase_invoice', 'create_return_purchase']);
+    if (aiData && aiData.entities) {
+      const entities = aiData.entities;
+      if (entities.partyName) {
+        setSupplier({ id: `ai_temp_${Date.now()}`, name: entities.partyName });
+      }
+      if (entities.items && entities.items.length > 0) {
+        bulkLoadItems(entities.items.map((item: any) => ({
+          id: crypto.randomUUID(),
+          productId: '',
+          sku: '',
+          name: item.productName || 'صنف غير محدد',
+          partNumber: item.productCode || '',
+          brand: item.manufacturer || '',
+          quantity: item.quantity || 1,
+          unitPrice: item.unitPrice || 0,
+          costPrice: item.unitPrice || 0,
+        })));
+      }
+      if (entities.paymentMethod) {
+        setMetadata('invoiceType', entities.paymentMethod === 'credit' ? 'credit' : 'cash');
+      }
+      setActiveTab('create');
+    }
+  }, [consumePrefill, bulkLoadItems, setSupplier, setMetadata]);
 
   /**
    * معالجة البيانات القادمة من نظام الاستيراد الذكي (AI)

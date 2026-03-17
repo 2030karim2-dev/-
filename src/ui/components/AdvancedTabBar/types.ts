@@ -88,7 +88,7 @@ export interface AdvancedTabBarProps {
     /** Additional CSS class */
     className?: string;
     /** Tab size variant */
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'micro' | 'sm' | 'md' | 'lg';
     /** Theme mode override */
     theme?: 'light' | 'dark' | 'auto';
 }

@@ -83,20 +83,20 @@ const HeaderActions: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center gap-1.5 md:gap-3">
+    <div className="flex items-center gap-1 md:gap-2">
       {/* Theme Toggle */}
       <button
         onClick={toggleTheme}
-        className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)] transition-all active:scale-90 border border-[var(--app-border)]"
+        className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-lg bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)] transition-all active:scale-90 border border-[var(--app-border)]"
         title={theme === 'light' ? t('theme_dark') : t('theme_light')}
       >
-        {theme === 'light' ? <Moon size={16} className="md:size-18" /> : <Sun size={16} className="text-yellow-500 md:size-18" />}
+        {theme === 'light' ? <Moon size={14} /> : <Sun size={14} className="text-yellow-500" />}
       </button>
 
       {/* Language Toggle (Desktop Friendly) */}
       <button
         onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-        className="hidden sm:flex w-10 h-10 items-center justify-center rounded-xl bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)] transition-all border border-[var(--app-border)] font-sans text-xs font-semibold uppercase tracking-tighter focus:ring-2 focus:ring-blue-500/40"
+        className="hidden sm:flex w-8 h-8 items-center justify-center rounded-lg bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)] transition-all border border-[var(--app-border)] font-sans text-[10px] font-black uppercase tracking-tighter"
         title={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
         aria-label={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
       >
@@ -106,15 +106,15 @@ const HeaderActions: React.FC = () => {
       {/* Sound Toggle */}
       <button
         onClick={toggleSound}
-        className="hidden sm:flex w-8 h-8 md:w-10 md:h-10 items-center justify-center rounded-xl bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)] transition-all active:scale-90 border border-[var(--app-border)]"
+        className="hidden sm:flex w-7 h-7 md:w-8 md:h-8 items-center justify-center rounded-lg bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)] transition-all active:scale-90 border border-[var(--app-border)]"
         title={isSoundEnabled ? t('sound_disable') || 'تعطيل الصوت' : t('sound_enable') || 'تفعيل الصوت'}
         aria-label={isSoundEnabled ? 'تعطيل صوت الإشعارات' : 'تفعيل صوت الإشعارات'}
         aria-pressed={isSoundEnabled}
       >
         {isSoundEnabled ? (
-          <Volume2 size={16} className="md:size-18 text-emerald-500" />
+          <Volume2 size={14} className="text-emerald-500" />
         ) : (
-          <VolumeX size={16} className="md:size-18 text-gray-400" />
+          <VolumeX size={14} className="text-gray-400" />
         )}
       </button>
 
@@ -122,13 +122,13 @@ const HeaderActions: React.FC = () => {
       {pendingCount > 0 && (
         <button
           onClick={() => setIsSyncModalOpen(true)}
-          className="relative w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-all active:scale-95 border border-amber-200 dark:border-amber-800"
+          className="relative w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-all active:scale-95 border border-amber-200 dark:border-amber-800"
           title={`${pendingCount} عمليات بانتظار المزامنة`}
         >
-          <RefreshCw size={16} className={cn("md:size-18", pendingCount > 0 && "animate-spin-slow")} />
+          <RefreshCw size={14} className={cn(pendingCount > 0 && "animate-spin-slow")} />
           <span className={cn(
-            "absolute -top-1 flex items-center justify-center min-w-[18px] h-[18px] bg-amber-600 text-white text-[10px] font-bold rounded-full border-2 border-[var(--app-surface)] shadow-sm",
-            dir === 'rtl' ? '-left-1' : '-right-1'
+            "absolute -top-1.5 flex items-center justify-center min-w-[14px] h-[14px] bg-amber-600 text-white text-[8px] font-black rounded-full border-2 border-[var(--app-surface)] shadow-sm",
+            dir === 'rtl' ? '-left-1.5' : '-right-1.5'
           )}>
             {pendingCount}
           </span>
@@ -145,17 +145,17 @@ const HeaderActions: React.FC = () => {
       <div className="relative" ref={notifRef}>
         <button
           onClick={() => setIsNotifOpen(!isNotifOpen)}
-          className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)] hover:text-[var(--accent)] transition-all duration-200 active:scale-95 border border-[var(--app-border)] relative focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
+          className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-lg bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)] hover:text-[var(--accent)] transition-all duration-200 active:scale-95 border border-[var(--app-border)] relative focus:outline-none"
           title={t('notifications')}
           aria-label={`${t('notifications')} ${unreadCount > 0 ? `(${unreadCount} غير مقروء)` : ''}`}
           aria-expanded={isNotifOpen}
           aria-haspopup="true"
         >
-          <Bell size={16} className="md:size-18 transition-transform duration-200" />
+          <Bell size={14} className="transition-transform duration-200" />
           {unreadCount > 0 && (
             <span className={cn(
-              "absolute -top-1 min-w-[18px] h-[18px] flex items-center justify-center px-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-bold rounded-full border-2 border-[var(--app-surface)] shadow-sm animate-in fade-in zoom-in duration-200",
-              dir === 'rtl' ? '-left-1' : '-right-1'
+              "absolute -top-1.5 min-w-[14px] h-[14px] flex items-center justify-center px-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[8px] font-black rounded-full border-2 border-[var(--app-surface)] shadow-sm animate-in fade-in zoom-in duration-200",
+              dir === 'rtl' ? '-left-1.5' : '-right-1.5'
             )}>
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
@@ -168,17 +168,17 @@ const HeaderActions: React.FC = () => {
       <div className="relative" ref={profileRef}>
         <button
           onClick={() => setIsProfileOpen(!isProfileOpen)}
-          className="ms-1 md:ms-0 group relative focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:ring-offset-2 focus:ring-offset-[var(--app-bg)] rounded-xl"
+          className="ms-1 group relative focus:outline-none rounded-lg"
           title={t('profile') || 'الملف الشخصي'}
           aria-label={t('profile') || 'الملف الشخصي'}
           aria-expanded={isProfileOpen}
         >
-          <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-xs md:text-sm border-2 border-[var(--app-surface)] shadow-lg shadow-blue-500/25 transform transition-all duration-300 group-hover:scale-105 group-hover:shadow-blue-500/40 group-hover:rotate-3 group-active:scale-95">
+          <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 text-white flex items-center justify-center font-black text-[10px] border-2 border-[var(--app-surface)] shadow-md shadow-blue-500/25 transform transition-all duration-300 group-hover:rotate-3 group-active:scale-95">
             {userInitial}
           </div>
           {/* Connectivity Status Indicator */}
           <span className={cn(
-            "absolute -bottom-0.5 w-3.5 h-3.5 border-2 border-[var(--app-surface)] rounded-full transition-colors duration-500",
+            "absolute -bottom-0.5 w-3 h-3 border-2 border-[var(--app-surface)] rounded-full transition-colors duration-500",
             dir === 'rtl' ? '-left-0.5' : '-right-0.5',
             status.isOnline
               ? (status.isPoorConnection ? "bg-amber-500 animate-pulse" : "bg-emerald-500")

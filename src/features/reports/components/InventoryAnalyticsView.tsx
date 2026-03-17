@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useInventoryAnalytics, useInventorySmartInsights } from '../../inventory/hooks';
+import { useInventoryAnalytics, useInventorySmartInsights } from '../../inventory/hooks/index';
 import { Download, Activity, Target, BrainCircuit, PackageX } from 'lucide-react';
 
 // UI Helpers
@@ -11,6 +11,9 @@ import { ABCAnalysisChart } from './ABCAnalysisChart';
 import { TopProductsTable } from './TopProductsTable';
 import { StockAlertsTable } from './StockAlertsTable';
 import { StagnantProductsTable } from './StagnantProductsTable';
+import AIInsightCard from './AIInsightCard';
+import { Activity as ActivityIcon, Calculator } from 'lucide-react';
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 
 const InventoryAnalyticsView: React.FC = () => {
     const [dateRange, setDateRange] = useState<{ from: string; to: string }>({
@@ -19,7 +22,8 @@ const InventoryAnalyticsView: React.FC = () => {
     });
 
     const { data: analyticsData, isLoading: analyticsLoading } = useInventoryAnalytics(dateRange.from, dateRange.to);
-    useInventorySmartInsights(dateRange.from, dateRange.to);
+    const { data: insights } = useInventorySmartInsights(dateRange.from, dateRange.to);
+    const { t } = useTranslation();
 
     const handleExport = () => {
         if (!analyticsData) return;
@@ -66,58 +70,80 @@ const InventoryAnalyticsView: React.FC = () => {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 pb-20 max-w-[1400px] mx-auto px-4">
 
-            {/* Premium Command Center Header */}
-            <div className="glass-panel bento-item p-8 bg-slate-900 dark:bg-slate-950 relative overflow-hidden flex flex-col lg:flex-row items-center justify-between border-none shadow-2xl">
-                <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] -mr-40 -mt-40 transition-all duration-1000" />
+            {/* Premium Command Center Header - Micro Version */}
+            <div className="glass-panel bento-item p-4 bg-slate-900 dark:bg-slate-950 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between border-none shadow-xl shrink-0">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 rounded-full blur-[60px] -mr-20 -mt-20 pointer-events-none" />
 
-                <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
-                    <div className="p-4 bg-blue-500 text-white rounded-[2rem] shadow-2xl shadow-blue-500/30 rotate-3 hover:rotate-0 transition-transform cursor-pointer">
-                        <BrainCircuit size={32} />
+                <div className="relative z-10 flex items-center gap-4">
+                    <div className="p-2 bg-blue-500 text-white rounded-xl shadow-lg rotate-2">
+                        <BrainCircuit size={18} />
                     </div>
-                    <div className="text-center md:text-right">
-                        <h2 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+                    <div>
+                        <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
                             تحليل المخزون الاستراتيجي
                         </h2>
-                        <p className="text-xs text-blue-400/80 font-bold uppercase tracking-[0.3em] mt-1">مركز التحكم في تدفقات الأصناف والربحية</p>
+                        <p className="text-[8px] text-blue-400/80 font-bold uppercase tracking-widest leading-none mt-0.5">مركز التحكم في تدفقات الأصناف والربحية</p>
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-4 mt-8 lg:mt-0 relative z-10">
-                    <div className="flex items-center glass-card bg-white/5 border border-white/10 rounded-2xl p-2 backdrop-blur-xl">
-                        <div className="flex items-center gap-2 px-3">
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">النطاق</span>
+                <div className="flex items-center gap-3 mt-4 sm:mt-0 relative z-10">
+                    <div className="flex items-center glass-card bg-white/5 border border-white/10 rounded-xl p-1.5 backdrop-blur-xl">
+                        <div className="flex items-center gap-2 px-2">
                             <input
                                 type="date"
                                 value={dateRange.from}
-                                onChange={(e) => setDateRange((prev: any) => ({ ...prev, from: e.target.value }))}
-                                className="text-[10px] bg-white/10 text-white border-none rounded-lg p-1.5 outline-none font-bold"
+                                onChange={(e) => { setDateRange((prev: any) => ({ ...prev, from: e.target.value })); }}
+                                className="text-[9px] bg-transparent text-white border-none p-0.5 outline-none font-bold cursor-pointer"
                             />
-                            <span className="text-white/20">—</span>
+                            <span className="text-white/20 text-[9px]">—</span>
                             <input
                                 type="date"
                                 value={dateRange.to}
-                                onChange={(e) => setDateRange((prev: any) => ({ ...prev, to: e.target.value }))}
-                                className="text-[10px] bg-white/10 text-white border-none rounded-lg p-1.5 outline-none font-bold"
+                                onChange={(e) => { setDateRange((prev: any) => ({ ...prev, to: e.target.value })); }}
+                                className="text-[9px] bg-transparent text-white border-none p-0.5 outline-none font-bold cursor-pointer"
                             />
                         </div>
                     </div>
 
                     <button
                         onClick={handleExport}
-                        className="group flex items-center gap-3 bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3.5 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-xl shadow-emerald-500/20 active:scale-95"
+                        className="group flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all shadow-md shadow-emerald-500/20 active:scale-95"
                     >
-                        <Download size={16} className="group-hover:translate-y-0.5 transition-transform" />
-                        تصدير البيانات
+                        <Download size={14} />
+                        تصدير
                     </button>
                 </div>
             </div>
 
-            {/* AI Smart Insights Section - Stubbed */}
-            <div className="glass-panel bento-item p-12 flex flex-col items-center justify-center space-y-4 bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 shadow-sm">
-                <BrainCircuit size={40} className="text-slate-400" />
-                <div className="text-center">
-                    <h4 className="text-lg font-bold text-slate-800 dark:text-white">الرؤى الذكية قيد التطوير</h4>
-                    <p className="text-xs text-slate-500 max-w-sm">يتم حالياً إعادة بناء محرك التحليل الذكي لتقديم توصيات أكثر دقة بناءً على أنماط التوريد الخاصة بك.</p>
+            {/* AI Smart Insights Section - Micro Header */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl shadow-md">
+                            <ActivityIcon size={14} />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold tracking-tight">رادار الرؤى الذكية</h3>
+                            <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">توصيات مدعومة بتحليل أنماط التوريد والطلب</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-[8px] font-black bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm uppercase tracking-tighter">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        AI Active
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    {insights && insights.length > 0 ? (
+                        insights.map((insight: any) => (
+                            <AIInsightCard key={insight.id} insight={insight} />
+                        ))
+                    ) : (
+                        <div className="col-span-full glass-panel p-12 flex flex-col items-center justify-center space-y-4 bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800">
+                            <Calculator size={40} className="text-slate-400 opacity-20" />
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('no_data_available')}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 

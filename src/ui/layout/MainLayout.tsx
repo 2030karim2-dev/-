@@ -47,12 +47,7 @@ const MainLayout: React.FC = () => {
 
   // Dynamic content max-width for large screens
   const contentMaxWidth = useMemo(() => {
-    if (breakpoint === '5xl') return 'max-w-none px-16';
-    if (breakpoint === '4xl') return 'max-w-none px-12';
-    if (breakpoint === '3xl') return 'max-w-none px-8';
-    if (breakpoint === '2xl') return 'max-w-none px-6';
-    if (breakpoint === 'xl') return 'max-w-none px-4';
-    return 'max-w-full';
+    return 'max-w-none px-0';
   }, [breakpoint]);
 
   // Padding bottom for main content (to account for mobile nav)

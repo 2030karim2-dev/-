@@ -478,6 +478,24 @@
   border-radius: 0.625rem;
 }
 
+.advanced-tab-bar--micro .advanced-tab {
+  padding: 0.2rem 0.45rem;
+  font-size: 0.65rem;
+  gap: 0.25rem;
+  border-radius: 0.45rem;
+}
+
+.advanced-tab-bar--micro .advanced-tab__icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.advanced-tab-bar--micro .advanced-tab__badge {
+  min-width: 0.9rem;
+  height: 0.9rem;
+  font-size: 0.55rem;
+}
+
 .advanced-tab-bar--sm .advanced-tab__icon {
   width: 0.875rem;
   height: 0.875rem;

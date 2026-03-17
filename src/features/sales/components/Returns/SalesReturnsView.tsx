@@ -1,13 +1,15 @@
-import React, { useState, useMemo, useRef } from 'react';
-import { RefreshCw, Plus, Eye, RotateCcw, FileText, Search, Filter, Download, Printer, X, Trash2, ShoppingCart } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Plus, Eye, RotateCcw, FileText, Trash2, ShoppingCart } from 'lucide-react';
 import ExcelTable from '../../../../ui/common/ExcelTable';
 import { useSalesReturns, useSalesReturnsStats } from '../../hooks/useSalesReturns';
 import { useDeleteInvoice } from '../../hooks';
 import { formatCurrency, sumInBaseCurrency } from '../../../../core/utils';
 import Button from '../../../../ui/base/Button';
-import { exportReturnsToExcel } from '../../../../core/utils/returnsExcelExporter';
 import { exportToPDF } from '../../../../core/utils/pdfExporter';
 import { AdvancedReturnModal } from '../../../returns/components/AdvancedReturnModal';
+import { useReturnsListView } from '../../../returns/hooks/useReturnsListView';
+import { ReturnsStatsHeader } from '../../../returns/components/view/ReturnsStatsHeader';
+import { ReturnsFilterControls } from '../../../returns/components/view/ReturnsFilterControls';
 
 // Status labels
 const STATUS_LABELS: Record<string, string> = {
@@ -21,105 +23,57 @@ interface SalesReturnsViewProps {
   onViewDetails: (id: string) => void;
 }
 
-type SortField = 'issue_date' | 'total_amount' | 'party_name' | 'invoice_number';
-type SortDirection = 'asc' | 'desc';
-
 const SalesReturnsView: React.FC<SalesReturnsViewProps> = ({ searchTerm: propSearchTerm, onViewDetails }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [localSearchTerm, setLocalSearchTerm] = useState(propSearchTerm || '');
-  const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({
-    status: '',
-    startDate: '',
-    endDate: '',
-    minAmount: '',
-    maxAmount: '',
-    returnReason: '',
-  });
-  const [sortField, setSortField] = useState<SortField>('issue_date');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const printRef = useRef<HTMLDivElement>(null);
 
-  const { data: returns, isLoading, refetch } = useSalesReturns({
-    searchTerm: localSearchTerm,
-    status: filters.status || undefined,
-    startDate: filters.startDate || undefined,
-    endDate: filters.endDate || undefined,
-  });
   const { data: stats } = useSalesReturnsStats();
   const { mutate: deleteInvoice, isPending: isDeleting } = useDeleteInvoice();
 
-  // Apply client-side filtering and sorting
-  const processedReturns = useMemo(() => {
-    if (!returns) return [];
+  // We fetch without strict filters since client-side filtering handles most cases for small-medium lists
+  // But for larger datasets, server-side filtering would be preferred.
+  // For now, keeping the pattern consistent with original implementation.
+  const [queryFilters, setQueryFilters] = useState({
+      status: '',
+      startDate: '',
+      endDate: ''
+  });
 
-    let filtered = [...returns];
+  const { data: returns, isLoading, refetch } = useSalesReturns({
+    searchTerm: propSearchTerm || '', // Initial search term passed to query
+    status: queryFilters.status || undefined,
+    startDate: queryFilters.startDate || undefined,
+    endDate: queryFilters.endDate || undefined,
+  });
 
-    // Apply amount filters
-    if (filters.minAmount) {
-      filtered = filtered.filter(r => (Number(r.total_amount) || 0) >= Number(filters.minAmount));
+  const {
+      localSearchTerm, setLocalSearchTerm,
+      showFilters, setShowFilters,
+      filters, setFilters,
+      sortField, setSortField,
+      sortDirection, setSortDirection,
+      processedReturns,
+      totalAmount,
+      handleExportExcel,
+      clearFilters,
+      hasActiveFilters
+  } = useReturnsListView(returns, 'sales', (filteredReturns) => sumInBaseCurrency(filteredReturns as any[]));
+
+  // Sync initial search term
+  React.useEffect(() => {
+    if (propSearchTerm) {
+        setLocalSearchTerm(propSearchTerm);
     }
-    if (filters.maxAmount) {
-      filtered = filtered.filter(r => (Number(r.total_amount) || 0) <= Number(filters.maxAmount));
-    }
-    if (filters.returnReason) {
-      // Note: return_reason is not available in the current query
-    }
+  }, [propSearchTerm, setLocalSearchTerm]);
 
-    // Apply sorting
-    filtered.sort((a, b) => {
-      let comparison = 0;
-      switch (sortField) {
-        case 'issue_date':
-          comparison = new Date(a.issue_date || a.created_at).getTime() - new Date(b.issue_date || b.created_at).getTime();
-          break;
-        case 'total_amount':
-          comparison = (Number(a.total_amount) || 0) - (Number(b.total_amount) || 0);
-          break;
-        case 'party_name':
-          comparison = (a.party?.name || '').localeCompare(b.party?.name || '');
-          break;
-        case 'invoice_number':
-          comparison = (a.invoice_number || '').localeCompare(b.invoice_number || '');
-          break;
-      }
-      return sortDirection === 'asc' ? comparison : -comparison;
-    });
-
-    return filtered;
-  }, [returns, filters, sortField, sortDirection]);
-
-  // Calculate totals correctly in base currency
-  const totalAmountBase = useMemo(() => {
-    return sumInBaseCurrency(processedReturns as any[]);
-  }, [processedReturns]);
-
-  // Handle export to Excel
-  const handleExportExcel = () => {
-    if (!processedReturns.length) return;
-
-    exportReturnsToExcel({
-      companyName: 'شركة',
-      returns: processedReturns.map((r: any) => ({
-        invoiceNumber: r.invoice_number || '',
-        issueDate: new Date(r.issue_date || r.created_at).toLocaleDateString('ar-SA'),
-        customerName: r.party?.name || 'عميل نقدي',
-        referenceInvoice: '',
-        returnReason: '',
-        items: r.invoice_items?.length || 0,
-        totalAmount: Number(r.total_amount) || 0,
-        status: r.status || 'draft',
-        notes: r.notes || '',
-      })),
-      summary: {
-        totalReturns: totalAmountBase,
-        totalAmount: totalAmountBase,
-        averageAmount: processedReturns.length > 0 ? totalAmountBase / processedReturns.length : 0,
-        count: processedReturns.length,
-      },
-      type: 'sales',
-    });
-  };
+  // Sync server filters when local filters change (for larger datasets where full clientside filter isn't enough)
+  React.useEffect(() => {
+      setQueryFilters({
+          status: filters.status,
+          startDate: filters.startDate,
+          endDate: filters.endDate
+      });
+  }, [filters.status, filters.startDate, filters.endDate]);
 
   // Handle print
   const handlePrint = async () => {
@@ -131,255 +85,38 @@ const SalesReturnsView: React.FC<SalesReturnsViewProps> = ({ searchTerm: propSea
     }
   };
 
-  // Clear filters
-  const clearFilters = () => {
-    setFilters({
-      status: '',
-      startDate: '',
-      endDate: '',
-      minAmount: '',
-      maxAmount: '',
-      returnReason: '',
-    });
-    setLocalSearchTerm('');
-  };
-
-  const hasActiveFilters = filters.status || filters.startDate || filters.endDate ||
-    filters.minAmount || filters.maxAmount || filters.returnReason || localSearchTerm;
-
   return (
     <div className="space-y-3 animate-in fade-in duration-300 pt-2" ref={printRef}>
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-        <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
-          <div className="flex items-center gap-2 mb-1">
-            <RotateCcw size={18} className="text-red-600" />
-            <span className="text-xs font-bold text-red-600 dark:text-red-400">عدد المرتجعات</span>
-          </div>
-          <p className="text-2xl font-bold text-red-700 dark:text-red-300">{stats?.returnCount || 0}</p>
-        </div>
-        <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
-          <div className="flex items-center gap-2 mb-1">
-            <FileText size={18} className="text-red-600" />
-            <span className="text-xs font-bold text-red-600 dark:text-red-400">إجمالي المرتجعات</span>
-          </div>
-          <p className="text-2xl font-bold text-red-700 dark:text-red-300">
-            {(stats?.totalReturns || 0).toFixed(2)}
-          </p>
-        </div>
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-          <div className="flex items-center gap-2 mb-1">
-            <FileText size={18} className="text-blue-600" />
-            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">متوسط المرتجع</span>
-          </div>
-          <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-            {(stats?.avgReturn || 0).toFixed(2)}
-          </p>
-        </div>
-        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800">
-          <div className="flex items-center gap-2 mb-1">
-            <RefreshCw size={18} className="text-yellow-600" />
-            <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400">قيد الانتظار</span>
-          </div>
-          <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
-            {stats?.pendingCount || 0}
-          </p>
-        </div>
-      </div>
+      <ReturnsStatsHeader
+        returnCount={stats?.returnCount || 0}
+        totalReturns={stats?.totalReturns || 0}
+        avgReturn={stats?.avgReturn || 0}
+        pendingCount={stats?.pendingCount || 0}
+        type="sales"
+      />
 
       {/* Search and Filter Bar */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-gray-100 dark:border-slate-700">
-        <div className="flex flex-col lg:flex-row gap-3">
-          {/* Search Input */}
-          <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-            <input
-              type="text"
-              value={localSearchTerm}
-              onChange={(e) => setLocalSearchTerm(e.target.value)}
-              placeholder="بحث بالعميل، رقم الفاتورة، سبب الإرجاع..."
-              className="w-full pr-10 pl-3 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400"
-            />
-            {localSearchTerm && (
-              <button
-                onClick={() => setLocalSearchTerm('')}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <Button
-              variant={showFilters ? 'primary' : 'outline'}
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-              leftIcon={<Filter size={14} />}
-            >
-              فلترة
-              {hasActiveFilters && (
-                <span className="mr-1 px-1.5 py-0.5 bg-red-500 text-white text-xs rounded-full">
-                  {[filters.status, filters.startDate, filters.endDate, filters.minAmount, filters.maxAmount, filters.returnReason, localSearchTerm].filter(Boolean).length}
-                </span>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExportExcel}
-              disabled={!processedReturns.length}
-              leftIcon={<Download size={14} />}
-            >
-              Excel
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePrint}
-              disabled={!processedReturns.length}
-              leftIcon={<Printer size={14} />}
-            >
-              طباعة
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              leftIcon={<RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />}
-            >
-              تحديث
-            </Button>
-          </div>
-        </div>
-
-        {/* Advanced Filters Panel */}
-        {showFilters && (
-          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-600">
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
-              {/* Status Filter */}
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">الحالة</label>
-                <select
-                  value={filters.status}
-                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                  className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm"
-                >
-                  <option value="">الكل</option>
-                  <option value="draft">مسودة</option>
-                  <option value="posted">معتمد</option>
-                  <option value="paid">مدفوع</option>
-                </select>
-              </div>
-
-              {/* Return Reason Filter */}
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">سبب الإرجاع</label>
-                <select
-                  value={filters.returnReason}
-                  onChange={(e) => setFilters({ ...filters, returnReason: e.target.value })}
-                  className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm"
-                >
-                  <option value="">الكل</option>
-                  <option value="defective">منتج تالف</option>
-                  <option value="not_as_described">غير مطابق للمواصفات</option>
-                  <option value="wrong_item">صنف خاطئ</option>
-                  <option value="quality_issue">مشكلة في الجودة</option>
-                  <option value="changed_mind">تغيير رأي العميل</option>
-                  <option value="other">أخرى</option>
-                </select>
-              </div>
-
-              {/* Start Date */}
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">من تاريخ</label>
-                <input
-                  type="date"
-                  value={filters.startDate}
-                  onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                  className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm"
-                />
-              </div>
-
-              {/* End Date */}
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">إلى تاريخ</label>
-                <input
-                  type="date"
-                  value={filters.endDate}
-                  onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-                  className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm"
-                />
-              </div>
-
-              {/* Min Amount */}
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">الحد الأدنى</label>
-                <input
-                  type="number"
-                  value={filters.minAmount}
-                  onChange={(e) => setFilters({ ...filters, minAmount: e.target.value })}
-                  placeholder="الحد الأدنى للمبلغ"
-                  className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm"
-                />
-              </div>
-
-              {/* Max Amount */}
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1">الحد الأعلى</label>
-                <input
-                  type="number"
-                  value={filters.maxAmount}
-                  onChange={(e) => setFilters({ ...filters, maxAmount: e.target.value })}
-                  placeholder="الحد الأعلى للمبلغ"
-                  className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm"
-                />
-              </div>
-            </div>
-
-            {/* Sort Options */}
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <span className="text-xs font-bold text-gray-500">ترتيب حسب:</span>
-              <div className="flex gap-1">
-                {[
-                  { value: 'issue_date', label: 'التاريخ' },
-                  { value: 'total_amount', label: 'المبلغ' },
-                  { value: 'party_name', label: 'العميل' },
-                  { value: 'invoice_number', label: 'رقم الفاتورة' },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      if (sortField === option.value) {
-                        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-                      } else {
-                        setSortField(option.value as SortField);
-                        setSortDirection('desc');
-                      }
-                    }}
-                    className={`px-2 py-1 text-xs rounded ${sortField === option.value
-                      ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
-                      : 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-300'
-                      }`}
-                  >
-                    {option.label} {sortField === option.value && (sortDirection === 'asc' ? '↑' : '↓')}
-                  </button>
-                ))}
-              </div>
-
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="ml-auto text-xs text-red-500 hover:text-red-700 flex items-center gap-1"
-                >
-                  <X size={12} /> مسح الفلاتر
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+      <ReturnsFilterControls
+        localSearchTerm={localSearchTerm}
+        setLocalSearchTerm={setLocalSearchTerm}
+        showFilters={showFilters}
+        setShowFilters={setShowFilters}
+        filters={filters}
+        setFilters={setFilters}
+        sortField={sortField}
+        setSortField={setSortField}
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
+        hasActiveFilters={hasActiveFilters}
+        clearFilters={clearFilters}
+        handleExportExcel={handleExportExcel}
+        handlePrint={handlePrint}
+        refetch={refetch}
+        isLoading={isLoading}
+        hasData={processedReturns.length > 0}
+        type="sales"
+      />
 
       {/* Add Return Button */}
       <div className="flex justify-end">
@@ -536,7 +273,7 @@ const SalesReturnsView: React.FC<SalesReturnsViewProps> = ({ searchTerm: propSea
             <span className="font-bold text-red-800 dark:text-red-300">إجمالي المرتجعات المعروضة:</span>
             <div className="text-left flex flex-col items-end">
               <span className="font-bold text-xl text-red-600 dark:text-red-400">
-                {formatCurrency(totalAmountBase, 'SAR')}
+                {formatCurrency(totalAmount, 'SAR')}
               </span>
               <span className="text-[10px] text-gray-400 font-medium">إجمالي القيمة بالريال السعودي</span>
             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useItemMovement, useMinimalProducts } from '../../inventory/hooks';
+import { useItemMovement, useMinimalProducts } from '../../inventory/hooks/index';
 import ExcelTable from '../../../ui/common/ExcelTable';
 import { Search, Package, History, ArrowUpRight, ArrowDownRight, ArrowLeftRight, CheckCircle2, Zap, BarChart3 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';

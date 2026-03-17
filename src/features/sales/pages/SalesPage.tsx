@@ -10,6 +10,8 @@ import { useCreateInvoice, useInvoices } from '../hooks';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 import { CreateInvoiceDTO } from '../types';
 import { logger } from '../../../core/utils/logger';
+import { useAIPrefillStore } from '../../ai/store';
+import { useSalesStore } from '../store';
 
 type SalesViewTab = 'create' | 'list' | 'returns' | 'analytics';
 
@@ -27,6 +29,41 @@ const SalesPage: React.FC = () => {
     { id: 'returns' as const, label: t('returns'), icon: RefreshCw },
     { id: 'analytics' as const, label: t('analytics'), icon: BarChart3 },
   ];
+
+  // AI Prefill: consume pending sales invoice intent
+  const consumePrefill = useAIPrefillStore((s: any) => s.consumePrefill);
+  React.useEffect(() => {
+    const aiData = consumePrefill(['create_sales_invoice', 'create_return_sale']);
+    if (aiData && aiData.entities) {
+      const { resetCart, setCustomer, setMetadata, calculateTotals } = useSalesStore.getState();
+      resetCart();
+      const entities = aiData.entities;
+      if (entities.partyName) {
+        setCustomer({ id: `ai_temp_${Date.now()}`, name: entities.partyName });
+      }
+      if (entities.paymentMethod) {
+        setMetadata('invoiceType', entities.paymentMethod === 'credit' ? 'credit' : 'cash');
+      }
+      if (entities.items && entities.items.length > 0) {
+        const newItems = entities.items.map((item: any) => ({
+          id: crypto.randomUUID(),
+          productId: item.productId || '',
+          sku: item.sku || '',
+          name: item.productName || 'صنف غير محدد',
+          partNumber: item.productCode || '',
+          brand: item.manufacturer || '',
+          quantity: item.quantity || 1,
+          basePrice: item.unitPrice || 0,
+          price: item.unitPrice || 0,
+          discount: 0,
+          costPrice: 0,
+        }));
+        useSalesStore.setState({ items: newItems });
+        calculateTotals();
+      }
+      setActiveTab('create');
+    }
+  }, [consumePrefill]);
 
   const handleReturnAction = async (invoice: any, items: any[]) => {
     if (!invoice || items.length === 0) return;

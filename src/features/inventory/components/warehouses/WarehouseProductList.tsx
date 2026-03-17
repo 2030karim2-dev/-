@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { useInventoryCategories } from '../../hooks';
-import ExcelTable from '../../../../ui/common/ExcelTable';
-import { formatNumberDisplay } from '../../../../core/utils';
+import { useInventoryCategories } from '../../hooks/index';
 import { Product } from '../../types';
-import { Loader2, Layers } from 'lucide-react';
+import { Layers } from 'lucide-react';
+import ProductExcelGrid from '../ProductExcelGrid';
 
 interface Props {
     products: Product[];
@@ -19,20 +18,6 @@ const WarehouseProductList: React.FC<Props> = ({ products, isLoading }) => {
         return products.filter(p => p.category === selectedCategory);
     }, [products, selectedCategory]);
 
-    const columns = [
-        { header: 'اسم الصنف', accessor: (row: any) => <span className="font-bold text-gray-800 dark:text-slate-100 text-sm whitespace-pre-wrap">{row.name_ar || row.name || 'غير متوفر'}</span> },
-        { header: 'الشركة الصانعة', accessor: (row: any) => <span className="font-bold text-gray-600 dark:text-slate-300">{row.brand || '---'}</span> },
-        { header: 'SKU', accessor: (row: any) => <span className="font-mono text-gray-500 font-bold">{row.sku || '---'}</span>, width: 'w-28' },
-        { header: 'رقم القطعة', accessor: (row: any) => <span className="font-mono text-gray-500 font-bold">{row.part_number || '---'}</span>, width: 'w-32' },
-        {
-            header: 'الكمية',
-            accessor: (row: any) => formatNumberDisplay(row.stock_quantity),
-            className: 'text-center font-mono font-bold text-blue-600',
-            width: 'w-20'
-        },
-        { header: 'الموقع', accessor: (row: any) => <span className="font-mono text-gray-700 dark:text-slate-300 font-bold">{row.location || '---'}</span>, className: 'text-center', width: 'w-24' },
-    ];
-
     if (isLoading) {
         return (
             <div className="p-20 text-center flex justify-center items-center gap-2">
@@ -43,26 +28,34 @@ const WarehouseProductList: React.FC<Props> = ({ products, isLoading }) => {
     }
 
     return (
-        <div className="space-y-2">
-            <div className="flex justify-end">
+        <div className="space-y-4">
+            <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-3 border-b-2 border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                    <div className="w-1 h-4 bg-blue-600 rounded-full"></div>
+                    <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-widest">فرز حسب التصنيف</h3>
+                </div>
                 <div className="relative w-full md:w-64">
                     <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="w-full bg-white dark:bg-slate-900 border-2 border-gray-100 dark:border-slate-800 rounded-none py-2 pr-9 pl-3 text-[10px] font-bold outline-none appearance-none focus:border-blue-500/50 transition-all dark:text-slate-200"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl py-2 pr-9 pl-3 text-[10px] font-bold outline-none appearance-none focus:border-blue-500/50 focus:bg-white transition-all dark:text-slate-200"
                     >
                         <option value="all">كل التصنيفات</option>
                         {Array.isArray(categories) && categories.map((cat: any) => (
                             <option key={cat.id} value={cat.name}>{cat.name}</option>
                         ))}
                     </select>
-                    <Layers size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <Layers size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
             </div>
-            <ExcelTable
-                columns={columns}
-                data={filteredProducts}
-                title="الأصناف في المستودع الحالي"
+
+            <ProductExcelGrid
+                products={filteredProducts}
+                isLoading={isLoading}
+                hideActions={true}
+                hideBulkActions={true}
+                title="الأصناف في المستودع"
+                subtitle={`يوجد ${filteredProducts.length} صنف متاح`}
                 colorTheme="blue"
             />
         </div>
