@@ -112,8 +112,8 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
                     }}
                 />
 
-                {isMounted && (
-                    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={160} debounce={100}>
+                {isMounted ? (
+                    <ResponsiveContainer width="99%" height="100%">
                         <PieChart>
                             <defs>
                                 <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -147,6 +147,8 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
                             </Pie>
                         </PieChart>
                     </ResponsiveContainer>
+                ) : (
+                    <div className="w-full h-full bg-slate-50/50 dark:bg-slate-800/10 animate-pulse rounded-2xl" />
                 )}
 
                 {/* Center Text */}

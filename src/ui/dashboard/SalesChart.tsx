@@ -87,82 +87,84 @@ const SalesChart: React.FC<SalesChartProps> = ({
       )}
 
       {/* Chart */}
-      <div className="flex-1 min-h-[220px] w-full relative group overflow-hidden" dir="ltr">
+      <div className="flex-1 h-[220px] min-h-[220px] w-full relative group overflow-hidden" dir="ltr">
         {/* Decorative background glow */}
         <div
           className="absolute inset-x-0 bottom-0 h-32 opacity-20 transition-opacity duration-700 pointer-events-none rounded-b-3xl"
           style={{ background: `linear-gradient(to top, ${accentColor}30, transparent)` }}
         />
-        {isMounted && (
-          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={220} debounce={100}>
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="salesGradientMain" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={accentColor} stopOpacity={0.6} />
-                <stop offset="95%" stopColor={accentColor} stopOpacity={0.0} />
-              </linearGradient>
-              <filter id="shadowMain" height="150%">
-                <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
-                <feOffset dx="0" dy="4" result="offsetblur" />
-                <feFlood floodColor="rgba(0,0,0,0.15)" />
-                <feComposite in2="offsetblur" operator="in" />
-                <feMerge>
-                  <feMergeNode />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-            <CartesianGrid
-              strokeDasharray="4 4"
-              stroke={isDark ? '#334155' : '#e2e8f0'}
-              vertical={false}
-              opacity={0.4}
-            />
-            <XAxis
-              dataKey="name"
-              tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 'bold' }}
-              axisLine={false}
-              tickLine={false}
-              dy={10}
-              minTickGap={30}
-            />
-            <YAxis
-              tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 'bold' }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={formatNumber}
-              dx={-10}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                backdropFilter: 'blur(12px)',
-                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)',
-                borderRadius: '16px',
-                color: isDark ? '#f8fafc' : '#0f172a',
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-                padding: '12px 16px'
-              }}
-              formatter={(value) => [
-                <span className="font-mono tracking-tight text-sm font-bold mx-2" style={{ color: accentColor }}>
-                  {formatNumber(Number(value) || 0)}
-                </span>,
-                <span className="text-xs font-bold text-[var(--app-text-secondary)]">المبيعات</span>
-              ]}
-              labelStyle={{ fontWeight: 'black', marginBottom: '8px', borderBottom: '1px solid rgba(148, 163, 184, 0.2)', paddingBottom: '4px', fontSize: '11px', color: isDark ? '#94a3b8' : '#64748b' }}
-              cursor={{ stroke: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', strokeWidth: 2, strokeDasharray: '4 4' }}
-            />
-            <Area
-              type="monotone"
-              dataKey="sales"
-              stroke={accentColor}
-              strokeWidth={4}
-              fill="url(#salesGradientMain)"
-              filter="url(#shadowMain)"
-              activeDot={{ r: 8, stroke: accentColor, strokeWidth: 2, fill: isDark ? '#1e293b' : '#fff' }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {isMounted ? (
+          <ResponsiveContainer width="99%" height="100%">
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="salesGradientMain" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={accentColor} stopOpacity={0.6} />
+                  <stop offset="95%" stopColor={accentColor} stopOpacity={0.0} />
+                </linearGradient>
+                <filter id="shadowMain" height="150%">
+                  <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+                  <feOffset dx="0" dy="4" result="offsetblur" />
+                  <feFlood floodColor="rgba(0,0,0,0.15)" />
+                  <feComposite in2="offsetblur" operator="in" />
+                  <feMerge>
+                    <feMergeNode />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="4 4"
+                stroke={isDark ? '#334155' : '#e2e8f0'}
+                vertical={false}
+                opacity={0.4}
+              />
+              <XAxis
+                dataKey="name"
+                tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 'bold' }}
+                axisLine={false}
+                tickLine={false}
+                dy={10}
+                minTickGap={30}
+              />
+              <YAxis
+                tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 'bold' }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={formatNumber}
+                dx={-10}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: isDark ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                  backdropFilter: 'blur(12px)',
+                  border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)',
+                  borderRadius: '16px',
+                  color: isDark ? '#f8fafc' : '#0f172a',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                  padding: '12px 16px'
+                }}
+                formatter={(value) => [
+                  <span key="val" className="font-mono tracking-tight text-sm font-bold mx-2" style={{ color: accentColor }}>
+                    {formatNumber(Number(value) || 0)}
+                  </span>,
+                  <span key="lbl" className="text-xs font-bold text-[var(--app-text-secondary)]">المبيعات</span>
+                ]}
+                labelStyle={{ fontWeight: 'black', marginBottom: '8px', borderBottom: '1px solid rgba(148, 163, 184, 0.2)', paddingBottom: '4px', fontSize: '11px', color: isDark ? '#94a3b8' : '#64748b' }}
+                cursor={{ stroke: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', strokeWidth: 2, strokeDasharray: '4 4' }}
+              />
+              <Area
+                type="monotone"
+                dataKey="sales"
+                stroke={accentColor}
+                strokeWidth={4}
+                fill="url(#salesGradientMain)"
+                filter="url(#shadowMain)"
+                activeDot={{ r: 8, stroke: accentColor, strokeWidth: 2, fill: isDark ? '#1e293b' : '#fff' }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="w-full h-full bg-slate-50/50 dark:bg-slate-800/10 animate-pulse rounded-2xl" />
         )}
       </div>
 
