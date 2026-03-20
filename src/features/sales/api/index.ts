@@ -31,7 +31,7 @@ type InvoiceWithDetails = Invoice & {
 
 export const salesApi = {
   getInvoices: async (companyId: string) => {
-    const { data, error } = await (supabase
+    const { data, error } = await supabase
       .from('invoices')
       .select(`
         id,
@@ -52,11 +52,10 @@ export const salesApi = {
       .neq('status', 'void')
       .is('deleted_at', null)
       .order('issue_date', { ascending: false })
-      .limit(1000) as any)
-      .returns<InvoiceWithParty[]>();
+      .limit(1000);
 
     if (error) throw parseError(error);
-    return data;
+    return data as unknown as InvoiceWithParty[];
   },
 
   commitInvoiceRPC: async (companyId: string, userId: string, payload: CreateInvoicePayload): Promise<InvoiceResponse> => {
@@ -105,7 +104,7 @@ export const salesApi = {
   },
 
   getInvoiceDetails: async (invoiceId: string) => {
-    const { data, error } = await (supabase
+    const { data, error } = await supabase
       .from('invoices')
       .select(`
         *,
@@ -119,11 +118,10 @@ export const salesApi = {
         )
       `)
       .eq('id', invoiceId)
-      .single() as any)
-      .returns<InvoiceWithDetails>();
+      .single();
     
     if (error) throw parseError(error);
-    return data;
+    return data as unknown as InvoiceWithDetails;
   },
 
   getNextInvoiceNumber: async (companyId: string) => {

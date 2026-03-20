@@ -103,14 +103,14 @@ export const useSalesReturns = (filters?: {
                 query = query.lte('issue_date', filters.endDate);
             }
 
-            const { data, error } = await (query
-                .order('issue_date', { ascending: false }) as any)
-                .returns<SalesReturnQueryResult[]>();
+            const { data, error } = await query
+                .order('issue_date', { ascending: false });
 
             if (error) throw error;
+            const typedData = data as unknown as SalesReturnQueryResult[];
 
             // Client-side search filtering
-            let returns = data || [];
+            let returns = typedData || [];
 
             if (filters?.searchTerm) {
                 const term = filters.searchTerm.toLowerCase();
@@ -138,17 +138,17 @@ export const useSalesReturnsStats = () => {
                 return { returnCount: 0, totalReturns: 0, avgReturn: 0, pendingCount: 0 };
             }
 
-            const { data, error } = await (supabase
+            const { data, error } = await supabase
                 .from('invoices')
                 .select('id, total_amount, status')
                 .eq('company_id', user.company_id)
                 .eq('type', 'return_sale')
-                .is('deleted_at', null) as any)
-                .returns<Pick<Invoice, 'id' | 'total_amount' | 'status'>[]>();
+                .is('deleted_at', null);
 
             if (error) throw error;
+            const typedData = data as unknown as Pick<Invoice, 'id' | 'total_amount' | 'status'>[];
 
-            const returns = data || [];
+            const returns = typedData || [];
             const returnCount = returns.length;
             const totalReturns = returns.reduce((sum: number, r: any) => sum + (Number(r.total_amount) || 0), 0);
             const avgReturn = returnCount > 0 ? totalReturns / returnCount : 0;
@@ -248,14 +248,14 @@ export const useSalesInvoicesForReturn = (customerId?: string | null) => {
                 query = query.eq('party_id', customerId);
             }
 
-            const { data, error } = await (query
+            const { data, error } = await query
                 .order('issue_date', { ascending: false })
-                .limit(100) as any)
-                .returns<SalesReturnQueryResult[]>();
+                .limit(100);
 
             if (error) throw error;
+            const typedData = data as unknown as SalesReturnQueryResult[];
 
-            return data || [];
+            return typedData || [];
         },
         enabled: !!user?.company_id,
     });

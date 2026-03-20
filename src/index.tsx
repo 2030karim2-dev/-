@@ -97,6 +97,8 @@ if (import.meta.env.DEV && 'serviceWorker' in navigator) {
   }
 }
 
+import { ErrorBoundary } from './core/components/ErrorBoundary';
+
 const rootElement = document.querySelector('#root');
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
@@ -105,9 +107,11 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <ReactQueryProvider>
-      <OfflineManager />
-      <App />
-    </ReactQueryProvider>
+    <ErrorBoundary>
+      <ReactQueryProvider>
+        <OfflineManager />
+        <App />
+      </ReactQueryProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
