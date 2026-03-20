@@ -43,7 +43,8 @@ export const useBondMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['financials'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['parties'] });
-      showToast(`تم إصدار سند ال${variables.type === 'receipt' ? 'قبض' : 'صرف'} وترحيله آلياً`, 'success');
+      const typeName = variables.type === 'receipt' ? 'قبض' : (variables.type === 'transfer' ? 'تحويل' : 'صرف');
+      showToast(`تم إصدار سند ال${typeName} وترحيله آلياً`, 'success');
     },
     onError: (error: Error) => {
       showToast(error.message, 'error', error);

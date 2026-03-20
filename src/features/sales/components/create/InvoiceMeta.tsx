@@ -3,7 +3,7 @@ import React from 'react';
 // Force rebuild
 import { Calendar, Hash, CreditCard, Warehouse, Wallet, Coins } from 'lucide-react';
 import { useSalesStore } from '../../store';
-import { usePaymentAccounts } from '../../../accounting/hooks';
+import { usePaymentAccounts } from '../../../accounting/hooks/index';
 import { useWarehouses } from '../../../inventory/hooks/useInventoryManagement';
 import { useCurrencies } from '../../../settings/hooks';
 import CustomerSelector from '../CreateInvoice/CustomerSelector';

@@ -68,38 +68,11 @@
 
 /* Rhythmic Pulsing for Active Tab */
 @keyframes rhythmicPulse {
-
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 0 var(--tab-glow-color),
-      0 4px 12px rgba(0, 0, 0, 0.1),
-      0 0 30px var(--tab-ambient-glow);
-    transform: scale(1);
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--tab-glow-color), 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-
-  25% {
-    box-shadow:
-      0 0 0 4px rgba(59, 130, 246, 0.1),
-      0 6px 16px rgba(0, 0, 0, 0.12),
-      0 0 40px var(--tab-ambient-glow);
-    transform: scale(1.01);
-  }
-
   50% {
-    box-shadow:
-      0 0 0 8px rgba(59, 130, 246, 0.05),
-      0 8px 24px rgba(0, 0, 0, 0.15),
-      0 0 50px var(--tab-glow-color);
-    transform: scale(1.02);
-  }
-
-  75% {
-    box-shadow:
-      0 0 0 4px rgba(59, 130, 246, 0.1),
-      0 6px 16px rgba(0, 0, 0, 0.12),
-      0 0 40px var(--tab-ambient-glow);
-    transform: scale(1.01);
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.05), 0 8px 24px rgba(0, 0, 0, 0.15);
   }
 }
 

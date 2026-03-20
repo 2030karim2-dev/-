@@ -65,9 +65,21 @@ export const SalesChartPlot: React.FC<SalesChartPlotProps> = ({
     const { theme, accentColor } = useThemeStore();
     const isDark = theme === 'dark';
     const [isMounted, setIsMounted] = React.useState(false);
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        setIsMounted(true);
+        let retryTimer: any;
+        const timer = setTimeout(() => {
+            if (containerRef.current && containerRef.current.offsetWidth > 0) {
+                setIsMounted(true);
+            } else {
+                retryTimer = setTimeout(() => setIsMounted(true), 500);
+            }
+        }, 300);
+        return () => {
+            clearTimeout(timer);
+            if (retryTimer) clearTimeout(retryTimer);
+        };
     }, []);
 
     const gradients = (
@@ -153,12 +165,15 @@ export const SalesChartPlot: React.FC<SalesChartPlotProps> = ({
     const ChartComponent = chartType === 'bar' ? BarChart : ComposedChart;
 
     return (
-        <div className="relative group w-full h-[300px]">
+        <div 
+          ref={containerRef}
+          className="relative group w-full h-[300px] overflow-hidden"
+        >
             {/* Subtle glowing background behind chart container */}
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-blue-500/5 dark:from-blue-500/10 to-transparent pointer-events-none rounded-b-3xl" />
 
             {isMounted && (
-                <ResponsiveContainer width="100%" height={300} minWidth={1} minHeight={300} debounce={1}>
+                <ResponsiveContainer width="100%" height={300} minWidth={1} minHeight={300} debounce={100}>
                     <ChartComponent {...commonProps}>
                         {gradients}
                         <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.3} />

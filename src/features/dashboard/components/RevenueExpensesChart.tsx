@@ -139,9 +139,21 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
     const { theme } = useThemeStore();
     const isDark = theme === 'dark';
     const [isMounted, setIsMounted] = React.useState(false);
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        setIsMounted(true);
+        let retryTimer: any;
+        const timer = setTimeout(() => {
+            if (containerRef.current && containerRef.current.offsetWidth > 0) {
+                setIsMounted(true);
+            } else {
+                retryTimer = setTimeout(() => setIsMounted(true), 500);
+            }
+        }, 300);
+        return () => {
+            clearTimeout(timer);
+            if (retryTimer) clearTimeout(retryTimer);
+        };
     }, []);
 
     const metrics = React.useMemo(() => {
@@ -176,9 +188,13 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
                 totalExpenses={metrics.totalExpenses}
             />
 
-            <div className="w-full relative group" style={{ height: '220px', minHeight: '192px' }}>
+            <div 
+              ref={containerRef}
+              className="w-full relative group overflow-hidden" 
+              style={{ height: '220px', minHeight: '220px' }}
+            >
                 {isMounted && (
-                    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={192} debounce={1}>
+                    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={220} debounce={100}>
                         <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="barRevenue" x1="0" y1="0" x2="0" y2="1">

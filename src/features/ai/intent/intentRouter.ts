@@ -22,6 +22,8 @@ const INTENT_ROUTES: Record<string, RouteMapping> = {
     create_product: { path: '/inventory', label: 'منتج جديد' },
     statement_of_account: { path: '/parties/customers', label: 'كشف حساب' },
     journal_entry: { path: '/accounting', label: 'قيد محاسبي' },
+    list_quotations: { path: '/sales', label: 'عروض المبيعات' },
+    check_supplier_quotes: { path: '/purchases', label: 'عروض المشتريات' },
 };
 
 /**
@@ -40,6 +42,7 @@ export function isInvoiceIntent(intent: AIIntent): boolean {
         'create_sales_invoice',
         'create_return_sale',
         'create_purchase_invoice',
-        'create_return_purchase'
+        'create_return_purchase',
+        'create_quotation'
     ].includes(intent);
 }

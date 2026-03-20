@@ -31,12 +31,10 @@ const TreasuryActions: React.FC<Props> = ({ onAction, onPrint }) => {
             <Button
                 onClick={() => onAction('transfer')}
                 variant="outline"
-                className="flex-1 border-gray-200 text-gray-400 cursor-not-allowed opacity-70"
+                className="flex-1 border-gray-200 text-gray-600 hover:bg-gray-50 bg-white"
                 leftIcon={<ArrowRightLeft size={16} />}
-                disabled
-                title="قريباً"
             >
-                تحويل داخلي (قريباً)
+                تحويل داخلي
             </Button>
             <Button
                 onClick={onPrint}

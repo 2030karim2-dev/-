@@ -39,15 +39,16 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
             }
 
             const classifications = await aiCategoryService.classifyBatch(
-                uncategorized as any, 
-                currentCategories as any
+                (uncategorized || []) as { id: string; name_ar: string }[], 
+                (currentCategories || []) as { id: string; name: string }[]
             );
             
             setResults(classifications);
             setAcceptedIds(new Set(classifications.map(r => r.product_id)));
             setStep('review');
-        } catch (error: any) {
-            showToast(error.message || 'فشل البدء في التصنيف الذكي', 'error');
+        } catch (error) {
+            const err = error as Error;
+            showToast(err.message || 'فشل البدء في التصنيف الذكي', 'error');
         } finally {
             setIsProcessing(false);
         }
@@ -71,8 +72,9 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
             setAcceptedIds(new Set());
             setHasProcessed(true);
             setStep('scan'); // Go back to scan step to allow next batch
-        } catch (error: any) {
-            showToast(error.message || 'فشل تطبيق التغييرات', 'error');
+        } catch (error) {
+            const err = error as Error;
+            showToast(err.message || 'فشل تطبيق التغييرات', 'error');
             setStep('review');
         } finally {
             setIsProcessing(false);
@@ -86,7 +88,11 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
         setAcceptedIds(next);
     };
 
-    const updateResult = (id: string, field: keyof ClassificationResult, value: any) => {
+    const updateResult = <K extends keyof ClassificationResult>(
+        id: string, 
+        field: K, 
+        value: ClassificationResult[K]
+    ) => {
         setResults(prev => prev.map(r => 
             r.product_id === id ? { ...r, [field]: value } : r
         ));
@@ -170,10 +176,9 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
                                     </thead>
                                     <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                                         {results.map((res) => (
-                                            <tr key={res.product_id} className={cn(
-                                                "transition-colors",
-                                                acceptedIds.has(res.product_id) ? "bg-white dark:bg-slate-900" : "bg-gray-50/50 dark:bg-slate-900/20 opacity-60"
-                                            )}>
+                                            <tr key={res.product_id} className={
+                                                `transition-colors ${acceptedIds.has(res.product_id) ? "bg-white dark:bg-slate-900" : "bg-gray-50/50 dark:bg-slate-900/20 opacity-60"}`
+                                            }>
                                                 <td className="p-3 text-center">
                                                     <input 
                                                         type="checkbox" 
@@ -252,6 +257,6 @@ export default AICategoryReviewModal;
 /**
  * Utility function for dynamic class names
  */
-function cn(...classes: any[]) {
+function cn(...classes: (string | boolean | undefined | null)[]) {
     return classes.filter(Boolean).join(' ');
 }

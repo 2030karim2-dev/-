@@ -44,7 +44,8 @@ const CategoriesChart: React.FC<CategoriesChartProps> = ({ data }) => {
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setIsMounted(true);
+    const timer = setTimeout(() => setIsMounted(true), 300);
+    return () => clearTimeout(timer);
   }, []);
 
   const onPieEnter = (_: any, _index: number) => {
@@ -52,10 +53,10 @@ const CategoriesChart: React.FC<CategoriesChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="h-[300px] min-h-[300px] w-full relative group">
+    <div className="h-[300px] min-h-[300px] w-full relative group overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent dark:from-slate-800/20 rounded-3xl pointer-events-none" />
       {isMounted && (
-        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={300}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={300} debounce={100}>
           <PieChart>
             <defs>
               {COLORS.map((color, index) => (

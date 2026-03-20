@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { ShoppingCart, Plus, RefreshCw, Wallet, History, BarChart3, Sparkles, ShieldCheck, Wrench } from 'lucide-react';
+import { ShoppingCart, Plus, RefreshCw, Wallet, History, BarChart3, Sparkles, ShieldCheck, Wrench, FileText } from 'lucide-react';
 import PurchaseStats from '../components/PurchaseStats';
 import PurchasesTable from '../components/PurchasesTable';
 import CreatePurchaseModal from '../components/CreatePurchaseModal';
@@ -18,10 +18,11 @@ import { purchaseFixesService } from '../services/maintenance/purchaseFixes';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
 import PurchaseReturnsView from '../components/Returns/PurchaseReturnsView';
+import PurchaseQuotationsTab from '../components/quotations/PurchaseQuotationsTab';
 import { useAIPrefillStore } from '../../ai/store';
 
 const PurchasesPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'create' | 'list' | 'returns' | 'analytics' | 'smart_import'>('list');
+  const [activeTab, setActiveTab] = useState<'create' | 'list' | 'returns' | 'analytics' | 'smart_import' | 'quotations'>('list');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isAuditOpen, setIsAuditOpen] = useState(false);
   const [viewInvoiceId, setViewInvoiceId] = useState<string | null>(null);
@@ -40,6 +41,7 @@ const PurchasesPage: React.FC = () => {
     { id: 'create', label: t('new_invoice'), icon: Plus },
     { id: 'smart_import', label: 'استيراد ذكي (AI)', icon: Sparkles },
     { id: 'returns', label: t('supplier_returns'), icon: RefreshCw },
+    { id: 'quotations', label: 'عروض الأسعار', icon: FileText },
     { id: 'analytics', label: t('financial_analytics'), icon: BarChart3 }
   ];
 
@@ -182,6 +184,8 @@ const PurchasesPage: React.FC = () => {
         return <PurchasesTable data={filteredData} isLoading={isLoading} onView={setViewInvoiceId} />;
       case 'returns':
         return <PurchaseReturnsView searchTerm={searchTerm} onViewDetails={setViewInvoiceId} />;
+      case 'quotations':
+        return <PurchaseQuotationsTab onConvertToPurchase={() => setActiveTab('create')} />;
       case 'analytics':
         return <PurchasesAnalytics />;
       default:

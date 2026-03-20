@@ -28,9 +28,11 @@ interface RawProduct {
     image_url?: string | null;
     alternative_numbers?: string | null;
     barcode?: string | null;
-    created_at: string;
+    updated_at: string;
+    created_at?: string;
     stock?: RawStock[];
     status?: string;
+    location?: string;
 }
 
 export const productService = {
@@ -75,6 +77,19 @@ export const productService = {
                 image_url: prod.image_url || null,
                 alternative_numbers: prod.alternative_numbers || null,
                 barcode: prod.barcode || null,
+                location: (() => {
+                    const warehouseNames = stockList
+                        .map((s: RawStock) => s.warehouses?.name_ar)
+                        .filter(Boolean) as string[];
+                    
+                    const uniqueWarehouses = [...new Set(warehouseNames)].join(', ');
+                    const shelfLocation = prod.location || '';
+                    
+                    if (uniqueWarehouses && shelfLocation) {
+                        return `${uniqueWarehouses} (${shelfLocation})`;
+                    }
+                    return uniqueWarehouses || shelfLocation || '—';
+                })(),
                 created_at: prod.created_at || new Date().toISOString(),
                 isLowStock: totalStock <= (Number(prod.min_stock_level) || 5),
 
@@ -82,7 +97,7 @@ export const productService = {
                     warehouse_id: s.warehouse_id,
                     warehouse_name: s.warehouses?.name_ar || 'مستودع',
                     quantity: Number(s.quantity) || 0,
-                    location: ''
+                    location: prod.location || ''
                 })),
 
                 alternatives: prod.alternative_numbers ? prod.alternative_numbers.split(',').map(n => n.trim()) : [],
@@ -149,8 +164,9 @@ export const productService = {
             image_url: data.image_url || null,
             alternative_numbers: data.alternative_numbers || null,
             barcode: data.barcode || null,
-            category_id: (data.category && data.category.length === 36) ? data.category : null
-        };
+            category_id: (data.category && data.category.length === 36) ? data.category : null,
+            location: data.location || null
+        } as any;
 
         const { data: product, error } = await inventoryApi.createProduct(payload);
         if (error) throw error;
@@ -199,10 +215,11 @@ export const productService = {
             if (data.image_url !== undefined) payload.image_url = data.image_url || null;
             if (data.alternative_numbers !== undefined) payload.alternative_numbers = data.alternative_numbers || null;
             if (data.barcode !== undefined) payload.barcode = data.barcode || null;
+            if (data.location !== undefined) payload.location = data.location || null;
             if (data.category) payload.category_id = data.category.length === 36 ? data.category : null;
 
             logger.debug('ProductService', `Sending update payload to API`, payload);
-            const { data: product, error } = await inventoryApi.updateProduct(id, payload);
+            const { data: product, error } = await inventoryApi.updateProduct(id, payload as any);
 
             if (error) {
                 logger.error('ProductService', `API update failed`, error);

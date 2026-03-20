@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSalesStore } from '../../store';
-import { useCreateInvoice, useNextInvoiceNumber } from '../../hooks';
+import { useCreateInvoice, useNextInvoiceNumber } from '../../hooks/index';
 import { useCompany, useCurrencies } from '../../../settings/hooks';
 import { useSettingsStore } from '../../../settings/settingsStore';
 import { partiesService } from '../../../../features/parties/service';

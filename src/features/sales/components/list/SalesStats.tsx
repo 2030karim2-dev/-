@@ -1,6 +1,6 @@
 import { DollarSign, FileText, BarChart, TrendingUp } from 'lucide-react';
 import StatCard from '../../../../ui/common/StatCard';
-import { useSalesStats } from '../../hooks';
+import { useSalesStats } from '../../hooks/index';
 import { formatCurrency, formatNumberDisplay } from '../../../../core/utils';
 import ErrorDisplay from '../../../../ui/base/ErrorDisplay';
 import Spinner from '../../../../ui/base/Spinner';

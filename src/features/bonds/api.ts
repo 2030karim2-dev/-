@@ -5,7 +5,7 @@ import { BondFormData, BondType } from './types';
 export const bondsApi = {
   getBonds: async (companyId: string, type?: BondType) => {
     // Map BondType → payments.type
-    const paymentType = type === 'receipt' ? 'receipt' : 'disbursement';
+    const paymentType = type === 'receipt' ? 'receipt' : (type === 'transfer' ? 'transfer' : 'disbursement');
 
     return await supabase.from('payments')
       .select(`
@@ -34,8 +34,8 @@ export const bondsApi = {
       throw new Error("يجب اختيار الحسابات المطلوبة");
     }
 
-    // Map BondType (receipt/payment) to payments.type (receipt/disbursement)
-    const paymentType = data.type === 'receipt' ? 'receipt' : 'disbursement';
+    // Map BondType (receipt/payment/transfer) to payments.type (receipt/disbursement/transfer)
+    const paymentType = data.type === 'receipt' ? 'receipt' : (data.type === 'transfer' ? 'transfer' : 'disbursement');
 
     const { data: result, error } = await supabase.rpc('commit_payment', {
       p_company_id: companyId,

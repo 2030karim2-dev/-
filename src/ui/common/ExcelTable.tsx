@@ -1,13 +1,15 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, CornerDownLeft, Trash2, Copy, Clipboard, Search, FileSpreadsheet, Keyboard, Minimize2, Maximize2, Minus, Plus, RotateCcw, GripVertical } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import { cn } from '../../core/utils';
-import { useTableKeyboardNavigation, TABLE_SHORTCUTS } from './useTableKeyboardNavigation';
+import { useTableKeyboardNavigation } from './useTableKeyboardNavigation';
 import { useTableDragDrop } from './hooks/useTableDragDrop';
 import { useTableSelection } from './hooks/useTableSelection';
 import { ExcelTableHeader } from './ExcelTableHeader';
 import { ExcelTableBody } from './ExcelTableBody';
 import { ExcelTablePagination } from './ExcelTablePagination';
 import FullscreenContainer from '../base/FullscreenContainer';
+import ExcelTableToolbar from './ExcelTableToolbar';
+import ExcelTableStatusBar from './ExcelTableStatusBar';
 
 export interface Column<T> {
   header: string;
@@ -382,32 +384,7 @@ function ExcelTable<T>({
     }
   };
 
-  // Status bar text
-  const getStatusText = () => {
-    if (!focusedCell) return '';
-    const { row, col } = focusedCell;
-    const totalRows = orderedData.length;
-    const totalCols = columns.length;
-    return `خلية [${row + 1}, ${col + 1}] من [${totalRows} × ${totalCols}]`;
-  };
 
-  // Get shortcuts for display
-  const getShortcutIcon = (key: string) => {
-    switch (key) {
-      case 'ArrowUp': return <ArrowUp size={10} />;
-      case 'ArrowDown': return <ArrowDown size={10} />;
-      case 'ArrowLeft': return <ArrowLeft size={10} />;
-      case 'ArrowRight': return <ArrowRight size={10} />;
-      case 'Home': return <CornerDownLeft size={10} className="rotate-90" />;
-      case 'End': return <CornerDownLeft size={10} className="-rotate-90" />;
-      case 'Delete': return <Trash2 size={10} />;
-      case 'c':
-      case 'Copy': return <Copy size={10} />;
-      case 'v':
-      case 'Paste': return <Clipboard size={10} />;
-      default: return null;
-    }
-  };
 
   return (
     <FullscreenContainer isMaximized={isZoomed} onToggleMaximize={() => setIsZoomed(false)}>
@@ -415,92 +392,23 @@ function ExcelTable<T>({
         "w-full flex flex-col transition-all duration-300 relative", 
         isZoomed ? "h-full bg-white dark:bg-slate-950 p-4" : "h-full"
       )}>
-      {/* Table Header Controls - Minimized */}
-      <div className="flex flex-col sm:flex-row justify-between items-center px-1 py-0.5 border-b border-[var(--app-border)] bg-gray-50/50 dark:bg-slate-900/50">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          {title && (
-            <div className="flex items-center gap-2">
-              <span className={cn("w-1 h-3 rounded-full", currentTheme.accent)}></span>
-              <h3 className="text-[10px] font-bold text-[var(--app-text-secondary)] uppercase tracking-tight">{title}</h3>
-            </div>
-          )}
-          <div className="flex items-center gap-1 bg-[var(--app-bg)] p-1 rounded-lg">
-            {enableResize && (
-              <>
-                <button
-                  onClick={handleResetSize}
-                  className="p-1.5 text-[var(--app-text-secondary)] hover:text-blue-500 transition-colors rounded hover:bg-[var(--app-surface)] shadow-sm"
-                  title="إعادة الحجم الأصلي"
-                >
-                  <RotateCcw size={14} />
-                </button>
-                <div className="w-px h-4 bg-[var(--app-border)] mx-0.5" />
-              </>
-            )}
-            <button onClick={() => setIsZoomed(!isZoomed)} className="p-1.5 text-[var(--app-text-secondary)] hover:text-blue-500 transition-colors rounded hover:bg-[var(--app-surface)] shadow-sm">
-              {isZoomed ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-            </button>
-            <button onClick={() => setZoomLevel(z => Math.max(0.7, z - 0.1))} className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 rounded hover:bg-[var(--app-surface)] shadow-sm"><Minus size={12} /></button>
-            <span className="text-[10px] w-8 text-center font-mono font-medium text-[var(--app-text-secondary)]">{Math.round(zoomLevel * 100)}%</span>
-            <button onClick={() => setZoomLevel(z => Math.min(1.5, z + 0.1))} className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 rounded hover:bg-[var(--app-surface)] shadow-sm"><Plus size={12} /></button>
-          </div>
-          {/* Keyboard shortcuts toggle */}
-          <button
-            onClick={() => setShowShortcuts(!showShortcuts)}
-            className={cn(
-              "p-1.5 rounded-lg transition-colors",
-              showShortcuts ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" : "text-[var(--app-text-secondary)] hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-            )}
-            title="اختصارات لوحة المفاتيح"
-          >
-            <Keyboard size={14} />
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto flex-1 justify-end">
-          {showSearch && (
-            <div className="relative flex-1 sm:max-w-xs group">
-              <Search className={cn("absolute top-1/2 -translate-y-1/2 text-[var(--app-text-secondary)] group-hover:text-blue-500 transition-colors", isRTL ? "left-3 right-auto" : "right-3")} size={14} />
-              <input
-                type="text"
-                placeholder="بحث سريع في النتائج..."
-                value={internalSearch}
-                onChange={(e) => setInternalSearch(e.target.value)}
-                className={cn(
-                  "w-full py-2 bg-[var(--app-surface)] border-2 border-[var(--app-border)] rounded-lg text-[11px] font-medium text-[var(--app-text)] outline-none focus:border-blue-500/50 transition-all shadow-sm focus:shadow-md",
-                  isRTL ? "pl-3 pr-9" : "pr-9 pl-3"
-                )}
-              />
-            </div>
-          )}
-          {onExport && (
-            <button onClick={onExport} className="p-2 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 border border-emerald-100 dark:border-emerald-900/30 hover:bg-emerald-600 hover:text-white transition-all rounded-lg shadow-sm">
-              <FileSpreadsheet size={16} />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Keyboard Shortcuts Panel */}
-      {showShortcuts && (
-        <div className="bg-[var(--app-surface)] border border-[var(--app-border)] rounded-xl p-3 shadow-lg animate-in fade-in slide-in-from-top-2">
-          <div className="flex items-center gap-2 mb-2">
-            <Keyboard size={14} className="text-blue-600" />
-            <span className="text-[10px] font-bold text-[var(--app-text-secondary)]">اختصارات لوحة المفاتيح</span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {TABLE_SHORTCUTS.map((shortcut, idx) => (
-              <div key={idx} className="flex items-center gap-1.5 text-[9px]">
-                <kbd className="px-1.5 py-0.5 bg-[var(--app-bg)] border border-[var(--app-border)] rounded text-[9px] font-mono font-medium text-[var(--app-text)] flex items-center gap-0.5 min-w-[45px] justify-center">
-                  {shortcut.modifier && <span className="text-[7px]">{shortcut.modifier === 'ctrl' ? 'Ctrl' : shortcut.modifier === 'shift' ? '⇧' : 'Alt'}</span>}
-                  {getShortcutIcon(shortcut.key) || shortcut.key}
-                </kbd>
-                <span className="text-[var(--app-text-secondary)]">{isRTL ? shortcut.descriptionAr : shortcut.description}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <ExcelTableToolbar
+        title={title}
+        currentTheme={currentTheme}
+        showSearch={showSearch}
+        internalSearch={internalSearch}
+        setInternalSearch={setInternalSearch}
+        isRTL={isRTL}
+        onExport={onExport}
+        enableResize={enableResize}
+        handleResetSize={handleResetSize}
+        isZoomed={isZoomed}
+        setIsZoomed={setIsZoomed}
+        zoomLevel={zoomLevel}
+        setZoomLevel={setZoomLevel}
+        showShortcuts={showShortcuts}
+        setShowShortcuts={setShowShortcuts}
+      />
 
       {/* Table Wrapper with Resize Handles */}
       <div
@@ -626,35 +534,14 @@ function ExcelTable<T>({
           </table>
         </div>
 
-        {/* Status Bar */}
-        <div className="p-1 px-2 border-t border-[var(--app-border)] bg-[var(--app-bg)] flex flex-col sm:flex-row justify-between items-center gap-1.5 select-none">
-          <div className="flex items-center gap-2 text-[10px] text-[var(--app-text-secondary)]">
-            <span className="font-mono">{getStatusText()}</span>
-            {selection && (
-              <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-[9px] font-bold">
-                تحديد: {Math.abs(selection.end.row - selection.start.row) + 1} × {Math.abs(selection.end.col - selection.start.col) + 1}
-              </span>
-            )}
-          </div>
-
-          {/* Quick actions */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={copySelection}
-              className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 hover:bg-[var(--app-surface-hover)] rounded transition-colors"
-              title="نسخ (Ctrl+C)"
-            >
-              <Copy size={12} />
-            </button>
-            <button
-              onClick={pasteCells}
-              className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 hover:bg-[var(--app-surface-hover)] rounded transition-colors"
-              title="لصق (Ctrl+V)"
-            >
-              <Clipboard size={12} />
-            </button>
-          </div>
-        </div>
+        <ExcelTableStatusBar
+          focusedCell={focusedCell}
+          selection={selection}
+          totalRows={orderedData.length}
+          totalCols={columns.length}
+          copySelection={copySelection}
+          pasteCells={pasteCells}
+        />
 
         {/* Pagination Footer */}
         <ExcelTablePagination

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useInventoryCategories } from '../../hooks/index';
 import { Product } from '../../types';
-import { Layers } from 'lucide-react';
+import { Layers, Loader2 } from 'lucide-react';
 import ProductExcelGrid from '../ProductExcelGrid';
 
 interface Props {

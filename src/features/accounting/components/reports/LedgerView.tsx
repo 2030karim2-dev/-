@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAccounts, useLedger } from '../../hooks/index';
 import { LedgerEntry } from '../../types/index';
@@ -7,6 +6,7 @@ import { formatCurrency, formatNumberDisplay } from '../../../../core/utils';
 import { Loader2, FileText } from 'lucide-react';
 import EmptyState from '../../../../ui/base/EmptyState';
 import ShareButton from '../../../../ui/common/ShareButton';
+import SearchableAccountSelector from '../../../../ui/common/SearchableAccountSelector';
 
 interface Props {
   dateRange: { from: string; to: string };
@@ -87,18 +87,14 @@ const LedgerView: React.FC<Props> = ({ dateRange, accountId, showAccountSelector
     <div className="space-y-4 print-area h-full flex flex-col">
       {/* Show dropdown only if explicitly requested and no account is forced */}
       {showAccountSelector && !accountId && (
-        <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center gap-3 no-print shadow-sm">
-          <div className="p-2 bg-blue-100 text-blue-600 rounded-lg"><FileText size={18} /></div>
-          <select
-            value={internalAccountId}
-            onChange={(e) => setInternalAccountId(e.target.value)}
-            className="flex-1 bg-transparent text-sm font-bold outline-none dark:text-white"
-          >
-            <option value="">-- اختر حساباً لعرض كشف الحساب --</option>
-            {accounts?.map(acc => (
-              <option key={acc.id} value={acc.id}>{acc.code} - {acc.name}</option>
-            ))}
-          </select>
+        <div className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-md p-2 rounded-2xl border border-gray-100 dark:border-slate-800 flex items-center gap-3 no-print shadow-sm">
+          <SearchableAccountSelector
+            accounts={accounts || []}
+            selectedId={internalAccountId}
+            onSelect={setInternalAccountId}
+            placeholder="-- اختر حساباً لعرض كشف الحساب --"
+            className="flex-1"
+          />
           {effectiveAccountId && ledger && ledger.length > 0 && (
             <ShareButton
               size="sm"

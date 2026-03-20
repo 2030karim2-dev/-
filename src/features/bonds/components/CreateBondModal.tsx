@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { DollarSign, Calendar, FileText, ArrowDown, ArrowUpCircle, Search, Landmark, Save, Tag, Building, Wallet } from 'lucide-react';
+import { DollarSign, Calendar, FileText, ArrowDown, ArrowUpCircle, ArrowRightLeft, Search, Landmark, Save, Tag, Building, Wallet } from 'lucide-react';
 import { BondFormData, BondType } from '../types';
 // Fix: Corrected import path to point to the barrel file.
 import { useAccounts } from '../../accounting/hooks/index';
@@ -13,6 +13,7 @@ import Button from '../../../ui/base/Button';
 import Input from '../../../ui/base/Input';
 import { cn, formatCurrency } from '../../../core/utils';
 import { convertToBaseCurrency } from '../../../core/utils/currencyUtils';
+import AIAssistantButton from '../../../ui/common/AIAssistantButton';
 
 interface CreateBondModalProps {
   isOpen: boolean;
@@ -48,7 +49,7 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
   }, [allParties]);
 
   const { register, handleSubmit, reset, watch, setValue } = useForm<BondFormData>({
-    defaultValues: { type, date: new Date().toISOString().split('T')[0], currency_code: 'SAR', exchange_rate: 1, counterparty_type: 'party', payment_method: 'cash' }
+    defaultValues: { type, date: new Date().toISOString().split('T')[0], currency_code: 'SAR', exchange_rate: 1, counterparty_type: type === 'transfer' ? 'account' : 'party', payment_method: 'cash' }
   });
 
   const selectedCurrency = watch('currency_code');
@@ -58,7 +59,7 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
 
   useEffect(() => {
     if (isOpen) {
-      reset({ type, date: new Date().toISOString().split('T')[0], currency_code: 'SAR', exchange_rate: 1, counterparty_type: 'party', payment_method: 'cash' });
+      reset({ type, date: new Date().toISOString().split('T')[0], currency_code: 'SAR', exchange_rate: 1, counterparty_type: type === 'transfer' ? 'account' : 'party', payment_method: 'cash' });
       setPartyQuery('');
     }
   }, [isOpen, type, reset]);
@@ -105,7 +106,9 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
 
   const theme = type === 'receipt'
     ? { color: 'emerald', icon: ArrowDown, title: 'سند قبض جديد', description: 'تسجيل عملية قبض نقدية أو بنكية' }
-    : { color: 'rose', icon: ArrowUpCircle, title: 'سند صرف جديد', description: 'تسجيل عملية صرف نقدية أو بنكية' };
+    : type === 'transfer'
+      ? { color: 'blue', icon: ArrowRightLeft, title: 'تحويل داخلي جديد', description: 'تحويل مبالغ بين الخزائن والحسابات البنكية' }
+      : { color: 'rose', icon: ArrowUpCircle, title: 'سند صرف جديد', description: 'تسجيل عملية صرف نقدية أو بنكية' };
 
   const footer = (
     <div className="flex w-full gap-3 p-1">
@@ -113,7 +116,7 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
       <Button
         onClick={handleSubmit(onSubmit)}
         isLoading={isSubmitting}
-        variant={type === 'receipt' ? 'success' : 'danger'}
+        variant={type === 'receipt' ? 'success' : (type === 'transfer' ? 'primary' : 'danger')}
         className="flex-[2] py-6 text-xs font-bold shadow-xl shadow-blue-500/10 uppercase group"
         leftIcon={<Save size={18} className="group-hover:scale-110 transition-transform" />}
       >
@@ -133,13 +136,61 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
       size="full"
     >
       <form className="space-y-6 max-w-5xl mx-auto">
+        <div className="p-3 mb-2 rounded-2xl border dark:border-slate-800 bg-indigo-50/50 dark:bg-indigo-900/10 flex justify-between items-center bg-[url('/bg-pattern.svg')] bg-cover">
+          <div className="flex flex-col">
+            <span className="text-[11px] font-black text-indigo-800 dark:text-indigo-300">مساعد الإدخال الذكي</span>
+            <span className="text-[9px] text-indigo-600/70 dark:text-indigo-400/70 font-bold">اشرح تفاصيل السند وسيقوم المساعد بتعبئته.</span>
+          </div>
+          <AIAssistantButton
+            promptDescription={`أنت تقوم بإنشاء سند من نوع: ${theme.title}. استنتج المبلغ المطلوب، العملة، الحساب المقابل/الجهة، حساب الدفع/القبض، والبيان من طلب المستخدم بالرجوع لقوائم الحسابات والجهات.`}
+            schemaDescription={`{
+  "amount": "المبلغ كرقم",
+  "currency_code": "رمز العملة (اختياري، الافتراضي SAR)",
+  "counterparty_type": "party إذا كان خصماً لحساب عميل أو مورد، أو account إذا كان حساباً عاماً",
+  "counterparty_id": "معرف (ID) الحساب المقابل أو الجهة المطابقة. استخدم قوائم parties أو otherAccounts أو cashAccounts",
+  "cash_account_id": "معرف (ID) حساب الصندوق أو البنك للعملية. استخدم قائمة cashAccounts",
+  "description": "بيان السند",
+  "date": "تاريخ السند بصيغة YYYY-MM-DD (اختياري)"
+}`}
+            contextData={{
+               parties: parties.map((p: any) => ({ id: p.id, name: p.name, type: p.type })),
+               cashAccounts: cashAccounts.map(a => ({ id: a.id, name: a.name })),
+               otherAccounts: otherAccounts.map(a => ({ id: a.id, name: a.name }))
+            }}
+            onDataExtracted={(data) => {
+               if (data.amount) setValue(selectedCurrency === 'SAR' ? 'amount' : 'foreign_amount', data.amount, { shouldValidate: true });
+               if (data.currency_code) setValue('currency_code', data.currency_code, { shouldValidate: true });
+               if (data.counterparty_type) setValue('counterparty_type', data.counterparty_type, { shouldValidate: true });
+               
+               if (data.counterparty_id) {
+                   setValue('counterparty_id', data.counterparty_id, { shouldValidate: true });
+                   // Update search query display if party
+                   if (data.counterparty_type === 'party') {
+                       const foundParty = parties.find((p: any) => p.id === data.counterparty_id);
+                       if (foundParty) setPartyQuery(foundParty.name);
+                   }
+               }
+               
+               if (data.cash_account_id) setValue('cash_account_id', data.cash_account_id, { shouldValidate: true });
+               if (data.description) setValue('description', data.description, { shouldValidate: true });
+               if (data.date) setValue('date', data.date, { shouldValidate: true });
+            }}
+          />
+        </div>
+
         {/* Step 1: Head - Amount & Currency */}
         <div className={cn(
           "p-8 rounded-3xl border-2 transition-all shadow-md flex flex-col md:flex-row items-center gap-8",
-          type === 'receipt' ? "bg-emerald-50/40 border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-800/20" : "bg-rose-50/40 border-rose-100 dark:bg-rose-900/10 dark:border-rose-800/20"
+          type === 'receipt' ? "bg-emerald-50/40 border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-800/20" : 
+          type === 'transfer' ? "bg-blue-50/40 border-blue-100 dark:bg-blue-900/10 dark:border-blue-800/20" :
+          "bg-rose-50/40 border-rose-100 dark:bg-rose-900/10 dark:border-rose-800/20"
         )}>
           <div className="flex-1 w-full relative">
-            <label className={cn("inline-block text-xs font-black uppercase tracking-widest px-3 py-1 rounded-t-xl mb-0.5", type === 'receipt' ? "bg-emerald-600 text-white" : "bg-rose-600 text-white")}>
+            <label className={cn("inline-block text-xs font-black uppercase tracking-widest px-3 py-1 rounded-t-xl mb-0.5", 
+              type === 'receipt' ? "bg-emerald-600 text-white" : 
+              type === 'transfer' ? "bg-blue-600 text-white" :
+              "bg-rose-600 text-white"
+            )}>
               المبلغ {selectedCurrency}
             </label>
             <div className="relative group">
@@ -153,11 +204,17 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
                 })}
                 className={cn(
                   "w-full px-8 py-6 bg-white dark:bg-slate-950 border-2 rounded-2xl text-5xl font-black outline-none transition-all font-mono",
-                  type === 'receipt' ? "border-emerald-200 focus:border-emerald-500 text-emerald-600 dark:border-emerald-800/50" : "border-rose-200 focus:border-rose-500 text-rose-600 dark:border-rose-800/50"
+                  type === 'receipt' ? "border-emerald-200 focus:border-emerald-500 text-emerald-600 dark:border-emerald-800/50" : 
+                  type === 'transfer' ? "border-blue-200 focus:border-blue-500 text-blue-600 dark:border-blue-800/50" :
+                  "border-rose-200 focus:border-rose-500 text-rose-600 dark:border-rose-800/50"
                 )}
                 placeholder="0.00"
               />
-              <DollarSign className={cn("absolute left-6 top-1/2 -translate-y-1/2 opacity-20", type === 'receipt' ? "text-emerald-600" : "text-rose-600")} size={48} />
+              <DollarSign className={cn("absolute left-6 top-1/2 -translate-y-1/2 opacity-20", 
+                type === 'receipt' ? "text-emerald-600" : 
+                type === 'transfer' ? "text-blue-600" :
+                "text-rose-600"
+              )} size={48} />
             </div>
           </div>
 
@@ -209,7 +266,7 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
               </div>
 
               <div className="space-y-3">
-                <div className="flex h-11 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-2xl border dark:border-slate-800">
+                <div className={cn("flex h-11 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-2xl border dark:border-slate-800", type === 'transfer' && "opacity-50 pointer-events-none")}>
                   <button type="button" onClick={() => setValue('counterparty_type', 'party')} className={cn("flex-1 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 transition-all", counterpartyType === 'party' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-md" : "text-gray-400 hover:text-gray-500")}><Building size={14} /> جهة (عميل/مورد)</button>
                   <button type="button" onClick={() => setValue('counterparty_type', 'account')} className={cn("flex-1 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 transition-all", counterpartyType === 'account' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-md" : "text-gray-400 hover:text-gray-500")}><Landmark size={14} /> حساب عام</button>
                 </div>
@@ -242,19 +299,23 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
                     )}
                   </div>
                 ) : (
-                  <AccountSelector icon={Landmark} {...register('counterparty_id', { required: true })}>
-                    <option value="">-- اختر الحساب العمومي --</option>
-                    {otherAccounts.map(acc => <option key={acc.id} value={acc.id}>{acc.code} - {acc.name}</option>)}
+                  <AccountSelector 
+                    label={type === 'transfer' ? "الحساب المحول إليه" : "الحساب المقابل"} 
+                    icon={Landmark} 
+                    {...register('counterparty_id', { required: true })}
+                  >
+                    <option value="">-- اختر الحساب {type === 'transfer' ? 'الهدف' : ''} --</option>
+                    {type === 'transfer' ? cashAccounts.map(acc => <option key={acc.id} value={acc.id}>{acc.code} - {acc.name}</option>) : otherAccounts.map(acc => <option key={acc.id} value={acc.id}>{acc.code} - {acc.name}</option>)}
                   </AccountSelector>
                 )}
               </div>
 
               <AccountSelector
-                label="الصندوق أو البنك"
+                label={type === 'transfer' ? "الحساب المحول منه" : "الصندوق أو البنك"}
                 icon={Wallet}
                 {...register('cash_account_id', { required: true })}
               >
-                <option value="">-- اختر الصندوق المسئول --</option>
+                <option value="">-- اختر الحساب {type === 'transfer' ? 'المصدر' : ''} --</option>
                 {cashAccounts.map(acc => <option key={acc.id} value={acc.id}>{acc.code} - {acc.name}</option>)}
               </AccountSelector>
             </div>

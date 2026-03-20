@@ -1,2 +1,2 @@
 export { default as DashboardPage } from './DashboardPage';
-export * from './hooks';
+export * from './hooks/index';

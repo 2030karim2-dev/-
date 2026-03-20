@@ -1,14 +1,12 @@
 
-import React, { useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { X, Plus, Trash2, Save, Loader2, Calculator, AlertCircle } from 'lucide-react';
-import { z } from 'zod';
+import React from 'react';
+import { X, Save, Loader2, Calculator } from 'lucide-react';
 import { JournalEntryFormData } from '../../types/index';
-// Fix: Corrected import path to point to the barrel file.
-import { useAccounts } from '../../hooks/index';
-import { useCurrencies } from '../../../settings/hooks';
-import { formatCurrency, convertToBaseCurrency, cn } from '../../../../core/utils';
-import { useFeedbackStore } from '../../../../features/feedback/store';
+import { cn } from '../../../../core/utils';
+import { useJournalEntryForm } from '../../hooks/useJournalEntryForm';
+import JournalEntryTable from './JournalEntryTable';
+import JournalEntryTotals from './JournalEntryTotals';
+import AIAssistantButton from '../../../../ui/common/AIAssistantButton';
 
 interface AddJournalEntryModalProps {
     isOpen: boolean;
@@ -17,96 +15,27 @@ interface AddJournalEntryModalProps {
     isSubmitting: boolean;
 }
 
-const journalLineSchema = z.object({
-    account_id: z.string().min(1, 'يجب اختيار الحساب'),
-    description: z.string().optional(),
-    debit_amount: z.number().min(0),
-    credit_amount: z.number().min(0),
-}).refine(data => (data.debit_amount > 0 && data.credit_amount === 0) || (data.credit_amount > 0 && data.debit_amount === 0), {
-    message: 'يجب إدخال إما مبلغ مدين أو دائن فقط لكل سطر',
-    path: ['debit_amount']
-});
-
-const journalEntrySchema = z.object({
-    date: z.string().min(1, 'التاريخ مطلوب'),
-    description: z.string().min(3, 'الوصف العام مطلوب (على الأقل 3 أحرف)'),
-    currency_code: z.string(),
-    exchange_rate: z.number().gt(0),
-    lines: z.array(journalLineSchema).min(2, 'يجب أن يحتوي القيد على سطرين على الأقل')
-}).refine(data => {
-    const totalDebit = data.lines.reduce((sum, line) => sum + line.debit_amount, 0);
-    const totalCredit = data.lines.reduce((sum, line) => sum + line.credit_amount, 0);
-    return Math.abs(totalDebit - totalCredit) < 0.01;
-}, {
-    message: 'القيد غير متوازن (إجمالي المدين لا يساوي إجمالي الدائن)',
-    path: ['lines']
-});
-
 const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onClose, onSubmit, isSubmitting }) => {
-    const { data: accounts, isLoading: isLoadingAccounts } = useAccounts();
-    const { currencies, rates } = useCurrencies();
-    const { showToast } = useFeedbackStore(); // Need to import this or just use local state
-
-    const { control, register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm<JournalEntryFormData>({
-        defaultValues: {
-            date: new Date().toISOString().split('T')[0],
-            description: '',
-            currency_code: 'SAR',
-            exchange_rate: 1,
-            lines: [
-                { account_id: '', description: '', debit_amount: 0, credit_amount: 0 },
-                { account_id: '', description: '', debit_amount: 0, credit_amount: 0 }
-            ]
-        }
-    });
-
-    const selectedCurrency = watch('currency_code');
-    const exchangeRate = watch('exchange_rate') || 1;
-
-    const currencyObj = currencies.data?.find((c: any) => c.code === selectedCurrency);
-    const isDivide = currencyObj?.exchange_operator === 'divide';
-
-    useEffect(() => {
-        if (selectedCurrency === 'SAR') {
-            setValue('exchange_rate', 1);
-        } else {
-            const rate = rates.data?.find((r: any) => r.currency_code === selectedCurrency);
-            if (rate) setValue('exchange_rate', rate.rate_to_base);
-        }
-    }, [selectedCurrency, rates.data, setValue]);
-
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: "lines"
-    });
-
-    const lines = watch("lines");
-
-    const totals = lines.reduce((acc, line) => ({
-        debit_amount: acc.debit_amount + (Number(line.debit_amount) || 0),
-        credit_amount: acc.credit_amount + (Number(line.credit_amount) || 0)
-    }), { debit_amount: 0, credit_amount: 0 });
-
-    const difference = totals.debit_amount - totals.credit_amount;
-    const isBalanced = Math.abs(difference) < 0.01 && totals.debit_amount > 0;
-
-    useEffect(() => {
-        if (isOpen) {
-            reset();
-        }
-    }, [isOpen, reset]);
+    const {
+        register,
+        handleSubmit,
+        errors,
+        setValue,
+        fields,
+        append,
+        remove,
+        accounts,
+        isLoadingAccounts,
+        currencies,
+        selectedCurrency,
+        exchangeRate,
+        isDivide,
+        totals,
+        difference,
+        isBalanced
+    } = useJournalEntryForm(onSubmit, isOpen);
 
     if (!isOpen) return null;
-
-    const handleFormSubmit = (data: JournalEntryFormData) => {
-        const result = journalEntrySchema.safeParse(data);
-        if (!result.success) {
-            const errorMsg = result.error.errors[0].message;
-            showToast(errorMsg, 'error');
-            return;
-        }
-        onSubmit(data);
-    };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
@@ -128,8 +57,50 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col flex-1 overflow-hidden">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
+
+                        <div className="p-3 mb-2 rounded-2xl border dark:border-slate-800 bg-indigo-50/50 dark:bg-indigo-900/10 flex justify-between items-center bg-[url('/bg-pattern.svg')] bg-cover">
+                            <div className="flex flex-col">
+                                <span className="text-[11px] font-black text-indigo-800 dark:text-indigo-300">مساعد القيد الذكي</span>
+                                <span className="text-[9px] text-indigo-600/70 dark:text-indigo-400/70 font-bold">اشرح العملية وسيقوم المساعد بتوجيه الحسابات بناءً على الوصف.</span>
+                            </div>
+                            <AIAssistantButton
+                                promptDescription="أنت تقوم بإنشاء قيد يومية محاسبي (Journal Entry). استنتج تاريخ القيد، بيانه العام، والسطور المستحقة (المدين والدائن) بناءً على طلب المستخدم ومطابقتها مع الحسابات المرفقة بقواعد المحاسبة المزدوجة."
+                                schemaDescription={`{
+  "date": "تاريخ القيد بصيغة YYYY-MM-DD (الافتراضي يمكن تحديده من النص إن وجد، وإلا استبعد هذا الحقل)",
+  "description": "البيان أو الشرح العام للقيد",
+  "currency_code": "رمز العملة إن ذكر (مثل SAR, USD)، الافتراضي SAR",
+  "lines": [
+    {
+      "account_id": "معرف (ID) الحساب الأنسب من قائمة accounts المرفقة.",
+      "debit_amount": "قيمة المدين (رقم)، اجعلها 0 إذا كان الحساب دائن",
+      "credit_amount": "قيمة الدائن (رقم)، اجعلها 0 إذا كان الحساب مدين",
+      "description": "شرح السطر (اختياري)"
+    }
+  ]
+}
+هام: مجموع الـ debit_amount يجب أن يساوي مجموع الـ credit_amount في السطور.`}
+                                contextData={{
+                                    accounts: accounts?.map((a: any) => ({ id: a.id, name: a.name, code: a.code, type: a.type }))
+                                }}
+                                onDataExtracted={(data) => {
+                                    if (data.date) setValue('date', data.date, { shouldValidate: true });
+                                    if (data.description) setValue('description', data.description, { shouldValidate: true });
+                                    if (data.currency_code) setValue('currency_code', data.currency_code, { shouldValidate: true });
+                                    
+                                    if (data.lines && Array.isArray(data.lines) && data.lines.length > 0) {
+                                        // Ensure previous lines are cleared, but react-hook-form's setValue automatically replaces the array.
+                                        setValue('lines', data.lines.map((line: any) => ({
+                                            account_id: line.account_id || '',
+                                            debit_amount: Number(line.debit_amount) || 0,
+                                            credit_amount: Number(line.credit_amount) || 0,
+                                            description: line.description || ''
+                                        })), { shouldValidate: true });
+                                    }
+                                }}
+                            />
+                        </div>
 
                         {/* Header Fields */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
@@ -182,161 +153,27 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                         </div>
 
                         {/* Lines Table */}
-                        <div className="border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm transition-colors">
-                            <div className="bg-gray-100 dark:bg-slate-800 px-4 py-2.5 grid grid-cols-12 gap-4 text-[11px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
-                                <div className="col-span-1 text-center">#</div>
-                                <div className="col-span-3">الحساب</div>
-                                <div className="col-span-4">البيان (اختياري)</div>
-                                <div className="col-span-2 text-left">مدين</div>
-                                <div className="col-span-2 text-left">دائن</div>
-                            </div>
-
-                            <div className="divide-y divide-gray-100 dark:divide-slate-800 bg-white dark:bg-slate-900/50">
-                                {fields.map((field, index) => (
-                                    <div key={field.id} className="grid grid-cols-12 gap-4 px-4 py-3 items-start group hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
-                                        <div className="col-span-1 flex items-center justify-center pt-2">
-                                            <span dir="ltr" className="w-6 h-6 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-slate-400 flex items-center justify-center text-xs font-bold">
-                                                {index + 1}
-                                            </span>
-                                        </div>
-
-                                        <div className="col-span-3">
-                                            {isLoadingAccounts ? (
-                                                <div className="text-xs text-gray-400 p-2 animate-pulse">جاري التحميل...</div>
-                                            ) : (
-                                                <select
-                                                    {...register(`lines.${index}.account_id`, { required: true })}
-                                                    className={cn("w-full px-2 py-2 bg-gray-50 dark:bg-slate-800 border rounded-xl text-sm dark:text-slate-200 focus:border-accent outline-none", errors.lines?.[index]?.account_id ? "border-red-500" : "border-gray-200 dark:border-slate-700")}
-                                                >
-                                                    <option value="">اختر الحساب...</option>
-                                                    {accounts?.map(acc => (
-                                                        <option key={acc.id} value={acc.id}>
-                                                            {acc.code} - {acc.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            )}
-                                            {errors.lines?.[index]?.account_id && <p className="text-[9px] text-red-500 font-bold px-1 mt-0.5">{errors.lines[index].account_id.message}</p>}
-                                        </div>
-
-                                        <div className="col-span-4">
-                                            <input
-                                                type="text"
-                                                {...register(`lines.${index}.description`)}
-                                                placeholder="شرح للحركة..."
-                                                className="w-full px-2 py-2 bg-transparent border border-transparent hover:border-gray-200 dark:hover:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:border-accent outline-none transition-all"
-                                            />
-                                        </div>
-
-                                        <div className="col-span-2">
-                                            <input
-                                                type="number"
-                                                step="0.01"
-                                                min="0"
-                                                placeholder="0.00"
-                                                {...register(`lines.${index}.debit_amount`, { valueAsNumber: true })}
-                                                className="w-full px-2 py-2 bg-emerald-50/10 dark:bg-emerald-900/5 border border-transparent hover:border-emerald-200 dark:hover:border-emerald-900/30 rounded-xl text-sm dark:text-emerald-400 focus:border-accent outline-none text-left font-mono"
-                                                onChange={(e) => {
-                                                    if (parseFloat(e.target.value) > 0) setValue(`lines.${index}.credit_amount`, 0);
-                                                }}
-                                                dir="ltr"
-                                            />
-                                        </div>
-
-                                        <div className="col-span-2 relative">
-                                            <input
-                                                type="number"
-                                                step="0.01"
-                                                min="0"
-                                                placeholder="0.00"
-                                                {...register(`lines.${index}.credit_amount`, { valueAsNumber: true })}
-                                                className="w-full px-2 py-2 bg-red-50/10 dark:bg-red-900/5 border border-transparent hover:border-red-200 dark:hover:border-red-900/30 rounded-xl text-sm dark:text-red-400 focus:border-accent outline-none text-left font-mono"
-                                                onChange={(e) => {
-                                                    if (parseFloat(e.target.value) > 0) setValue(`lines.${index}.debit_amount`, 0);
-                                                }}
-                                                dir="ltr"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => remove(index)}
-                                                className="absolute -left-10 top-2 p-1.5 text-gray-300 dark:text-slate-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={() => append({ account_id: '', description: '', debit_amount: 0, credit_amount: 0 })}
-                                className="w-full py-3 bg-gray-50/50 dark:bg-slate-800/30 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-400 text-sm font-bold flex items-center justify-center gap-2 border-t border-gray-100 dark:border-slate-800 transition-colors"
-                            >
-                                <Plus size={18} />
-                                <span>إضافة صف جديد</span>
-                            </button>
-                        </div>
+                        <JournalEntryTable
+                            fields={fields}
+                            append={append}
+                            remove={remove}
+                            register={register}
+                            errors={errors}
+                            setValue={setValue}
+                            accounts={accounts}
+                            isLoadingAccounts={isLoadingAccounts}
+                        />
 
                         {/* Totals Section */}
-                        <div className="flex justify-end pt-2">
-                            <div className="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-gray-100 dark:border-slate-800 w-full md:w-80 space-y-3 shadow-inner">
-                                <div className="flex justify-between items-start text-sm">
-                                    <span className="text-gray-500 dark:text-slate-400">إجمالي المدين</span>
-                                    <div className="flex flex-col items-end">
-                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.debit_amount, selectedCurrency || 'SAR')}</span>
-                                        {selectedCurrency !== 'SAR' && (
-                                            <span dir="ltr" className="font-mono text-[10px] text-gray-500">
-                                                {formatCurrency(convertToBaseCurrency({
-                                                    amount: totals.debit_amount,
-                                                    currencyCode: (selectedCurrency || 'SAR') as any,
-                                                    exchangeRate,
-                                                    exchangeOperator: isDivide ? 'divide' : 'multiply'
-                                                }), 'SAR')}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-start text-sm">
-                                    <span className="text-gray-500 dark:text-slate-400">إجمالي الدائن</span>
-                                    <div className="flex flex-col items-end">
-                                        <span dir="ltr" className="font-mono font-bold text-gray-800 dark:text-slate-100">{formatCurrency(totals.credit_amount, selectedCurrency || 'SAR')}</span>
-                                        {selectedCurrency !== 'SAR' && (
-                                            <span dir="ltr" className="font-mono text-[10px] text-gray-500">
-                                                {formatCurrency(convertToBaseCurrency({
-                                                    amount: totals.credit_amount,
-                                                    currencyCode: (selectedCurrency || 'SAR') as any,
-                                                    exchangeRate,
-                                                    exchangeOperator: isDivide ? 'divide' : 'multiply'
-                                                }), 'SAR')}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className={`flex justify-between items-start text-sm pt-3 border-t border-gray-200 dark:border-slate-700 font-bold ${isBalanced ? 'text-emerald-600' : 'text-red-600'}`}>
-                                    <span>الفرق</span>
-                                    <div className="flex flex-col items-end">
-                                        <span dir="ltr" className="font-mono">{formatCurrency(Math.abs(difference), selectedCurrency || 'SAR')}</span>
-                                        {selectedCurrency !== 'SAR' && (
-                                            <span dir="ltr" className="font-mono text-[10px] opacity-70">
-                                                {formatCurrency(convertToBaseCurrency({
-                                                    amount: Math.abs(difference),
-                                                    currencyCode: (selectedCurrency || 'SAR') as any,
-                                                    exchangeRate,
-                                                    exchangeOperator: isDivide ? 'divide' : 'multiply'
-                                                }), 'SAR')}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                {(!isBalanced || errors.lines) && (
-                                    <div className="text-[10px] text-red-500 dark:text-red-400 text-center bg-red-50 dark:bg-red-900/20 p-1.5 rounded-lg border border-red-100 dark:border-red-900/30 animate-pulse flex items-center justify-center gap-1">
-                                        <AlertCircle size={10} />
-                                        <span>{errors.lines?.message || (totals.debit_amount === 0 ? 'يجب إدخال مبالغ' : 'القيد غير متوازن')}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                        <JournalEntryTotals
+                            totals={totals}
+                            currencyCode={selectedCurrency || 'SAR'}
+                            exchangeRate={Number(exchangeRate) || 1}
+                            isDivide={isDivide}
+                            difference={difference}
+                            isBalanced={isBalanced}
+                            errors={errors}
+                        />
 
                     </div>
 
@@ -364,4 +201,5 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
     );
 };
 
-export default AddJournalEntryModal;
+
+export default AddJournalEntryModal;

@@ -29,9 +29,12 @@ export const STRICT_SYSTEM_ROLE = `أنت مساعد ذكي متخصص في إد
 8. "create_customer": عميل جديد.
 9. "create_supplier": مورد جديد.
 10. "create_product": منتج/صنف جديد.
-11. "statement_of_account": طلب كشف حساب.
-12. "journal_entry": قيد يومية.
-13. "unknown": إذا لم تفهم المطلوب.
+11. "create_quotation": عرض سعر جديد (مبيعات).
+12. "statement_of_account": طلب كشف حساب.
+13. "journal_entry": قيد يومية.
+14. "list_quotations": عرض عروض الأسعار الحالية (مبيعات أو مشتريات).
+15. "check_supplier_quotes": فحص أو مقارنة عروض الموردين.
+16. "unknown": إذا لم تفهم المطلوب.
 
 هيكل الـ JSON المطلوب:
 {
@@ -79,5 +82,9 @@ export const STRICT_SYSTEM_ROLE = `أنت مساعد ذكي متخصص في إد
 `;
 
 export function buildRealDataContext(): string {
-    return `الوقت الحالي هو: ${new Date().toLocaleString('ar-SA')}`;
+    return `الوقت الحالي هو: ${new Date().toLocaleString('ar-SA')}
+نظام عروض الأسعار مفعل حالياً:
+- يدعم عروض مبيعات العملاء.
+- يدعم طلبات عروض أسعار الموردين (RFQ) والمقارنة بينها.
+- يمكن تحويل العروض المقبولة إلى فواتير أو أوامر شراء بضغطة واحدة.`;
 }

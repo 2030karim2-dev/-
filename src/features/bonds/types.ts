@@ -1,5 +1,5 @@
 
-export type BondType = 'receipt' | 'payment';
+export type BondType = 'receipt' | 'payment' | 'transfer';
 
 export interface BondFormData {
   type: BondType;

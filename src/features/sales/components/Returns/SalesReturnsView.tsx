@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Plus, Eye, RotateCcw, FileText, Trash2, ShoppingCart } from 'lucide-react';
 import ExcelTable from '../../../../ui/common/ExcelTable';
 import { useSalesReturns, useSalesReturnsStats } from '../../hooks/useSalesReturns';
-import { useDeleteInvoice } from '../../hooks';
+import { useDeleteInvoice } from '../../hooks/index';
 import { formatCurrency, sumInBaseCurrency } from '../../../../core/utils';
 import Button from '../../../../ui/base/Button';
 import { exportToPDF } from '../../../../core/utils/pdfExporter';

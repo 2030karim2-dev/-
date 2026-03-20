@@ -27,6 +27,7 @@ export const productsApi = {
                 image_url,
                 alternative_numbers,
                 barcode,
+                location,
                 created_at,
                 updated_at,
                 status,

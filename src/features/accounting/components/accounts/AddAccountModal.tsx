@@ -6,6 +6,7 @@ import { AccountFormData, Account } from '../../types/index'; // Import Account 
 import Modal from '../../../../ui/base/Modal';
 import Button from '../../../../ui/base/Button';
 import Input from '../../../../ui/base/Input';
+import AIAssistantButton from '../../../../ui/common/AIAssistantButton';
 
 interface AddAccountModalProps {
   isOpen: boolean;
@@ -16,7 +17,7 @@ interface AddAccountModalProps {
 }
 
 const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClose, onSubmit, isSubmitting, accounts = [] }) => {
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<AccountFormData>();
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<AccountFormData>();
   const selectedType = watch('type');
 
   // Filter potential parents based on type (optional but good UX)
@@ -50,6 +51,31 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClose, onSu
       footer={footer}
     >
       <form className="flex flex-col border-t dark:border-slate-800">
+        <div className="p-3 border-b dark:border-slate-800 bg-indigo-50/50 dark:bg-indigo-900/10 flex justify-between items-center bg-[url('/bg-pattern.svg')] bg-cover">
+          <div className="flex flex-col">
+            <span className="text-[11px] font-black text-indigo-800 dark:text-indigo-300">مساعد إدخال الحسابات</span>
+            <span className="text-[9px] text-indigo-600/70 dark:text-indigo-400/70 font-bold">اشرح الحساب الذي تريد إضافته وسجلّه آلياً.</span>
+          </div>
+          <AIAssistantButton
+            promptDescription="أنت تقوم بإنشاء حساب مالي جديد في دليل الحسابات (شجرة الحسابات). استنتج رمز الحساب والاسم ونوعه المناسب والحساب الرئيسي من طلب المستخدم بالرجوع لقائمة الحسابات المتوفرة."
+            schemaDescription={`{
+  "code": "رمز الحساب المالي (يستنتج ليكون تابعاً للحساب الرئيسي إن وجد، أو رقم مقترح)",
+  "name": "الاسم الكامل للحساب",
+  "type": "نوع الحساب، يجب أن يكون أحد هذه القيم فقط: asset, liability, equity, revenue, expense",
+  "parent_id": "معرف (ID) الحساب الرئيسي (الأب). ابحث في الحسابات المرفقة عن الأنسب وأرجع المعرف الخاص به، وإذا كان حساباً مستقلاً أرجع سلسلة فارغة"
+}`}
+            contextData={{
+               existingAccounts: accounts.map(a => ({ id: a.id, name: a.name, code: a.code, type: a.type }))
+            }}
+            onDataExtracted={(data) => {
+               if (data.code) setValue('code', data.code, { shouldValidate: true });
+               if (data.name) setValue('name', data.name, { shouldValidate: true });
+               if (data.type) setValue('type', data.type, { shouldValidate: true });
+               if (data.parent_id) setValue('parent_id', data.parent_id, { shouldValidate: true });
+            }}
+          />
+        </div>
+
         <div className="grid grid-cols-3 divide-x-0">
           <div className="col-span-1">
             <Input

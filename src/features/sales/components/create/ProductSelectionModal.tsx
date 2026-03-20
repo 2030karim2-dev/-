@@ -10,9 +10,10 @@ interface Props {
     onClose: () => void;
     onSelect: (product: Product) => void;
     initialQuery?: string;
+    mode?: 'sale' | 'purchase';
 }
 
-const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, initialQuery = '' }) => {
+const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, initialQuery = '', mode = 'sale' }) => {
     const [localQuery, setLocalQuery] = useState(initialQuery);
     const [submittedQuery, setSubmittedQuery] = useState(initialQuery);
     const { products, isLoading } = useProducts(submittedQuery);
@@ -58,7 +59,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                                 <th className="border border-gray-200 dark:border-slate-700 p-2 text-right">رقم الصنف</th>
                                 <th className="border border-gray-200 dark:border-slate-700 p-2 text-right">الشركة</th>
                                 <th className="border border-gray-200 dark:border-slate-700 p-2 text-center w-12">كمية</th>
-                                <th className="border border-gray-200 dark:border-slate-700 p-2 text-left">البيع</th>
+                                <th className="border border-gray-200 dark:border-slate-700 p-2 text-left">{mode === 'sale' ? 'البيع' : 'التكلفة'}</th>
                                 <th className="border border-gray-200 dark:border-slate-700 p-2 text-right">المقاس</th>
                             </tr>
                         </thead>
@@ -81,7 +82,9 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                                         <td className="border border-gray-100 dark:border-slate-800 p-1.5 text-[9px] font-mono group-hover:text-blue-200">{p.sku}</td>
                                         <td className="border border-gray-100 dark:border-slate-800 p-1.5 text-[9px] font-bold opacity-60">{p.brand}</td>
                                         <td className="border border-gray-100 dark:border-slate-800 p-1.5 text-center text-[10px] font-bold font-mono">{p.stock_quantity}</td>
-                                        <td className="border border-gray-100 dark:border-slate-800 p-1.5 text-left text-[10px] font-bold font-mono text-emerald-600 group-hover:text-white">{p.selling_price}</td>
+                                        <td className="border border-gray-100 dark:border-slate-800 p-1.5 text-left text-[10px] font-bold font-mono text-emerald-600 group-hover:text-white">
+                                            {mode === 'sale' ? p.selling_price : p.cost_price}
+                                        </td>
                                         <td className="border border-gray-100 dark:border-slate-800 p-1.5 text-[9px] opacity-60">{p.size || '---'}</td>
                                     </tr>
                                 ))

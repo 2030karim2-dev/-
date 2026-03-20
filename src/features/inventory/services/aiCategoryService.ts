@@ -14,6 +14,15 @@ export interface ClassificationResult {
     reasoning: string;
 }
 
+interface RawAIResult {
+    product_id: string;
+    category_index?: string | number;
+    suggested_category_name?: string;
+    is_new_category?: boolean;
+    confidence?: number;
+    reasoning?: string;
+}
+
 export const aiCategoryService = {
     /**
      * Fetch products that need categorization (category_id is null or name is 'عام')
@@ -29,19 +38,20 @@ export const aiCategoryService = {
             .maybeSingle();
 
         // 2. Query products
-        let query = supabase
+        const query = supabase
             .from('products')
             .select('id, name_ar, category_id')
             .eq('company_id', companyId)
             .is('deleted_at', null);
 
+        let finalQuery;
         if (generalCat?.id) {
-            query = query.or(`category_id.is.null,category_id.eq.${generalCat.id}`);
+            finalQuery = query.or(`category_id.is.null,category_id.eq.${generalCat.id as string}`);
         } else {
-            query = query.is('category_id', null);
+            finalQuery = query.is('category_id', null);
         }
 
-        const { data: products, error } = await query
+        const { data: products, error } = await finalQuery
             .order('name_ar', { ascending: true }) // Consistently get items
             .limit(limitNum);
 
@@ -84,18 +94,18 @@ export const aiCategoryService = {
                 }
             }
 
-            const rawResults: any[] = JSON.parse(cleanResponse);
+            const rawResults = JSON.parse(cleanResponse) as RawAIResult[];
             
             // Map back the results
             return rawResults.map(raw => {
                 const product = products.find(p => p.id === raw.product_id);
                 
                 // Map the category_index (1-based) back to the category ID
-                let suggested_category_id = null;
+                let suggested_category_id: string | null = null;
                 let suggested_category_name = raw.suggested_category_name || '';
 
                 if (raw.category_index) {
-                    const idx = parseInt(raw.category_index) - 1;
+                    const idx = parseInt(String(raw.category_index)) - 1;
                     if (categories[idx]) {
                         suggested_category_id = categories[idx].id;
                         if (!suggested_category_name) {
@@ -134,7 +144,7 @@ export const aiCategoryService = {
         if (catFetchError) throw catFetchError;
 
         const categoryMap: Record<string, string> = {}; // Name -> ID
-        existingCategories?.forEach((c: { id: string, name: string }) => {
+        (existingCategories as { id: string, name: string }[])?.forEach((c) => {
             if (c.name) categoryMap[c.name] = c.id;
         });
 
@@ -152,7 +162,7 @@ export const aiCategoryService = {
                     throw new Error(`فشل إنشاء القسم الجديد "${catName}". قد يكون القسم موجوداً بالفعل باسم مشابه.`);
                 }
                 if (data) {
-                    categoryMap[catName] = data.id;
+                    categoryMap[catName] = (data as { id: string }).id;
                 }
             }
         }
@@ -164,8 +174,6 @@ export const aiCategoryService = {
                 ? categoryMap[r.suggested_category_name] 
                 : r.suggested_category_id
         })).filter(u => u.category_id);
-
-        console.log('Applying AI Category Updates:', updates);
 
         // Execute updates and check for errors
         const results_data = await Promise.all(

@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Plus, History, RefreshCw, BarChart3 } from 'lucide-react';
-import MicroHeader from '../../../ui/base/MicroHeader';
-import CreateInvoiceView from '../components/create/CreateInvoiceView';
-import InvoiceListView from '../components/list/InvoiceListView';
-import SalesReturnsView from '../components/Returns/SalesReturnsView';
-import SalesAnalyticsView from '../components/Analytics/SalesAnalyticsView';
-import InvoiceDetailsModal from '../components/details/InvoiceDetailsModal';
-import { useCreateInvoice, useInvoices } from '../hooks';
-import { useTranslation } from '../../../lib/hooks/useTranslation';
-import { CreateInvoiceDTO } from '../types';
-import { logger } from '../../../core/utils/logger';
-import { useAIPrefillStore } from '../../ai/store';
-import { useSalesStore } from '../store';
+// Trigger rebuild to resolve stale hooks.ts link
+import { ShoppingBag, Plus, History, RefreshCw, BarChart3, FileText } from 'lucide-react';
+import MicroHeader from '@/ui/base/MicroHeader';
+import CreateInvoiceView from '@/features/sales/components/create/CreateInvoiceView';
+import InvoiceListView from '@/features/sales/components/list/InvoiceListView';
+import SalesReturnsView from '@/features/sales/components/Returns/SalesReturnsView';
+import SalesAnalyticsView from '@/features/sales/components/Analytics/SalesAnalyticsView';
+import QuotationsTab from '@/features/sales/components/quotations/QuotationsTab';
+import InvoiceDetailsModal from '@/features/sales/components/details/InvoiceDetailsModal';
+import { useCreateInvoice, useInvoices } from '@/features/sales/hooks/index';
+import { useTranslation } from '@/lib/hooks/useTranslation';
+import { CreateInvoiceDTO } from '@/features/sales/types';
+import { logger } from '@/core/utils/logger';
+import { useAIPrefillStore } from '@/features/ai/store';
+import { useSalesStore } from '@/features/sales/store';
 
-type SalesViewTab = 'create' | 'list' | 'returns' | 'analytics';
+type SalesViewTab = 'create' | 'list' | 'returns' | 'analytics' | 'quotations';
 
 const SalesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SalesViewTab>('list');
@@ -27,6 +29,7 @@ const SalesPage: React.FC = () => {
     { id: 'list' as const, label: t('sales_log'), icon: History },
     { id: 'create' as const, label: t('new_sale'), icon: Plus },
     { id: 'returns' as const, label: t('returns'), icon: RefreshCw },
+    { id: 'quotations' as const, label: 'عروض الأسعار', icon: FileText },
     { id: 'analytics' as const, label: t('analytics'), icon: BarChart3 },
   ];
 
@@ -115,6 +118,8 @@ const SalesPage: React.FC = () => {
           searchTerm={searchTerm}
           onViewDetails={setViewInvoiceId}
         />;
+      case 'quotations':
+        return <QuotationsTab onConvertToInvoice={() => setActiveTab('create')} />;
       case 'analytics':
         return <SalesAnalyticsView />;
       default:

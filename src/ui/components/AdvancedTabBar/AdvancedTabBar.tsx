@@ -18,7 +18,7 @@ interface TabButtonProps {
     isFocused: boolean;
     isDragging: boolean;
     isDropTarget: boolean;
-    size: 'sm' | 'md' | 'lg';
+    size: 'sm' | 'md' | 'lg' | 'micro';
     onClick: () => void;
     onMouseEnter: () => void;
     onMouseLeave: () => void;
@@ -147,7 +147,7 @@ export const AdvancedTabBar: React.FC<AdvancedTabBarProps> = ({
     enableDragDrop = false,
     enableKeyboardNav = true,
     className,
-    size = 'md',
+    size = 'md' as 'sm' | 'md' | 'lg' | 'micro',
     theme = 'auto',
 }) => {
     // Use the advanced tabs hook

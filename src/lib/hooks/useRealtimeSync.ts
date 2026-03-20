@@ -43,23 +43,32 @@ export const useRealtimeSync = () => {
         if (!registry.has(channelId)) {
             logger.debug('Realtime', `🔌 Initializing semi-persistent channel for company [${companyId}]`);
 
+            // Local throttle for rapid updates
+            let lastInvalidated = 0;
+            const THROTTLE_MS = 2000;
+
             const channel = supabase.channel(channelId)
                 .on(
                     'postgres_changes',
                     { event: '*', schema: 'public' },
-                    (payload) => {
+                    (payload: any) => {
+                        const now = Date.now();
+                        if (now - lastInvalidated < THROTTLE_MS) return;
+
                         const table = payload.table;
-                        const preset = TABLE_PRESET_MAP[table];
+                        const preset = (TABLE_PRESET_MAP as any)[table];
                         if (preset) {
-                            logger.info('Realtime', `🔄 Realtime update on table [${table}], refreshing queries...`);
+                            logger.info('Realtime', `🔄 Sync: [${table}] updated, refreshing...`);
                             invalidateByPreset(queryClient, preset);
-                        } else {
+                            lastInvalidated = now;
+                        } else if (table === 'dashboard_data') {
                             invalidateKeys(queryClient, ['dashboard_data', 'dashboard']);
+                            lastInvalidated = now;
                         }
                     }
                 );
 
-            channel.subscribe((status) => {
+            channel.subscribe((status: any) => {
                 if (status === 'SUBSCRIBED') {
                     logger.debug('Realtime', '✅ Realtime Connection Active');
                 }

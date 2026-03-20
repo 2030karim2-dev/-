@@ -281,14 +281,17 @@ export const useAdvancedTabs = ({
         }
     }, [activeTab, updateIndicatorPosition]);
 
-    // Update indicator on resize
+    // Update indicator on resize with ResizeObserver for better performance
     useEffect(() => {
-        const handleResize = () => {
-            updateIndicatorPosition(false);
-        };
+        if (!containerRef.current) return;
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        const observer = new ResizeObserver(() => {
+            if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
+            animationFrameId.current = requestAnimationFrame(() => updateIndicatorPosition(false));
+        });
+
+        observer.observe(containerRef.current);
+        return () => observer.disconnect();
     }, [updateIndicatorPosition]);
 
     // Cleanup animation frame on unmount

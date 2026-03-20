@@ -1,9 +1,13 @@
 
-import { supabase } from '../../lib/supabaseClient';
-import { parseError } from '../../core/utils/errorUtils';
-import { CreateInvoicePayload, InvoiceResponse } from './types';
-import { logger } from '../../core/utils/logger';
-import type { Invoice, Party } from '../../core/types/supabase-helpers';
+import { supabase } from '@/lib/supabaseClient';
+import { parseError } from '@/core/utils/errorUtils';
+import { CreateInvoicePayload, InvoiceResponse } from '../types';
+import { logger } from '@/core/utils/logger';
+import type { Invoice, Party } from '@/core/types/supabase-helpers';
+import { salesQuotationsApi } from './quotationsApi';
+
+// Re-export quotations API
+export { salesQuotationsApi };
 
 // Define types for invoice with relations
 type InvoiceWithParty = Invoice & {
@@ -21,13 +25,13 @@ type InvoiceWithDetails = Invoice & {
     unit_price: number;
     total: number;
     returned_at: string | null;
-    product: { name_ar: string; sku: string };
+    product: { name_ar: string; sku: string; cost_price?: number; part_number?: string; brand?: string };
   }>;
 };
 
 export const salesApi = {
   getInvoices: async (companyId: string) => {
-    return await supabase
+    const { data, error } = await (supabase
       .from('invoices')
       .select(`
         id,
@@ -48,8 +52,11 @@ export const salesApi = {
       .neq('status', 'void')
       .is('deleted_at', null)
       .order('issue_date', { ascending: false })
-      .limit(1000)
+      .limit(1000) as any)
       .returns<InvoiceWithParty[]>();
+
+    if (error) throw parseError(error);
+    return data;
   },
 
   commitInvoiceRPC: async (companyId: string, userId: string, payload: CreateInvoicePayload): Promise<InvoiceResponse> => {
@@ -98,26 +105,28 @@ export const salesApi = {
   },
 
   getInvoiceDetails: async (invoiceId: string) => {
-    return await supabase
+    const { data, error } = await (supabase
       .from('invoices')
       .select(`
         *,
         parties:party_id(*),
-        payment_allocations(
+        payment_allocations:invoice_payments(
           payments:payment_id(amount, created_at, payment_method)
         ),
-        invoice_items(
+        invoice_items:invoice_items(
           *,
-          product:product_id(name_ar, sku, part_number)
+          product:product_id(name_ar, sku, cost_price, part_number, brand)
         )
       `)
       .eq('id', invoiceId)
-      .single()
+      .single() as any)
       .returns<InvoiceWithDetails>();
+    
+    if (error) throw parseError(error);
+    return data;
   },
 
   getNextInvoiceNumber: async (companyId: string) => {
-    // H4: Use atomic RPC with advisory lock instead of COUNT(*)
     const { data, error } = await supabase.rpc('get_next_invoice_number', {
       p_company_id: companyId,
       p_prefix: 'INV'

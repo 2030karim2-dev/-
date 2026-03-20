@@ -5,7 +5,7 @@ import { cn } from '../../../../core/utils';
 interface Props {
     file: File | null;
     onClick: () => void;
-    inputRef: React.RefObject<HTMLInputElement>;
+    inputRef: React.RefObject<HTMLInputElement | null>;
     onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 

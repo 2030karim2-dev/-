@@ -1,25 +1,22 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeftRight, Plus, AlertTriangle, CheckCircle, Maximize2 } from 'lucide-react';
+import { ArrowLeftRight, Plus, Maximize2, Sparkles, History as HistoryIcon, LayoutDashboard } from 'lucide-react';
 import NewTransferModal from './NewTransferModal';
 import { useTransfers, useWarehouses } from '../hooks/useInventoryManagement';
-import { useProducts } from '../hooks/useProducts';
-import { useSmartTransferSuggestions } from '../hooks/useSmartTransferSuggestions';
-import ExcelTable from '../../../ui/common/ExcelTable';
-import EmptyState from '../../../ui/base/EmptyState';
 import TableSkeleton from '../../../ui/base/TableSkeleton';
 import FullscreenContainer from '../../../ui/base/FullscreenContainer';
 import { cn } from '../../../core/utils';
 import TransferStats from './transfers/TransferStats';
-import SmartSuggestionsSection from './transfers/SmartSuggestionsSection';
+import TransferHistoryView from './TransferHistoryView';
+import TransferSuggestionsView from './TransferSuggestionsView';
+
+type SubTab = 'overview' | 'history' | 'suggestions';
 
 const TransfersView: React.FC = () => {
+    const [activeSubTab, setActiveSubTab] = useState<SubTab>('overview');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { data: transfers, isLoading: isTransfersLoading } = useTransfers();
     const { data: warehouses } = useWarehouses();
-    const { products } = useProducts('');
     const [isMaximized, setIsMaximized] = useState(false);
-
-    const { suggestions } = useSmartTransferSuggestions(products, warehouses);
 
     const stats = useMemo(() => {
         const transfersArray = Array.isArray(transfers) ? transfers : [];
@@ -35,55 +32,6 @@ const TransfersView: React.FC = () => {
         };
     }, [transfers, warehouses]);
 
-    const columns = [
-        { header: '#', accessor: (row: any) => <span className="font-mono font-bold text-gray-400">{row.transfer_number || '-'}</span>, width: 'w-24' },
-        {
-            header: 'من مستودع', accessor: (row: any) => (
-                <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-rose-500 shadow-sm shadow-rose-500/50"></div>
-                    <span className="font-black text-[11px] text-rose-600 dark:text-rose-400 uppercase tracking-tight">{row.from_warehouse_name}</span>
-                </div>
-            ), sortKey: 'from_warehouse_name'
-        },
-        {
-            header: 'إلى مستودع', accessor: (row: any) => (
-                <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"></div>
-                    <span className="font-black text-[11px] text-emerald-600 dark:text-emerald-400 uppercase tracking-tight">{row.to_warehouse_name}</span>
-                </div>
-            ), sortKey: 'to_warehouse_name'
-        },
-        {
-            header: 'التاريخ', accessor: (row: any) => (
-                <span className="text-gray-600 dark:text-gray-400 font-mono text-[10px]">
-                    {new Date(row.created_at).toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric' })}
-                </span>
-            ), width: 'w-32', sortKey: 'created_at'
-        },
-        {
-            header: 'الأصناف', accessor: (row: any) => (
-                <span className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                    {row.item_count} أصناف
-                </span>
-            ), className: 'text-center', width: 'w-24'
-        },
-        {
-            header: 'الحالة',
-            accessor: (row: any) => (
-                <span className={cn(
-                    "px-2.5 py-1 rounded-full text-[9px] font-bold flex items-center gap-1 w-fit mx-auto",
-                    row.status === 'completed'
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800"
-                        : "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800"
-                )}>
-                    {row.status === 'completed' ? <><CheckCircle size={10} /> مكتملة</> : <><AlertTriangle size={10} /> معلقة</>}
-                </span>
-            ),
-            className: 'text-center',
-            width: 'w-28'
-        },
-    ];
-
     if (isTransfersLoading) return <TableSkeleton rows={5} cols={6} />;
 
     return (
@@ -94,45 +42,105 @@ const TransfersView: React.FC = () => {
             )}>
                 <TransferStats stats={stats} />
 
-                <SmartSuggestionsSection 
-                    suggestions={suggestions} 
-                    onTransfer={() => { setIsModalOpen(true); }} 
-                />
-
-                <div className="flex justify-end gap-1.5">
-                    {!isMaximized && (
+                {/* Internal Sub-Navigation */}
+                <div className="flex bg-gray-100/50 dark:bg-slate-900/50 p-1 rounded-xl w-fit shrink-0 backdrop-blur-sm border border-gray-200/50 dark:border-slate-800/50">
+                    {[
+                        { id: 'overview', label: 'نظرة عامة', icon: LayoutDashboard },
+                        { id: 'history', label: 'سجل المناقلات', icon: HistoryIcon },
+                        { id: 'suggestions', label: 'اقتراحات النقل', icon: Sparkles },
+                    ].map((tab) => (
                         <button
-                            onClick={() => { setIsMaximized(true); }}
-                            className="bg-white dark:bg-slate-800 text-gray-400 border border-gray-100 dark:border-slate-800 px-3 py-1.5 rounded-lg text-[9px] font-black active:scale-95 flex items-center gap-1.5 shadow-sm transition-all"
+                            key={tab.id}
+                            onClick={() => setActiveSubTab(tab.id as SubTab)}
+                            className={cn(
+                                "flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black transition-all duration-300",
+                                activeSubTab === tab.id
+                                    ? "bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm shadow-blue-500/10"
+                                    : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                            )}
                         >
-                            <Maximize2 size={12} />
-                            <span className="hidden sm:inline">ملئ الشاشة</span>
+                            <tab.icon size={12} strokeWidth={activeSubTab === tab.id ? 2.5 : 2} />
+                            <span>{tab.label}</span>
                         </button>
-                    )}
-                    <button
-                        onClick={() => { setIsModalOpen(true); }}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg text-[9px] font-black active:scale-95 flex items-center gap-1.5 shadow-md shadow-emerald-500/10 transition-all"
-                    >
-                        <Plus size={12} strokeWidth={3} />
-                        <span>مناقلة جديدة</span>
-                    </button>
+                    ))}
                 </div>
 
-                {!isTransfersLoading && (!transfers || transfers.length === 0) ? (
-                    <EmptyState
-                        icon={ArrowLeftRight}
-                        title="لا توجد عمليات مناقلة"
-                        description="لم يتم تسجيل أي عمليات نقل بضاعة بين المستودعات بعد. ابدأ بإنشاء أول عملية مناقلة."
-                    />
-                ) : (
-                    <ExcelTable
-                        columns={columns}
-                        data={transfers || []}
-                        colorTheme="green"
-                        title="سجل المناقلات المخزنية"
-                        subtitle={`${stats.total} عملية مسجلة • ${stats.totalItems} صنف تم نقله`}
-                    />
-                )}
+                <div className="flex-1 overflow-hidden">
+                    {activeSubTab === 'overview' && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-8 rounded-2xl flex flex-col items-center justify-center text-center gap-6 shadow-sm">
+                                <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center shadow-inner">
+                                    <ArrowLeftRight size={32} />
+                                </div>
+                                <div className="max-w-md">
+                                    <h3 className="text-xl font-black mb-2">إدارة مناقلات المخزون</h3>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+                                        هنا يمكنك البدء بعملية نقل بضاعة جديدة بين مستودعاتك وفروعك. تصفح التبويبات أعلاه لمشاهدة السجل الكامل أو الحصول على اقتراحات ذكية.
+                                    </p>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                                    <button
+                                        onClick={() => { setIsModalOpen(true); }}
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-2.5 rounded-xl text-xs font-black active:scale-95 flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-500/20 transition-all"
+                                    >
+                                        <Plus size={16} strokeWidth={3} />
+                                        <span>إنشاء مناقلة جديدة الآن</span>
+                                    </button>
+                                    
+                                    {!isMaximized && (
+                                        <button
+                                            onClick={() => { setIsMaximized(true); }}
+                                            className="bg-white dark:bg-slate-800 text-gray-400 border border-gray-100 dark:border-slate-800 px-6 py-2.5 rounded-xl text-xs font-black active:scale-95 flex items-center justify-center gap-2.5 shadow-sm transition-all"
+                                        >
+                                            <Maximize2 size={16} />
+                                            <span>ملئ الشاشة</span>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button 
+                                    onClick={() => setActiveSubTab('suggestions')}
+                                    className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 p-4 rounded-xl flex items-center gap-4 text-right hover:bg-amber-100/50 dark:hover:bg-amber-900/20 transition-all group"
+                                >
+                                    <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                        <Sparkles size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-[11px] font-black text-amber-900 dark:text-amber-100 italic">اقتراحات ذكية</h4>
+                                        <p className="text-[10px] text-amber-800/70 dark:text-amber-300/70 line-clamp-1">موازنة المخزون آلياً بين الفروع</p>
+                                    </div>
+                                </button>
+                                <button 
+                                    onClick={() => setActiveSubTab('history')}
+                                    className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/50 p-4 rounded-xl flex items-center gap-4 text-right hover:bg-blue-100/50 dark:hover:bg-blue-900/20 transition-all group"
+                                >
+                                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                        <HistoryIcon size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-[11px] font-black text-blue-900 dark:text-blue-100 italic">السجل الكامل</h4>
+                                        <p className="text-[10px] text-blue-800/70 dark:text-blue-300/70 line-clamp-1">تدقيق العمليات السابقة والمكتملة</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeSubTab === 'history' && (
+                        <div className="h-full animate-in fade-in slide-in-from-left-4 duration-500">
+                            <TransferHistoryView />
+                        </div>
+                    )}
+
+                    {activeSubTab === 'suggestions' && (
+                        <div className="h-full animate-in fade-in slide-in-from-right-4 duration-500">
+                            <TransferSuggestionsView />
+                        </div>
+                    )}
+                </div>
 
                 <NewTransferModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); }} />
             </div>

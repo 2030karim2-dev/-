@@ -178,6 +178,9 @@ export interface Warehouse {
   status: string;
   is_primary?: boolean;
   is_active?: boolean | undefined;
+  itemCount?: number;
+  totalStock?: number;
+  stockValue?: number;
   created_at?: string | undefined;
   updated_at?: string | undefined;
   deleted_at?: string | null;

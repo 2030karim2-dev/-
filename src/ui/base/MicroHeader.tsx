@@ -1,9 +1,10 @@
 import React from 'react';
-import { LucideIcon, ArrowRight, ArrowLeft, Search, X, Maximize2, Minimize2, Eye, EyeOff } from 'lucide-react';
+import { LucideIcon, ArrowRight, ArrowLeft, Maximize2, Minimize2, Eye, EyeOff } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '../../core/utils';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import { AdvancedTabBar, TabItem } from '../components/AdvancedTabBar';
+import { useSearchStore } from '../../core/store/searchStore';
 
 interface MicroHeaderProps {
   title: string;
@@ -55,6 +56,29 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
   const { dir } = useTranslation();
   const isRoot = location.pathname === '/';
   const [localSearch, setLocalSearch] = React.useState(searchValue || '');
+  const setPageSearch = useSearchStore(s => s.setPageSearch);
+  const clearPageSearch = useSearchStore(s => s.clearPageSearch);
+
+  React.useEffect(() => {
+    if (onSearchChange) {
+      setPageSearch({
+        value: localSearch,
+        placeholder: searchPlaceholder || "بحث...",
+        onChange: (val) => {
+          setLocalSearch(val);
+          onSearchChange(val);
+        }
+      });
+    } else {
+      clearPageSearch();
+    }
+
+    return () => {
+      clearPageSearch();
+    };
+  }, [onSearchChange, searchPlaceholder, setPageSearch, clearPageSearch]);
+
+  // Keep local search in sync if external value changes (e.g. cleared by parent)
 
   // Keep local search in sync if external value changes (e.g. cleared by parent)
   React.useEffect(() => {
@@ -148,39 +172,9 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
               </div>
             )}
 
-            {/* Search/Filter Section */}
-            {(onSearchChange || extraRow) && (
+            {/* Search/Filter Section - HIDDEN because it's moved to Top Header */}
+            {extraRow && (
               <div className={`flex items-center gap-2 w-full ${searchWidth} shrink-0`}>
-                {onSearchChange && (
-                    <div className="relative flex-1 group">
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 transition-colors z-10 pointer-events-none">
-                        <Search size={14} />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder={searchPlaceholder || "بحث..."}
-                        value={localSearch}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setLocalSearch(val);
-                          if (onSearchChange) onSearchChange(val);
-                        }}
-                        className="w-full bg-[var(--app-surface)] border border-[var(--app-border)] rounded-md py-1.5 pr-8 pl-8 text-[11px] font-bold outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:font-bold"
-                        aria-label={searchPlaceholder || "Search"}
-                      />
-                    {localSearch && (
-                      <button
-                        onClick={() => {
-                          setLocalSearch('');
-                          onSearchChange('');
-                        }}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 bg-[var(--app-bg)]/80 backdrop-blur-sm p-0.5 rounded-full transition-colors z-10"
-                      >
-                        <X size={12} />
-                      </button>
-                    )}
-                  </div>
-                )}
                 {extraRow}
               </div>
             )}

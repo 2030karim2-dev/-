@@ -24,12 +24,21 @@ export const useDashboardData = () => {
   // 1. Fetch Raw Data using React Query
   const rawDataQuery = useQuery({
     queryKey: ['dashboard_raw_data', companyId],
-    queryFn: async () => {
-      if (!companyId) return Promise.reject('No company ID');
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const dateLimit = thirtyDaysAgo.toISOString().split('T')[0];
-      return dashboardApi.fetchRawDashboardData(companyId, dateLimit);
+    queryFn: async ({ signal }) => {
+      try {
+        if (!companyId) return Promise.reject('No company ID');
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const dateLimit = thirtyDaysAgo.toISOString().split('T')[0];
+        return await dashboardApi.fetchRawDashboardData(companyId, dateLimit, signal);
+      } catch (error: any) {
+        // Gracefully handle aborted requests to avoid console error spam
+        if (error.name === 'AbortError' || error.message?.includes('aborted') || signal.aborted) {
+          console.debug('Dashboard data fetch aborted');
+          return null;
+        }
+        throw error;
+      }
     },
     enabled: !!companyId,
     staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes

@@ -1,0 +1,68 @@
+TOTAL_SOURCE_FILES 740
+TOTAL_SOURCE_LINES 84418
+
+TOP_40_LARGEST_FILES
+  4002  core/database.types.ts
+  1123  features/appearance/constants.ts
+   678  ui/common/ExcelTable.tsx
+   601  ui/components/AdvancedTabBar/useAdvancedTabs.ts
+   475  core/utils/decimalUtils.ts
+   430  features/parties/api/enhanced/customerApi.ts
+   429  ui/common/useTableKeyboardNavigation.ts
+   382  features/ai/hooks/useDebtManagement.ts
+   374  features/returns/components/AdvancedReturnModal.tsx
+   362  features/sales/types/domain.ts
+   361  ui/cards/animations.ts
+   360  features/settings/components/integrations/MessagingIntegration.tsx
+   356  features/purchases/components/quotations/CreatePurchaseQuotationModal.tsx
+   348  features/inventory/services/productService.ts
+   348  types.ts
+   326  features/purchases/components/quotations/QuotationComparisonView.tsx
+   323  features/inventory/hooks/useInventoryManagement.ts
+   316  data/constants.tsx
+   312  core/lib/persister.ts
+   312  features/bonds/components/CreateBondModal.tsx
+   308  features/settings/components/backup/BackupPage.tsx
+   307  features/vehicles/components/VINLookupTab.tsx
+   304  features/reports/components/InventoryMovementView.tsx
+   303  features/sales/components/Returns/SalesReturnsView.tsx
+   299  ui/components/AdvancedTabBar/AdvancedTabBar.tsx
+   297  features/settings/SettingsPage.tsx
+   296  features/parties/components/customers/CustomerTimeline.tsx
+   296  features/settings/components/localization/LocalizationSettings.tsx
+   291  features/parties/types/enhanced/index.ts
+   291  features/sales/components/quotations/QuotationDetailsModal.tsx
+   290  features/parties/PartiesPage.tsx
+   290  features/settings/components/pos/POSSettings.tsx
+   288  core/utils/currencyUtils.ts
+   288  features/inventory/services/analyticsService.ts
+   287  features/expenses/pages/ExpensesAnalyticsView.tsx
+   284  features/appearance/AppearancePage.tsx
+   283  ui/base/Modal.tsx
+   279  features/settings/components/invoice/InvoiceSettings.tsx
+   277  features/returns/components/InvoiceItemsList.tsx
+   271  lib/themeStore.ts
+
+FEATURE_DISTRIBUTION(files,lines)
+inventory          116 files   10678 lines
+sales               70 files    7719 lines
+settings            64 files    6866 lines
+accounting          51 files    4681 lines
+reports             33 files    4412 lines
+purchases           27 files    4214 lines
+dashboard           37 files    4036 lines
+parties             23 files    3207 lines
+ai                  53 files    3120 lines
+returns             18 files    2700 lines
+auth                26 files    2493 lines
+appearance           8 files    1888 lines
+expenses            18 files    1686 lines
+bonds               12 files    1365 lines
+notifications        9 files    1135 lines
+vehicles             9 files    1051 lines
+pos                  8 files     669 lines
+smart-import         2 files     493 lines
+command              2 files     110 lines
+customers            2 files      61 lines
+feedback             1 files      45 lines
+suppliers            1 files      45 lines

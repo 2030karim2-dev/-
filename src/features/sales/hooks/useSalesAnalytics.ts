@@ -4,7 +4,7 @@
 // ============================================
 
 import { useQuery } from '@tanstack/react-query';
-import { salesApi } from '../api';
+import { salesApi } from '@/features/sales/api';
 
 interface SalesAnalyticsParams {
     companyId: string;

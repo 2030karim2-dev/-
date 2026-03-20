@@ -75,11 +75,11 @@ export const getProductColumns = ({
         {
             header: 'المخزن/الرف',
             accessor: (p) => (
-                <span className="text-[10px] font-bold text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 px-1.5 py-0.5 rounded border border-rose-100 dark:border-rose-900/30">
+                <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/40 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-800">
                     {p.location || '—'}
                 </span>
             ),
-            width: 'w-24',
+            width: 'w-48',
             sortKey: 'location'
         },
         {

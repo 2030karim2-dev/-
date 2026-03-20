@@ -104,7 +104,7 @@ const MainLayout: React.FC = () => {
       />
 
       <div className={cn(
-        "flex-1 flex flex-col h-full overflow-hidden relative transition-all duration-300 ease-in-out",
+        "flex-1 flex flex-col h-full overflow-hidden relative transition-[transform,margin,padding] duration-300 ease-in-out will-change-[transform,margin,padding]",
         contentMaxWidth,
         isDesktop && getMainLayoutOffsetClasses({
           breakpoint,

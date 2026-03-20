@@ -6,6 +6,9 @@ import TreasuryActions from './TreasuryActions';
 import EmptyState from '../../../../ui/base/EmptyState';
 import { useFeedbackStore } from '../../../../features/feedback/store';
 import { Wallet } from 'lucide-react';
+import CreateBondModal from '../../../bonds/components/CreateBondModal';
+import { useBondMutation } from '../../../bonds/hooks';
+import { BondType } from '../../../bonds/types';
 
 interface Props {
     dateRange: { from: string; to: string };
@@ -13,12 +16,24 @@ interface Props {
 
 const TreasuryView: React.FC<Props> = ({ dateRange }) => {
     const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [activeAction, setActiveAction] = useState<BondType>('receipt');
+    
     const { showToast } = useFeedbackStore();
+    const bondMutation = useBondMutation();
 
-    const handleAction = (action: 'receipt' | 'payment' | 'transfer') => {
-        // TODO: Open respective modals
-        console.info('Action triggered:', action);
-        showToast(`Coming soon: ${action} modal`, 'info');
+    const handleAction = (action: BondType) => {
+        setActiveAction(action);
+        setIsModalOpen(true);
+    };
+
+    const handleBondSubmit = async (data: any) => {
+        try {
+            await bondMutation.mutateAsync(data);
+            setIsModalOpen(false);
+        } catch (error) {
+            // Error handled by hook toast
+        }
     };
 
     const handlePrint = () => {
@@ -57,6 +72,14 @@ const TreasuryView: React.FC<Props> = ({ dateRange }) => {
                     </div>
                 )}
             </main>
+
+            <CreateBondModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                type={activeAction}
+                onSubmit={handleBondSubmit}
+                isSubmitting={bondMutation.isPending}
+            />
         </div>
     );
 };

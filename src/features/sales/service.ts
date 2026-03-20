@@ -1,5 +1,5 @@
 
-import { salesApi } from './api';
+import { salesApi } from './api/index';
 import { CreateInvoiceDTO, InvoiceResponse } from './types';
 import { messagingService } from '../notifications/messagingService';
 import { toBaseCurrency } from '../../core/utils/currencyUtils';

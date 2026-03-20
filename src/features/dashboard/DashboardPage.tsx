@@ -25,6 +25,7 @@ const WarehouseTransferSuggestions = lazy(() => import('./components/WarehouseTr
 const InventoryOverview = lazy(() => import('./components/InventoryOverview'));
 const QuickActions = lazy(() => import('./components/QuickActions'));
 const CategoriesChart = lazy(() => import('../../ui/dashboard/CategoriesChart'));
+const QuotationSummaryWidget = lazy(() => import('./components/QuotationSummaryWidget'));
 
 // Sub-components for state management
 const DashboardLoading = () => {
@@ -84,9 +85,9 @@ const DashboardPage: React.FC = () => {
 
     return (
         <div className="flex flex-col h-full bg-[var(--app-bg)] font-cairo relative">
-            {/* Cinematic Grain Texture */}
-            <div className="fixed inset-0 opacity-[0.03] pointer-events-none z-[1]" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E")`,
+            {/* Cinematic Grain Texture - Optimized Opacity and fixed positioning */}
+            <div className="fixed inset-0 opacity-[0.015] pointer-events-none z-[1] will-change-transform" style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E")`,
                 backgroundRepeat: 'repeat'
             }} />
 
@@ -160,12 +161,12 @@ const DashboardPage: React.FC = () => {
                     </Suspense>
 
                     <GlobalErrorBoundary sectionName="الإيرادات والمصروفات">
-                        <Suspense fallback={<ChartSkeleton />}>
+                        <Suspense fallback={<div className="h-[220px] min-h-[220px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
                             <RevenueExpensesChart data={revenueExpensesData} />
                         </Suspense>
                     </GlobalErrorBoundary>
 
-                    <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                    <Suspense fallback={<div className="h-40 min-h-[160px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
                         <PerformanceGauge
                             value={salesValue}
                             target={100000}
@@ -181,8 +182,12 @@ const DashboardPage: React.FC = () => {
                         <InventoryOverview lowStockProducts={lowStockProducts} />
                     </Suspense>
 
-                    <Suspense fallback={<ChartSkeleton />}>
-                        <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] rounded-2xl p-4">
+                    <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                        <QuotationSummaryWidget />
+                    </Suspense>
+
+                    <Suspense fallback={<div className="h-[300px] min-h-[300px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                        <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] rounded-2xl p-4 h-[350px]">
                             <h3 className="text-xs font-bold text-[var(--app-text)] mb-4">التصنيفات الأكثر حركة</h3>
                             <div className="flex flex-col h-full items-center p-2">
                                 <CategoriesChart data={categoryData as any} />

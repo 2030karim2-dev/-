@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import SalesStats from './SalesStats';
 import ExcelTable from '../../../../ui/common/ExcelTable';
-import { useInvoices, useDeleteInvoice } from '../../hooks';
+import { useInvoices, useDeleteInvoice } from '../../hooks/index';
 import { formatCurrency } from '../../../../core/utils';
 import { Eye, Trash2 } from 'lucide-react';
 import ShareButton from '../../../../ui/common/ShareButton';
@@ -23,7 +23,7 @@ const InvoiceListView: React.FC<InvoiceListViewProps> = ({ viewType, searchTerm,
 
     const filteredData = useMemo(() => {
         if (!invoices) return [];
-        return invoices.filter(item => {
+        return (invoices as InvoiceListItem[]).filter(item => {
             const matchesType = item.type === viewType;
             const matchesSearch = (item.customerName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (item.invoiceNumber || '').toLowerCase().includes(searchTerm.toLowerCase());
@@ -135,7 +135,7 @@ const InvoiceListView: React.FC<InvoiceListViewProps> = ({ viewType, searchTerm,
             <div className="bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 shadow-sm overflow-hidden">
                 <ExcelTable
                     columns={columns}
-                    data={filteredData.map(item => ({
+                    data={(filteredData as InvoiceListItem[]).map(item => ({
                         ...item,
                         invoiceNumber: item.invoiceNumber || '',
                         paymentMethod: item.paymentMethod || 'cash'
