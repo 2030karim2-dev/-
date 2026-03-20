@@ -63,7 +63,7 @@ const SmartPurchaseAlert: React.FC<Props> = ({ lowStockItems }) => {
                 <div className="mt-3 space-y-2">
                     <p className="text-xs text-[var(--app-text)] font-medium">{result.summary}</p>
                     <div className="space-y-1.5">
-                        {result.items.map((item, i) => (
+                        {result.items?.map((item, i) => (
                             <div key={i} className="flex items-center gap-2 bg-[var(--app-surface-hover)] rounded-xl p-2.5 text-xs">
                                 <Package size={12} className="text-[var(--app-text-secondary)] flex-shrink-0" />
                                 <span className="font-bold text-[var(--app-text)] flex-1">{item.name}</span>

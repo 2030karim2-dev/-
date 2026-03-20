@@ -42,6 +42,26 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
 }) => {
     const { dictionary: t } = useI18nStore();
     const [activeChart, setActiveChart] = useState<'area' | 'bar' | 'line'>('area');
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [isMounted, setIsMounted] = useState(false);
+
+    React.useEffect(() => {
+        const checkDimensions = () => {
+            if (containerRef.current && containerRef.current.offsetWidth > 0) {
+                setIsMounted(true);
+                return true;
+            }
+            return false;
+        };
+
+        if (checkDimensions()) return;
+
+        const interval = setInterval(() => {
+            if (checkDimensions()) clearInterval(interval);
+        }, 500);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const commonProps = {
         data: salesByDay,
@@ -174,10 +194,18 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
                     </button>
                 </div>
             </div>
-            <div className="h-72 w-full mt-6" dir="ltr">
-                <ResponsiveContainer width="100%" height={280} minWidth={100} minHeight={280}>
-                    {renderChart()}
-                </ResponsiveContainer>
+            <div 
+                ref={containerRef}
+                className="h-72 w-full mt-6" 
+                dir="ltr"
+            >
+                {isMounted ? (
+                    <ResponsiveContainer width="99%" height={280}>
+                        {renderChart()}
+                    </ResponsiveContainer>
+                ) : (
+                    <div className="w-full h-[280px] bg-slate-50/50 dark:bg-slate-800/10 animate-pulse rounded-2xl" />
+                )}
             </div>
         </div>
     );

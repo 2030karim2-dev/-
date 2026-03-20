@@ -30,8 +30,26 @@ export const PaymentMethodsChart: React.FC<PaymentMethodsChartProps> = ({
 }) => {
     const { dictionary: t } = useI18nStore();
     const total = salesByPaymentMethod.reduce((sum, p) => sum + p.amount, 0);
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const [isMounted, setIsMounted] = React.useState(false);
-    React.useEffect(() => { setIsMounted(true); }, []);
+
+    React.useEffect(() => {
+        const checkDimensions = () => {
+            if (containerRef.current && containerRef.current.offsetWidth > 0) {
+                setIsMounted(true);
+                return true;
+            }
+            return false;
+        };
+
+        if (checkDimensions()) return;
+
+        const interval = setInterval(() => {
+            if (checkDimensions()) clearInterval(interval);
+        }, 500);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const getMethodInfo = (method: string) => {
         switch (method) {
@@ -71,9 +89,9 @@ export const PaymentMethodsChart: React.FC<PaymentMethodsChartProps> = ({
                 <Wallet size={18} className="text-purple-600" />
                 {t.payment_methods}
             </h4>
-            <div className="h-56 relative group w-full" dir="ltr">
+            <div ref={containerRef} className="h-56 relative group w-full" dir="ltr">
                 {isMounted && (
-                    <ResponsiveContainer width="100%" height={224} minWidth={100} minHeight={224}>
+                    <ResponsiveContainer width="99%" height={224}>
                         <PieChart>
                             <defs>
                                 {GRADIENTS.map((g, i) => (

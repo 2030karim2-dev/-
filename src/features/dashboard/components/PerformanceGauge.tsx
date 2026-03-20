@@ -23,18 +23,21 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        let retryTimer: any;
-        const timer = setTimeout(() => {
+        const checkDimensions = () => {
             if (containerRef.current && containerRef.current.offsetWidth > 0) {
                 setIsMounted(true);
-            } else {
-                retryTimer = setTimeout(() => setIsMounted(true), 500);
+                return true;
             }
-        }, 300);
-        return () => {
-            clearTimeout(timer);
-            if (retryTimer) clearTimeout(retryTimer);
+            return false;
         };
+
+        if (checkDimensions()) return;
+
+        const interval = setInterval(() => {
+            if (checkDimensions()) clearInterval(interval);
+        }, 500);
+
+        return () => clearInterval(interval);
     }, []);
 
     const percentage = target > 0 ? Math.min(100, (value / target) * 100) : 0;

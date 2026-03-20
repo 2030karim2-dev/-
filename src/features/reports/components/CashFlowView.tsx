@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCashFlow } from '../hooks';
 import { formatCurrency } from '../../../core/utils';
 import { ArrowDownRight, ArrowUpRight, BarChart3, Clock } from 'lucide-react';
@@ -9,6 +9,12 @@ import ShareButton from '../../../ui/common/ShareButton';
 
 const CashFlowView: React.FC = () => {
     const { data, isLoading } = useCashFlow();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsMounted(true), 100);
+        return () => clearTimeout(timer);
+    }, []);
 
     if (isLoading) return (
         <div className="flex flex-col items-center justify-center p-20 gap-4">
@@ -115,90 +121,94 @@ const CashFlowView: React.FC = () => {
                     </div>
 
                     <div className="flex-1 min-h-[400px] relative z-10">
-                        <ResponsiveContainer width="100%" height={400} minWidth={1} minHeight={1}>
-                            <AreaChart data={data?.monthlyTrend || []} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="flowIn" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.6} />
-                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
-                                    </linearGradient>
-                                    <linearGradient id="flowOut" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.2} />
-                                        <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
-                                    </linearGradient>
-                                </defs>
-                                <XAxis
-                                    dataKey="month"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fontSize: 11, fontWeight: 'bold', fill: '#64748b' }}
-                                    dy={15}
-                                />
-                                <YAxis
-                                    tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 'medium' }}
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v}
-                                />
-                                <Tooltip
-                                    cursor={{ stroke: '#3b82f6', strokeWidth: 2, strokeDasharray: '6 6' }}
-                                    content={({ active, payload, label }: any) => {
-                                        if (active && payload && payload.length) {
-                                            return (
-                                                <div className="glass-panel p-6 border-none shadow-2xl bg-white/95 dark:bg-slate-900/95 min-w-[220px]">
-                                                    <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
-                                                        <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">{label}</span>
-                                                        <Clock size={12} className="text-slate-300" />
-                                                    </div>
-                                                    <div className="space-y-4">
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-300">تدفقات واردة</span>
-                                                            </div>
-                                                            <span className="text-sm font-bold text-emerald-600 font-mono italic">
-                                                                {formatCurrency(payload[0].value)}
-                                                            </span>
+                        {isMounted ? (
+                            <ResponsiveContainer width="99%" height={400}>
+                                <AreaChart data={data?.monthlyTrend || []} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="flowIn" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.6} />
+                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                                        </linearGradient>
+                                        <linearGradient id="flowOut" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis
+                                        dataKey="month"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fontSize: 11, fontWeight: 'bold', fill: '#64748b' }}
+                                        dy={15}
+                                    />
+                                    <YAxis
+                                        tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 'medium' }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v}
+                                    />
+                                    <Tooltip
+                                        cursor={{ stroke: '#3b82f6', strokeWidth: 2, strokeDasharray: '6 6' }}
+                                        content={({ active, payload, label }: any) => {
+                                            if (active && payload && payload.length) {
+                                                return (
+                                                    <div className="glass-panel p-6 border-none shadow-2xl bg-white/95 dark:bg-slate-900/95 min-w-[220px]">
+                                                        <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                                                            <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">{label}</span>
+                                                            <Clock size={12} className="text-slate-300" />
                                                         </div>
-                                                        <div className="flex items-center justify-between pt-2 border-t border-slate-50 dark:border-slate-800/50">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-300">تدفقات صادرة</span>
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                                                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">تدفقات واردة</span>
+                                                                </div>
+                                                                <span className="text-sm font-bold text-emerald-600 font-mono italic">
+                                                                    {formatCurrency(payload[0].value)}
+                                                                </span>
                                                             </div>
-                                                            <span className="text-sm font-bold text-rose-600 font-mono italic">
-                                                                {formatCurrency(payload[1].value)}
-                                                            </span>
+                                                            <div className="flex items-center justify-between pt-2 border-t border-slate-50 dark:border-slate-800/50">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                                                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">تدفقات صادرة</span>
+                                                                </div>
+                                                                <span className="text-sm font-bold text-rose-600 font-mono italic">
+                                                                    {formatCurrency(payload[1].value)}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    }}
-                                />
-                                <Area
-                                    type="monotone"
-                                    dataKey="in"
-                                    stroke="#10b981"
-                                    fillOpacity={1}
-                                    fill="url(#flowIn)"
-                                    strokeWidth={4}
-                                    animationDuration={2000}
-                                    dot={{ r: 4, fill: '#10b981', strokeWidth: 3, stroke: '#fff' }}
-                                    activeDot={{ r: 8, stroke: '#fff', strokeWidth: 4, fill: '#10b981' }}
-                                />
-                                <Area
-                                    type="monotone"
-                                    dataKey="out"
-                                    stroke="#f43f5e"
-                                    fillOpacity={1}
-                                    fill="url(#flowOut)"
-                                    strokeWidth={2}
-                                    strokeDasharray="8 8"
-                                    animationDuration={2500}
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                                                );
+                                            }
+                                            return null;
+                                        }}
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="in"
+                                        stroke="#10b981"
+                                        fillOpacity={1}
+                                        fill="url(#flowIn)"
+                                        strokeWidth={4}
+                                        animationDuration={2000}
+                                        dot={{ r: 4, fill: '#10b981', strokeWidth: 3, stroke: '#fff' }}
+                                        activeDot={{ r: 8, stroke: '#fff', strokeWidth: 4, fill: '#10b981' }}
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="out"
+                                        stroke="#f43f5e"
+                                        fillOpacity={1}
+                                        fill="url(#flowOut)"
+                                        strokeWidth={2}
+                                        strokeDasharray="8 8"
+                                        animationDuration={2500}
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="w-full h-[400px] bg-slate-50/50 dark:bg-slate-800/10 animate-pulse rounded-3xl" />
+                        )}
                     </div>
                 </div>
             </div>

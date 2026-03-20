@@ -142,18 +142,21 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        let retryTimer: any;
-        const timer = setTimeout(() => {
+        const checkDimensions = () => {
             if (containerRef.current && containerRef.current.offsetWidth > 0) {
                 setIsMounted(true);
-            } else {
-                retryTimer = setTimeout(() => setIsMounted(true), 500);
+                return true;
             }
-        }, 300);
-        return () => {
-            clearTimeout(timer);
-            if (retryTimer) clearTimeout(retryTimer);
+            return false;
         };
+
+        if (checkDimensions()) return;
+
+        const interval = setInterval(() => {
+            if (checkDimensions()) clearInterval(interval);
+        }, 500);
+
+        return () => clearInterval(interval);
     }, []);
 
     const metrics = React.useMemo(() => {
@@ -194,7 +197,7 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
               style={{ height: '220px', minHeight: '220px' }}
             >
                 {isMounted && (
-                    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={220} debounce={100}>
+                    <ResponsiveContainer width="99%" height="100%" debounce={100}>
                         <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="barRevenue" x1="0" y1="0" x2="0" y2="1">

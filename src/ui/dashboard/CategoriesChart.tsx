@@ -41,11 +41,25 @@ const renderActiveShape = (props: any) => {
 const CategoriesChart: React.FC<CategoriesChartProps> = ({ data }) => {
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 300);
-    return () => clearTimeout(timer);
+    const checkDimensions = () => {
+      if (containerRef.current && containerRef.current.offsetWidth > 0) {
+        setIsMounted(true);
+        return true;
+      }
+      return false;
+    };
+
+    if (checkDimensions()) return;
+
+    const interval = setInterval(() => {
+      if (checkDimensions()) clearInterval(interval);
+    }, 500);
+
+    return () => clearInterval(interval);
   }, []);
 
   const onPieEnter = (_: any, _index: number) => {
@@ -53,7 +67,10 @@ const CategoriesChart: React.FC<CategoriesChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="h-[300px] min-h-[300px] w-full relative group overflow-hidden">
+    <div 
+      ref={containerRef}
+      className="h-[300px] min-h-[300px] w-full relative group overflow-hidden"
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent dark:from-slate-800/20 rounded-3xl pointer-events-none" />
       {isMounted ? (
         <ResponsiveContainer width="99%" height="100%">

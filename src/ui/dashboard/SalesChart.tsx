@@ -21,11 +21,25 @@ const SalesChart: React.FC<SalesChartProps> = ({
   const { theme, accentColor } = useThemeStore();
   const isDark = theme === 'dark';
   const [period, setPeriod] = useState<PeriodType>('week');
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 300);
-    return () => clearTimeout(timer);
+    const checkDimensions = () => {
+      if (containerRef.current && containerRef.current.offsetWidth > 0) {
+        setIsMounted(true);
+        return true;
+      }
+      return false;
+    };
+
+    if (checkDimensions()) return;
+
+    const interval = setInterval(() => {
+      if (checkDimensions()) clearInterval(interval);
+    }, 500);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Calculate summary stats
@@ -87,7 +101,11 @@ const SalesChart: React.FC<SalesChartProps> = ({
       )}
 
       {/* Chart */}
-      <div className="flex-1 h-[220px] min-h-[220px] w-full relative group overflow-hidden" dir="ltr">
+      <div 
+        ref={containerRef}
+        className="flex-1 h-[220px] min-h-[220px] w-full relative group overflow-hidden" 
+        dir="ltr"
+      >
         {/* Decorative background glow */}
         <div
           className="absolute inset-x-0 bottom-0 h-32 opacity-20 transition-opacity duration-700 pointer-events-none rounded-b-3xl"
