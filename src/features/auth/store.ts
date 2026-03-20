@@ -15,6 +15,7 @@ interface AuthState {
   isReady: boolean;
   _authSubscription: { unsubscribe: () => void } | null;
   login: (user: AuthUser) => void;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
 }
@@ -36,6 +37,19 @@ export const useAuthStore = create<AuthState>()(
       _authSubscription: null,
 
       login: (user) => set({ user, isAuthenticated: true, isLoading: false, isReady: true }),
+
+      loginWithGoogle: async () => {
+        try {
+          set({ isLoading: true });
+          const { error } = await authApi.signInWithGoogle();
+          if (error) throw error;
+          // The page will redirect to Google, so we don't need to do anything else here.
+        } catch (err) {
+          logger.error('Auth', 'Google login error', err as Error);
+          set({ isLoading: false });
+          throw err;
+        }
+      },
 
       logout: async () => {
         try {

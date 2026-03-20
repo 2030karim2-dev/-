@@ -12,6 +12,19 @@ export const authApi = {
     });
   },
 
+  signInWithGoogle: async (redirectTo?: string) => {
+    return await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectTo || window.location.origin,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+  },
+
   // --- MFA Methods ---
   enrollMFA: async () => {
     return await supabase.auth.mfa.enroll({
@@ -101,8 +114,8 @@ export const authApi = {
         const fallbackData = {
           id: userId,
           email: user?.email || '',
-          full_name: profileData?.full_name || '',
-          avatar_url: profileData?.avatar_url,
+          full_name: profileData?.full_name || user?.user_metadata?.full_name || '',
+          avatar_url: profileData?.avatar_url || user?.user_metadata?.avatar_url,
           role: (roleRes.data as any)?.role || 'viewer',
           company_id: (roleRes.data as any)?.company_id,
           company_name: (roleRes.data as any)?.companies?.name_ar,

@@ -192,3 +192,23 @@ export const usePasswordChange = () => {
 
     return { changePassword, isLoading, error };
 };
+export const useGoogleLogin = () => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const { loginWithGoogle } = useAuthStore();
+
+    const login = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            await loginWithGoogle();
+            // Redirect is handled by the browser
+        } catch (err: unknown) {
+            const parsed = parseError(err);
+            setError(parsed.message);
+            setIsLoading(false);
+        }
+    };
+
+    return { login, isLoading, error };
+};
