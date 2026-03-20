@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useInventoryCategories, useInventoryCategoryMutations } from '../hooks/index';
 import CategoryExcelGrid from './CategoryExcelGrid';
 import Spinner from '../../../ui/base/Spinner';
 import CategoryStats from './categories/CategoryStats';
 import CategoryControlBar from './categories/CategoryControlBar';
 import CategoryGrid from './categories/CategoryGrid';
+import AICategoryReviewModal from './categories/AICategoryReviewModal';
 
 interface Props {
     onFilterProduct: (catName: string) => void;
@@ -20,11 +22,13 @@ interface Category {
 }
 
 const CategoriesManagementView: React.FC<Props> = ({ onFilterProduct }) => {
+    const queryClient = useQueryClient();
     const { data: categories, isLoading } = useInventoryCategories();
     const { createCategory, deleteCategory, isCreating } = useInventoryCategoryMutations();
     const [newCatName, setNewCatName] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [displayMode, setDisplayMode] = useState<'grid' | 'table'>('table');
+    const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
     const filteredCategories = useMemo(() => {
         if (!categories) return [];
@@ -65,6 +69,16 @@ const CategoriesManagementView: React.FC<Props> = ({ onFilterProduct }) => {
                 setSearchQuery={setSearchQuery}
                 displayMode={displayMode}
                 setDisplayMode={setDisplayMode}
+                onOpenAICategorize={() => setIsAIModalOpen(true)}
+            />
+
+            <AICategoryReviewModal 
+                isOpen={isAIModalOpen}
+                onClose={() => setIsAIModalOpen(false)}
+                onComplete={() => {
+                    queryClient.invalidateQueries({ queryKey: ['inventory_categories'] });
+                    queryClient.invalidateQueries({ queryKey: ['products'] });
+                }}
             />
 
             {displayMode === 'table' ? (

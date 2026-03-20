@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, Search, LayoutGrid, List } from 'lucide-react';
+import { Layers, Search, LayoutGrid, List, Sparkles } from 'lucide-react';
 import Button from '../../../../ui/base/Button';
 import { cn } from '../../../../core/utils';
 
@@ -12,11 +12,13 @@ interface Props {
     setSearchQuery: (query: string) => void;
     displayMode: 'grid' | 'table';
     setDisplayMode: (mode: 'grid' | 'table') => void;
+    onOpenAICategorize: () => void;
 }
 
 const CategoryControlBar: React.FC<Props> = ({
     newCatName, setNewCatName, handleAdd, isCreating,
-    searchQuery, setSearchQuery, displayMode, setDisplayMode
+    searchQuery, setSearchQuery, displayMode, setDisplayMode,
+    onOpenAICategorize
 }) => {
     return (
         <div className="flex flex-col md:flex-row gap-1.5 bg-white dark:bg-slate-900 p-1.5 border border-gray-100 dark:border-slate-800 shadow-sm">
@@ -33,6 +35,16 @@ const CategoryControlBar: React.FC<Props> = ({
                 </div>
                 <Button type="submit" isLoading={isCreating} size="sm" className="px-3 rounded-none text-[9px]">حفظ</Button>
             </form>
+
+            <Button 
+                onClick={onOpenAICategorize}
+                variant="ghost" 
+                size="sm" 
+                className="gap-2 text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-900/30 hover:bg-blue-100 rounded-none px-4"
+            >
+                <Sparkles size={12} />
+                تصنيف ذكي (AI)
+            </Button>
             <div className="flex gap-1 bg-gray-50 dark:bg-slate-800 p-1 rounded-none">
                 <button
                     onClick={() => setDisplayMode('grid')}

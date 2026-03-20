@@ -19,7 +19,7 @@ export async function generateAIContent(
     const isJson = options?.jsonMode ?? true;
     
     const finalSystemInstruction = isJson 
-        ? `${systemInstruction}\n\nيجب أن يكون الرد بصيغة JSON صالحة ومحاطة بعلامات \`\`\`json ... \`\`\`.`
+        ? `${systemInstruction}\n\nيجب أن يكون الرد بصيغة JSON صالحة وحصرية.`
         : systemInstruction;
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -37,7 +37,7 @@ export async function generateAIContent(
                 { role: 'user', content: prompt }
             ],
             temperature: options?.temperature ?? 0.1,
-            max_tokens: 1500
+            max_tokens: 4000
         })
     });
 
