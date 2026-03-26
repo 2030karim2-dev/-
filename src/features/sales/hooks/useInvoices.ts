@@ -11,7 +11,7 @@ export const useInvoices = () => {
   const companyId = user?.company_id;
   return useQuery({
     queryKey: ['invoices', companyId],
-    queryFn: () => companyId ? salesService.fetchSalesLog(companyId) : Promise.resolve([]),
+    queryFn: () => companyId ? salesService.fetchSalesLog(companyId) : Promise.resolve([] as any[]),
     enabled: !!companyId,
   });
 };
@@ -21,7 +21,7 @@ export const useSalesStats = () => {
   const companyId = user?.company_id;
   return useQuery({
     queryKey: ['sales_stats', companyId],
-    queryFn: () => companyId ? salesService.getStats(companyId) : Promise.resolve(null),
+    queryFn: () => companyId ? salesService.getStats(companyId) : Promise.resolve(null as any),
     enabled: !!companyId,
   });
 };

@@ -15,7 +15,7 @@ export const usePurchases = () => {
   const companyId = user?.company_id;
   return useQuery({
     queryKey: ['purchases', companyId],
-    queryFn: () => companyId ? purchasesService.getPurchases(companyId) : Promise.resolve([]),
+    queryFn: () => companyId ? purchasesService.getPurchases(companyId) : Promise.resolve([] as any[]),
     enabled: !!companyId,
   });
 };
@@ -112,7 +112,7 @@ export const usePurchasesAnalytics = () => {
   const companyId = user?.company_id;
   return useQuery({
     queryKey: ['purchases_analytics', companyId],
-    queryFn: () => companyId ? purchasesService.getAnalytics(companyId) : Promise.resolve(null),
+    queryFn: () => companyId ? purchasesService.getAnalytics(companyId) : Promise.resolve(null as any),
     enabled: !!companyId,
   });
 };

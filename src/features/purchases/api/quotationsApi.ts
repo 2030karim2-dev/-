@@ -10,7 +10,7 @@ export const purchaseQuotationsApi = {
    * Get all purchase quotations
    */
   getQuotations: async (companyId: string) => {
-    return await supabase
+    const { data, error } = await supabase
       .from('quotations')
       .select(`
         id,
@@ -31,13 +31,15 @@ export const purchaseQuotationsApi = {
       .eq('type', 'purchase')
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
+    
+    return { data, error };
   },
 
   /**
    * Get quotation details with items
    */
   getQuotationDetails: async (quotationId: string) => {
-    return await supabase
+    const { data, error } = await supabase
       .from('quotations')
       .select(`
         *,
@@ -49,6 +51,8 @@ export const purchaseQuotationsApi = {
       `)
       .eq('id', quotationId)
       .single();
+    
+    return { data, error };
   },
 
   /**

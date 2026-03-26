@@ -12,7 +12,7 @@ export const useWarehouses = () => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['warehouses', user?.company_id],
-        queryFn: () => user?.company_id ? inventoryService.getWarehouses(user.company_id) : Promise.resolve([]),
+        queryFn: () => user?.company_id ? inventoryService.getWarehouses(user.company_id) : Promise.resolve([] as any[]),
         enabled: !!user?.company_id
     });
 };
@@ -23,7 +23,7 @@ export const useWarehouseProducts = (warehouseId: string | null) => {
         queryKey: ['warehouse_products', warehouseId],
         queryFn: () => (user?.company_id && warehouseId)
             ? inventoryService.getProductsForWarehouse(user.company_id, warehouseId)
-            : Promise.resolve([]),
+            : Promise.resolve([] as any[]),
         enabled: !!user?.company_id && !!warehouseId,
     });
 };
@@ -66,7 +66,7 @@ export const useTransfers = () => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['transfers', user?.company_id],
-        queryFn: () => user?.company_id ? inventoryService.getTransfers(user.company_id) : Promise.resolve([]),
+        queryFn: () => user?.company_id ? inventoryService.getTransfers(user.company_id) : Promise.resolve([] as any[]),
         enabled: !!user?.company_id
     });
 };
@@ -75,7 +75,7 @@ export const useAuditSessions = () => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['audit_sessions', user?.company_id],
-        queryFn: () => user?.company_id ? inventoryService.getAuditSessions(user.company_id) : Promise.resolve([]),
+        queryFn: () => user?.company_id ? inventoryService.getAuditSessions(user.company_id) : Promise.resolve([] as any[]),
         enabled: !!user?.company_id
     });
 };
@@ -119,7 +119,7 @@ export const useInventoryCategories = () => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['inventory_categories', user?.company_id],
-        queryFn: () => user?.company_id ? inventoryService.getInventoryCategories(user.company_id) : Promise.resolve([]),
+        queryFn: () => user?.company_id ? inventoryService.getInventoryCategories(user.company_id) : Promise.resolve([] as any[]),
         enabled: !!user?.company_id
     });
 };
@@ -265,11 +265,11 @@ export const useInventoryAnalytics = (from?: string, to?: string) => {
     return useQuery({
         queryKey: ['inventory_analytics', user?.company_id, from, to],
         queryFn: () => user?.company_id ? inventoryService.getInventoryAnalytics(user.company_id, from, to) : Promise.resolve({
-            mostActive: [],
-            mostProfitable: [],
-            stagnant: [],
-            abcAnalysis: { A: [], B: [], C: [] },
-            stockAlerts: []
+            mostActive: [] as any[],
+            mostProfitable: [] as any[],
+            stagnant: [] as any[],
+            abcAnalysis: { A: [] as any[], B: [] as any[], C: [] as any[] },
+            stockAlerts: [] as any[]
         }),
         enabled: !!user?.company_id,
     });

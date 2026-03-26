@@ -1,0 +1,141 @@
+﻿src/features/accounting/components/treasury/TreasuryView.tsx(22,11): error TS6133: 'showToast' is declared but its value is never read.
+src/features/accounting/hooks/useJournalEntryForm.ts(8,1): error TS6133: 'useFeedbackStore' is declared but its value is never read.
+src/features/accounting/hooks/useJournalEntryForm.ts(40,9): error TS2322: Type 'Resolver<{ date: string; currency_code: string; description: string; exchange_rate: number; lines: { account_id: string; credit_amount: number; debit_amount: number; description?: string | undefined; }[]; }, any, { ...; }>' is not assignable to type 'Resolver<JournalEntryFormData, any, JournalEntryFormData>'.
+  Types of parameters 'values' and 'values' are incompatible.
+    Type 'JournalEntryFormData' is not assignable to type '{ date: string; currency_code: string; description: string; exchange_rate: number; lines: { account_id: string; credit_amount: number; debit_amount: number; description?: string | undefined; }[]; }'.
+      Types of property 'currency_code' are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.
+src/features/accounting/hooks/useJournalEntryForm.ts(98,36): error TS2345: Argument of type '(data: JournalEntryFormData) => void' is not assignable to parameter of type 'SubmitHandler<TFieldValues>'.
+  Types of parameters 'data' and 'data' are incompatible.
+    Type 'TFieldValues' is not assignable to type 'JournalEntryFormData'.
+      Type 'FieldValues' is missing the following properties from type 'JournalEntryFormData': date, description, lines
+src/features/accounting/services/accountsService.ts(86,62): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/features/accounting/services/accountsService.ts(149,57): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/features/accounting/services/reportService.ts(132,31): error TS7006: Parameter 'line' implicitly has an 'any' type.
+src/features/ai/components/debt/CustomerRiskTable.tsx(79,52): error TS2552: Cannot find name 'getPriorityColor'. Did you mean 'priorityColor'?
+src/features/ai/components/debt/CustomerRiskTable.tsx(103,47): error TS2304: Cannot find name 'Flag'.
+src/features/ai/hooks/useDebtChat.ts(1,33): error TS6133: 'useRef' is declared but its value is never read.
+src/features/ai/hooks/useDebtChat.ts(1,41): error TS6133: 'useEffect' is declared but its value is never read.
+src/features/bonds/components/BondAccountDistributionChart.tsx(44,29): error TS2322: Type '{ children: Element[]; activeIndex: number | undefined; activeShape: (props: any) => Element; data: { name: string; amount: number; count: number; }[]; cx: string; cy: string; innerRadius: number; ... 6 more ...; animationDuration: number; }' is not assignable to type 'IntrinsicAttributes & PieSvgAttributes & PieProps'.
+  Property 'activeIndex' does not exist on type 'IntrinsicAttributes & PieSvgAttributes & PieProps'.
+src/features/dashboard/components/QuotationSummaryWidget.tsx(7,1): error TS6133: 'cn' is declared but its value is never read.
+src/features/dashboard/components/QuotationSummaryWidget.tsx(13,59): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(options: DefinedInitialDataOptions<unknown, Error, unknown, (string | undefined)[]>, queryClient?: QueryClient | undefined): DefinedUseQueryResult<unknown, Error>', gave the following error.
+    Argument of type '{ queryKey: (string | undefined)[]; queryFn: () => Promise<{ data: QuotationRow[] | null; error: any; }> | Promise<{ data: never[]; }>; enabled: boolean; }' is not assignable to parameter of type 'DefinedInitialDataOptions<unknown, Error, unknown, (string | undefined)[]>'.
+      Property 'initialData' is missing in type '{ queryKey: (string | undefined)[]; queryFn: () => Promise<{ data: QuotationRow[] | null; error: any; }> | Promise<{ data: never[]; }>; enabled: boolean; }' but required in type '{ initialData: unknown; queryFn?: QueryFunction<unknown, (string | undefined)[]>; }'.
+  Overload 2 of 3, '(options: UndefinedInitialDataOptions<{ data: QuotationRow[] | null; error: any; }, Error, { data: QuotationRow[] | null; error: any; }, (string | undefined)[]>, queryClient?: QueryClient | undefined): UseQueryResult<...>', gave the following error.
+    Type '() => Promise<{ data: QuotationRow[] | null; error: any; }> | Promise<{ data: never[]; }>' is not assignable to type 'unique symbol | QueryFunction<{ data: QuotationRow[] | null; error: any; }, (string | undefined)[], never>'.
+      Type '() => Promise<{ data: QuotationRow[] | null; error: any; }> | Promise<{ data: never[]; }>' is not assignable to type 'QueryFunction<{ data: QuotationRow[] | null; error: any; }, (string | undefined)[], never>'.
+        Type 'Promise<{ data: QuotationRow[] | null; error: any; }> | Promise<{ data: never[]; }>' is not assignable to type '{ data: QuotationRow[] | null; error: any; } | Promise<{ data: QuotationRow[] | null; error: any; }>'.
+          Type 'Promise<{ data: never[]; }>' is not assignable to type '{ data: QuotationRow[] | null; error: any; } | Promise<{ data: QuotationRow[] | null; error: any; }>'.
+            Type 'Promise<{ data: never[]; }>' is not assignable to type 'Promise<{ data: QuotationRow[] | null; error: any; }>'.
+              Property 'error' is missing in type '{ data: never[]; }' but required in type '{ data: QuotationRow[] | null; error: any; }'.
+  Overload 3 of 3, '(options: UseQueryOptions<{ data: QuotationRow[] | null; error: any; }, Error, { data: QuotationRow[] | null; error: any; }, (string | undefined)[]>, queryClient?: QueryClient | undefined): UseQueryResult<...>', gave the following error.
+    Type '() => Promise<{ data: QuotationRow[] | null; error: any; }> | Promise<{ data: never[]; }>' is not assignable to type 'unique symbol | QueryFunction<{ data: QuotationRow[] | null; error: any; }, (string | undefined)[], never>'.
+      Type '() => Promise<{ data: QuotationRow[] | null; error: any; }> | Promise<{ data: never[]; }>' is not assignable to type 'QueryFunction<{ data: QuotationRow[] | null; error: any; }, (string | undefined)[], never>'.
+        Type 'Promise<{ data: QuotationRow[] | null; error: any; }> | Promise<{ data: never[]; }>' is not assignable to type '{ data: QuotationRow[] | null; error: any; } | Promise<{ data: QuotationRow[] | null; error: any; }>'.
+          Type 'Promise<{ data: never[]; }>' is not assignable to type '{ data: QuotationRow[] | null; error: any; } | Promise<{ data: QuotationRow[] | null; error: any; }>'.
+            Type 'Promise<{ data: never[]; }>' is not assignable to type 'Promise<{ data: QuotationRow[] | null; error: any; }>'.
+              Property 'error' is missing in type '{ data: never[]; }' but required in type '{ data: QuotationRow[] | null; error: any; }'.
+src/features/dashboard/components/QuotationSummaryWidget.tsx(26,34): error TS2339: Property 'data' does not exist on type '{}'.
+src/features/dashboard/hooks/useDashboard.ts(139,18): error TS7006: Parameter 'payload' implicitly has an 'any' type.
+src/features/inventory/api/autoPartsApi.ts(15,38): error TS7006: Parameter 'product' implicitly has an 'any' type.
+src/features/inventory/api/autoPartsApi.ts(29,19): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/inventory/api/autoPartsApi.ts(30,22): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/features/inventory/api/autoPartsApi.ts(35,27): error TS7006: Parameter 'req' implicitly has an 'any' type.
+src/features/inventory/api/autoPartsApi.ts(79,19): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/inventory/api/autoPartsApi.ts(80,22): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/features/inventory/api/autoPartsApi.ts(84,27): error TS7006: Parameter 'req' implicitly has an 'any' type.
+src/features/inventory/api/autoPartsApi.ts(132,27): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/inventory/components/AIChatInterface.tsx(2,21): error TS6133: 'User' is declared but its value is never read.
+src/features/inventory/components/AIChatInterface.tsx(2,46): error TS6133: 'MessageSquare' is declared but its value is never read.
+src/features/inventory/components/auto_parts/CrossReferenceList.tsx(4,42): error TS6133: 'Box' is declared but its value is never read.
+src/features/inventory/components/auto_parts/CrossReferenceList.tsx(4,47): error TS6133: 'AlertTriangle' is declared but its value is never read.
+src/features/inventory/components/auto_parts/CrossReferenceList.tsx(4,62): error TS6133: 'CheckCircle' is declared but its value is never read.
+src/features/inventory/components/auto_parts/ProductKitList.tsx(4,33): error TS6133: 'Box' is declared but its value is never read.
+src/features/inventory/components/auto_parts/SupplierPricesList.tsx(5,34): error TS6133: 'DollarSign' is declared but its value is never read.
+src/features/inventory/components/auto_parts/SupplierPricesList.tsx(5,46): error TS6133: 'Calendar' is declared but its value is never read.
+src/features/inventory/components/auto_parts/VehicleCompatibilityList.tsx(5,1): error TS6133: 'cn' is declared but its value is never read.
+src/features/inventory/components/auto_parts/VehicleCompatibilityList.tsx(15,37): error TS6133: 'error' is declared but its value is never read.
+src/features/inventory/components/categories/AICategoryReviewModal.tsx(260,10): error TS6133: 'cn' is declared but its value is never read.
+src/features/inventory/components/product_detail/AlternativesSection.tsx(2,141): error TS6133: 'Clock' is declared but its value is never read.
+src/features/inventory/components/product_detail/FitmentSection.tsx(2,40): error TS6133: 'Loader2' is declared but its value is never read.
+src/features/inventory/components/transfers/TransferItemsList.tsx(143,21): error TS2322: Type '{ products: any[]; isLoading: false; hideActions: true; hideBulkActions: true; extraColumns: ({ header: string; accessorKey: string; accessor: (row: any) => Element; isEditable: boolean; width: string; align?: never; } | { ...; })[]; onCellUpdate: any; title: string; subtitle: string; colorTheme: string; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'onCellUpdate' does not exist on type 'IntrinsicAttributes & Props'.
+src/features/inventory/components/transfers/TransferProductSearch.tsx(11,68): error TS6133: 'products' is declared but its value is never read.
+src/features/inventory/components/transfers/TransferProductSearch.tsx(11,78): error TS6133: 'onAddItem' is declared but its value is never read.
+src/features/inventory/components/warehouses/WarehouseDetailView.tsx(21,32): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/features/inventory/hooks/useProducts.ts(35,18): error TS7006: Parameter 'payload' implicitly has an 'any' type.
+src/features/inventory/services/analyticsService.ts(112,9): error TS2578: Unused '@ts-expect-error' directive.
+src/features/parties/api/enhanced/customerApi.ts(61,34): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/parties/api/enhanced/customerApi.ts(98,34): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/parties/api/enhanced/customerApi.ts(184,34): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/parties/api/enhanced/customerApi.ts(241,37): error TS7006: Parameter 'tag' implicitly has an 'any' type.
+src/features/parties/api/enhanced/customerApi.ts(333,33): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/parties/api/enhanced/customerApi.ts(393,34): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/parties/api/enhanced/customerApi.ts(423,34): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/pos/components/ProductGrid.tsx(40,33): error TS7006: Parameter 'cat' implicitly has an 'any' type.
+src/features/pos/pages/POSPage.tsx(154,88): error TS2322: Type '{ onPay: () => void; onSuspend: () => void; isQuickMode: boolean; }' is not assignable to type 'IntrinsicAttributes & POSCartProps'.
+  Property 'isQuickMode' does not exist on type 'IntrinsicAttributes & POSCartProps'.
+src/features/purchases/api.ts(26,26): error TS2347: Untyped function calls may not accept type arguments.
+src/features/purchases/api.ts(163,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/purchases/api/quotationsApi.ts(171,40): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/features/purchases/components/quotations/PurchaseQuotationsTab.tsx(102,10): error TS2375: Type '{ rfqGroupId: string; onClose: () => void; onConvertToPurchase: (() => void) | undefined; }' is not assignable to type 'Props' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'onConvertToPurchase' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(30,53): error TS6133: 'rfqGroupId' is declared but its value is never read.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(31,21): error TS6133: 'setSuppliers' is declared but its value is never read.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(31,37): error TS2304: Cannot find name 'useState'.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(32,19): error TS6133: 'setLoading' is declared but its value is never read.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(32,33): error TS2304: Cannot find name 'useState'.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(33,45): error TS2304: Cannot find name 'useState'.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(34,35): error TS2304: Cannot find name 'useState'.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(37,33): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(50,48): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(70,22): error TS2304: Cannot find name 'useMemo'.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(75,23): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(75,55): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(82,25): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(83,46): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(94,27): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(94,30): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(158,35): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(176,47): error TS7006: Parameter 'desc' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(176,53): error TS7006: Parameter 'idx' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(181,37): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(182,60): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(216,35): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(236,35): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(247,35): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(259,35): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(298,37): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(312,64): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/components/quotations/QuotationComparisonView.tsx(312,114): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/features/purchases/service.ts(113,34): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/features/purchases/service.ts(124,34): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/features/purchases/service.ts(126,42): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/features/purchases/service.ts(126,47): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/features/returns/components/ReturnsWizard.tsx(2,19): error TS6133: 'Hash' is declared but its value is never read.
+src/features/returns/components/ReturnsWizard.tsx(28,51): error TS2345: Argument of type 'RefObject<HTMLDivElement | null>' is not assignable to parameter of type 'RefObject<HTMLDivElement>'.
+  Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
+    Type 'null' is not assignable to type 'HTMLDivElement'.
+src/features/sales/components/quotations/QuotationsTab.tsx(207,10): error TS2375: Type '{ quotationId: string; onClose: () => void; onRefresh: () => Promise<void>; onConvertToInvoice: (() => void) | undefined; }' is not assignable to type 'Props' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'onConvertToInvoice' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+src/features/sales/hooks/useInvoiceDetails.ts(9,15): error TS2339: Property 'data' does not exist on type 'InvoiceWithDetails'.
+src/features/sales/hooks/useInvoiceDetails.ts(9,21): error TS2339: Property 'error' does not exist on type 'InvoiceWithDetails'.
+src/features/settings/api.ts(6,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(15,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(26,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(35,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(53,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(63,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(73,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(113,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(126,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(136,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(151,18): error TS2347: Untyped function calls may not accept type arguments.
+src/features/settings/api.ts(160,18): error TS2347: Untyped function calls may not accept type arguments.
