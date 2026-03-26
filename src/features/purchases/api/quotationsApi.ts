@@ -168,7 +168,7 @@ export const purchaseQuotationsApi = {
 
     // Deduplicate by rfq_group_id
     const seen = new Set<string>();
-    const unique = (data || []).filter(row => {
+    const unique = (data || []).filter((row: any) => {
       if (!row.rfq_group_id || seen.has(row.rfq_group_id)) return false;
       seen.add(row.rfq_group_id);
       return true;

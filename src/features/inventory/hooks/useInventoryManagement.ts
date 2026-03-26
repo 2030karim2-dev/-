@@ -204,6 +204,21 @@ export const useInventoryMutations = () => {
         }
     });
 
+    const quickAdjust = useMutation({
+        mutationFn: (items: { product_id: string; warehouse_id: string; quantity: number }[]) => {
+            if (!user?.company_id || !user.id) throw new Error("Auth error");
+            return inventoryService.quickAdjustStock(user.company_id, items, user.id);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: ['audit_sessions'] });
+            showToast("تم إضافة التسويات السريعة بنجاح", 'success');
+        },
+        onError: (err: any) => {
+            showToast("فشلت التسوية السريعة: " + err.message, 'error');
+        }
+    });
+
     return {
         createTransfer: transfer.mutate,
         isTransferring: transfer.isPending,
@@ -213,6 +228,8 @@ export const useInventoryMutations = () => {
         isFinalizing: finalize.isPending,
         saveAuditProgress: saveProgress.mutate,
         isSavingProgress: saveProgress.isPending,
+        quickAdjustStock: quickAdjust.mutate,
+        isQuickAdjusting: quickAdjust.isPending,
     };
 };
 

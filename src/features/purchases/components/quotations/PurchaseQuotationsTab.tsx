@@ -102,7 +102,7 @@ export const PurchaseQuotationsTab: React.FC<Props> = ({ onConvertToPurchase }) 
         <QuotationComparisonView
           rfqGroupId={compareGroupId}
           onClose={() => setCompareGroupId(null)}
-          onConvertToPurchase={onConvertToPurchase}
+          {...(onConvertToPurchase ? { onConvertToPurchase } : {})}
         />
       )}
 

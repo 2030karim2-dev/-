@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Store, ScanBarcode, RotateCcw, PauseCircle, ShoppingCart, ChevronLeft, Home } from 'lucide-react';
+import { Store, ScanBarcode, RotateCcw, PauseCircle, ShoppingCart, ChevronLeft, Home, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import MicroHeader from '../../../ui/base/MicroHeader';
 import ProductGrid from '../components/ProductGrid';
@@ -22,6 +22,7 @@ const POSPage: React.FC = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [showSuspended, setShowSuspended] = useState(false);
+  const [isQuickMode, setIsQuickMode] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState<'products' | 'cart'>('products');
   const isDesktop = useBreakpoint('md');
   const { t } = useTranslation();
@@ -93,6 +94,13 @@ const POSPage: React.FC = () => {
         <Home size={18} />
       </button>
       <button
+        onClick={() => setIsQuickMode(!isQuickMode)}
+        className={`p-2 rounded-xl active:scale-95 transition-all border ${isQuickMode ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 border-blue-200 dark:border-blue-800' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 border-slate-100 dark:border-slate-800'}`}
+        title="الوضع السريع"
+      >
+        <Zap size={18} />
+      </button>
+      <button
         onClick={() => resetCart()}
         className="p-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-xl hover:bg-rose-100 active:scale-95 transition-all border border-rose-100 dark:border-rose-900/30"
         title={t('clear_cart')}
@@ -114,6 +122,7 @@ const POSPage: React.FC = () => {
         onSearchChange={setSearchTerm}
         searchWidth="md:w-[550px] lg:w-[800px] xl:w-[1000px]"
         extraRow={
+          !isQuickMode ? (
           <button
             onClick={() => setIsScannerOpen(true)}
             className="flex items-center justify-center gap-3 bg-blue-600 text-white py-2 rounded-xl shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all font-bold text-[11px] uppercase tracking-widest px-4"
@@ -121,6 +130,7 @@ const POSPage: React.FC = () => {
             <ScanBarcode size={18} />
             <span className="hidden sm:inline">{t('launch_scanner')}</span>
           </button>
+          ) : undefined
         }
       />
 
@@ -141,11 +151,13 @@ const POSPage: React.FC = () => {
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">مراجعة الطلب</span>
             </div>
           )}
-          <POSCart onPay={() => setIsPaymentModalOpen(true)} onSuspend={handleSuspend} />
+          <POSCart onPay={() => setIsPaymentModalOpen(true)} onSuspend={handleSuspend} isQuickMode={isQuickMode} />
 
+          {!isQuickMode && (
           <div className="p-2 bg-gray-50 dark:bg-slate-950 border-t dark:border-slate-800 hidden md:block">
             <SmartRecommendations cartItems={items.filter(i => i.productId) as any} onAdd={(name) => setSearchTerm(name)} />
           </div>
+          )}
         </aside>
 
         {/* Product Grid / Mobile View */}

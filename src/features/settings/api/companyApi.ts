@@ -8,7 +8,7 @@ export const companyApi = {
       .from('companies')
       .select('*')
       .eq('id', companyId)
-      .single();
+      .maybeSingle();
   },
 
   updateCompany: async (companyId: string, data: CompanyFormData) => {

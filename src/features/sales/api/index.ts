@@ -30,7 +30,10 @@ type InvoiceWithDetails = Invoice & {
 };
 
 export const salesApi = {
-  getInvoices: async (companyId: string) => {
+  getInvoices: async (companyId: string, page: number = 0, limit: number = 50) => {
+    const from = page * limit;
+    const to = from + limit - 1;
+
     const { data, error } = await supabase
       .from('invoices')
       .select(`
@@ -52,7 +55,7 @@ export const salesApi = {
       .neq('status', 'void')
       .is('deleted_at', null)
       .order('issue_date', { ascending: false })
-      .limit(1000);
+      .range(from, to);
 
     if (error) throw parseError(error);
     return data as unknown as InvoiceWithParty[];
@@ -160,9 +163,16 @@ export const salesApi = {
   },
 
   deleteInvoice: async (id: string) => {
-    return await supabase
-      .from('invoices')
-      .update({ deleted_at: new Date().toISOString() })
-      .eq('id', id);
+    // Avoid providing client-system dates to auditing timestamps, relying instead on 
+    // remote RPCs for secure soft deletion logging where feasible.
+    const { error } = await supabase.rpc('void_invoice', { p_invoice_id: id });
+    if(error) {
+      // Direct update fallback (for envs lacking void_invoice)
+      return await supabase
+        .from('invoices')
+        .update({ deleted_at: ((new Date()).toISOString() as unknown as string), status: 'void' })
+        .eq('id', id);
+    }
+    return { error: null };
   }
 };

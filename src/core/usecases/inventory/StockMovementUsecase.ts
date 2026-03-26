@@ -1,5 +1,4 @@
 import { inventoryApi } from '../../../features/inventory/api';
-import { costingService } from '../../../features/inventory/services/costingService';
 import { supabase } from '../../../lib/supabaseClient';
 
 interface MovementParams {
@@ -16,24 +15,21 @@ interface MovementParams {
 
 export class StockMovementUsecase {
   static async execute(params: MovementParams) {
+    if (!params.productId) {
+      throw new Error("لم يتم تحديدرقم مرجعي للمنتج (Product ID missing)");
+    }
 
     // 1. إذا كانت الحركة توريد (IN)، نقوم بتحديث متوسط التكلفة أولاً
-    if (params.type === 'IN' && params.unitPrice !== undefined) {
-      const { data: product } = await (supabase.from('products') as any)
-        .select('cost_price, product_stock(quantity)')
-        .eq('id', params.productId)
-        .single();
-
-      if (product) {
-        const currentTotalStock = (product.product_stock || []).reduce((s: number, i: any) => s + i.quantity, 0);
-        const newWac = costingService.calculateNewAverageCost(
-          currentTotalStock,
-          product.cost_price,
-          params.quantity,
-          params.unitPrice
-        );
-
-        await (supabase.from('products') as any).update({ cost_price: newWac }).eq('id', params.productId);
+    if (params.type === 'IN' && params.unitPrice !== undefined && params.quantity > 0) {
+      // Execute Atomic Database RPC instead of calculating in JS memory to prevent race conditions
+      const { error: wacError } = await supabase.rpc('calculate_and_update_wac', {
+          p_product_id: params.productId,
+          p_added_qty: params.quantity,
+          p_unit_price: params.unitPrice
+      });
+      if (wacError) {
+        console.error("RPC calculate_and_update_wac error:", wacError);
+        throw new Error("فشل في تقييم متوسط التكلفة الآلي للمخزون");
       }
     }
 

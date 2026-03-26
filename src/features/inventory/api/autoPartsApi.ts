@@ -11,8 +11,7 @@ const fetchProductsByIds = async (productIds: string[]) => {
         .in('id', productIds);
 
     if (error) throw error;
-
-    return new Map((data || []).map((product) => [product.id, product as Record<string, unknown>]));
+    return new Map((data || []).map((product: any) => [product.id, product as Record<string, unknown>]));
 };
 
 export const autoPartsApi = {
@@ -26,13 +25,13 @@ export const autoPartsApi = {
         if (error) throw error;
 
         const alternativeProductIds = (data || [])
-            .map((item) => item.alternative_product_id)
-            .filter((id): id is string => typeof id === 'string');
+            .map((item: any) => item.alternative_product_id)
+            .filter((id: any): id is string => typeof id === 'string');
 
         const productsMap = await fetchProductsByIds(alternativeProductIds);
 
         // Map camelCase for frontend where necessary
-        return data?.map((req) => {
+        return data?.map((req: any) => {
             type AltProduct = { name_ar?: string; name_en?: string };
             const alternativeProduct = productsMap.get(req.alternative_product_id) || null;
             const alt = alternativeProduct as AltProduct | null;
@@ -76,12 +75,12 @@ export const autoPartsApi = {
         if (error) throw error;
 
         const componentProductIds = (data || [])
-            .map((item) => item.component_product_id)
-            .filter((id): id is string => typeof id === 'string');
+            .map((item: any) => item.component_product_id)
+            .filter((id: any): id is string => typeof id === 'string');
 
         const productsMap = await fetchProductsByIds(componentProductIds);
 
-        return data?.map((req) => {
+        return data?.map((req: any) => {
             type CompProduct = { name_ar?: string; name_en?: string };
             const componentProduct = productsMap.get(req.component_product_id) || null;
             const comp = componentProduct as CompProduct | null;
@@ -129,7 +128,7 @@ export const autoPartsApi = {
 
         if (error) throw error;
 
-        return data?.map((item) => {
+        return data?.map((item: any) => {
             type Sup = { name?: string };
             const sup = item.supplier as unknown as Sup | null;
             return {

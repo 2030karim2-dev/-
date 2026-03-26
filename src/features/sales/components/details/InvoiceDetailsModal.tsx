@@ -182,7 +182,14 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
               </div>
             </div>
 
-            <InvoiceHealthBadge invoice={invoice} />
+            <InvoiceHealthBadge invoice={{
+              number: invoice.invoice_number || '',
+              total: invoice.total_amount || 0,
+              itemCount: invoice.invoice_items?.length || 0,
+              customerName: (invoice.parties as any)?.name || 'غير محدد',
+              customerDebt: 0,
+              avgInvoiceTotal: 0
+            }} />
 
             {showReturnSection ? (
               <ReturnWizard 

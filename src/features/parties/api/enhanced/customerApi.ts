@@ -58,7 +58,7 @@ export const customerApi = {
 
         if (error) throw error;
 
-        return (data || []).map((item) => this._mapCustomerActivity(item));
+        return (data || []).map((item: any) => this._mapCustomerActivity(item));
     },
 
     async getCompanyActivities(companyId: string, filters?: CustomerActivityFilters): Promise<CustomerActivity[]> {
@@ -95,7 +95,7 @@ export const customerApi = {
 
         if (error) throw error;
 
-        return (data || []).map((item) => this._mapCustomerActivity(item));
+        return (data || []).map((item: any) => this._mapCustomerActivity(item));
     },
 
     async createActivity(activity: CustomerActivityFormData & { customerId: string; companyId: string }): Promise<CustomerActivity> {
@@ -181,7 +181,7 @@ export const customerApi = {
 
         if (error) throw error;
 
-        return (data || []).map((item) => ({
+        return (data || []).map((item: any) => ({
             id: item.id,
             companyId: item.company_id || '',
             customerId: item.customer_id || '',
@@ -238,7 +238,7 @@ export const customerApi = {
 
         // Get count for each tag
         const tagsWithCount = await Promise.all(
-            (data || []).map(async (tag) => {
+            (data || []).map(async (tag: any) => {
                 const { count } = await supabase
                     .from('customer_tag_assignments')
                     .select('*', { count: 'exact', head: true })
@@ -330,7 +330,7 @@ export const customerApi = {
 
         if (error) throw error;
 
-        return (data || []).map(item => ({
+        return (data || []).map((item: any) => ({
             id: item.tag.id,
             companyId: item.tag.company_id || '',
             name: item.tag.name,
@@ -390,7 +390,7 @@ export const customerApi = {
 
         if (error) throw error;
 
-        return (data || []).map((item) => this._mapCustomerActivity(item));
+        return (data || []).map((item: any) => this._mapCustomerActivity(item));
     },
 
     async getOverdueActivities(companyId: string): Promise<CustomerActivity[]> {
@@ -420,7 +420,7 @@ export const customerApi = {
                 .lt('scheduled_at', now);
         }
 
-        return (data || []).map((item) => {
+        return (data || []).map((item: any) => {
             const activity = this._mapCustomerActivity(item);
             activity.status = 'overdue';
             return activity;

@@ -6,8 +6,7 @@ export const useInvoiceDetails = (invoiceId: string | null) => {
     queryKey: ['invoice_details', invoiceId],
     queryFn: async () => {
       if (!invoiceId) return null;
-      const { data, error } = await salesApi.getInvoiceDetails(invoiceId);
-      if (error) throw error;
+      const data = await salesApi.getInvoiceDetails(invoiceId);
       return data;
     },
     enabled: !!invoiceId,

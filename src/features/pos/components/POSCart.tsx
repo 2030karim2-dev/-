@@ -9,9 +9,10 @@ import { useTranslation } from '../../../lib/hooks/useTranslation';
 interface POSCartProps {
     onPay: () => void;
     onSuspend: () => void;
+    isQuickMode?: boolean;
 }
 
-export const POSCart: React.FC<POSCartProps> = ({ onPay, onSuspend }) => {
+export const POSCart: React.FC<POSCartProps> = ({ onPay, onSuspend, isQuickMode }) => {
     const { items, updateQuantity, removeItem, summary, currency, setMetadata } = useSalesStore();
     const validItems = items.filter(i => i.productId);
     const { t } = useTranslation();

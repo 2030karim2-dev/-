@@ -20,6 +20,7 @@ import DashboardPage from '../features/dashboard/DashboardPage';
 // Lazy Loaded Features
 const InventoryPage = lazy(() => import('../features/inventory/InventoryPage'));
 const AuditSessionPage = lazy(() => import('../features/inventory/pages/AuditSessionPage'));
+const QuickAuditPage = lazy(() => import('../features/inventory/pages/QuickAuditPage'));
 const DeadStockPage = lazy(() => import('../features/inventory/pages/DeadStockPage'));
 const POSPage = lazy(() => import('../features/pos/pages/POSPage'));
 const SalesPage = lazy(() => import('../features/sales/pages/SalesPage'));
@@ -76,6 +77,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.DASHBOARD.INVENTORY} element={<Suspense fallback={<PageLoader />}><InventoryPage /></Suspense>} />
         <Route path="/inventory/dead-stock" element={<Suspense fallback={<PageLoader />}><DeadStockPage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.INVENTORY_AUDIT_SESSION} element={<Suspense fallback={<PageLoader />}><AuditSessionPage /></Suspense>} />
+        <Route path="/inventory/quick-audit" element={<Suspense fallback={<PageLoader />}><QuickAuditPage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.SALES} element={<Suspense fallback={<PageLoader />}><SalesPage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.POS} element={<Suspense fallback={<PageLoader />}><POSPage /></Suspense>} />
         <Route path={ROUTES.DASHBOARD.ACCOUNTING} element={<Suspense fallback={<PageLoader />}><AccountingPage /></Suspense>} />

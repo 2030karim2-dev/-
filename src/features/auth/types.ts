@@ -6,11 +6,11 @@ export interface AuthUser {
   name?: string; // Alias for full_name for backward compatibility
   avatar_url?: string | null;
 
-  // هذه الحقول تأتي الآن من جدول الربط (Join Table)
-  // وتضاف برمجياً في الـ API Layer
+  // تأتي الآن من جدول الربط (Join Table) و جدول roles_permissions
   role?: string;
   company_id?: string;
   company_name?: string;
+  permissions?: string[];
 }
 
 export interface LoginCredentials {

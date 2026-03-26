@@ -9,6 +9,9 @@ import { logger } from '../../core/utils/logger';
 import { accountsService } from '../accounting/services/accountsService';
 import { supabase } from '../../lib/supabaseClient';
 
+// Constants (These should eventually be migrated to an i18n translation file e.g., t('cash_customer'))
+const CASH_CUSTOMER_LABEL = 'عميل نقدي';
+
 // Type for raw invoice data from Supabase
 interface RawInvoice {
   id: string;
@@ -26,32 +29,35 @@ interface RawInvoice {
 }
 
 export const salesService = {
-  fetchSalesLog: async (companyId: string) => {
-    const { data, error } = await salesApi.getInvoices(companyId);
-    if (error) {
+  fetchSalesLog: async (companyId: string, page: number = 0) => {
+    try {
+      const data = await salesApi.getInvoices(companyId, page);
+      return (data || []).map((inv: unknown) => {
+        const _inv = inv as RawInvoice;
+        return {
+          id: _inv.id,
+          invoiceNumber: _inv.invoice_number,
+          customerName: _inv.party?.name || CASH_CUSTOMER_LABEL,
+          date: new Date(_inv.issue_date).toLocaleDateString('ar-SA'),
+          total: Number(_inv.total_amount) || 0,
+          baseTotal: toBaseCurrency({
+            amount: Number(_inv.total_amount) || 0,
+            currency_code: _inv.currency_code || 'SAR',
+            exchange_rate: Number(_inv.exchange_rate) || 1
+          }),
+          status: _inv.status,
+          type: _inv.type,
+          paymentMethod: _inv.payment_method,
+          currencyCode: _inv.currency_code || 'SAR',
+          exchangeRate: Number(_inv.exchange_rate) || 1,
+          itemCount: Array.isArray(_inv.invoice_items) ? _inv.invoice_items.length : 0,
+          referenceInvoiceId: _inv.reference_invoice_id
+        };
+      });
+    } catch (error) {
       logger.error('SalesService', 'Failed to fetch sales log', { companyId, error });
       throw error;
     }
-
-    return (data || []).map((inv: RawInvoice) => ({
-      id: inv.id,
-      invoiceNumber: inv.invoice_number,
-      customerName: inv.party?.name || 'عميل نقدي',
-      date: new Date(inv.issue_date).toLocaleDateString('ar-SA'),
-      total: Number(inv.total_amount) || 0,
-      baseTotal: toBaseCurrency({
-        amount: Number(inv.total_amount) || 0,
-        currency_code: inv.currency_code || 'SAR',
-        exchange_rate: Number(inv.exchange_rate) || 1
-      }),
-      status: inv.status,
-      type: inv.type,
-      paymentMethod: inv.payment_method,
-      currencyCode: inv.currency_code || 'SAR',
-      exchangeRate: Number(inv.exchange_rate) || 1,
-      itemCount: Array.isArray(inv.invoice_items) ? inv.invoice_items.length : 0,
-      referenceInvoiceId: inv.reference_invoice_id
-    }));
   },
 
   processNewSale: async (companyId: string, userId: string, payload: CreateInvoiceDTO) => {
@@ -90,7 +96,7 @@ export const salesService = {
       const typedResult = result as InvoiceResponse;
       messagingService.notify(companyId, 'sale', {
         invoiceNumber: typedResult.invoice_number || '',
-        customerName: 'عميل نقدي', // Customer name comes from party, not payload
+        customerName: CASH_CUSTOMER_LABEL, // Target refactoring to extract party name from DB result later
         amount: itemsTotal,
         currency: payload.currency || 'SAR',
         date: new Date().toLocaleDateString('ar-SA'),

@@ -5,11 +5,10 @@ import { z } from 'zod';
 import { JournalEntryFormData } from '../types/index';
 import { useAccounts } from './index';
 import { useCurrencies } from '../../settings/hooks';
-import { useFeedbackStore } from '../../feedback/store';
 
 const journalLineSchema = z.object({
     account_id: z.string().min(1, 'يجب اختيار الحساب'),
-    description: z.string().optional(),
+    description: z.string(),
     debit_amount: z.number().min(0),
     credit_amount: z.number().min(0),
 }).refine(data => (data.debit_amount > 0 && data.credit_amount === 0) || (data.credit_amount > 0 && data.debit_amount === 0), {
@@ -20,8 +19,8 @@ const journalLineSchema = z.object({
 const journalEntrySchema = z.object({
     date: z.string().min(1, 'التاريخ مطلوب'),
     description: z.string().min(3, 'الوصف العام مطلوب (على الأقل 3 أحرف)'),
-    currency_code: z.string(),
-    exchange_rate: z.number().gt(0),
+    currency_code: z.string().optional(),
+    exchange_rate: z.number().optional(),
     lines: z.array(journalLineSchema).min(2, 'يجب أن يحتوي القيد على سطرين على الأقل')
 }).refine(data => {
     const totalDebit = data.lines.reduce((sum, line) => sum + line.debit_amount, 0);

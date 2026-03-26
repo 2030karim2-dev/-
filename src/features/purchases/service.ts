@@ -110,7 +110,7 @@ export const purchasesService = {
   getPurchaseReturns: async (companyId: string) => {
     const { data, error } = await purchasesApi.getPurchases(companyId);
     if (error) throw error;
-    const returns = data?.filter(p => p.type === 'return_purchase') || [];
+    const returns = data?.filter((p: any) => p.type === 'return_purchase') || [];
     return returns;
   },
 
@@ -121,9 +121,9 @@ export const purchasesService = {
       logger.error('PurchaseService', 'Error in getPurchaseReturnsStats', { error });
       throw error;
     }
-    const returns = data?.filter(p => p.type === 'return_purchase') || [];
+    const returns = data?.filter((p: any) => p.type === 'return_purchase') || [];
 
-    const totalReturns = returns.reduce((sum, r) => sum + toBaseCurrency({
+    const totalReturns = returns.reduce((sum: number, r: any) => sum + toBaseCurrency({
       amount: r.total_amount || 0,
       currency_code: r.currency_code || 'SAR',
       exchange_rate: r.exchange_rate || 1

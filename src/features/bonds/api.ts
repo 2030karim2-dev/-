@@ -33,6 +33,11 @@ export const bondsApi = {
     if (!data.cash_account_id || !data.counterparty_id) {
       throw new Error("يجب اختيار الحسابات المطلوبة");
     }
+    
+    // Explicit bounds check preventing logical crashes
+    if (Number(data.amount) <= 0) {
+      throw new Error("لا يمكن إنشاء سند بقيمة صفر أو قيمة سالبة");
+    }
 
     // Map BondType (receipt/payment/transfer) to payments.type (receipt/disbursement/transfer)
     const paymentType = data.type === 'receipt' ? 'receipt' : (data.type === 'transfer' ? 'transfer' : 'disbursement');
@@ -69,14 +74,9 @@ export const bondsApi = {
     });
 
     if (rpcError) {
-      // Fallback: if RPC doesn't exist yet, do a soft delete
-      console.warn('void_bond RPC not available, falling back:', rpcError.message);
-      return await supabase.from('payments')
-        .update({
-          deleted_at: new Date().toISOString(),
-          status: 'void'
-        })
-        .eq('id', id);
+      // Must fail strictly to prevent double-entry imbalance
+      console.error('Fatal: void_bond RPC failed', rpcError);
+      throw new Error('تعذر إلغاء السند: فشل في إنشاء القيود العكسية');
     }
 
     return { error: null };

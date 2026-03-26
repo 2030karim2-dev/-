@@ -208,7 +208,7 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
           quotationId={selectedQuotationId}
           onClose={() => setSelectedQuotationId(null)}
           onRefresh={fetchQuotations}
-          onConvertToInvoice={onConvertToInvoice || undefined}
+          {...(onConvertToInvoice ? { onConvertToInvoice } : {})}
         />
       )}
     </div>

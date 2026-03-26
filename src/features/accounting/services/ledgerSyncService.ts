@@ -24,7 +24,7 @@ export const ledgerSyncService = {
     contraAccountId?: string
   ) => {
     // تحديد حساب النظام المقابل (1100 للعملاء، 2010 للموردين)
-    const accountCode = party.type === 'customer' ? '1100' : '2010';
+    const accountCode = party.type === 'customer' ? '1100' : '2100';
     const mainAccount = await accountingService.findAccountByCode(companyId, accountCode);
 
     if (!mainAccount) return;

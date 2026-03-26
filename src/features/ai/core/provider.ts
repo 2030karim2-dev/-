@@ -8,7 +8,7 @@ import { getActiveModel, getApiKey } from './config';
 export async function generateAIContent(
     prompt: string,
     systemInstruction: string = STRICT_SYSTEM_ROLE,
-    options?: { jsonMode?: boolean; temperature?: number }
+    options?: { jsonMode?: boolean; temperature?: number; maxTokens?: number }
 ): Promise<string> {
     const apiKey = getApiKey();
 
@@ -37,9 +37,13 @@ export async function generateAIContent(
                 { role: 'user', content: prompt }
             ],
             temperature: options?.temperature ?? 0.1,
-            max_tokens: 4000
+            max_tokens: options?.maxTokens ?? 1500
         })
     });
+
+    if (response.status === 402) {
+        throw new Error('رصيد OpenRouter غير كافٍ لإتمام هذه العملية. يرجى شحن الرصيد أو تقليل عدد النصوص المطلوبة.');
+    }
 
     if (!response.ok) {
         const err = await response.text();

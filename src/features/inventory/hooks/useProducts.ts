@@ -32,7 +32,7 @@ export const useProducts = (searchTerm: string = '', options: { limitNum?: numbe
                     table: 'products',
                     filter: `company_id=eq.${companyId}`
                 },
-                (payload) => {
+                (payload: any) => {
                     logger.debug('Products', 'Inventory updated via realtime', JSON.stringify(payload));
                     query.refetch(); // Invalidate directly via refetch
                 }
@@ -51,7 +51,10 @@ export const useProducts = (searchTerm: string = '', options: { limitNum?: numbe
         return data.filter(p =>
             p.name.toLowerCase().includes(lowerTerm) ||
             p.sku.toLowerCase().includes(lowerTerm) ||
-            p.brand?.toLowerCase().includes(lowerTerm)
+            p.brand?.toLowerCase().includes(lowerTerm) ||
+            p.part_number?.toLowerCase().includes(lowerTerm) ||
+            p.alternative_numbers?.toLowerCase().includes(lowerTerm) ||
+            p.size?.toLowerCase().includes(lowerTerm)
         );
     }, [query.data, searchTerm]);
 
@@ -170,4 +173,17 @@ export const useProductMutations = () => {
         isSaving: saveProduct.isPending,
         isDeleting: deleteProduct.isPending || bulkDeleteProducts.isPending
     };
+};
+
+export const useSearchProducts = (searchTerm: string) => {
+    const { user } = useAuthStore();
+    const companyId = user?.company_id;
+
+    return useQuery({
+        queryKey: ['products_search', companyId, searchTerm],
+        queryFn: () => (companyId && searchTerm.length > 1) 
+            ? inventoryService.searchProducts(companyId, searchTerm) 
+            : Promise.resolve([]),
+        enabled: !!companyId && searchTerm.length > 1,
+    });
 };

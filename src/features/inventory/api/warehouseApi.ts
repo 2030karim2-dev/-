@@ -39,27 +39,43 @@ export const warehouseApi = {
             } as TableInsert<'inventory_transactions'>);
     },
 
-    initializeStock: async (stockData: TableInsert<'product_stock'> | TableInsert<'product_stock'>[]) => {
-        return await supabase.from('product_stock')
-            .insert(stockData as any);
+    initializeStock: async (companyId: string, userId: string, stockData: { product_id: string, warehouse_id: string, quantity: number }) => {
+        return await supabase.from('inventory_transactions')
+            .insert({
+                company_id: companyId,
+                created_by: userId,
+                product_id: stockData.product_id,
+                warehouse_id: stockData.warehouse_id,
+                quantity: stockData.quantity,
+                transaction_type: 'initial',
+                reference_type: 'opening_balance'
+            });
     },
 
-    updateStock: async (companyId: string, productId: string, warehouseId: string, quantity: number) => {
-        const { data } = await supabase.from('product_stock')
-            .select('id')
+    updateStock: async (companyId: string, productId: string, warehouseId: string, quantity: number, userId?: string) => {
+        // Since the system uses a derivation trigger, we record an adjustment to reach the desired quantity
+        // Step 1: Get current stock
+        const { data: currentStock } = await supabase.from('product_stock')
+            .select('quantity')
             .eq('product_id', productId)
             .eq('warehouse_id', warehouseId)
-            .single();
+            .maybeSingle();
+        
+        const currentQty = currentStock?.quantity || 0;
+        const adjustment = quantity - currentQty;
 
-        if (data) {
-            return await supabase.from('product_stock')
-                .update({ quantity })
-                .eq('product_id', productId)
-                .eq('warehouse_id', warehouseId);
-        } else {
-            return await supabase.from('product_stock')
-                .insert({ company_id: companyId, product_id: productId, warehouse_id: warehouseId, quantity });
-        }
+        if (adjustment === 0) return { data: null, error: null };
+
+        return await supabase.from('inventory_transactions')
+            .insert({
+                company_id: companyId,
+                created_by: userId,
+                product_id: productId,
+                warehouse_id: warehouseId,
+                quantity: adjustment,
+                transaction_type: 'adjustment',
+                reference_type: 'manual_update'
+            });
     },
 
     saveWarehouse: async (companyId: string, data: { id?: string, name_ar: string, location: string }) => {

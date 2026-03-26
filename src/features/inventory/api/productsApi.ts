@@ -32,15 +32,15 @@ export const productsApi = {
                 updated_at,
                 status,
                 category:product_categories(id, name),
-                stock:product_stock!product_stock_product_id_fkey(
+                stock:product_stock(
                     quantity,
                     warehouse_id,
-                    warehouses!product_stock_warehouse_id_fkey(name_ar)
+                    warehouses(name_ar)
                 )
             `)
             .eq('company_id', companyId)
             .is('deleted_at', null)
-            // Removed .order('created_at', { ascending: false }) to prevent slow sort & ERR_CONNECTION_CLOSED
+            .order('created_at', { ascending: false }) // Re-enabled after adding indexes
             .range(from, to);
     },
 
@@ -64,6 +64,16 @@ export const productsApi = {
             .eq('id', id)
             .select()
             .single();
+    },
+
+    saveProductUoMs: async (productId: string, uoms: any[]) => {
+        // Simple replace all strategy for UoMs
+        await supabase.from('product_uoms').delete().eq('product_id', productId);
+        if (uoms && uoms.length > 0) {
+            const uomsToInsert = uoms.map(u => ({ ...u, product_id: productId }));
+            return await supabase.from('product_uoms').insert(uomsToInsert);
+        }
+        return { error: null };
     },
 
     deleteProduct: async (id: string) => {

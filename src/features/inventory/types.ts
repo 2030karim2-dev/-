@@ -61,6 +61,15 @@ export interface ProductKitItem {
   created_at: string;
 }
 
+export interface ProductUOM {
+  id?: string;
+  product_id?: string;
+  uom_name: string;
+  conversion_factor: number;
+  barcode?: string;
+  sale_price?: number;
+}
+
 export interface ProductSupplierPrice {
   id: string;
   company_id: string;
@@ -137,6 +146,7 @@ export interface Product {
     shelf: string;
     bin: string;
   }[] | undefined;
+  uoms?: ProductUOM[] | undefined;
 }
 
 export interface ProductFormData {
@@ -159,6 +169,7 @@ export interface ProductFormData {
   unit?: 'piece' | 'set' | undefined;
   category?: string | undefined;
   is_core?: boolean | undefined;
+  uoms?: ProductUOM[] | undefined;
 }
 
 export interface ProductFilters {

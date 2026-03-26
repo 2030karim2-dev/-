@@ -15,28 +15,14 @@ type Action =
   | 'create_sale_return';
 
 export class AuthorizeActionUsecase {
-  private static rolePermissions: Record<string, Action[]> = {
-    'owner': [
-      'delete_product', 'create_product', 'close_fiscal_year',
-      'edit_posted_invoice', 'view_financial_reports',
-      'create_purchase', 'delete_party', 'post_journal_entry',
-      'create_expense', 'create_bond', 'delete_bond', 'create_sale_return'
-    ],
-    'manager': [
-      'create_product', 'delete_product', 'view_financial_reports',
-      'create_purchase', 'post_journal_entry', 'create_expense', 'create_bond',
-      'delete_bond', 'create_sale_return'
-    ],
-    'accountant': [
-      'view_financial_reports', 'post_journal_entry', 'create_expense', 'create_bond', 'delete_bond'
-    ],
-    'sales': ['create_product']
-  };
 
   static canPerform(user: AuthUser | null, action: Action): boolean {
-    if (!user || !user.role) return false;
+    if (!user) return false;
+    
+    // Owner bypass or specific permission check
+    if (user.role === 'owner') return true;
 
-    const permissions = this.rolePermissions[user.role.toLowerCase()] || [];
+    const permissions = user.permissions || [];
     return permissions.includes(action);
   }
 
@@ -55,7 +41,7 @@ export class AuthorizeActionUsecase {
         'delete_party': 'حذف جهات (عملاء/موردين)',
         'create_sale_return': 'إنشاء مرتجع مبيعات'
       };
-      throw new Error(`عذراً، دورك الوظيفي لا يمنحك صلاحية: [${actionNames[action] || action}]`);
+      throw new Error(`عذراً، لا تمتلك صلاحية كافية لتنفيذ: [${actionNames[action] || action}] - يرجى مراجعة الصلاحيات في النظام`);
     }
   }
 }

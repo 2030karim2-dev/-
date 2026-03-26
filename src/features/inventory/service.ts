@@ -142,6 +142,23 @@ export const inventoryService = {
 
   getInventoryAnalytics: async (companyId: string, from?: string, to?: string) => {
     return analyticsService.getInventoryAnalytics(companyId, from, to);
+  },
+
+  // ==========================================
+  // Quick Adjustments
+  // ==========================================
+  
+  quickAdjustStock: async (companyId: string, items: { product_id: string; warehouse_id: string; quantity: number }[], userId: string) => {
+    // Import warehouseApi directly here to avoid circular dependencies if any, or use it from warehouseService if it was exposed.
+    // Actually, warehouseApi has updateStock.
+    const { warehouseApi } = await import('./api/warehouseApi');
+    
+    const promises = items.map(item => 
+       warehouseApi.updateStock(companyId, item.product_id, item.warehouse_id, item.quantity, userId)
+    );
+    
+    await Promise.all(promises);
+    return true;
   }
 };
 

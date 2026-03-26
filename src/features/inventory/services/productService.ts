@@ -33,6 +33,7 @@ interface RawProduct {
     stock?: RawStock[];
     status?: string;
     location?: string;
+    uoms?: unknown[];
 }
 
 export const productService = {
@@ -74,6 +75,7 @@ export const productService = {
                 stock_quantity: totalStock,
                 min_stock_level: Number(prod.min_stock_level) || 0,
                 unit: prod.unit || 'pcs',
+                uoms: prod.uoms || [],
                 image_url: prod.image_url || null,
                 alternative_numbers: prod.alternative_numbers || null,
                 barcode: prod.barcode || null,
@@ -171,6 +173,12 @@ export const productService = {
         const { data: product, error } = await inventoryApi.createProduct(payload);
         if (error) throw error;
 
+        // Save UOMs
+        if (product && data.uoms && data.uoms.length > 0) {
+            // using type assertion since api aggregation might not have exact types
+            await (inventoryApi as any).saveProductUoMs(product.id, data.uoms);
+        }
+
         // Initialize stock in default warehouse
         if (product) {
             const { data: warehouses } = await supabase
@@ -181,12 +189,11 @@ export const productService = {
 
             if (warehouses && warehouses.length > 0) {
                 const warehouse = warehouses[0] as { id: string };
-                await inventoryApi.initializeStock({
-                    company_id: companyId,
+                await inventoryApi.initializeStock(companyId, _userId, {
                     product_id: product.id,
                     warehouse_id: warehouse.id,
                     quantity: Number(data.stock_quantity) || 0
-                } as any);
+                });
             }
         }
 
@@ -226,6 +233,11 @@ export const productService = {
                 throw error;
             }
 
+            // Update UOMs
+            if (data.uoms) {
+                await (inventoryApi as any).saveProductUoMs(id, data.uoms);
+            }
+
             logger.debug('ProductService', `Product metadata updated successfully`, product);
 
             // Update stock in default warehouse
@@ -243,8 +255,9 @@ export const productService = {
                     const warehouse = warehouses[0] as { id: string };
                     logger.debug('ProductService', `Updating stock in warehouse ${warehouse.id} to ${data.stock_quantity}`);
                     try {
+                        // Pass null for userId if not available in this context, or we could pass current user if tracked in store
                         await inventoryApi.updateStock(companyId, id, warehouse.id, Number(data.stock_quantity));
-                        logger.debug('ProductService', `Stock updated successfully`);
+                        logger.debug('ProductService', `Stock updated successfully via transaction`);
                     } catch (stockErr) {
                         logger.error('ProductService', `Failed to update stock, but metadata was saved`, stockErr);
                         // We don't throw here to avoid failing the whole operation if only stock fails

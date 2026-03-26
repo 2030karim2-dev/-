@@ -2,24 +2,7 @@
 import { supabase } from '../../lib/supabaseClient';
 import { parseError } from '../../core/utils/errorUtils';
 import { CreatePurchaseDTO, SupplierPaymentData } from './types';
-import type { Invoice, Party } from '../../core/types/supabase-helpers';
 
-type PurchaseInvoiceWithParty = Invoice & {
-  party: Pick<Party, 'name'>;
-  invoice_items: { id: string }[];
-};
-
-type PurchaseInvoiceForReturn = Invoice & {
-  party: Pick<Party, 'id' | 'name'>;
-  invoice_items: Array<{
-    id: string;
-    product_id: string;
-    description: string;
-    quantity: number;
-    unit_price: number;
-    total: number;
-  }>;
-};
 
 export const purchasesApi = {
   getPurchases: async (companyId: string) => {
@@ -41,8 +24,7 @@ export const purchasesApi = {
       .eq('company_id', companyId)
       .in('type', ['purchase', 'return_purchase'])
       .is('deleted_at', null)
-      .order('issue_date', { ascending: false })
-      .returns<PurchaseInvoiceWithParty[]>();
+      .order('issue_date', { ascending: false });
 
     return result;
   },
@@ -161,8 +143,7 @@ export const purchasesApi = {
     }
 
     return await query
-      .order('issue_date', { ascending: false })
-      .returns<PurchaseInvoiceForReturn[]>();
+      .order('issue_date', { ascending: false });
   },
 
   deletePurchase: async (id: string) => {

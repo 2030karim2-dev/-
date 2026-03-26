@@ -44,13 +44,23 @@ const StockAuditView: React.FC = () => {
         )}
       </div>
 
-      <button 
-        onClick={() => { setIsModalOpen(true); }}
-        className="w-full bg-white dark:bg-slate-900 border border-dashed border-blue-200 dark:border-blue-900/30 rounded-xl p-3 text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2 hover:bg-blue-50/50 transition-colors shadow-sm"
-      >
-        <Plus size={14} strokeWidth={3} />
-        <span className="text-[10px] font-black uppercase tracking-widest">بدء جلسة جرد ميداني</span>
-      </button>
+      <div className="flex gap-2">
+        <button 
+          onClick={() => { setIsModalOpen(true); }}
+          className="flex-1 bg-white dark:bg-slate-900 border border-dashed border-blue-200 dark:border-blue-900/30 rounded-xl p-3 text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2 hover:bg-blue-50/50 transition-colors shadow-sm"
+        >
+          <Plus size={14} strokeWidth={3} />
+          <span className="text-[10px] font-black uppercase tracking-widest">جلسة جرد</span>
+        </button>
+
+        <button 
+          onClick={() => navigate('/inventory/quick-audit')}
+          className="flex-1 bg-gradient-to-l from-emerald-500 to-teal-400 text-white rounded-xl p-3 flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-emerald-500/20 transition-all shadow-sm active:scale-95"
+        >
+          <ClipboardCheck size={14} strokeWidth={3} />
+          <span className="text-[10px] font-black uppercase tracking-widest">جرد سريع</span>
+        </button>
+      </div>
 
       {audits?.map((ad: any) => (
         <MicroListItem

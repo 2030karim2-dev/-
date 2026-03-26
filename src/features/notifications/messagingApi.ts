@@ -59,9 +59,9 @@ export const messagingApi = {
             .from('messaging_config')
             .select('*')
             .eq('company_id', companyId)
-            .single();
+            .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') {
+        if (error) {
             console.error('[MessagingAPI] Error fetching config:', error);
         }
         return data as MessagingConfig | null;

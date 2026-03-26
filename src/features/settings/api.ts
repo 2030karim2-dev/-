@@ -1,5 +1,5 @@
 import { supabase } from '../../lib/supabaseClient';
-import { CompanyFormData, WarehouseFormData, FiscalYearFormData, ExchangeRateFormData, Company, Invitation, AuditLog, Warehouse, SupportedCurrency, ExchangeRate, FiscalYear } from './types';
+import { CompanyFormData, WarehouseFormData, FiscalYearFormData, ExchangeRateFormData } from './types';
 
 export const settingsApi = {
   getCompany: async (companyId: string) => {
@@ -7,7 +7,6 @@ export const settingsApi = {
       .from('companies')
       .select('*')
       .eq('id', companyId)
-      .returns<Company>()
       .single();
   },
 
@@ -17,7 +16,7 @@ export const settingsApi = {
       .update(data)
       .eq('id', companyId)
       .select()
-      .returns<Company>()
+      .select()
       .single();
   },
 
@@ -28,7 +27,7 @@ export const settingsApi = {
       .select('*')
       .eq('company_id', companyId)
       .order('created_at', { ascending: false })
-      .returns<Invitation[]>();
+      .order('created_at', { ascending: false });
   },
 
   inviteUser: async (email: string, role: string, companyId: string, userId: string) => {
@@ -41,7 +40,7 @@ export const settingsApi = {
         created_by: userId
       })
       .select()
-      .returns<Invitation>()
+      .select()
       .single();
   },
 
@@ -56,7 +55,7 @@ export const settingsApi = {
       .eq('company_id', companyId)
       .order('created_at', { ascending: false })
       .limit(100)
-      .returns<AuditLog[]>();
+      .limit(100);
   },
 
   getWarehouses: async (companyId: string) => {
@@ -66,7 +65,7 @@ export const settingsApi = {
       .eq('company_id', companyId)
       .is('deleted_at', null)
       .order('name_ar', { ascending: true })
-      .returns<Warehouse[]>();
+      .order('name_ar', { ascending: true });
   },
 
   createWarehouse: async (companyId: string, data: WarehouseFormData) => {
@@ -74,7 +73,7 @@ export const settingsApi = {
       .from('warehouses')
       .insert({ ...data, company_id: companyId })
       .select()
-      .returns<Warehouse>()
+      .select()
       .single();
   },
 
@@ -111,7 +110,7 @@ export const settingsApi = {
 
   getSupportedCurrencies: async () => {
     return await supabase.from('supported_currencies').select('*')
-      .returns<SupportedCurrency[]>();
+    return await supabase.from('supported_currencies').select('*');
   },
 
   createCurrency: async (data: { code: string, name_ar: string, symbol: string, exchange_operator?: 'multiply' | 'divide' }) => {
@@ -129,7 +128,7 @@ export const settingsApi = {
       .eq('company_id', companyId)
       .order('effective_date', { ascending: false })
       .order('created_at', { ascending: false })
-      .returns<ExchangeRate[]>();
+      .order('created_at', { ascending: false });
   },
 
   updateExchangeRate: async (companyId: string, data: ExchangeRateFormData, userId: string) => {
@@ -143,7 +142,7 @@ export const settingsApi = {
         created_by: userId
       })
       .select()
-      .returns<ExchangeRate>()
+      .select()
       .single();
   },
 
@@ -153,7 +152,7 @@ export const settingsApi = {
       .select('*')
       .eq('company_id', companyId)
       .order('start_date', { ascending: false })
-      .returns<FiscalYear[]>();
+      .order('start_date', { ascending: false });
   },
 
   createFiscalYear: async (companyId: string, data: FiscalYearFormData) => {
@@ -161,7 +160,7 @@ export const settingsApi = {
       .from('fiscal_years')
       .insert({ ...data, company_id: companyId, is_closed: false })
       .select()
-      .returns<FiscalYear>()
+      .select()
       .single();
   },
 
