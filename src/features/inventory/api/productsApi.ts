@@ -116,32 +116,46 @@ export const productsApi = {
     },
 
     searchProduct: async (companyId: string, term: string) => {
-        const sanitized = term.replace(/[%_\\*()]/g, '');
-        if (!sanitized.trim()) return { data: [], error: null };
+        // 1. Clean and normalize the term (support Arabic, English, Numbers)
+        // We allow letters, numbers, and spaces. We replace others with space.
+        const sanitized = term.replace(/[^\w\s\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/g, ' '); 
+        
+        // 2. Tokenize and build tsQuery
+        const tokens = sanitized
+            .split(/\s+/)
+            .filter(word => word.length > 0);
+            
+        if (tokens.length === 0) return { data: [], error: null };
 
-        // Use textSearch on the search_vector column for high performance
-        // Falling back to a simpler ILIKE only if textSearch isn't performing as expected for specific partial matches
+        // Convert to prefix matching: "word1:* & word2:*"
+        const tsQuery = tokens.map(word => `${word}:*`).join(' & ');
+
+        // Use textSearch on the search_vector column
         return await supabase.from('products')
-            .select('id, name_ar, sku, sale_price, part_number, alternative_numbers, brand')
+            .select('id, name_ar, sku, sale_price, part_number, alternative_numbers, brand, quantity:product_stock(quantity)')
             .eq('company_id', companyId)
             .eq('status', 'active')
-            .textSearch('search_vector', term, { 
-                config: 'simple', 
-                type: 'plain' 
+            .textSearch('search_vector', tsQuery, { 
+                config: 'simple'
             })
+            .order('name_ar')
             .limit(15);
     },
 
     searchProductForFitment: async (companyId: string, term: string) => {
-        const sanitized = term.replace(/[%_\\*()]/g, '');
-        if (!sanitized.trim() || sanitized.length < 2) return [];
+        // 1. Clean and tokenize
+        const sanitized = term.replace(/[^\w\s\u0600-\u06FF]/g, ' '); 
+        const tokens = sanitized.split(/\s+/).filter(word => word.length > 0);
+        
+        if (tokens.length < 1) return [];
+
+        const tsQuery = tokens.map(word => `${word}:*`).join(' & ');
 
         const { data, error } = await supabase.from('products')
             .select('id, name_ar, name_en, sku, part_number, brand')
             .eq('company_id', companyId)
-            .textSearch('search_vector', term, { 
-                config: 'simple', 
-                type: 'plain' 
+            .textSearch('search_vector', tsQuery, { 
+                config: 'simple'
             })
             .limit(10);
 

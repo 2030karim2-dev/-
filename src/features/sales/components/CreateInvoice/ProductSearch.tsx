@@ -23,7 +23,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onSelectProduct, }) => {
     const { products, isLoading, hasResults } = useProductSearch(searchTerm, {
         companyId: user?.company_id || '',
         debounceMs: 300,
-        enabled: !!user?.company_id && searchTerm.length >= 2,
+        enabled: !!user?.company_id && searchTerm.trim().length >= 2,
     });
 
     const handleSelect = (product: ProductSearchResult) => {
@@ -65,7 +65,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onSelectProduct, }) => {
             </div>
 
             {/* Results Dropdown */}
-            {searchTerm.length >= 2 && (
+            {searchTerm.trim().length >= 2 && (
                 <div className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700 max-h-80 overflow-y-auto">
                     {isLoading ? (
                         <div className="p-4 text-center text-gray-500">جاري البحث...</div>

@@ -39,9 +39,15 @@ export const useProductSearch = (searchTerm: string, options?: UseProductSearchO
         return () => clearTimeout(timer);
     }, [searchTerm, debounceMs]);
 
+    // Normalize the term for consistent caching (strip extra spaces)
+    const normalizedTerm = useMemo(() => 
+        debouncedTerm.replace(/\s+/g, ' ').trim(), 
+        [debouncedTerm]
+    );
+
     const queryKey = useMemo(() =>
-        ['product_search', companyId, debouncedTerm] as const,
-        [companyId, debouncedTerm]
+        ['product_search', companyId, normalizedTerm] as const,
+        [companyId, normalizedTerm]
     );
 
     const {
@@ -52,19 +58,39 @@ export const useProductSearch = (searchTerm: string, options?: UseProductSearchO
     } = useQuery({
         queryKey,
         queryFn: async () => {
-            if (!companyId || !debouncedTerm || debouncedTerm.length < 2) {
+            if (!companyId || !normalizedTerm || normalizedTerm.length < 2) {
                 return [];
             }
 
-            const { data, error } = await inventoryApi.searchProduct(companyId, debouncedTerm);
+            const { data, error } = await inventoryApi.searchProduct(companyId, normalizedTerm);
 
-            if (error) {
+            if (data === null) return [];
+            
+            if (error !== null) {
                 throw new Error(error.message || 'Failed to search products');
             }
 
-            return (data as ProductSearchResult[]) || [];
+            // Map results to sum quantities from the nested stock array
+            return data.map((item: Record<string, unknown>) => {
+                const stockArray = Array.isArray(item.quantity) ? item.quantity : [];
+                const totalQty = (stockArray as { quantity: string | number }[]).reduce(
+                    (sum: number, s: { quantity: string | number }) => sum + (Number(s.quantity) || 0), 
+                    0
+                );
+                
+                return {
+                    id: String(item.id || ''),
+                    name_ar: String(item.name_ar || ''),
+                    sku: String(item.sku || ''),
+                    sale_price: Number(item.sale_price || 0),
+                    purchase_price: Number(item.purchase_price || 0),
+                    quantity: totalQty,
+                    alternative_numbers: item.alternative_numbers ? String(item.alternative_numbers) : undefined,
+                    is_core: Boolean(item.is_core)
+                } as ProductSearchResult;
+            });
         },
-        enabled: enabled && !!companyId && debouncedTerm.length >= 2,
+        enabled: enabled && !!companyId && normalizedTerm.length >= 2,
     });
 
     const search = useCallback((term: string) => {
