@@ -1,8 +1,8 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { usePurchaseStore, PurchaseInvoiceItem } from '../../store';
+import { usePurchaseStore, type PurchaseInvoiceItem } from '../../store';
 import { useDiscountStore } from '../../../settings/taxDiscountStore';
-import { Product } from '../../../inventory/types';
+import type { Product } from '../../../inventory/types';
 import { Plus, Trash2, Settings, Search } from 'lucide-react';
 import { cn } from '../../../../core/utils';
 import ProductSelectionModal from '../../../sales/components/create/ProductSelectionModal';
@@ -90,7 +90,7 @@ const InteractivePurchaseTable: React.FC = () => {
         }
     }, [initializeItems, items.length]);
 
-    const handleOpenSearch = (index: number, query: string = '') => {
+    const handleOpenSearch = (index: number, query = '') => {
         setModalState({ isOpen: true, rowIndex: index, query });
     };
 
@@ -100,7 +100,7 @@ const InteractivePurchaseTable: React.FC = () => {
 
         // Auto-focus quantity after selection
         setTimeout(() => {
-            const nextCell = tableRef.current?.querySelector(`[data-row-index="${modalState.rowIndex}"][data-col-field="quantity"]`) as HTMLInputElement;
+            const nextCell = tableRef.current?.querySelector(`[data-row-index="${modalState.rowIndex}"][data-col-field="quantity"]`)!;
             nextCell?.focus();
             if (nextCell) nextCell.select();
         }, 50);
@@ -116,13 +116,13 @@ const InteractivePurchaseTable: React.FC = () => {
             return;
         }
 
-        const fieldsOrder: (keyof PurchaseInvoiceItem)[] = ['name', 'quantity', 'costPrice'];
+        const fieldsOrder: Array<keyof PurchaseInvoiceItem> = ['name', 'quantity', 'costPrice'];
         if (showDiscount) fieldsOrder.push('discount');
 
         const colIndex = fieldsOrder.indexOf(field);
 
         const moveFocus = (row: number, colField: keyof PurchaseInvoiceItem) => {
-            const nextCell = tableRef.current?.querySelector(`[data-row-index="${row}"][data-col-field="${colField}"]`) as HTMLInputElement;
+            const nextCell = tableRef.current?.querySelector(`[data-row-index="${row}"][data-col-field="${colField}"]`)!;
             nextCell?.focus();
             if (nextCell instanceof HTMLInputElement) nextCell.select();
         };
@@ -134,7 +134,7 @@ const InteractivePurchaseTable: React.FC = () => {
                 e.preventDefault();
                 if (rowIndex === items.length - 1 && field === 'costPrice') {
                     addItem();
-                    setTimeout(() => moveFocus(rowIndex + 1, 'name'), 50);
+                    setTimeout(() => { moveFocus(rowIndex + 1, 'name'); }, 50);
                 } else {
                     moveFocus(rowIndex + 1, field);
                 }
@@ -146,7 +146,7 @@ const InteractivePurchaseTable: React.FC = () => {
                     moveFocus(rowIndex, fieldsOrder[nextColIndex]);
                 } else if (!e.shiftKey && rowIndex === items.length - 1) {
                     addItem();
-                    setTimeout(() => moveFocus(rowIndex + 1, fieldsOrder[0]), 50);
+                    setTimeout(() => { moveFocus(rowIndex + 1, fieldsOrder[0]); }, 50);
                 } else if (!e.shiftKey) {
                     moveFocus(rowIndex + 1, fieldsOrder[0]);
                 } else if (e.shiftKey && rowIndex > 0) {
@@ -163,7 +163,7 @@ const InteractivePurchaseTable: React.FC = () => {
             <div className="p-1.5 flex justify-end gap-2 bg-blue-600 dark:bg-slate-950 border-b dark:border-slate-800">
                 <div className="flex bg-white/10 p-0.5 rounded-none border border-white/20">
                     {useDiscountStore.getState().discountEnabled && (
-                        <button onClick={() => toggleColumn('showDiscount')}
+                        <button onClick={() => { toggleColumn('showDiscount'); }}
                             className={cn("px-3 py-1 text-[9px] font-bold uppercase transition-all", showDiscount ? "bg-white text-blue-600" : "text-blue-100")}>إظهار الخصم</button>
                     )}
 
@@ -178,34 +178,34 @@ const InteractivePurchaseTable: React.FC = () => {
                             <th style={{ width: colWidths.index }} className="relative p-2 text-center border-l border-white/10">#</th>
                             <th style={{ width: colWidths.name }} className="relative p-2 border-l border-white/10 pr-4">
                                 وصف الصنف المورد
-                                <div onMouseDown={(e) => onMouseDown(e, 'name')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                                <div onMouseDown={(e) => { onMouseDown(e, 'name'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
                             </th>
                             <th style={{ width: colWidths.partNumber }} className="relative p-2 text-center border-l border-white/10">
                                 رقم القطعة
-                                <div onMouseDown={(e) => onMouseDown(e, 'partNumber')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                                <div onMouseDown={(e) => { onMouseDown(e, 'partNumber'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
                             </th>
                             <th style={{ width: colWidths.brand }} className="relative p-2 text-center border-l border-white/10">
                                 الشركة الصانعة
-                                <div onMouseDown={(e) => onMouseDown(e, 'brand')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                                <div onMouseDown={(e) => { onMouseDown(e, 'brand'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
                             </th>
                             <th style={{ width: colWidths.quantity }} className="relative p-2 text-center border-l border-white/10">
                                 الكمية
-                                <div onMouseDown={(e) => onMouseDown(e, 'quantity')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                                <div onMouseDown={(e) => { onMouseDown(e, 'quantity'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
                             </th>
                             <th style={{ width: colWidths.costPrice }} className="relative p-2 text-center border-l border-white/10">
                                 سعر التكلفة
-                                <div onMouseDown={(e) => onMouseDown(e, 'costPrice')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                                <div onMouseDown={(e) => { onMouseDown(e, 'costPrice'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
                             </th>
                             {showDiscount && (
                                 <th style={{ width: colWidths.discount }} className="relative p-2 text-center border-l border-white/10">
                                     الخصم
-                                    <div onMouseDown={(e) => onMouseDown(e, 'discount')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                                    <div onMouseDown={(e) => { onMouseDown(e, 'discount'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
                                 </th>
                             )}
 
                             <th style={{ width: colWidths.total }} className="relative p-2 text-left pr-4">
                                 الإجمالي
-                                <div onMouseDown={(e) => onMouseDown(e, 'total')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                                <div onMouseDown={(e) => { onMouseDown(e, 'total'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
                             </th>
                             <th className="p-2 w-8 text-center bg-blue-700"></th>
                         </tr>
@@ -221,8 +221,8 @@ const InteractivePurchaseTable: React.FC = () => {
                                             value={item.name}
                                             data-row-index={index}
                                             data-col-field="name"
-                                            onKeyDown={(e) => handleKeyDown(e, index, 'name')}
-                                            onClick={() => handleOpenSearch(index, (item.name || ''))}
+                                            onKeyDown={(e) => { handleKeyDown(e, index, 'name'); }}
+                                            onClick={() => { handleOpenSearch(index, (item.name || '')); }}
                                             readOnly
                                             className="flex-1 p-2 bg-transparent outline-none text-right font-bold text-[11px] text-blue-900 dark:text-slate-100 cursor-pointer placeholder:text-blue-200"
                                             placeholder="اختر صنفاً..."
@@ -237,19 +237,19 @@ const InteractivePurchaseTable: React.FC = () => {
                                     {item.brand || '---'}
                                 </td>
                                 <td className="p-0 border-l dark:border-slate-800">
-                                    <input type="number" value={item.quantity || ''} onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                                        onKeyDown={(e) => handleKeyDown(e, index, 'quantity')} data-row-index={index} data-col-field="quantity"
+                                    <input type="number" value={item.quantity || ''} onChange={(e) => { updateItem(index, 'quantity', parseFloat(e.target.value) || 0); }}
+                                        onKeyDown={(e) => { handleKeyDown(e, index, 'quantity'); }} data-row-index={index} data-col-field="quantity"
                                         className="w-full h-full p-2 bg-transparent outline-none text-center font-mono font-bold text-[11px] focus:bg-blue-50 dark:focus:bg-slate-800" placeholder="0" />
                                 </td>
                                 <td className="p-0 border-l dark:border-slate-800">
-                                    <input type="number" value={item.costPrice || ''} onChange={(e) => updateItem(index, 'costPrice', parseFloat(e.target.value) || 0)}
-                                        onKeyDown={(e) => handleKeyDown(e, index, 'costPrice')} data-row-index={index} data-col-field="costPrice"
+                                    <input type="number" value={item.costPrice || ''} onChange={(e) => { updateItem(index, 'costPrice', parseFloat(e.target.value) || 0); }}
+                                        onKeyDown={(e) => { handleKeyDown(e, index, 'costPrice'); }} data-row-index={index} data-col-field="costPrice"
                                         className="w-full h-full p-2 bg-transparent outline-none text-center font-mono font-bold text-[11px] text-rose-600 focus:bg-rose-50 dark:focus:bg-slate-800" placeholder="0.00" />
                                 </td>
                                 {showDiscount && (
                                     <td className="p-0 border-l dark:border-slate-800">
-                                        <input type="number" value={item.discount || ''} onChange={(e) => updateItem(index, 'discount', parseFloat(e.target.value) || 0)}
-                                            onKeyDown={(e) => handleKeyDown(e, index, 'discount')} data-row-index={index} data-col-field="discount"
+                                        <input type="number" value={item.discount || ''} onChange={(e) => { updateItem(index, 'discount', parseFloat(e.target.value) || 0); }}
+                                            onKeyDown={(e) => { handleKeyDown(e, index, 'discount'); }} data-row-index={index} data-col-field="discount"
                                             className="w-full h-full p-2 bg-transparent outline-none text-center font-mono font-bold text-[11px] focus:bg-amber-50 dark:focus:bg-slate-800" />
                                     </td>
                                 )}
@@ -258,7 +258,7 @@ const InteractivePurchaseTable: React.FC = () => {
                                     {((Number(item.quantity) * Number(item.costPrice)) - (showDiscount ? Number(item.discount || 0) : 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                                 </td>
                                 <td className="p-0 bg-blue-50/30">
-                                    <button onClick={() => removeItem(index)} className="w-full h-full flex items-center justify-center text-rose-300 hover:text-rose-600 transition-colors">
+                                    <button onClick={() => { removeItem(index); }} className="w-full h-full flex items-center justify-center text-rose-300 hover:text-rose-600 transition-colors">
                                         <Trash2 size={12} />
                                     </button>
                                 </td>
@@ -276,7 +276,7 @@ const InteractivePurchaseTable: React.FC = () => {
 
             <ProductSelectionModal
                 isOpen={modalState.isOpen}
-                onClose={() => setModalState({ ...modalState, isOpen: false })}
+                onClose={() => { setModalState({ ...modalState, isOpen: false }); }}
                 onSelect={handleProductSelect}
                 initialQuery={modalState.query}
             />

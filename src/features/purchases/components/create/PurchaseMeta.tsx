@@ -72,7 +72,7 @@ const PurchaseMeta: React.FC = () => {
             {isSelect ? (
                 <select
                     value={value}
-                    onChange={(e) => setMetadata(field, e.target.value)}
+                    onChange={(e) => { setMetadata(field, e.target.value); }}
                     className="bg-transparent text-[11px] font-bold outline-none appearance-none cursor-pointer text-blue-900 dark:text-white text-right"
                 >
                     {options.map((opt: any) => <option key={opt.id} value={opt.id}>{opt.label}</option>)}
@@ -80,7 +80,7 @@ const PurchaseMeta: React.FC = () => {
             ) : type === "date" || type === "input" ? (
                 <input
                     type={type} value={value}
-                    onChange={(e) => setMetadata(field, e.target.value)}
+                    onChange={(e) => { setMetadata(field, e.target.value); }}
                     className="bg-transparent text-[11px] font-bold outline-none text-blue-900 dark:text-white text-right font-mono"
                 />
             ) : (
@@ -100,7 +100,7 @@ const PurchaseMeta: React.FC = () => {
                             <User size={12} className="text-blue-200" />
                             <span className="text-[11px] font-bold uppercase">المورد: {supplier.name}</span>
                         </div>
-                        <button onClick={() => setSupplier(null)} className="p-1 hover:bg-white/10 rounded"><X size={14} /></button>
+                        <button onClick={() => { setSupplier(null); }} className="p-1 hover:bg-white/10 rounded"><X size={14} /></button>
                     </div>
                 ) : (
                     <div className="relative">

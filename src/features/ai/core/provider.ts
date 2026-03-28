@@ -17,7 +17,7 @@ export async function generateAIContent(
         ? `${systemInstruction}\n\nيجب أن يكون الرد بصيغة JSON صالحة وحصرية.`
         : systemInstruction;
 
-    const { data, error } = await supabase.functions.invoke('ai-proxy', {
+    const { data, error } = await supabase.functions.invoke<{ choices: { message: { content: string } }[] }>('ai-proxy', {
         body: {
             prompt,
             model: getActiveModel(),
@@ -30,12 +30,13 @@ export async function generateAIContent(
 
     if (error) {
         console.error('AI Proxy Error:', error);
-        if (error.message?.includes('402')) {
+        const errorMessage = (error as { message?: string }).message ?? '';
+        if (errorMessage.includes('402')) {
             throw new Error('رصيد OpenRouter غير كافٍ لإتمام هذه العملية. يرجى شحن الرصيد أو تقليل عدد النصوص المطلوبة.');
         }
-        throw new Error(`تعذر الاتصال بالمساعد الذكي: ${error.message}`);
+        throw new Error(`تعذر الاتصال بالمساعد الذكي: ${errorMessage}`);
     }
 
     // Edge Function returns the full OpenRouter response
-    return data.choices?.[0]?.message?.content || '';
+    return data?.choices?.[0]?.message?.content ?? '';
 }

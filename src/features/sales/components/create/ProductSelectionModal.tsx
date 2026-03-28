@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Search, Box } from 'lucide-react';
 import { useProducts } from '../../../inventory/hooks/index';
-import { Product } from '../../../inventory/types';
+import type { Product } from '../../../inventory/types';
 import Modal from '../../../../ui/base/Modal';
 
 interface Props {
@@ -93,7 +93,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                             autoFocus
                             type="text"
                             value={localQuery}
-                            onChange={(e) => setLocalQuery(e.target.value)}
+                            onChange={(e) => { setLocalQuery(e.target.value); }}
                             onKeyDown={handleKeyDown}
                             placeholder="ابحث بالاسم، رقم الصنف... (اضغط Enter للبحث)"
                             className="w-full pr-10 pl-4 py-2.5 bg-gray-50 dark:bg-slate-800 border-2 border-blue-500/20 focus:border-blue-500 outline-none rounded-none text-sm font-bold"
@@ -108,31 +108,31 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                                 <th style={{ width: colWidths.index }} className="relative border border-gray-200 dark:border-slate-700 p-2 text-center">ت</th>
                                 <th style={{ width: colWidths.name }} className="relative border border-gray-200 dark:border-slate-700 p-2 pr-4">
                                     اسم المنتج
-                                    <div onMouseDown={(e) => onMouseDown(e, 'name')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
+                                    <div onMouseDown={(e) => { onMouseDown(e, 'name'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
                                 </th>
                                 <th style={{ width: colWidths.sku }} className="relative border border-gray-200 dark:border-slate-700 p-2 pr-4">
                                     رقم الصنف
-                                    <div onMouseDown={(e) => onMouseDown(e, 'sku')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
+                                    <div onMouseDown={(e) => { onMouseDown(e, 'sku'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
                                 </th>
                                 <th style={{ width: colWidths.brand }} className="relative border border-gray-200 dark:border-slate-700 p-2 pr-4">
                                     الشركة
-                                    <div onMouseDown={(e) => onMouseDown(e, 'brand')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
+                                    <div onMouseDown={(e) => { onMouseDown(e, 'brand'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
                                 </th>
                                 <th style={{ width: colWidths.stock }} className="relative border border-gray-200 dark:border-slate-700 p-2 text-center">
                                     كمية
-                                    <div onMouseDown={(e) => onMouseDown(e, 'stock')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
+                                    <div onMouseDown={(e) => { onMouseDown(e, 'stock'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
                                 </th>
                                 <th style={{ width: colWidths.price }} className="relative border border-gray-200 dark:border-slate-700 p-2 text-left">
                                     {mode === 'sale' ? 'البيع' : 'التكلفة'}
-                                    <div onMouseDown={(e) => onMouseDown(e, 'price')} className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
+                                    <div onMouseDown={(e) => { onMouseDown(e, 'price'); }} className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
                                 </th>
                                 <th style={{ width: colWidths.size }} className="relative border border-gray-200 dark:border-slate-700 p-2 pr-4">
                                     المقاس
-                                    <div onMouseDown={(e) => onMouseDown(e, 'size')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
+                                    <div onMouseDown={(e) => { onMouseDown(e, 'size'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
                                 </th>
                                 <th style={{ width: colWidths.specs }} className="relative border border-gray-200 dark:border-slate-700 p-2 pr-4">
                                     المواصفات
-                                    <div onMouseDown={(e) => onMouseDown(e, 'specs')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
+                                    <div onMouseDown={(e) => { onMouseDown(e, 'specs'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-30"></div>
                                 </th>
                             </tr>
                         </thead>
@@ -145,7 +145,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                                 products.map((p, idx) => (
                                     <tr
                                         key={p.id}
-                                        onClick={() => onSelect(p)}
+                                        onClick={() => { onSelect(p); }}
                                         onKeyDown={(e) => e.key === 'Enter' && onSelect(p)}
                                         tabIndex={0}
                                         className="hover:bg-blue-600 hover:text-white cursor-pointer group transition-colors focus:bg-blue-600 focus:text-white outline-none"
