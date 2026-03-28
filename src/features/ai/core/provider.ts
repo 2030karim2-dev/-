@@ -3,53 +3,39 @@
  * Handles communication with the AI model API.
  */
 import { STRICT_SYSTEM_ROLE } from './prompts';
-import { getActiveModel, getApiKey } from './config';
+import { getActiveModel } from './config';
+import { supabase } from '../../../lib/supabaseClient';
 
 export async function generateAIContent(
     prompt: string,
     systemInstruction: string = STRICT_SYSTEM_ROLE,
     options?: { jsonMode?: boolean; temperature?: number; maxTokens?: number }
 ): Promise<string> {
-    const apiKey = getApiKey();
-
-    if (!apiKey) {
-        throw new Error('يرجى إضافة مفتاح واجهة المبرمجين لـ OpenRouter في الإعدادات (VITE_OPENROUTER_API_KEY) لتشغيل المساعد الذكي.');
-    }
-
     const isJson = options?.jsonMode ?? true;
     
     const finalSystemInstruction = isJson 
         ? `${systemInstruction}\n\nيجب أن يكون الرد بصيغة JSON صالحة وحصرية.`
         : systemInstruction;
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': window.location.origin,
-            'X-Title': 'ERP Assistant'
-        },
-        body: JSON.stringify({
+    const { data, error } = await supabase.functions.invoke('ai-proxy', {
+        body: {
+            prompt,
             model: getActiveModel(),
-            messages: [
-                { role: 'system', content: finalSystemInstruction },
-                { role: 'user', content: prompt }
-            ],
+            systemInstruction: finalSystemInstruction,
             temperature: options?.temperature ?? 0.1,
-            max_tokens: options?.maxTokens ?? 1500
-        })
+            maxTokens: options?.maxTokens ?? 1500,
+            jsonMode: isJson
+        }
     });
 
-    if (response.status === 402) {
-        throw new Error('رصيد OpenRouter غير كافٍ لإتمام هذه العملية. يرجى شحن الرصيد أو تقليل عدد النصوص المطلوبة.');
+    if (error) {
+        console.error('AI Proxy Error:', error);
+        if (error.message?.includes('402')) {
+            throw new Error('رصيد OpenRouter غير كافٍ لإتمام هذه العملية. يرجى شحن الرصيد أو تقليل عدد النصوص المطلوبة.');
+        }
+        throw new Error(`تعذر الاتصال بالمساعد الذكي: ${error.message}`);
     }
 
-    if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`Failed to generate AI content: ${err}`);
-    }
-
-    const data = await response.json();
+    // Edge Function returns the full OpenRouter response
     return data.choices?.[0]?.message?.content || '';
 }

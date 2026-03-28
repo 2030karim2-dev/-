@@ -79,7 +79,7 @@ const CreatePurchaseModal: React.FC<Props> = ({ onSuccess }) => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-3 animate-in fade-in duration-500 pt-2 pb-24">
+    <div className="max-w-none mx-auto space-y-3 animate-in fade-in duration-500 pt-2 pb-24 px-1 md:px-2">
       <div className="bg-white dark:bg-slate-900 border-2 border-gray-100 dark:border-slate-800 shadow-2xl rounded-none flex flex-col overflow-hidden">
         {company && <InvoiceHeader company={company} />}
         <PurchaseMeta />

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { usePurchaseStore, PurchaseInvoiceItem } from '../../store';
 import { useDiscountStore } from '../../../settings/taxDiscountStore';
 import { Product } from '../../../inventory/types';
@@ -17,6 +17,71 @@ const InteractivePurchaseTable: React.FC = () => {
     const [modalState, setModalState] = useState<{ isOpen: boolean; rowIndex: number; query: string }>({
         isOpen: false, rowIndex: 0, query: ''
     });
+
+    // --- Column Resizing Logic ---
+    const initialWidths = (() => {
+        try {
+            const saved = localStorage.getItem('purchase_col_widths');
+            return saved ? JSON.parse(saved) : {
+                index: 40,
+                name: 350,
+                partNumber: 130,
+                brand: 110,
+                quantity: 70,
+                costPrice: 90,
+                discount: 80,
+                total: 120,
+            };
+        } catch {
+            return { index: 40, name: 350, partNumber: 130, brand: 110, quantity: 70, costPrice: 90, discount: 80, total: 120 };
+        }
+    })();
+
+    const [colWidths, setColWidths] = useState<Record<string, number>>(initialWidths);
+
+    useEffect(() => {
+        localStorage.setItem('purchase_col_widths', JSON.stringify(colWidths));
+    }, [colWidths]);
+
+    const resizingRef = useRef<{ field: string; startX: number; startWidth: number } | null>(null);
+
+    const onMouseDown = (e: React.MouseEvent, field: string) => {
+        resizingRef.current = {
+            field,
+            startX: e.pageX,
+            startWidth: colWidths[field]
+        };
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+    };
+
+    const onMouseMove = useCallback((e: MouseEvent) => {
+        if (!resizingRef.current) return;
+        const { field, startX, startWidth } = resizingRef.current;
+        const delta = e.pageX - startX;
+        setColWidths(prev => ({
+            ...prev,
+            [field]: Math.max(40, startWidth + (document.dir === 'rtl' ? -delta : delta))
+        }));
+    }, []);
+
+    const onMouseUp = useCallback(() => {
+        resizingRef.current = null;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
+    }, [onMouseMove, onMouseUp]);
 
     useEffect(() => {
         // Only initialize with empty rows if the items array is completely empty
@@ -107,18 +172,41 @@ const InteractivePurchaseTable: React.FC = () => {
             </div>
 
             <div className="overflow-x-auto custom-scrollbar">
-                <table ref={tableRef} className="w-full border-collapse table-fixed min-w-[1000px]">
+                <table ref={tableRef} className="w-full border-collapse table-fixed min-w-max">
                     <thead>
-                        <tr className="bg-blue-600 text-[9px] font-bold text-white uppercase tracking-widest text-right">
-                            <th className="p-2 w-10 text-center border-l border-white/10">#</th>
-                            <th className="p-2 border-l border-white/10">وصف الصنف المورد</th>
-                            <th className="p-2 text-center w-32 border-l border-white/10">رقم القطعة</th>
-                            <th className="p-2 text-center w-28 border-l border-white/10">الشركة الصانعة</th>
-                            <th className="p-2 text-center w-16 border-l border-white/10">الكمية</th>
-                            <th className="p-2 text-center w-24 border-l border-white/10">سعر التكلفة</th>
-                            {showDiscount && <th className="p-2 text-center w-20 border-l border-white/10">الخصم</th>}
+                        <tr className="bg-blue-600 text-[10px] font-black text-white uppercase tracking-widest text-right">
+                            <th style={{ width: colWidths.index }} className="relative p-2 text-center border-l border-white/10">#</th>
+                            <th style={{ width: colWidths.name }} className="relative p-2 border-l border-white/10 pr-4">
+                                وصف الصنف المورد
+                                <div onMouseDown={(e) => onMouseDown(e, 'name')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                            </th>
+                            <th style={{ width: colWidths.partNumber }} className="relative p-2 text-center border-l border-white/10">
+                                رقم القطعة
+                                <div onMouseDown={(e) => onMouseDown(e, 'partNumber')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                            </th>
+                            <th style={{ width: colWidths.brand }} className="relative p-2 text-center border-l border-white/10">
+                                الشركة الصانعة
+                                <div onMouseDown={(e) => onMouseDown(e, 'brand')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                            </th>
+                            <th style={{ width: colWidths.quantity }} className="relative p-2 text-center border-l border-white/10">
+                                الكمية
+                                <div onMouseDown={(e) => onMouseDown(e, 'quantity')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                            </th>
+                            <th style={{ width: colWidths.costPrice }} className="relative p-2 text-center border-l border-white/10">
+                                سعر التكلفة
+                                <div onMouseDown={(e) => onMouseDown(e, 'costPrice')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                            </th>
+                            {showDiscount && (
+                                <th style={{ width: colWidths.discount }} className="relative p-2 text-center border-l border-white/10">
+                                    الخصم
+                                    <div onMouseDown={(e) => onMouseDown(e, 'discount')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                                </th>
+                            )}
 
-                            <th className="p-2 text-left w-24">الإجمالي</th>
+                            <th style={{ width: colWidths.total }} className="relative p-2 text-left pr-4">
+                                الإجمالي
+                                <div onMouseDown={(e) => onMouseDown(e, 'total')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"></div>
+                            </th>
                             <th className="p-2 w-8 text-center bg-blue-700"></th>
                         </tr>
                     </thead>

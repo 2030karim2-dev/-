@@ -125,45 +125,47 @@ const PurchaseMeta: React.FC = () => {
                 )}
             </div>
 
-            <div className="flex flex-col">
-                <div className="flex -space-x-px">
-                    <MetaBlock label="تاريخ الفاتورة" field="issueDate" value={issueDate} icon={Calendar} type="date" colorClass="text-emerald-500" />
-                    <MetaBlock label="رقم فاتورة المورد" field="invoiceNumber" value={invoiceNumber} icon={Hash} type="input" colorClass="text-blue-600" />
-                    <MetaBlock label="نوع الفاتورة" field="invoiceType" value={invoiceType} icon={CreditCard} isSelect
-                        options={[{ id: 'cash', label: 'نقدي (Cash)' }, { id: 'credit', label: 'آجل (Credit)' }]} />
-                    <MetaBlock label="الصندوق / البنك" field="cashboxId" value={cashboxId} icon={Wallet} isSelect
-                        options={cashAccounts.map(a => ({ id: a.id, label: a.name }))} />
-                </div>
-                <div className="flex -space-x-px">
-                    <MetaBlock label="المستودع المستلم" field="warehouseId" value={warehouseId} icon={Warehouse} isSelect
-                        options={[{ id: 'wh_main', label: 'المستودع الرئيسي' }]} />
-                    <MetaBlock label="العملة" field="currency" value={currency} icon={Coins} isSelect
-                        options={currencies.data?.map((c: any) => ({ id: c.code, label: c.code })) || [{ id: 'SAR', label: 'SAR' }]} />
-                    {currency && currency !== 'SAR' && (
-                        <div className="flex-[1.5] bg-white dark:bg-slate-900 border border-blue-100 dark:border-slate-800 p-2 flex flex-col group hover:bg-blue-50/40 transition-colors">
-                            <div className="flex items-center gap-1 mb-1">
-                                <Coins size={10} className="text-amber-500" />
-                                <span className="text-[8px] font-bold text-amber-500 uppercase tracking-widest">
-                                    سعر الصرف {isDivide ? '(القسمة ÷)' : '(الضرب ×)'}
-                                </span>
-                            </div>
-                            <input
-                                type="number"
-                                step="0.00001"
-                                value={exchangeRate ? (isDivide ? parseFloat((1 / exchangeRate).toFixed(5)) : exchangeRate) : ''}
-                                onChange={(e) => {
-                                    const val = parseFloat(e.target.value);
-                                    if (!val) return;
-                                    setMetadata('exchangeRate', isDivide ? (1 / val) : val);
-                                }}
-                                className="bg-transparent text-[11px] font-bold outline-none text-amber-600 dark:text-amber-400 text-right font-mono"
-                            />
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 -space-x-px">
+                <MetaBlock label="تاريخ الفاتورة" field="issueDate" value={issueDate} icon={Calendar} type="date" colorClass="text-emerald-500" />
+                <MetaBlock label="رقم فاتورة المورد" field="invoiceNumber" value={invoiceNumber} icon={Hash} type="input" colorClass="text-blue-600" />
+                <MetaBlock label="نوع الفاتورة" field="invoiceType" value={invoiceType} icon={CreditCard} isSelect
+                    options={[{ id: 'cash', label: 'نقدي (Cash)' }, { id: 'credit', label: 'آجل (Credit)' }]} />
+                <MetaBlock label="الصندوق / البنك" field="cashboxId" value={cashboxId} icon={Wallet} isSelect
+                    options={cashAccounts.map(a => ({ id: a.id, label: a.name }))} />
+                <MetaBlock label="المستودع المستلم" field="warehouseId" value={warehouseId} icon={Warehouse} isSelect
+                    options={[{ id: 'wh_main', label: 'المستودع الرئيسي' }]} />
+                <MetaBlock label="العملة" field="currency" value={currency} icon={Coins} isSelect
+                    options={currencies.data?.map((c: any) => ({ id: c.code, label: c.code })) || [{ id: 'SAR', label: 'SAR' }]} />
+                
+                {currency && currency !== 'SAR' ? (
+                    <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-slate-800 p-2 flex flex-col group hover:bg-blue-50/40 transition-colors">
+                        <div className="flex items-center gap-1 mb-1">
+                            <Coins size={10} className="text-amber-500" />
+                            <span className="text-[8px] font-bold text-amber-500 uppercase tracking-widest">
+                                سعر الصرف {isDivide ? '(÷)' : '(×)'}
+                            </span>
                         </div>
-                    )}
-                    <div className="flex-[2] bg-gray-50/50 dark:bg-slate-900/50 border border-blue-100 dark:border-slate-800 p-2">
-                        <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">ملاحظات التوريد</span>
-                        <input className="w-full bg-transparent outline-none text-[10px] font-bold mt-1" placeholder="أدخل أي ملاحظات إضافية..." />
+                        <input
+                            type="number"
+                            step="0.00001"
+                            value={exchangeRate ? (isDivide ? parseFloat((1 / exchangeRate).toFixed(5)) : exchangeRate) : ''}
+                            onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                if (!val) return;
+                                setMetadata('exchangeRate', isDivide ? (1 / val) : val);
+                            }}
+                            className="bg-transparent text-[11px] font-bold outline-none text-amber-600 dark:text-amber-400 text-right font-mono"
+                        />
                     </div>
+                ) : (
+                    <div className="bg-gray-50/20 dark:bg-slate-900/20 border border-blue-100 dark:border-slate-800 p-2 invisible lg:visible">
+                        {/* Placeholder to maintain grid shape on desktop */}
+                    </div>
+                )}
+
+                <div className="bg-gray-50/50 dark:bg-slate-900/50 border border-blue-100 dark:border-slate-800 p-2 col-span-2 md:col-span-1 lg:col-span-1">
+                    <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">ملاحظات التوريد</span>
+                    <input className="w-full bg-transparent outline-none text-[10px] font-bold mt-1" placeholder="ملاحظات..." />
                 </div>
             </div>
         </div>

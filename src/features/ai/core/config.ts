@@ -21,7 +21,3 @@ export function getActiveModel(): string {
 export function setActiveModel(modelId: string) {
     localStorage.setItem('ai_model', modelId);
 }
-
-export function getApiKey(): string | null {
-    return import.meta.env.VITE_OPENROUTER_API_KEY || localStorage.getItem('openrouter_key') || null;
-}
