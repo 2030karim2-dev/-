@@ -136,7 +136,7 @@ export const useDashboard = (options?: UseDashboardOptions) => {
                     table: 'invoices',
                     filter: `company_id=eq.${user.company_id}`
                 },
-                (payload) => {
+                (payload: any) => {
                     // Only notify for actual sales, ignoring returns and purchases
                     if (payload.new.type === 'sale') {
                         showToast(`مبيعات جديدة بقيمة ${payload.new.total_amount} ر.س`, 'success');

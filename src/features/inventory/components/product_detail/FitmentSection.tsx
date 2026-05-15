@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Car, Plus, X, Trash2, Search, Loader2 } from 'lucide-react';
+import { Car, Plus, X, Trash2, Search } from 'lucide-react';
 import { useAuthStore } from '../../../auth/store';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inventoryApi } from '../../api';

@@ -18,15 +18,11 @@ export interface SalesCartItem {
   basePrice: number; // Price in SAR (base currency)
   price: number;     // Converted price based on current exchange rate
   discount: number;
-
   costPrice: number;
 }
 
-
-
 export interface SalesSummary {
   subtotal: number;
-
   discountAmount: number;
   totalAmount: number;
 }
@@ -41,8 +37,6 @@ interface SalesState {
   exchangeOperator: 'multiply' | 'divide';
   warehouseId: string;
   cashboxId: string;
-
-
   showDiscount: boolean;
 
   // Actions
@@ -71,7 +65,6 @@ const createNewItem = (): SalesCartItem => ({
   basePrice: 0,
   price: 0,
   discount: 0,
-
   costPrice: 0,
 });
 
@@ -85,7 +78,6 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   exchangeOperator: 'multiply',
   warehouseId: 'wh_main',
   cashboxId: 'box_1',
-
   showDiscount: false,
 
   initializeItems: (count) => set({ items: Array.from({ length: count }, createNewItem) }),
@@ -113,9 +105,8 @@ export const useSalesStore = create<SalesState>((set, get) => ({
     set(state => {
       const newItems = [...state.items];
       const basePrice = product.selling_price || 0;
-      const convertedPrice = state.exchangeOperator === 'divide'
-        ? basePrice * state.exchangeRate
-        : basePrice / state.exchangeRate;
+      // Consistent with our multi-currency logic: Base / Rate = Foreign
+      const convertedPrice = basePrice / state.exchangeRate;
 
       if (newItems[index]) {
         newItems[index] = {
@@ -149,11 +140,8 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         };
       }
 
-
       const basePrice = product.selling_price || 0;
-      const convertedPrice = state.exchangeOperator === 'divide'
-        ? basePrice * state.exchangeRate
-        : basePrice / state.exchangeRate;
+      const convertedPrice = basePrice / state.exchangeRate;
 
       const newItem: SalesCartItem = {
         id: crypto.randomUUID(),
@@ -166,7 +154,6 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         basePrice: basePrice,
         price: convertedPrice,
         discount: 0,
-
         costPrice: product.cost_price || 0
       };
 
@@ -198,7 +185,6 @@ export const useSalesStore = create<SalesState>((set, get) => ({
         const lineSub = qty * price;
         subtotal += lineSub;
 
-        // Discount: only if globally enabled AND column shown
         const lineDiscount = (discountEnabled && state.showDiscount) ? (Number(item.discount) || 0) : 0;
         discountAmount += lineDiscount;
       });
@@ -217,14 +203,14 @@ export const useSalesStore = create<SalesState>((set, get) => ({
     set((state) => {
       const newState = { ...state, [field]: value };
 
-      // Re-calculate all prices if currency or rate or operator changes
       if (['currency', 'exchangeRate', 'exchangeOperator'].includes(field as string)) {
         const rate = (newState.currency === 'SAR') ? 1 : newState.exchangeRate;
-        const op = (newState.currency === 'SAR') ? 'multiply' : newState.exchangeOperator;
 
         newState.items = newState.items.map(item => {
           if (!item.productId) return item;
-          const newPrice = op === 'divide' ? item.basePrice * rate : item.basePrice / rate;
+          // The exchangeRate in our system is ALWAYS the multiplier to get Base from Foreign.
+          // To get Foreign from Base, we ALWAYS divide by the rate.
+          const newPrice = item.basePrice / rate;
           return { ...item, price: newPrice };
         });
       }
@@ -239,13 +225,10 @@ export const useSalesStore = create<SalesState>((set, get) => ({
     get().calculateTotals();
   },
 
-  resetCart: () => set({
+  resetCart: () => set(() => ({
     items: [],
     selectedCustomer: null,
     summary: { subtotal: 0, discountAmount: 0, totalAmount: 0 },
-    invoiceType: 'cash',
-    currency: 'SAR',
-    exchangeRate: 1,
-    exchangeOperator: 'multiply'
-  })
+    invoiceType: 'cash'
+  }))
 }));

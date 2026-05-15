@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../../types';
 import { useSupplierPrices, useSupplierPriceMutations } from '../../hooks/index';
 import { useFeedbackStore } from '../../../feedback/store';
-import { Plus, Building2, Truck, DollarSign, Calendar, X } from 'lucide-react';
+import { Plus, Building2, Truck, X } from 'lucide-react';
 import { cn } from '../../../../core/utils';
 
 interface SupplierPricesListProps {

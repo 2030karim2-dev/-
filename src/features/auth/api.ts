@@ -76,7 +76,22 @@ export const authApi = {
         });
 
         if (!error && data && Object.keys(data).length > 2) {
-          return { data, error: null };
+          // Fetch email from session as RPC does not return it
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          const firstCompany = Array.isArray(data.companies) && data.companies.length > 0 ? data.companies[0] : null;
+          
+          const flatData = {
+            id: data.id,
+            email: user?.email || '',
+            full_name: data.full_name || user?.user_metadata?.full_name || '',
+            avatar_url: data.avatar_url || user?.user_metadata?.avatar_url,
+            role: firstCompany?.role || 'viewer',
+            company_id: firstCompany?.company_id,
+            company_name: firstCompany?.company_name,
+          };
+
+          return { data: flatData, error: null };
         }
 
         // 2. Fallback: Manual fetch if RPC fails (e.g. timeout or connection closed)

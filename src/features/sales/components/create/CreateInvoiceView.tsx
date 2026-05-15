@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSalesStore } from '../../store';
 import { useCreateInvoice, useNextInvoiceNumber } from '../../hooks/index';
-import { useCompany, useCurrencies } from '../../../settings/hooks';
+import { useCompany } from '../../../settings/hooks';
 import { useSettingsStore } from '../../../settings/settingsStore';
 import { partiesService } from '../../../../features/parties/service';
 import InvoiceHeader from './InvoiceHeader';
@@ -23,11 +23,10 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
   const comp = company as { id: string;[key: string]: unknown } | null;
   const { data: nextInvoiceNumber, isLoading: numberLoading, error: numberError } = useNextInvoiceNumber();
   const {
-    items, selectedCustomer, summary, resetCart, invoiceType, cashboxId, currency,
+    items, selectedCustomer, summary, resetCart, invoiceType, cashboxId, currency, exchangeRate,
     setMetadata, setCustomer
   } = useSalesStore();
   const { mutate: createInvoice, isPending } = useCreateInvoice();
-  const { rates } = useCurrencies();
   const { invoice: invoiceSettings } = useSettingsStore();
 
   // Apply defaults on mount
@@ -72,10 +71,6 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
     }
   }, [comp?.id, invoiceSettings, selectedCustomer, setMetadata, setCustomer]);
 
-  const getExchangeRate = (currCode: string): number => {
-    const history = (rates?.data as { currency_code: string; rate_to_base: number }[] | undefined)?.filter((r) => r.currency_code === currCode) || [];
-    return (history.length > 0 ? history[0].rate_to_base : 1) as number;
-  };
 
   const [isPrinting, setIsPrinting] = useState(false);
 
@@ -101,7 +96,7 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
       paymentMethod: invoiceType,
       treasuryAccountId: cashboxId,
       currency: currency || 'SAR',
-      exchangeRate: getExchangeRate(currency || 'SAR')
+      exchangeRate: (currency === 'SAR') ? 1 : (exchangeRate || 1)
     }, {
       onSuccess: () => {
         resetCart();

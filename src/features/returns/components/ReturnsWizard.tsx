@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Package, Hash, Save, Receipt, Loader2, ListPlus } from 'lucide-react';
+import { Package, Save, Receipt, Loader2, ListPlus } from 'lucide-react';
 import { ReturnType, Invoice } from '../types';
 import { formatCurrency } from '../../../core/utils';
 import { useDraggableModal } from '../../../ui/hooks/useDraggableModal';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Link2, Loader2, Globe, CheckCircle, Sparkles, Copy, Check, Plus, ShieldCheck, ShieldAlert, Shield, AlertCircle, XCircle, Clock } from 'lucide-react';
+import { FileText, Link2, Loader2, Globe, CheckCircle, Sparkles, Copy, Check, Plus, ShieldCheck, ShieldAlert, Shield, AlertCircle, XCircle } from 'lucide-react';
 import { cn } from '../../../../core/utils';
 import { useAIPartLookup } from '../../hooks/useAIPartLookup';
 import type { AIAlternative, AISiteDebug } from '../../api/aiPartLookupApi';

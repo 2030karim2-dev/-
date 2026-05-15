@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Car, Search, Loader2 } from 'lucide-react';
 import { useVehicleCompatibility } from '../../hooks/useVehicleCompatibility';
 import { Product } from '../../types';
-import { cn } from '../../../../core/utils';
+
 
 interface Props {
   product: Product;
@@ -12,7 +12,7 @@ export const VehicleCompatibilityList: React.FC<Props> = ({ product }) => {
   const [searchTerm, setSearchTerm] = useState(product.part_number || product.sku || '');
   const [activeSearch, setActiveSearch] = useState(searchTerm);
 
-  const { data, isLoading, isError, error } = useVehicleCompatibility(activeSearch);
+  const { data, isLoading, isError } = useVehicleCompatibility(activeSearch);
   const vehicles = data?.vehicles ?? [];
 
   useEffect(() => {

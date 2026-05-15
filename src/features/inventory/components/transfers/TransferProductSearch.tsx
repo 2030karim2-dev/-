@@ -4,11 +4,9 @@ import { Search } from 'lucide-react';
 interface Props {
     query: string;
     setQuery: (q: string) => void;
-    products: any[];
-    onAddItem: (p: any) => void;
 }
 
-const TransferProductSearch: React.FC<Props> = ({ query, setQuery, products, onAddItem }) => {
+const TransferProductSearch: React.FC<Props> = ({ query, setQuery }) => {
     return (
         <div className="space-y-1">
             <div className="relative">

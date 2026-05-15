@@ -37,7 +37,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, onAddToCart }) =>
                 >
                     الكل
                 </button>
-                {categories.map(cat => (
+                {categories.map((cat: any) => (
                     <button
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat.id)}

@@ -91,12 +91,18 @@ export const useDashboardData = () => {
     const totalDebts = Math.max(serverTotalDebts, 0);
 
     // Process Trial Balance for accurate Net Profit/Loss
-    const trialBalanceRows = rawDataQuery.data.trialBalanceRows || [];
-    const revenues = trialBalanceRows.filter((a: any) => a.account_code?.startsWith('4'));
-    const expensesAcc = trialBalanceRows.filter((a: any) => a.account_code?.startsWith('5'));
+    let trialBalanceRows = [];
+    if (Array.isArray(rawDataQuery.data.trialBalanceRows)) {
+      trialBalanceRows = rawDataQuery.data.trialBalanceRows;
+    } else if (rawDataQuery.data.trialBalanceRows && Array.isArray(rawDataQuery.data.trialBalanceRows.rows)) {
+      trialBalanceRows = rawDataQuery.data.trialBalanceRows.rows;
+    }
 
-    const totalRevenues = revenues.reduce((s: number, a: any) => s + Math.abs(a.balance || 0), 0);
-    const totalExpensesAcc = expensesAcc.reduce((s: number, a: any) => s + Math.abs(a.balance || 0), 0);
+    const revenues = trialBalanceRows.filter((a: any) => (a.code || a.account_code || '').startsWith('4'));
+    const expensesAcc = trialBalanceRows.filter((a: any) => (a.code || a.account_code || '').startsWith('5'));
+
+    const totalRevenues = revenues.reduce((s: number, a: any) => s + Math.abs(a.netBalance ?? a.balance ?? 0), 0);
+    const totalExpensesAcc = expensesAcc.reduce((s: number, a: any) => s + Math.abs(a.netBalance ?? a.balance ?? 0), 0);
 
     // Net Profit based on accounting accounts (Revenues - Expenses)
     const netProfit = totalRevenues - totalExpensesAcc;

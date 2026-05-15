@@ -21,6 +21,7 @@ interface Props {
     title?: string;
     subtitle?: string;
     colorTheme?: string;
+    onCellUpdate?: (rowIndex: number, accessorKey: string, value: any) => void;
 }
 
 const ProductExcelGrid: React.FC<Props> = ({ 
@@ -35,7 +36,8 @@ const ProductExcelGrid: React.FC<Props> = ({
     extraColumns = [],
     title = "المنتجات",
     subtitle = `${products.length} منتج في المستودع`,
-    colorTheme = "indigo"
+    colorTheme = "indigo",
+    onCellUpdate
 }) => {
     const { saveProduct, bulkDeleteProducts } = useProductMutations();
     const { showToast } = useFeedbackStore();
@@ -105,7 +107,7 @@ const ProductExcelGrid: React.FC<Props> = ({
                 onRowDoubleClick={onViewDetails}
                 onRowClick={onRowClick}
                 onOrderChange={() => { }}
-                onCellUpdate={handleCellUpdate}
+                onCellUpdate={onCellUpdate || handleCellUpdate}
                 enableSelection={!hideBulkActions}
                 selectedRowIds={selectedRowIds}
                 onSelectionChange={setSelectedRowIds}

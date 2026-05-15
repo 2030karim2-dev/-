@@ -100,7 +100,7 @@ const InteractivePurchaseTable: React.FC = () => {
 
         // Auto-focus quantity after selection
         setTimeout(() => {
-            const nextCell = tableRef.current?.querySelector(`[data-row-index="${modalState.rowIndex}"][data-col-field="quantity"]`)!;
+            const nextCell = tableRef.current?.querySelector(`[data-row-index="${modalState.rowIndex}"][data-col-field="quantity"]`) as HTMLInputElement;
             nextCell?.focus();
             if (nextCell) nextCell.select();
         }, 50);
@@ -122,7 +122,7 @@ const InteractivePurchaseTable: React.FC = () => {
         const colIndex = fieldsOrder.indexOf(field);
 
         const moveFocus = (row: number, colField: keyof PurchaseInvoiceItem) => {
-            const nextCell = tableRef.current?.querySelector(`[data-row-index="${row}"][data-col-field="${colField}"]`)!;
+            const nextCell = tableRef.current?.querySelector(`[data-row-index="${row}"][data-col-field="${colField}"]`) as HTMLInputElement;
             nextCell?.focus();
             if (nextCell instanceof HTMLInputElement) nextCell.select();
         };

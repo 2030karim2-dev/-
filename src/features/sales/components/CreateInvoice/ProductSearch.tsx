@@ -73,7 +73,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onSelectProduct, }) => {
                         <div className="p-4 text-center text-gray-500">لا توجد نتائج</div>
                     ) : (
                         <ul>
-                            {products.map((product) => (
+                            {products.map((product: ProductSearchResult) => (
                                 <li
                                     key={product.id}
                                     onClick={() => handleSelect(product)}

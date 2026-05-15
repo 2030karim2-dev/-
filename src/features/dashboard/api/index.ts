@@ -60,7 +60,7 @@ export const dashboardApi = {
             categories: categoriesRes.data || [],
             invoiceItems: itemsRes.data || [],
             serverTotals: totalsRes.data || {},
-            trialBalanceRows: trialBalanceRes.data || []
+            trialBalanceRows: (trialBalanceRes.data as any)?.rows || []
         };
     }
 };

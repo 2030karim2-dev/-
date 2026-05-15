@@ -69,10 +69,8 @@ const NewTransferModal: React.FC<NewTransferModalProps> = ({ isOpen, onClose }) 
                 />
 
                 <TransferProductSearch 
-                    query={productQuery}
-                    setQuery={setProductQuery}
-                    products={products}
-                    onAddItem={handleAddItem}
+                    query={productQuery} 
+                    setQuery={setProductQuery} 
                 />
 
                 <div className="flex-1 min-h-0 relative">

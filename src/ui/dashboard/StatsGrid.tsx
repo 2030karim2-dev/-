@@ -149,14 +149,14 @@ const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
 
   return (
     <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      {statItems.map((item, index) => {
-        const trend = getTrend(
-          index === 0 ? stats.salesTrend :
-            index === 1 ? stats.purchasesTrend :
-              index === 2 ? stats.expensesTrend :
-                index === 3 ? stats.profitTrend :
-                  stats.debtsTrend
-        );
+      {statItems.map((item) => {
+        const trendKey = item.title === t('total_sales') ? 'salesTrend' :
+          item.title === (t('total_purchases') || 'المشتريات') ? 'purchasesTrend' :
+            item.title === t('total_expenses') ? 'expensesTrend' :
+              item.title === (t('net_profit') || 'صافي الربح') ? 'profitTrend' :
+                'debtsTrend';
+
+        const trend = getTrend(stats[trendKey as keyof typeof stats] as number);
 
         // Parse numeric value for counter
         // const _numericVal = parseFloat(item.value.replace(/[^0-9.-]/g, '')) || 0;

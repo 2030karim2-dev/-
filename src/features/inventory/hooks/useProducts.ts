@@ -45,17 +45,33 @@ export const useProducts = (searchTerm: string = '', options: { limitNum?: numbe
     }, [companyId, query.refetch]);
 
     const filteredProducts = useMemo(() => {
-        const data = query.data || [];
-        if (!searchTerm) return data;
-        const lowerTerm = searchTerm.toLowerCase();
-        return data.filter(p =>
-            p.name.toLowerCase().includes(lowerTerm) ||
-            p.sku.toLowerCase().includes(lowerTerm) ||
-            p.brand?.toLowerCase().includes(lowerTerm) ||
-            p.part_number?.toLowerCase().includes(lowerTerm) ||
-            p.alternative_numbers?.toLowerCase().includes(lowerTerm) ||
-            p.size?.toLowerCase().includes(lowerTerm)
-        );
+        const products = query.data || [];
+        if (!searchTerm) return products;
+
+        // Normalize Arabic characters for more flexible matching
+        const normalizeArabic = (text: string) => {
+            return text
+                .replace(/[أإآ]/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .replace(/ى/g, 'ي')
+                .replace(/[\u064B-\u065F]/g, ''); // Remove Harakat
+        };
+
+        const searchTokens = searchTerm.toLowerCase().split(/\s+/).filter(Boolean).map(normalizeArabic);
+
+        return products.filter(p => {
+            const searchableText = normalizeArabic([
+                p.name,
+                p.name_ar,
+                p.sku,
+                p.brand,
+                p.part_number,
+                p.alternative_numbers,
+                p.size
+            ].filter(Boolean).join(' ').toLowerCase());
+
+            return searchTokens.every(token => searchableText.includes(token));
+        });
     }, [query.data, searchTerm]);
 
     const stats = useMemo(() => ({

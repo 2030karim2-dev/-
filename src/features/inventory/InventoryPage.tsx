@@ -6,7 +6,7 @@ import ProductDetailModal from './components/ProductDetailModal';
 import AddProductModal from './components/AddProductModal';
 import ImportProductsModal from './components/ImportProductsModal';
 import MicroHeader from '../../ui/base/MicroHeader';
-import { Database, Plus, List, LayoutGrid, Upload, Sparkles } from 'lucide-react';
+import { Database, Plus, List, LayoutGrid, Upload, Sparkles, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useBreakpoint } from '../../lib/hooks/useBreakpoint';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import ErrorDisplay from '../../ui/base/ErrorDisplay';
@@ -45,6 +45,17 @@ const InventoryPage: React.FC = () => {
         if (success) setActiveView('products');
     };
 
+    const { totalProducts, availableProducts, outOfStockProducts } = useMemo(() => {
+        let total = 0, available = 0, outOfStock = 0;
+        products.forEach(p => {
+            total++;
+            const stock = ((p as any).product_stock || []).reduce((sum: number, s: any) => sum + Number(s.quantity || 0), 0);
+            if (stock > 0) available++;
+            else outOfStock++;
+        });
+        return { totalProducts: total, availableProducts: available, outOfStockProducts: outOfStock };
+    }, [products]);
+
     return (
         <FullscreenContainer 
             isMaximized={isMaximized} 
@@ -66,36 +77,53 @@ const InventoryPage: React.FC = () => {
                     isZenMode={isZenMode}
                     onToggleZen={() => setIsZenMode(!isZenMode)}
                     actions={
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setIsImportModalOpen(true)}
-                                className="flex items-center gap-1 bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 shadow-md shadow-emerald-500/20"
-                                title="استيراد من Excel"
-                            >
-                                <Upload size={14} />
-                                <span className="hidden sm:inline">Excel</span>
-                            </button>
-                            <button
-                                onClick={() => setIsDedupeOpen(true)}
-                                className="flex items-center gap-1 bg-amber-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 shadow-md shadow-amber-500/20"
-                                title="فحص المكررات"
-                            >
-                                <Sparkles size={14} />
-                                <span className="hidden sm:inline">فحص المكررات</span>
-                            </button>
-                            <button
-                                onClick={handleAdd}
-                                className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 shadow-md shadow-blue-500/20"
-                            >
-                                <Plus size={14} />
-                                <span>{t('add_new_entity', { entity: t('product') })}</span>
-                            </button>
-                            {!isDesktop && activeView === 'products' && (
-                                <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-xl">
-                                    <button onClick={() => setDisplayMode('table')} className={`p-1.5 rounded-lg ${displayMode === 'table' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><List size={14} /></button>
-                                    <button onClick={() => setDisplayMode('grid')} className={`p-1.5 rounded-lg ${displayMode === 'grid' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><LayoutGrid size={14} /></button>
+                        <div className="flex items-center gap-3">
+                            {activeView === 'products' && (
+                                <div className="hidden md:flex items-center gap-3 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-[10px] sm:text-xs font-bold shadow-sm" title="إحصائيات المنتجات">
+                                    <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400" title="إجمالي المنتجات">
+                                        <Database size={12} /> {totalProducts}
+                                    </span>
+                                    <span className="w-px h-3 bg-slate-300 dark:bg-slate-600"></span>
+                                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400" title="منتجات متوفرة">
+                                        <CheckCircle size={12} /> {availableProducts}
+                                    </span>
+                                    <span className="w-px h-3 bg-slate-300 dark:bg-slate-600"></span>
+                                    <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400" title="منتجات ناقصة">
+                                        <AlertTriangle size={12} /> {outOfStockProducts}
+                                    </span>
                                 </div>
                             )}
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setIsImportModalOpen(true)}
+                                    className="flex items-center gap-1 bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 shadow-md shadow-emerald-500/20"
+                                    title="استيراد من Excel"
+                                >
+                                    <Upload size={14} />
+                                    <span className="hidden sm:inline">Excel</span>
+                                </button>
+                                <button
+                                    onClick={() => setIsDedupeOpen(true)}
+                                    className="flex items-center gap-1 bg-amber-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 shadow-md shadow-amber-500/20"
+                                    title="فحص المكررات"
+                                >
+                                    <Sparkles size={14} />
+                                    <span className="hidden sm:inline">فحص المكررات</span>
+                                </button>
+                                <button
+                                    onClick={handleAdd}
+                                    className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 shadow-md shadow-blue-500/20"
+                                >
+                                    <Plus size={14} />
+                                    <span>{t('add_new_entity', { entity: t('product') })}</span>
+                                </button>
+                                {!isDesktop && activeView === 'products' && (
+                                    <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-xl">
+                                        <button onClick={() => setDisplayMode('table')} className={`p-1.5 rounded-lg ${displayMode === 'table' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><List size={14} /></button>
+                                        <button onClick={() => setDisplayMode('grid')} className={`p-1.5 rounded-lg ${displayMode === 'grid' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><LayoutGrid size={14} /></button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     }
                     searchValue={searchTerm}

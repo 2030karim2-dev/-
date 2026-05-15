@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, RefObject } from 'react';
 
-export const useDraggableModal = (modalRef: RefObject<HTMLDivElement>, isOpen: boolean) => {
+export const useDraggableModal = (modalRef: RefObject<HTMLDivElement | null>, isOpen: boolean) => {
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 

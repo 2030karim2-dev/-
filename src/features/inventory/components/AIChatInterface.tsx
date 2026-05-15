@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Sparkles, MessageSquare, Trash2 } from 'lucide-react';
+import { Send, Bot, Loader2, Sparkles, Trash2 } from 'lucide-react';
 import { useCarAI } from '../hooks/useCarAI';
 import { motion, AnimatePresence } from 'framer-motion';
 

@@ -12,13 +12,13 @@ const QuotationSummaryWidget: React.FC = () => {
 
     const { data: salesQuots, isLoading: salesLoading } = useQuery({
         queryKey: ['sales_quotations_summary', companyId],
-        queryFn: () => companyId ? salesQuotationsApi.getQuotations(companyId) : Promise.resolve({ data: [] }),
+        queryFn: () => companyId ? salesQuotationsApi.getQuotations(companyId) : Promise.resolve({ data: [], error: null }),
         enabled: !!companyId,
     });
 
     const { data: purchaseQuots, isLoading: purchaseLoading } = useQuery({
         queryKey: ['purchase_quotations_summary', companyId],
-        queryFn: () => companyId ? purchaseQuotationsApi.getQuotations(companyId) : Promise.resolve({ data: [] }),
+        queryFn: () => companyId ? purchaseQuotationsApi.getQuotations(companyId) : Promise.resolve({ data: [], error: null }),
         enabled: !!companyId,
     });
 

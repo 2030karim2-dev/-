@@ -18,7 +18,7 @@ const WarehouseDetailView: React.FC<Props> = ({ warehouseId, warehouses }) => {
 
     const lowStockCount = React.useMemo(() => {
         if (!products) return 0;
-        return products.filter(p => p.stock_quantity <= ((p as any).min_stock_level || 5)).length;
+        return products.filter((p: any) => p.stock_quantity <= ((p as any).min_stock_level || 5)).length;
     }, [products]);
 
     if (!warehouse) {

@@ -151,7 +151,7 @@ const POSPage: React.FC = () => {
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">مراجعة الطلب</span>
             </div>
           )}
-          <POSCart onPay={() => setIsPaymentModalOpen(true)} onSuspend={handleSuspend} isQuickMode={isQuickMode} />
+          <POSCart onPay={() => setIsPaymentModalOpen(true)} onSuspend={handleSuspend} />
 
           {!isQuickMode && (
           <div className="p-2 bg-gray-50 dark:bg-slate-950 border-t dark:border-slate-800 hidden md:block">

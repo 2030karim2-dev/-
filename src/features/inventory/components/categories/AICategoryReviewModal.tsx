@@ -254,9 +254,4 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
 
 export default AICategoryReviewModal;
 
-/**
- * Utility function for dynamic class names
- */
-function cn(...classes: (string | boolean | undefined | null)[]) {
-    return classes.filter(Boolean).join(' ');
-}
+
