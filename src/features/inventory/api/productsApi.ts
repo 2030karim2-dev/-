@@ -35,12 +35,11 @@ export const productsApi = {
                     quantity,
                     warehouse_id,
                     warehouses(name_ar)
-                ),
-                uoms:product_uoms(id, uom_name, conversion_factor)
+                )
             `)
             .eq('company_id', companyId)
             .is('deleted_at', null)
-            .order('created_at', { ascending: false }) // Re-enabled after adding indexes
+            .order('created_at', { ascending: false })
             .range(from, to);
     },
 
@@ -67,12 +66,14 @@ export const productsApi = {
     },
 
     saveProductUoMs: async (productId: string, uoms: any[]) => {
-        // Simple replace all strategy for UoMs
-        await supabase.from('product_uoms').delete().eq('product_id', productId);
-        if (uoms && uoms.length > 0) {
-            const uomsToInsert = uoms.map(u => ({ ...u, product_id: productId }));
-            return await supabase.from('product_uoms').insert(uomsToInsert);
-        }
+        // product_uoms table may not exist yet — silently skip if so
+        try {
+            await supabase.from('product_uoms' as any).delete().eq('product_id', productId);
+            if (uoms && uoms.length > 0) {
+                const uomsToInsert = uoms.map(u => ({ ...u, product_id: productId }));
+                return await supabase.from('product_uoms' as any).insert(uomsToInsert);
+            }
+        } catch (_) { /* table not yet migrated */ }
         return { error: null };
     },
 

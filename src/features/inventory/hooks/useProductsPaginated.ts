@@ -102,8 +102,7 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
            purchase_price, sale_price, min_stock_level, unit, image_url,
            alternative_numbers, barcode, updated_at, created_at, status,
            category:product_categories(id, name),
-           stock:product_stock(quantity, warehouse_id, warehouses(name_ar)),
-           uoms:product_uoms(id, uom_name, conversion_factor)`,
+           stock:product_stock(quantity, warehouse_id, warehouses(name_ar))`,
           { count: 'exact' }
         )
         .eq('company_id', companyId)
@@ -151,8 +150,7 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
              purchase_price, sale_price, min_stock_level, unit, image_url,
              alternative_numbers, barcode, updated_at, created_at, status,
              category:product_categories(id, name),
-             stock:product_stock(quantity, warehouse_id, warehouses(name_ar)),
-             uoms:product_uoms(id, uom_name, conversion_factor)`,
+             stock:product_stock(quantity, warehouse_id, warehouses(name_ar))`,
             { count: 'exact' }
           )
           .eq('company_id', companyId)
