@@ -18,7 +18,7 @@ export const isSupabasePlaceholder = !supabaseUrl || !supabaseAnonKey;
 // Custom fetch with timeout and retry logic
 const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): Promise<Response> => {
   const MAX_RETRIES = 3;
-  let lastError: any;
+  let lastError: Error | unknown;
 
   for (let i = 0; i <= MAX_RETRIES; i++) {
     const timeoutController = new AbortController();
@@ -60,13 +60,14 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
       useConnectionStore.getState().reportSuccess();
       
       return response;
-    } catch (error: any) {
+    } catch (error: unknown) {
       clearTimeout(timeoutId);
 
-      const isTimeout = error.name === 'AbortError' && (error.message?.includes('timeout') || signal.reason === 'timeout');
+      const err = error as Error & { name: string; message: string; reason?: string };
+      const isTimeout = err.name === 'AbortError' && (err.message?.includes('timeout') || signal.reason === 'timeout');
       if (isTimeout) {
         useConnectionStore.getState().reportTimeout();
-      } else if (error.name !== 'AbortError') {
+      } else if (err.name !== 'AbortError') {
         useConnectionStore.getState().reportFailure();
       }
 
@@ -74,19 +75,16 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
       // 1. Supabase auth token refresh (internal signal abort)
       // 2. Vite HMR module reloads (component unmount mid-request)
       // 3. Navigation away during pending requests
-      if (error.name === 'AbortError') {
-        // If it was an external abort (caller cancelled), re-throw it
+      if (err.name === 'AbortError') {
         if (options.signal?.aborted) {
-          throw error;
+          throw err;
         }
-        // For internal timeouts, continue to retry
-        // For other AbortErrors (no reason), just throw without retry
-        if (!error.message?.includes('timeout')) {
-          throw error;
+        if (!err.message?.includes('timeout')) {
+          throw err;
         }
       }
 
-      const errorMessage = error.message?.toLowerCase() || '';
+      const errorMessage = err.message?.toLowerCase() || '';
       const isOffline = errorMessage === 'network_offline';
       const isNetworkError =
         isOffline ||
@@ -95,7 +93,7 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
         errorMessage.includes('failed to fetch') ||
         errorMessage.includes('econnrefused') ||
         errorMessage.includes('etimedout') ||
-        error.name === 'TypeError';
+        error instanceof TypeError;
 
       if (i < MAX_RETRIES && isNetworkError) {
         const reason = isOffline ? 'offline' : 'network instability';
@@ -106,7 +104,7 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
         continue;
       }
 
-      lastError = error;
+      lastError = err;
       break;
     }
   }
@@ -163,8 +161,9 @@ export const supabase = isSupabasePlaceholder
   );
 
 // Export a helper function to handle auth errors gracefully
-export const handleSupabaseError = (error: any): { message: string; isAuthError: boolean } => {
-  const errorMessage = error?.message || error?.error_description || 'Unknown error occurred';
+export const handleSupabaseError = (error: unknown): { message: string; isAuthError: boolean } => {
+  const err = error as { message?: string; error_description?: string };
+  const errorMessage = err?.message || err?.error_description || 'Unknown error occurred';
   const isAuthError = errorMessage.includes('token') || errorMessage.includes('auth') || errorMessage.includes('JWT');
 
   return {

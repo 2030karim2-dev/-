@@ -158,22 +158,27 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
                otherAccounts: otherAccounts.map(a => ({ id: a.id, name: a.name }))
             }}
             onDataExtracted={(data) => {
-               if (data.amount) setValue(selectedCurrency === 'SAR' ? 'amount' : 'foreign_amount', data.amount, { shouldValidate: true });
-               if (data.currency_code) setValue('currency_code', data.currency_code, { shouldValidate: true });
-               if (data.counterparty_type) setValue('counterparty_type', data.counterparty_type, { shouldValidate: true });
+               type BondAIData = {
+                 amount?: number; currency_code?: string;
+                 counterparty_type?: 'party' | 'account'; counterparty_id?: string;
+                 cash_account_id?: string; description?: string; date?: string;
+               };
+               const d = data as BondAIData;
+               if (d.amount) setValue(selectedCurrency === 'SAR' ? 'amount' : 'foreign_amount', d.amount, { shouldValidate: true });
+               if (d.currency_code) setValue('currency_code', d.currency_code, { shouldValidate: true });
+               if (d.counterparty_type) setValue('counterparty_type', d.counterparty_type, { shouldValidate: true });
                
-               if (data.counterparty_id) {
-                   setValue('counterparty_id', data.counterparty_id, { shouldValidate: true });
-                   // Update search query display if party
-                   if (data.counterparty_type === 'party') {
-                       const foundParty = parties.find((p: any) => p.id === data.counterparty_id);
-                       if (foundParty) setPartyQuery(foundParty.name);
+               if (d.counterparty_id) {
+                   setValue('counterparty_id', d.counterparty_id, { shouldValidate: true });
+                   if (d.counterparty_type === 'party') {
+                       const foundParty = parties.find((p) => p.id === d.counterparty_id);
+                       if (foundParty) setPartyQuery((foundParty as { name: string }).name);
                    }
                }
                
-               if (data.cash_account_id) setValue('cash_account_id', data.cash_account_id, { shouldValidate: true });
-               if (data.description) setValue('description', data.description, { shouldValidate: true });
-               if (data.date) setValue('date', data.date, { shouldValidate: true });
+               if (d.cash_account_id) setValue('cash_account_id', d.cash_account_id, { shouldValidate: true });
+               if (d.description) setValue('description', d.description, { shouldValidate: true });
+               if (d.date) setValue('date', d.date, { shouldValidate: true });
             }}
           />
         </div>

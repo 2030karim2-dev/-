@@ -22,7 +22,7 @@ describe('logger', () => {
             enabled: true,
             minLevel: 'debug',
             includeTimestamp: true,
-            remoteLogging: false,
+            apmEnabled: false,
         });
     });
 
@@ -132,7 +132,10 @@ describe('logger', () => {
                 expect.stringContaining('[ERROR]'),
                 'Unknown error',
                 expect.objectContaining({
-                    error: 'string error'
+                    error: expect.objectContaining({
+                        name: 'Error',
+                        message: 'string error',
+                    })
                 })
             );
         });

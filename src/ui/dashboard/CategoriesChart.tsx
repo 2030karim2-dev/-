@@ -73,7 +73,7 @@ const CategoriesChart: React.FC<CategoriesChartProps> = ({ data }) => {
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent dark:from-slate-800/20 rounded-3xl pointer-events-none" />
       {isMounted ? (
-        <ResponsiveContainer width="99%" height="100%">
+        <ResponsiveContainer width="99%" height="100%" minWidth={1} minHeight={1}>
           <PieChart>
             <defs>
               {COLORS.map((color, index) => (

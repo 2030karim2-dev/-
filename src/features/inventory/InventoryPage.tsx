@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useProducts, useProductMutations } from './hooks/useProducts';
+import { useProductsPaginated } from './hooks/useProductsPaginated';
+import { useProductMutations } from './hooks/useProducts';
 import { useInventoryView } from './hooks/useInventoryView';
 import { useProductImport } from './hooks/useProductImport';
 import ProductDetailModal from './components/ProductDetailModal';
@@ -15,6 +16,7 @@ import { cn } from '../../core/utils';
 import DeduplicationTool from './components/DeduplicationTool';
 import InventoryViewRenderer from './components/InventoryViewRenderer';
 import { getInventoryTabs } from './constants';
+import ServerPaginationBar from '../../ui/common/ServerPaginationBar';
 
 const InventoryPage: React.FC = () => {
     const {
@@ -28,33 +30,43 @@ const InventoryPage: React.FC = () => {
 
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [isDedupeOpen, setIsDedupeOpen] = useState(false);
-    const { t } = useTranslation();
-    const { products, isLoading, error, refetch } = useProducts(searchTerm, { limitNum: 10000 });
-    const { saveProduct, isSaving, deleteProduct } = useProductMutations();
-    const { handleSmartImportConfirm: runSmartImport } = useProductImport(products);
-    
-    const isDesktop = useBreakpoint('lg');
+    const [pageSize, setPageSize] = useState(50);
     const [isMaximized, setIsMaximized] = useState(false);
     const [isZenMode, setIsZenMode] = useState(false);
     const [isDetailsMaximized, setIsDetailsMaximized] = useState(false);
 
+    const { t } = useTranslation();
+    const isDesktop = useBreakpoint('lg');
+
+    const {
+        products, totalCount, totalPages, page, isFetching,
+        isLoading, isError, error, handleSearchChange, goToPage
+    } = useProductsPaginated({ pageSize, initialSearch: searchTerm });
+
+    // Bridge: MicroHeader sets searchTerm in useInventoryView;
+    // useProductsPaginated handles debounced server search.
+    const handleSearch = (v: string) => {
+        setSearchTerm(v);
+        handleSearchChange(v);
+    };
+
+    const { saveProduct, isSaving, deleteProduct } = useProductMutations();
+    const { handleSmartImportConfirm: runSmartImport } = useProductImport(products);
+
     const tabs = useMemo(() => getInventoryTabs(t), [t]);
 
-    const handleSmartImportConfirm = async (data: { items: any[], currency?: string }) => {
-        const success = await runSmartImport(data);
+    const handleSmartImportConfirm = async (data: { items: unknown[], currency?: string }) => {
+        const success = await runSmartImport(data as { items: Parameters<typeof runSmartImport>[0]['items'], currency?: string });
         if (success) setActiveView('products');
     };
 
-    const { totalProducts, availableProducts, outOfStockProducts } = useMemo(() => {
-        let total = 0, available = 0, outOfStock = 0;
-        products.forEach(p => {
-            total++;
-            const stock = ((p as any).product_stock || []).reduce((sum: number, s: any) => sum + Number(s.quantity || 0), 0);
-            if (stock > 0) available++;
-            else outOfStock++;
-        });
-        return { totalProducts: total, availableProducts: available, outOfStockProducts: outOfStock };
-    }, [products]);
+    // Stats from current page (server delivers totalCount for the badge)
+    const { availableProducts, outOfStockProducts } = useMemo(() => ({
+        availableProducts: products.filter(p => p.stock_quantity > 0).length,
+        outOfStockProducts: products.filter(p => p.stock_quantity <= 0).length,
+    }), [products]);
+
+
 
     return (
         <FullscreenContainer 
@@ -81,7 +93,7 @@ const InventoryPage: React.FC = () => {
                             {activeView === 'products' && (
                                 <div className="hidden md:flex items-center gap-3 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-[10px] sm:text-xs font-bold shadow-sm" title="إحصائيات المنتجات">
                                     <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400" title="إجمالي المنتجات">
-                                        <Database size={12} /> {totalProducts}
+                                        <Database size={12} /> {totalCount.toLocaleString('ar-SA')}
                                     </span>
                                     <span className="w-px h-3 bg-slate-300 dark:bg-slate-600"></span>
                                     <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400" title="منتجات متوفرة">
@@ -127,7 +139,7 @@ const InventoryPage: React.FC = () => {
                         </div>
                     }
                     searchValue={searchTerm}
-                    onSearchChange={setSearchTerm}
+                    onSearchChange={handleSearch}
                     tabs={tabs}
                     activeTab={activeView}
                     onTabChange={setActiveView}
@@ -138,24 +150,38 @@ const InventoryPage: React.FC = () => {
                     isZenMode ? "bg-white dark:bg-slate-900" : ""
                 )}>
                     <div className="flex-1 overflow-hidden transition-all duration-500">
-                        {error ? (
-                            <ErrorDisplay error={error?.message || null} onRetry={refetch} variant="full" />
+                        {isError ? (
+                            <ErrorDisplay error={error?.message || null} onRetry={() => goToPage(page)} variant="full" />
                         ) : (
-                            <InventoryViewRenderer
-                                activeView={activeView}
-                                products={products}
-                                isLoading={isLoading}
-                                isDesktop={isDesktop}
-                                displayMode={displayMode}
-                                selectedProduct={selectedProduct}
-                                setSearchTerm={setSearchTerm}
-                                setActiveView={setActiveView}
-                                setSelectedProduct={setSelectedProduct}
-                                handleEdit={handleEdit}
-                                deleteProduct={deleteProduct}
-                                handleSmartImportConfirm={handleSmartImportConfirm}
-                                onMaximizeProduct={() => setIsDetailsMaximized(true)}
-                            />
+                            <>
+                                <InventoryViewRenderer
+                                    activeView={activeView}
+                                    products={products}
+                                    isLoading={isLoading}
+                                    isDesktop={isDesktop}
+                                    displayMode={displayMode}
+                                    selectedProduct={selectedProduct}
+                                    setSearchTerm={handleSearch}
+                                    setActiveView={setActiveView}
+                                    setSelectedProduct={setSelectedProduct}
+                                    handleEdit={handleEdit}
+                                    deleteProduct={deleteProduct}
+                                    handleSmartImportConfirm={handleSmartImportConfirm}
+                                    onMaximizeProduct={() => setIsDetailsMaximized(true)}
+                                />
+                                {activeView === 'products' && (
+                                    <ServerPaginationBar
+                                        page={page}
+                                        totalPages={totalPages}
+                                        totalCount={totalCount}
+                                        pageSize={pageSize}
+                                        isFetching={isFetching}
+                                        onPageChange={goToPage}
+                                        onPageSizeChange={setPageSize}
+                                        pageSizeOptions={[25, 50, 100, 200]}
+                                    />
+                                )}
+                            </>
                         )}
                     </div>
                 </div>

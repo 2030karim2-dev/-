@@ -1,6 +1,6 @@
 import React from 'react';
 import { CustomerDebtProfile } from '../../hooks/useDebtManagement';
-import { ShieldAlert, TrendingUp, TrendingDown, Info, ShieldCheck } from 'lucide-react';
+import { ShieldAlert, TrendingUp, TrendingDown, Info, ShieldCheck, Flag } from 'lucide-react';
 
 interface Props {
   customers: CustomerDebtProfile[];
@@ -39,6 +39,15 @@ export const CustomerRiskTable: React.FC<Props> = ({ customers }) => {
                 return { badge: 'bg-red-100 text-red-800 border-red-200', icon: <ShieldAlert className="w-4 h-4 text-red-600" /> };
             default:
                 return { badge: 'bg-gray-100 text-gray-800 border-gray-200', icon: null };
+        }
+    };
+
+    const getPriorityColor = (level: string) => {
+        switch (level) {
+            case 'High': return 'bg-red-100 text-red-800';
+            case 'Medium': return 'bg-yellow-100 text-yellow-800';
+            case 'Low': return 'bg-blue-100 text-blue-800';
+            default: return 'bg-gray-100 text-gray-800';
         }
     };
 

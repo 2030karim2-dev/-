@@ -8,7 +8,7 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 1000 * 60, // ⚡ 1 minute - balanced freshness for financial data
       gcTime: 1000 * 60 * 60 * 48, // Keep in cache for 48 hours
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error: Error & { code?: number | string; status?: number }) => {
         // ⚡ عدم إعادة المحاولة لأخطاء المصادقة - توجيه فوري للواجهة
         const code = error?.code || error?.status || '';
         const msg = (error?.message || '').toLowerCase();

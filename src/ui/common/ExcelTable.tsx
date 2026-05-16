@@ -35,7 +35,7 @@ interface ExcelTableProps<T> {
   onRowClick?: ((row: T) => void) | undefined;
   onRowDoubleClick?: ((row: T) => void) | undefined;
   onOrderChange?: ((reorderedData: T[]) => void) | undefined;
-  onCellUpdate?: ((rowIndex: number, accessorKey: string, value: any) => void | Promise<void>) | undefined;
+  onCellUpdate?: ((rowIndex: number, accessorKey: string, value: unknown) => void | Promise<void>) | undefined;
   enablePagination?: boolean;
   pageSize?: number;
   enableSelection?: boolean;

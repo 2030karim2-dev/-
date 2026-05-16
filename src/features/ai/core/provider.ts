@@ -17,7 +17,7 @@ export async function generateAIContent(
         ? `${systemInstruction}\n\nيجب أن يكون الرد بصيغة JSON صالحة وحصرية.`
         : systemInstruction;
 
-    const { data, error } = await supabase.functions.invoke<{ choices: { message: { content: string } }[] }>('ai-proxy', {
+    const { data, error } = await supabase.functions.invoke('ai-proxy', {
         body: {
             prompt,
             model: getActiveModel(),
@@ -38,5 +38,5 @@ export async function generateAIContent(
     }
 
     // Edge Function returns the full OpenRouter response
-    return data?.choices?.[0]?.message?.content ?? '';
+    return (data as any)?.choices?.[0]?.message?.content ?? '';
 }

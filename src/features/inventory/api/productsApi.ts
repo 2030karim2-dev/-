@@ -27,7 +27,6 @@ export const productsApi = {
                 image_url,
                 alternative_numbers,
                 barcode,
-                location,
                 created_at,
                 updated_at,
                 status,
@@ -36,7 +35,8 @@ export const productsApi = {
                     quantity,
                     warehouse_id,
                     warehouses(name_ar)
-                )
+                ),
+                uoms:product_uoms(id, uom_name, conversion_factor)
             `)
             .eq('company_id', companyId)
             .is('deleted_at', null)

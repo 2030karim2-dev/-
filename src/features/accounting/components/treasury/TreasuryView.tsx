@@ -4,7 +4,6 @@ import LedgerView from '../reports/LedgerView';
 import TreasurySummaryStats from './TreasurySummaryStats';
 import TreasuryActions from './TreasuryActions';
 import EmptyState from '../../../../ui/base/EmptyState';
-import { useFeedbackStore } from '../../../../features/feedback/store';
 import { Wallet } from 'lucide-react';
 import CreateBondModal from '../../../bonds/components/CreateBondModal';
 import { useBondMutation } from '../../../bonds/hooks';
@@ -19,7 +18,6 @@ const TreasuryView: React.FC<Props> = ({ dateRange }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeAction, setActiveAction] = useState<BondType>('receipt');
     
-    const { showToast } = useFeedbackStore();
     const bondMutation = useBondMutation();
 
     const handleAction = (action: BondType) => {

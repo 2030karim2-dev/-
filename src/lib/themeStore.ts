@@ -78,12 +78,27 @@ const applyPresetCSSVars = (presetId: string, currentTheme: 'light' | 'dark') =>
   if (!preset) return;
 
   const root = document.documentElement;
-  // اختيار المتغيرات بناءً على الوضع الحالي
-  const vars = currentTheme === 'dark' ? (preset.dark || preset.cssVars) : (preset.light || preset.cssVars);
-
-  Object.entries(vars).forEach(([prop, value]) => {
-    root.style.setProperty(prop, value);
-  });
+  
+  if (preset.light && preset.dark) {
+    // اختيار المتغيرات بناءً على الوضع الحالي للباقات التي تدعم كلا الوضعين
+    const vars = currentTheme === 'dark' ? preset.dark : preset.light;
+    Object.entries(vars).forEach(([prop, value]) => {
+      root.style.setProperty(prop, value);
+    });
+  } else {
+    // للباقات الفردية (إما نهارية أو ليلية فقط)
+    if ((currentTheme === 'dark' && !preset.isDark) || (currentTheme === 'light' && preset.isDark)) {
+      // إزالة المتغيرات المضمنة للسماح بمتغيرات الوضع الافتراضي من index.css بالعمل
+      Object.keys(preset.cssVars).forEach((prop) => {
+        root.style.removeProperty(prop);
+      });
+    } else {
+      // تطبيق المتغيرات
+      Object.entries(preset.cssVars).forEach(([prop, value]) => {
+        root.style.setProperty(prop, value);
+      });
+    }
+  }
 };
 
 export const useThemeStore = create<ThemeState>()(
@@ -115,6 +130,8 @@ export const useThemeStore = create<ThemeState>()(
         const initialTheme = applyTheme(mode);
         // تطبيق CSS variables الثيم المحفوظ مع مراعاة الوضع الحالي
         applyPresetCSSVars(activePresetId, initialTheme);
+        // التأكد من تطبيق اللون المميز المحفوظ لتجاوز أي إعدادات مسبقة
+        applyAccent(accentColor);
 
         set({
           theme: initialTheme,
@@ -129,6 +146,7 @@ export const useThemeStore = create<ThemeState>()(
             const newTheme = e.matches ? 'dark' : 'light';
             document.documentElement.classList.toggle('dark', e.matches);
             applyPresetCSSVars(get().activePresetId, newTheme);
+            applyAccent(get().accentColor);
             set({ theme: newTheme });
           }
         };
@@ -140,6 +158,7 @@ export const useThemeStore = create<ThemeState>()(
       setMode: (mode) => {
         const newTheme = applyTheme(mode);
         applyPresetCSSVars(get().activePresetId, newTheme);
+        applyAccent(get().accentColor);
         set({ mode, theme: newTheme });
       },
 
@@ -231,10 +250,11 @@ export const useThemeStore = create<ThemeState>()(
       },
 
       toggleTheme: () => {
-        const { theme } = get();
+        const { theme, accentColor } = get();
         const newMode = theme === 'light' ? 'dark' : 'light';
         const newTheme = applyTheme(newMode as ThemeMode);
         applyPresetCSSVars(get().activePresetId, newTheme);
+        applyAccent(accentColor);
         set({ mode: newMode, theme: newTheme });
       },
     }),

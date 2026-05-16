@@ -15,7 +15,7 @@ export type {
 } from './core/types';
 
 // Config
-export { AI_MODELS, getActiveModel, setActiveModel, getActiveProvider, getApiKey } from './core/config';
+export { AI_MODELS, getActiveModel, setActiveModel, getActiveProvider } from './core/config';
 
 // Provider
 export { generateAIContent } from './core/provider';

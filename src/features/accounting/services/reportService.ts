@@ -129,7 +129,7 @@ export const reportService = {
         // No currency conversion needed — foreign_amount & exchange_rate are documentary only.
 
         // 3. Aggregate by month (using base amounts)
-        (lines || []).forEach(line => {
+        (lines || []).forEach((line: any) => {
             const date = new Date(line.journal.entry_date);
             const month = date.getMonth(); // 0-11
             const type = line.account?.type;

@@ -1,41 +1,42 @@
 
-import React, { Suspense, lazy } from 'react';
+import React, { lazy } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-// import { Users, Truck, Building2, UserPlus, FileText, LayoutGrid, Package, ShoppingCart, Receipt, Wallet, PiggyBank, Settings, Palette, Link2, BarChart3 } from 'lucide-react';
 import MainLayout from '../ui/layout/MainLayout';
 import { ROUTES } from '../core/routes/paths';
-import PageLoader from '../ui/base/PageLoader';
 import { useTranslation } from '../lib/hooks/useTranslation';
 import { AuthGuard } from '../features/auth/components/AuthGuard';
 import { GuestGuard } from '../features/auth/components/GuestGuard';
+import { FeatureBoundary } from '../core/components/FeatureBoundary';
 
-// Auth Pages (Eager Loading)
+// Auth Pages (Eager Loading — must be instant)
 import LandingPage from '../features/auth/LandingPage';
 import ForgotPasswordPage from '../features/auth/ForgotPasswordPage';
 import UpdatePasswordPage from '../features/auth/UpdatePasswordPage';
 
-// Critical Dashboard Page
+// Critical Dashboard Page (eager — first thing user sees)
 import DashboardPage from '../features/dashboard/DashboardPage';
 
-// Lazy Loaded Features
-const InventoryPage = lazy(() => import('../features/inventory/InventoryPage'));
-const AuditSessionPage = lazy(() => import('../features/inventory/pages/AuditSessionPage'));
-const QuickAuditPage = lazy(() => import('../features/inventory/pages/QuickAuditPage'));
-const DeadStockPage = lazy(() => import('../features/inventory/pages/DeadStockPage'));
-const POSPage = lazy(() => import('../features/pos/pages/POSPage'));
-const SalesPage = lazy(() => import('../features/sales/pages/SalesPage'));
-const AccountingPage = lazy(() => import('../features/accounting/AccountingPage'));
-const PurchasesPage = lazy(() => import('../features/purchases/pages/PurchasesPage'));
-const VehiclesPage = lazy(() => import('../features/vehicles/VehiclesPage'));
+// Lazy Loaded Features — each isolated by FeatureBoundary
+const InventoryPage            = lazy(() => import('../features/inventory/InventoryPage'));
+const AuditSessionPage         = lazy(() => import('../features/inventory/pages/AuditSessionPage'));
+const QuickAuditPage           = lazy(() => import('../features/inventory/pages/QuickAuditPage'));
+const DeadStockPage            = lazy(() => import('../features/inventory/pages/DeadStockPage'));
+const POSPage                  = lazy(() => import('../features/pos/pages/POSPage'));
+const SalesPage                = lazy(() => import('../features/sales/pages/SalesPage'));
+const AccountingPage           = lazy(() => import('../features/accounting/AccountingPage'));
+const PurchasesPage            = lazy(() => import('../features/purchases/pages/PurchasesPage'));
+const VehiclesPage             = lazy(() => import('../features/vehicles/VehiclesPage'));
 const VehicleCompatibilityPage = lazy(() => import('../features/inventory/pages/VehicleCompatibilityPage'));
-const ExpensesPage = lazy(() => import('../features/expenses/pages/ExpensesPage'));
-const SettingsPage = lazy(() => import('../features/settings/SettingsPage'));
-const AppearancePage = lazy(() => import('../features/appearance/AppearancePage'));
-const BondsPage = lazy(() => import('../features/bonds/BondsPage'));
-const PartiesPage = lazy(() => import('../features/parties/PartiesPage'));
-const ReportsPage = lazy(() => import('../features/reports/ReportsPage'));
-const AICommandCenter = lazy(() => import('../features/ai/AICommandCenter'));
-const AIBrainPage = lazy(() => import('../features/ai/AIBrainPage'));
+const ExpensesPage             = lazy(() => import('../features/expenses/pages/ExpensesPage'));
+const SettingsPage             = lazy(() => import('../features/settings/SettingsPage'));
+const AppearancePage           = lazy(() => import('../features/appearance/AppearancePage'));
+const BondsPage                = lazy(() => import('../features/bonds/BondsPage'));
+const PartiesPage              = lazy(() => import('../features/parties/PartiesPage'));
+const ReportsPage              = lazy(() => import('../features/reports/ReportsPage'));
+const AICommandCenter          = lazy(() => import('../features/ai/AICommandCenter'));
+const AIBrainPage              = lazy(() => import('../features/ai/AIBrainPage'));
+
+// ── 404 ──────────────────────────────────────────────────────────────────────
 
 const NotFoundPage: React.FC = () => {
   const { t } = useTranslation();
@@ -46,56 +47,91 @@ const NotFoundPage: React.FC = () => {
       <div className="text-6xl mb-4 opacity-20">🧭</div>
       <h2 className="text-2xl font-bold text-[var(--app-text)]">{t('page_not_found_title')}</h2>
       <p className="mt-2 text-sm text-[var(--app-text-secondary)]">{t('page_not_found_desc')}</p>
-      <button onClick={() => navigate(ROUTES.DASHBOARD.ROOT)} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">
+      <button
+        onClick={() => navigate(ROUTES.DASHBOARD.ROOT)}
+        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+      >
         {t('back_to_home')}
       </button>
     </div>
   );
 };
 
+// ── Routes ───────────────────────────────────────────────────────────────────
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
       {/* Auth Routes */}
-      <Route path={ROUTES.AUTH.LANDING} element={<GuestGuard><LandingPage /></GuestGuard>} />
-      <Route path={ROUTES.AUTH.LOGIN} element={<Navigate to={ROUTES.AUTH.LANDING} replace />} />
-      <Route path={ROUTES.AUTH.REGISTER} element={<Navigate to={ROUTES.AUTH.LANDING} replace />} />
+      <Route path={ROUTES.AUTH.LANDING}         element={<GuestGuard><LandingPage /></GuestGuard>} />
+      <Route path={ROUTES.AUTH.LOGIN}           element={<Navigate to={ROUTES.AUTH.LANDING} replace />} />
+      <Route path={ROUTES.AUTH.REGISTER}        element={<Navigate to={ROUTES.AUTH.LANDING} replace />} />
       <Route path={ROUTES.AUTH.FORGOT_PASSWORD} element={<GuestGuard><ForgotPasswordPage /></GuestGuard>} />
       <Route path={ROUTES.AUTH.UPDATE_PASSWORD} element={<GuestGuard><UpdatePasswordPage /></GuestGuard>} />
 
       {/* Protected App Routes */}
-      <Route
-        path="/"
-        element={
-          <AuthGuard>
-            <MainLayout />
-          </AuthGuard>
-        }
-      >
+      <Route path="/" element={<AuthGuard><MainLayout /></AuthGuard>}>
+
+        {/* Dashboard — eager, no boundary needed */}
         <Route index element={<DashboardPage />} />
 
-        <Route path={ROUTES.DASHBOARD.INVENTORY} element={<Suspense fallback={<PageLoader />}><InventoryPage /></Suspense>} />
-        <Route path="/inventory/dead-stock" element={<Suspense fallback={<PageLoader />}><DeadStockPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.INVENTORY_AUDIT_SESSION} element={<Suspense fallback={<PageLoader />}><AuditSessionPage /></Suspense>} />
-        <Route path="/inventory/quick-audit" element={<Suspense fallback={<PageLoader />}><QuickAuditPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.SALES} element={<Suspense fallback={<PageLoader />}><SalesPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.POS} element={<Suspense fallback={<PageLoader />}><POSPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.ACCOUNTING} element={<Suspense fallback={<PageLoader />}><AccountingPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.PURCHASES} element={<Suspense fallback={<PageLoader />}><PurchasesPage /></Suspense>} />
-        <Route path="/vehicles" element={<Suspense fallback={<PageLoader />}><VehiclesPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.VEHICLE_COMPATIBILITY} element={<Suspense fallback={<PageLoader />}><VehicleCompatibilityPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.EXPENSES} element={<Suspense fallback={<PageLoader />}><ExpensesPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.SETTINGS} element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.APPEARANCE} element={<Suspense fallback={<PageLoader />}><AppearancePage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.BONDS} element={<Suspense fallback={<PageLoader />}><BondsPage /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.SUPPLIERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="supplier" /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.CLIENTS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="customer" /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.PARTIES} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="customer" /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.PARTIES_CUSTOMERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="customer" /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.PARTIES_SUPPLIERS} element={<Suspense fallback={<PageLoader />}><PartiesPage partyType="supplier" /></Suspense>} />
-        <Route path={ROUTES.DASHBOARD.REPORTS} element={<Suspense fallback={<PageLoader />}><ReportsPage /></Suspense>} />
-        <Route path="/ai-center" element={<Suspense fallback={<PageLoader />}><AICommandCenter isOpen={true} onClose={() => {}} /></Suspense>} />
-        <Route path="/ai-brain" element={<Suspense fallback={<PageLoader />}><AIBrainPage /></Suspense>} />
+        {/* Inventory cluster */}
+        <Route path={ROUTES.DASHBOARD.INVENTORY}
+          element={<FeatureBoundary name="inventory"><InventoryPage /></FeatureBoundary>} />
+        <Route path="/inventory/dead-stock"
+          element={<FeatureBoundary name="dead-stock"><DeadStockPage /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.INVENTORY_AUDIT_SESSION}
+          element={<FeatureBoundary name="audit-session"><AuditSessionPage /></FeatureBoundary>} />
+        <Route path="/inventory/quick-audit"
+          element={<FeatureBoundary name="quick-audit"><QuickAuditPage /></FeatureBoundary>} />
+
+        {/* Transactional */}
+        <Route path={ROUTES.DASHBOARD.SALES}
+          element={<FeatureBoundary name="sales"><SalesPage /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.POS}
+          element={<FeatureBoundary name="pos"><POSPage /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.PURCHASES}
+          element={<FeatureBoundary name="purchases"><PurchasesPage /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.EXPENSES}
+          element={<FeatureBoundary name="expenses"><ExpensesPage /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.BONDS}
+          element={<FeatureBoundary name="bonds"><BondsPage /></FeatureBoundary>} />
+
+        {/* Finance */}
+        <Route path={ROUTES.DASHBOARD.ACCOUNTING}
+          element={<FeatureBoundary name="accounting"><AccountingPage /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.REPORTS}
+          element={<FeatureBoundary name="reports"><ReportsPage /></FeatureBoundary>} />
+
+        {/* Parties */}
+        <Route path={ROUTES.DASHBOARD.SUPPLIERS}
+          element={<FeatureBoundary name="suppliers"><PartiesPage partyType="supplier" /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.CLIENTS}
+          element={<FeatureBoundary name="clients"><PartiesPage partyType="customer" /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.PARTIES}
+          element={<FeatureBoundary name="parties"><PartiesPage partyType="customer" /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.PARTIES_CUSTOMERS}
+          element={<FeatureBoundary name="parties-customers"><PartiesPage partyType="customer" /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.PARTIES_SUPPLIERS}
+          element={<FeatureBoundary name="parties-suppliers"><PartiesPage partyType="supplier" /></FeatureBoundary>} />
+
+        {/* Vehicles */}
+        <Route path="/vehicles"
+          element={<FeatureBoundary name="vehicles"><VehiclesPage /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.VEHICLE_COMPATIBILITY}
+          element={<FeatureBoundary name="vehicle-compatibility"><VehicleCompatibilityPage /></FeatureBoundary>} />
+
+        {/* Settings & Appearance */}
+        <Route path={ROUTES.DASHBOARD.SETTINGS}
+          element={<FeatureBoundary name="settings"><SettingsPage /></FeatureBoundary>} />
+        <Route path={ROUTES.DASHBOARD.APPEARANCE}
+          element={<FeatureBoundary name="appearance"><AppearancePage /></FeatureBoundary>} />
+
+        {/* AI */}
+        <Route path="/ai-center"
+          element={<FeatureBoundary name="ai-center"><AICommandCenter isOpen={true} onClose={() => {}} /></FeatureBoundary>} />
+        <Route path="/ai-brain"
+          element={<FeatureBoundary name="ai-brain"><AIBrainPage /></FeatureBoundary>} />
 
         {/* 404 Fallback */}
         <Route path="*" element={<NotFoundPage />} />

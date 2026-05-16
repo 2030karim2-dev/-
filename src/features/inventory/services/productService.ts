@@ -33,7 +33,7 @@ interface RawProduct {
     stock?: RawStock[];
     status?: string;
     location?: string;
-    uoms?: unknown[];
+    uoms?: Array<{ id: string; uom_name: string; conversion_factor: number }>;
 }
 
 export const productService = {
@@ -43,9 +43,15 @@ export const productService = {
     getProducts: async (companyId: string, page: number = 1, limitNum: number = 10000): Promise<Product[]> => {
         const { data, error } = await inventoryApi.getProducts(companyId, page, limitNum);
         if (error) throw error;
+        return productService.mapRawProducts(data || []);
+    },
 
-        return (data || []).map((p: unknown) => {
-            const prod = p as RawProduct;
+    /**
+     * Maps raw DB rows (any shape) to the Product domain type.
+     * Used both internally and by the paginated hook.
+     */
+    mapRawProducts: (rows: unknown[]): Product[] => {
+        return (rows as RawProduct[]).map((prod) => {
             if (!prod || !prod.id) return null;
 
             const stockList = Array.isArray(prod.stock) ? prod.stock : [];
@@ -75,7 +81,11 @@ export const productService = {
                 stock_quantity: totalStock,
                 min_stock_level: Number(prod.min_stock_level) || 0,
                 unit: prod.unit || 'pcs',
-                uoms: prod.uoms || [],
+                uoms: (prod.uoms || []).map(u => ({
+                    id: u.id,
+                    uom_name: u.uom_name,
+                    conversion_factor: Number(u.conversion_factor)
+                })),
                 image_url: prod.image_url || null,
                 alternative_numbers: prod.alternative_numbers || null,
                 barcode: prod.barcode || null,
@@ -83,25 +93,19 @@ export const productService = {
                     const warehouseNames = stockList
                         .map((s: RawStock) => s.warehouses?.name_ar)
                         .filter(Boolean) as string[];
-                    
                     const uniqueWarehouses = [...new Set(warehouseNames)].join(', ');
                     const shelfLocation = prod.location || '';
-                    
-                    if (uniqueWarehouses && shelfLocation) {
-                        return `${uniqueWarehouses} (${shelfLocation})`;
-                    }
+                    if (uniqueWarehouses && shelfLocation) return `${uniqueWarehouses} (${shelfLocation})`;
                     return uniqueWarehouses || shelfLocation || '—';
                 })(),
                 created_at: prod.created_at || new Date().toISOString(),
                 isLowStock: totalStock <= (Number(prod.min_stock_level) || 5),
-
                 warehouse_distribution: stockList.map((s: RawStock) => ({
                     warehouse_id: s.warehouse_id,
                     warehouse_name: s.warehouses?.name_ar || 'مستودع',
                     quantity: Number(s.quantity) || 0,
                     location: prod.location || ''
                 })),
-
                 alternatives: prod.alternative_numbers ? prod.alternative_numbers.split(',').map(n => n.trim()) : [],
                 compatibility: [],
                 total_purchases_qty: 0,
@@ -109,8 +113,8 @@ export const productService = {
                 total_profit: 0,
                 total_loss: 0,
                 last_invoice_date: new Date().toISOString()
-            } as any;
-        }).filter(Boolean);
+            } as Product;
+        }).filter((p): p is Product => p !== null);
     },
 
     /**
@@ -166,8 +170,7 @@ export const productService = {
             image_url: data.image_url || null,
             alternative_numbers: data.alternative_numbers || null,
             barcode: data.barcode || null,
-            category_id: (data.category && data.category.length === 36) ? data.category : null,
-            location: data.location || null
+            category_id: (data.category && data.category.length === 36) ? data.category : null
         } as any;
 
         const { data: product, error } = await inventoryApi.createProduct(payload);
@@ -222,7 +225,6 @@ export const productService = {
             if (data.image_url !== undefined) payload.image_url = data.image_url || null;
             if (data.alternative_numbers !== undefined) payload.alternative_numbers = data.alternative_numbers || null;
             if (data.barcode !== undefined) payload.barcode = data.barcode || null;
-            if (data.location !== undefined) payload.location = data.location || null;
             if (data.category) payload.category_id = data.category.length === 36 ? data.category : null;
 
             logger.debug('ProductService', `Sending update payload to API`, payload);

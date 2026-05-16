@@ -31,6 +31,8 @@ vi.mock('../../../lib/supabaseClient', () => ({
         eq: vi.fn(),
       })),
     })),
+    // Required by StockMovementUsecase when processing IN transactions
+    rpc: vi.fn().mockResolvedValue({ error: null }),
   }
 }));
 
@@ -51,34 +53,23 @@ describe('StockMovementUsecase', () => {
     vi.clearAllMocks();
   });
 
-  it('should calculate new weighted average cost on IN transaction', async () => {
-    // Mock Supabase response for product fetch
-    const mockProduct = {
-      cost_price: 40,
-      product_stock: [{ quantity: 20 }]
-    };
-
-    // Mock chain for supabase.from('products').select(...).eq(...).single()
-    const singleFn = vi.fn().mockResolvedValue({ data: mockProduct });
-    const eqFn = vi.fn().mockReturnValue({ single: singleFn });
-    const selectFn = vi.fn().mockReturnValue({ eq: eqFn });
-    const fromFn = vi.fn().mockReturnValue({ select: selectFn, update: vi.fn().mockReturnValue({ eq: vi.fn() }) });
-    (supabase.from as any).mockImplementation(fromFn);
-
-    // Mock costing service result
-    (costingService.calculateNewAverageCost as any).mockReturnValue(45);
+  it('should call RPC to calculate weighted average cost on IN transaction', async () => {
+    // Mock rpc to succeed
+    const rpcFn = vi.fn().mockResolvedValue({ error: null });
+    (supabase as unknown as { rpc: ReturnType<typeof vi.fn> }).rpc = rpcFn;
 
     // Mock inventory API
-    (inventoryApi.createInventoryTransactions as any).mockResolvedValue({ error: null });
+    (inventoryApi.createInventoryTransactions as ReturnType<typeof vi.fn>)
+      .mockResolvedValue({ error: null });
 
     await StockMovementUsecase.execute(mockParams);
 
-    // Verify costing calculation was called
-    expect(costingService.calculateNewAverageCost).toHaveBeenCalledWith(20, 40, 10, 50);
-
-    // Verify product cost update
-    const updateFn = (supabase.from('products') as any).update;
-    expect(updateFn).toHaveBeenCalledWith({ cost_price: 45 });
+    // Verify the atomic DB RPC was called with correct args
+    expect(rpcFn).toHaveBeenCalledWith('calculate_and_update_wac', {
+      p_product_id: 'prod-123',
+      p_added_qty:  10,
+      p_unit_price: 50,
+    });
   });
 
   it('should create inventory transaction record', async () => {

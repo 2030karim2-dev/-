@@ -41,7 +41,7 @@ const BondAccountDistributionChart: React.FC<BondAccountDistributionChartProps> 
                 <ResponsiveContainer width="100%" height={200} minWidth={100} minHeight={200}>
                     <PieChart>
                         <Pie
-                            activeIndex={activeIndex}
+                            {...({ activeIndex } as any)}
                             activeShape={renderActiveShape}
                             data={data}
                             cx="50%"

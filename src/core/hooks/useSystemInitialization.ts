@@ -11,6 +11,7 @@ import { notificationService } from '../../features/notifications/service';
 import { useLocalizationSettings } from '../../features/settings/settingsStore';
 import { useSoundStore } from '../../features/notifications/store';
 import { logger } from '../utils/logger';
+import { initAPM } from '../utils/initAPM';
 import { useRealtimeSync } from '../../lib/hooks/useRealtimeSync';
 
 let hasBootstrappedSystem = false;
@@ -53,9 +54,23 @@ export const useSystemInitialization = () => {
     if (hasBootstrappedSystem) return;
 
     hasBootstrappedSystem = true;
+
+    // Boot APM first so all subsequent logs are captured
+    initAPM();
+
     initialize();
     initializeLang();
   }, [initialize, initializeLang]);
+
+  // 1b. Enrich APM session context once user is identified
+  useEffect(() => {
+    if (!user?.id) return;
+    initAPM({
+      ...(user.id          && { userId:      user.id }),
+      ...(user.company_id  && { companyId:   user.company_id }),
+      ...(user.company_name && { companyName: user.company_name }),
+    });
+  }, [user?.id, user?.company_id, user?.company_name]);
 
   // 2. Apply localization settings when they change
   useEffect(() => {

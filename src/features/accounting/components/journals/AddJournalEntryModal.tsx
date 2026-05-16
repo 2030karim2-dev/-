@@ -85,13 +85,17 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                                     accounts: accounts?.map((a: any) => ({ id: a.id, name: a.name, code: a.code, type: a.type }))
                                 }}
                                 onDataExtracted={(data) => {
-                                    if (data.date) setValue('date', data.date, { shouldValidate: true });
-                                    if (data.description) setValue('description', data.description, { shouldValidate: true });
-                                    if (data.currency_code) setValue('currency_code', data.currency_code, { shouldValidate: true });
+                                    type JournalAIData = {
+                                      date?: string; description?: string; currency_code?: string;
+                                      lines?: { account_id?: string; debit_amount?: number; credit_amount?: number; description?: string }[];
+                                    };
+                                    const d = data as JournalAIData;
+                                    if (d.date) setValue('date', d.date, { shouldValidate: true });
+                                    if (d.description) setValue('description', d.description, { shouldValidate: true });
+                                    if (d.currency_code) setValue('currency_code', d.currency_code, { shouldValidate: true });
                                     
-                                    if (data.lines && Array.isArray(data.lines) && data.lines.length > 0) {
-                                        // Ensure previous lines are cleared, but react-hook-form's setValue automatically replaces the array.
-                                        setValue('lines', data.lines.map((line: any) => ({
+                                    if (d.lines && Array.isArray(d.lines) && d.lines.length > 0) {
+                                        setValue('lines', d.lines.map((line) => ({
                                             account_id: line.account_id || '',
                                             debit_amount: Number(line.debit_amount) || 0,
                                             credit_amount: Number(line.credit_amount) || 0,

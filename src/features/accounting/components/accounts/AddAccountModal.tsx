@@ -68,10 +68,12 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClose, onSu
                existingAccounts: accounts.map(a => ({ id: a.id, name: a.name, code: a.code, type: a.type }))
             }}
             onDataExtracted={(data) => {
-               if (data.code) setValue('code', data.code, { shouldValidate: true });
-               if (data.name) setValue('name', data.name, { shouldValidate: true });
-               if (data.type) setValue('type', data.type, { shouldValidate: true });
-               if (data.parent_id) setValue('parent_id', data.parent_id, { shouldValidate: true });
+               type AccountAIData = { code?: string; name?: string; type?: string; parent_id?: string };
+               const d = data as AccountAIData;
+               if (d.code) setValue('code', d.code, { shouldValidate: true });
+               if (d.name) setValue('name', d.name, { shouldValidate: true });
+               if (d.type) setValue('type', d.type as AccountFormData['type'], { shouldValidate: true });
+               if (d.parent_id) setValue('parent_id', d.parent_id, { shouldValidate: true });
             }}
           />
         </div>

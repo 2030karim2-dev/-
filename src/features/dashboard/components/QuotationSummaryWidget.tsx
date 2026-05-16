@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { salesQuotationsApi } from '../../sales/api/quotationsApi';
 import { purchaseQuotationsApi } from '../../purchases/api/quotationsApi';
 import { useAuthStore } from '../../auth/store';
-import { cn } from '../../../core/utils';
+// Removed unused cn
 
 const QuotationSummaryWidget: React.FC = () => {
     const { user } = useAuthStore();

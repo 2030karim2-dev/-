@@ -35,7 +35,7 @@ const CreateExpenseModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubm
 
     const { showToast } = useFeedbackStore();
 
-    const onInvalidSubmit = (errors: any) => {
+    const onInvalidSubmit = (errors: Record<string, unknown>) => {
         // Collect error messages
         const errorMessages = Object.keys(errors).map(key => {
             const fieldNames: Record<string, string> = {
@@ -103,11 +103,16 @@ const CreateExpenseModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubm
                             categories: categories?.map((c: any) => ({ id: c.id, name: c.name }))
                         }}
                         onDataExtracted={(data) => {
-                            if (data.amount) setValue('amount', data.amount, { shouldValidate: true });
-                            if (data.description) setValue('description', data.description, { shouldValidate: true });
-                            if (data.category_id) setValue('category_id', data.category_id, { shouldValidate: true });
-                            if (data.payment_method) setValue('payment_method', data.payment_method, { shouldValidate: true });
-                            if (data.currency_code) setValue('currency_code', data.currency_code, { shouldValidate: true });
+                            type ExpenseAIData = {
+                              amount?: number; description?: string;
+                              category_id?: string; payment_method?: string; currency_code?: string;
+                            };
+                            const d = data as ExpenseAIData;
+                            if (d.amount) setValue('amount', d.amount, { shouldValidate: true });
+                            if (d.description) setValue('description', d.description, { shouldValidate: true });
+                            if (d.category_id) setValue('category_id', d.category_id, { shouldValidate: true });
+                            if (d.payment_method) setValue('payment_method', d.payment_method as ExpenseFormData['payment_method'], { shouldValidate: true });
+                            if (d.currency_code) setValue('currency_code', d.currency_code, { shouldValidate: true });
                         }}
                     />
                 </div>

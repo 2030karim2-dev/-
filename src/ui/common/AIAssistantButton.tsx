@@ -9,8 +9,8 @@ import { cn } from '../../core/utils';
 export interface AIAssistantButtonProps {
     promptDescription: string;
     schemaDescription: string;
-    contextData?: Record<string, any>;
-    onDataExtracted: (data: any) => void;
+    contextData?: Record<string, unknown>;
+    onDataExtracted: (data: Record<string, unknown>) => void;
     buttonLabel?: string;
     className?: string;
 }
@@ -73,9 +73,10 @@ ${schemaDescription}
             showToast('تم استخراج البيانات بنجاح', 'success');
             setIsOpen(false);
             setUserInput('');
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('AI Extraction Error:', error);
-            showToast(error.message || 'حدث خطأ أثناء معالجة طلبك بواسطة الذكاء الاصطناعي', 'error');
+            const errMsg = error instanceof Error ? error.message : 'حدث خطأ أثناء معالجة طلبك بواسطة الذكاء الاصطناعي';
+            showToast(errMsg, 'error');
         } finally {
             setIsProcessing(false);
         }
