@@ -92,38 +92,19 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
       if (!companyId) return { data: [], totalCount: 0, page, pageSize, totalPages: 0 };
 
       const from = (page - 1) * pageSize;
-      const to = from + pageSize - 1;
 
-      // Build base query with exact count
-      let dbQuery = supabase
-        .from('products')
-        .select(
-          `id, company_id, name_ar, sku, part_number, brand, size, description,
-           purchase_price, sale_price, min_stock_level, unit, image_url,
-           alternative_numbers, barcode, updated_at, created_at, status,
-           category:product_categories(id, name),
-           stock:product_stock(quantity, warehouse_id, warehouses(name_ar))`,
-          { count: 'exact' }
-        )
-        .eq('company_id', companyId)
-        .eq('status', 'active')
-        .order(sortKey, { ascending: sortDir === 'asc' })
-        .range(from, to);
-
-      // Server-side search using full-text or ILIKE
-      if (debouncedSearch.trim()) {
-        // Normalize Arabic for consistent matching
-        const term = debouncedSearch.trim();
-        dbQuery = dbQuery.or(
-          `name_ar.ilike.%${term}%,sku.ilike.%${term}%,part_number.ilike.%${term}%,brand.ilike.%${term}%,alternative_numbers.ilike.%${term}%`
-        );
-      }
-
-      const { data, error, count } = await dbQuery;
+      const { data, error } = await supabase.rpc('search_inventory_paginated', {
+        p_company_id: companyId,
+        p_term: debouncedSearch.trim(),
+        p_limit: pageSize,
+        p_offset: from,
+        p_sort_key: sortKey,
+        p_sort_dir: sortDir
+      });
       if (error) throw error;
 
-      const products = await productService.mapRawProducts(data ?? []);
-      const totalCount = count ?? 0;
+      const products = productService.mapRawProducts(data ?? []);
+      const totalCount = (data as any)?.[0]?.total_count ?? 0;
       const totalPages = Math.ceil(totalCount / pageSize);
 
       return { data: products, totalCount, page, pageSize, totalPages };
@@ -142,32 +123,19 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
       queryKey: nextKey,
       queryFn: async (): Promise<ProductsPage> => {
         const from = page * pageSize;
-        const to = from + pageSize - 1;
-        let dbQuery = supabase
-          .from('products')
-          .select(
-            `id, company_id, name_ar, sku, part_number, brand, size, description,
-             purchase_price, sale_price, min_stock_level, unit, image_url,
-             alternative_numbers, barcode, updated_at, created_at, status,
-             category:product_categories(id, name),
-             stock:product_stock(quantity, warehouse_id, warehouses(name_ar))`,
-            { count: 'exact' }
-          )
-          .eq('company_id', companyId)
-          .eq('status', 'active')
-          .order(sortKey, { ascending: sortDir === 'asc' })
-          .range(from, to);
 
-        if (debouncedSearch.trim()) {
-          const term = debouncedSearch.trim();
-          dbQuery = dbQuery.or(
-            `name_ar.ilike.%${term}%,sku.ilike.%${term}%,part_number.ilike.%${term}%,brand.ilike.%${term}%,alternative_numbers.ilike.%${term}%`
-          );
-        }
-        const { data, error, count } = await dbQuery;
+        const { data, error } = await supabase.rpc('search_inventory_paginated', {
+          p_company_id: companyId,
+          p_term: debouncedSearch.trim(),
+          p_limit: pageSize,
+          p_offset: from,
+          p_sort_key: sortKey,
+          p_sort_dir: sortDir
+        });
         if (error) throw error;
-        const products = await productService.mapRawProducts(data ?? []);
-        const totalCount = count ?? 0;
+
+        const products = productService.mapRawProducts(data ?? []);
+        const totalCount = (data as any)?.[0]?.total_count ?? 0;
         return { data: products, totalCount, page: page + 1, pageSize, totalPages: Math.ceil(totalCount / pageSize) };
       },
       staleTime: 1000 * 30,

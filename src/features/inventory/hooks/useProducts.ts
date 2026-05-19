@@ -67,7 +67,8 @@ export const useProducts = (searchTerm: string = '', options: { limitNum?: numbe
                 p.brand,
                 p.part_number,
                 p.alternative_numbers,
-                p.size
+                p.size,
+                p.specifications
             ].filter(Boolean).join(' ').toLowerCase());
 
             return searchTokens.every(token => searchableText.includes(token));
