@@ -5,15 +5,13 @@ import { useInventoryView } from './hooks/useInventoryView';
 import { useProductImport } from './hooks/useProductImport';
 import ProductDetailModal from './components/ProductDetailModal';
 import AddProductModal from './components/AddProductModal';
-import ImportProductsModal from './components/ImportProductsModal';
 import MicroHeader from '../../ui/base/MicroHeader';
-import { Database, Plus, List, LayoutGrid, Upload, Sparkles, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Database, Plus, List, LayoutGrid, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useBreakpoint } from '../../lib/hooks/useBreakpoint';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import ErrorDisplay from '../../ui/base/ErrorDisplay';
 import FullscreenContainer from '../../ui/base/FullscreenContainer';
 import { cn } from '../../core/utils';
-import DeduplicationTool from './components/DeduplicationTool';
 import InventoryViewRenderer from './components/InventoryViewRenderer';
 import { getInventoryTabs } from './constants';
 import ServerPaginationBar from '../../ui/common/ServerPaginationBar';
@@ -28,8 +26,6 @@ const InventoryPage: React.FC = () => {
         handleEdit, handleAdd, handleCloseModal
     } = useInventoryView();
 
-    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-    const [isDedupeOpen, setIsDedupeOpen] = useState(false);
     const [pageSize, setPageSize] = useState(50);
     const [isMaximized, setIsMaximized] = useState(false);
     const [isZenMode, setIsZenMode] = useState(false);
@@ -106,22 +102,6 @@ const InventoryPage: React.FC = () => {
                                 </div>
                             )}
                             <div className="flex gap-2">
-                                <button
-                                    onClick={() => setIsImportModalOpen(true)}
-                                    className="flex items-center gap-1 bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 shadow-md shadow-emerald-500/20"
-                                    title="استيراد من Excel"
-                                >
-                                    <Upload size={14} />
-                                    <span className="hidden sm:inline">Excel</span>
-                                </button>
-                                <button
-                                    onClick={() => setIsDedupeOpen(true)}
-                                    className="flex items-center gap-1 bg-amber-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 shadow-md shadow-amber-500/20"
-                                    title="فحص المكررات"
-                                >
-                                    <Sparkles size={14} />
-                                    <span className="hidden sm:inline">فحص المكررات</span>
-                                </button>
                                 <button
                                     onClick={handleAdd}
                                     className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold active:scale-95 shadow-md shadow-blue-500/20"
@@ -213,20 +193,6 @@ const InventoryPage: React.FC = () => {
                     initialData={editingProduct}
                 />
 
-                <ImportProductsModal
-                    isOpen={isImportModalOpen}
-                    onClose={() => setIsImportModalOpen(false)}
-                />
-
-                <DeduplicationTool
-                    isOpen={isDedupeOpen}
-                    onClose={() => setIsDedupeOpen(false)}
-                    onEdit={(id) => {
-                        const p = products.find(prod => prod.id === id);
-                        if (p) handleEdit(p);
-                        setIsDedupeOpen(false);
-                    }}
-                />
             </div>
         </FullscreenContainer>
     );
