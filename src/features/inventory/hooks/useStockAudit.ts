@@ -144,6 +144,18 @@ export const useInventoryMutations = () => {
         }
     });
 
+    const addItem = useMutation({
+        mutationFn: ({ sessionId, productId, expectedQuantity }: { sessionId: string; productId: string; expectedQuantity: number }) => {
+            return inventoryService.addAuditItem(sessionId, productId, expectedQuantity);
+        },
+        onSuccess: (_, { sessionId }) => {
+            queryClient.invalidateQueries({ queryKey: ['audit_session', sessionId] });
+        },
+        onError: (err: any) => {
+            showToast("فشل إضافة الصنف: " + err.message, 'error');
+        }
+    });
+
     return {
         createTransfer: transfer.mutate,
         isTransferring: transfer.isPending,
@@ -155,5 +167,7 @@ export const useInventoryMutations = () => {
         isSavingProgress: saveProgress.isPending,
         quickAdjustStock: quickAdjust.mutate,
         isQuickAdjusting: quickAdjust.isPending,
+        addItemToAudit: addItem.mutate,
+        isAddingItem: addItem.isPending,
     };
 };

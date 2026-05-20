@@ -104,6 +104,10 @@ export const inventoryService = {
     return auditService.startAudit(data, companyId, userId);
   },
 
+  addAuditItem: async (sessionId: string, productId: string, expectedQuantity: number = 0) => {
+    return auditService.addAuditItem(sessionId, productId, expectedQuantity);
+  },
+
   finalizeAudit: async (sessionId: string, items: { id?: string; product_id: string; counted_quantity: number }[], _companyId: string, userId: string) => {
     return auditService.finalizeAudit(sessionId, items, userId);
   },
@@ -149,15 +153,18 @@ export const inventoryService = {
   // ==========================================
   
   quickAdjustStock: async (companyId: string, items: { product_id: string; warehouse_id: string; quantity: number }[], userId: string) => {
-    // Import warehouseApi directly here to avoid circular dependencies if any, or use it from warehouseService if it was exposed.
-    // Actually, warehouseApi has updateStock.
     const { warehouseApi } = await import('./api/warehouseApi');
     
-    const promises = items.map(item => 
-       warehouseApi.updateStock(companyId, item.product_id, item.warehouse_id, item.quantity, userId)
-    );
+    // Process in batches of 20 to prevent rate limiting and connection drops
+    const BATCH_SIZE = 20;
+    for (let i = 0; i < items.length; i += BATCH_SIZE) {
+      const batch = items.slice(i, i + BATCH_SIZE);
+      const promises = batch.map(item => 
+         warehouseApi.updateStock(companyId, item.product_id, item.warehouse_id, item.quantity, userId)
+      );
+      await Promise.all(promises);
+    }
     
-    await Promise.all(promises);
     return true;
   }
 };
