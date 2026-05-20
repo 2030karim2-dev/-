@@ -29,18 +29,36 @@ export const auditService = {
 
         if (error) throw error;
 
-        const { data: products } = await supabase
+        // Try loading from product_stock first
+        const { data: stockProducts } = await supabase
             .from('product_stock')
             .select('product_id, quantity')
             .eq('warehouse_id', data.warehouse_id);
 
-        if (products && products.length > 0) {
-            const auditItems = products.map((p: { product_id: string; quantity: number }) => ({
+        if (stockProducts && stockProducts.length > 0) {
+            const auditItems = stockProducts.map((p: { product_id: string; quantity: number }) => ({
                 session_id: session.id,
                 product_id: p.product_id,
                 expected_quantity: p.quantity
             }));
             await supabase.from('audit_items').insert(auditItems);
+        } else {
+            // Fallback: load from products table directly (limit 100)
+            const { data: allProducts } = await supabase
+                .from('products')
+                .select('id, stock_quantity')
+                .eq('company_id', companyId)
+                .order('name_ar', { ascending: true })
+                .limit(100);
+
+            if (allProducts && allProducts.length > 0) {
+                const auditItems = allProducts.map((p: { id: string; stock_quantity: number }) => ({
+                    session_id: session.id,
+                    product_id: p.id,
+                    expected_quantity: p.stock_quantity ?? 0
+                }));
+                await supabase.from('audit_items').insert(auditItems);
+            }
         }
 
         return session;
@@ -85,10 +103,36 @@ export const auditService = {
         if (sError) throw sError;
         const session = sessionRaw as Record<string, unknown>;
 
-        const { data: items, error: iError } = await supabase.from('audit_items')
+        let { data: items, error: iError } = await supabase.from('audit_items')
             .select('*, products(*, product_categories(name))')
             .eq('session_id', sessionId);
         if (iError) throw iError;
+
+        // If no items exist, auto-populate from the products table
+        if (!items || items.length === 0) {
+            const companyId = session.company_id as string;
+            const { data: allProducts } = await supabase
+                .from('products')
+                .select('id, stock_quantity')
+                .eq('company_id', companyId)
+                .order('name_ar', { ascending: true })
+                .limit(100);
+
+            if (allProducts && allProducts.length > 0) {
+                const auditItems = allProducts.map((p: { id: string; stock_quantity: number }) => ({
+                    session_id: sessionId,
+                    product_id: p.id,
+                    expected_quantity: p.stock_quantity ?? 0
+                }));
+                await supabase.from('audit_items').insert(auditItems);
+
+                // Re-fetch with product joins
+                const refetch = await supabase.from('audit_items')
+                    .select('*, products(*, product_categories(name))')
+                    .eq('session_id', sessionId);
+                items = refetch.data || [];
+            }
+        }
 
         return {
             session: { ...session, warehouse_name: (session?.warehouses as { name_ar?: string })?.name_ar } as Record<string, unknown>,
