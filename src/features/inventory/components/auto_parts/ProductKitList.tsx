@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../../types';
 import { useKitComponents, useKitMutations } from '../../hooks/index';
 import { Plus, Package, Trash2, Layers, X } from 'lucide-react';
-import ProductSearch from '../../../../features/sales/components/CreateInvoice/ProductSearch';
+import ProductSearch from '../../../../features/sales/components/create/ProductSearch';
 import { cn } from '../../../../core/utils';
 
 interface ProductKitListProps {

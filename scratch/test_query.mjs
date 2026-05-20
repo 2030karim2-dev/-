@@ -28,6 +28,10 @@ async function testQuery() {
   // Test 5: UoMs join
   const t5 = await supabase.from('products').select('id, uoms:product_uoms(id, uom_name, conversion_factor)').limit(1);
   console.log('Test 5 (UoMs):', t5.error ? `FAILED: ${t5.error.message}` : 'SUCCESS');
+
+  // Test 6: Direct product_uoms select
+  const t6 = await supabase.from('product_uoms').select('*').limit(1);
+  console.log('Test 6 (Direct product_uoms):', t6.error ? `FAILED: ${t6.error.message}` : 'SUCCESS');
 }
 
 testQuery();

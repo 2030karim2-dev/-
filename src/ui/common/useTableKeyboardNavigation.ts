@@ -248,6 +248,22 @@ export const useTableKeyboardNavigation = <T,>({
         if (!tableEl) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
+            // Bypass keyboard navigation if the user is typing in an input, textarea, select, or contenteditable element
+            const target = e.target as HTMLElement;
+            if (
+                target &&
+                (target.tagName === 'INPUT' ||
+                 target.tagName === 'TEXTAREA' ||
+                 target.tagName === 'SELECT' ||
+                 target.isContentEditable)
+            ) {
+                if (editingCell && e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelEdit();
+                }
+                return;
+            }
+
             // Don't handle keys if editing
             if (editingCell) {
                 if (e.key === 'Escape') {

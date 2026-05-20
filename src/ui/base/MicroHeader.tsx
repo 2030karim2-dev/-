@@ -55,35 +55,26 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
   const location = useLocation();
   const { dir } = useTranslation();
   const isRoot = location.pathname === '/';
-  const [localSearch, setLocalSearch] = React.useState(searchValue || '');
   const setPageSearch = useSearchStore(s => s.setPageSearch);
   const clearPageSearch = useSearchStore(s => s.clearPageSearch);
 
   React.useEffect(() => {
     if (onSearchChange) {
       setPageSearch({
-        value: localSearch,
+        value: searchValue || '',
         placeholder: searchPlaceholder || "بحث...",
-        onChange: (val) => {
-          setLocalSearch(val);
-          onSearchChange(val);
-        }
+        onChange: onSearchChange
       });
     } else {
       clearPageSearch();
     }
+  }, [searchValue, onSearchChange, searchPlaceholder, setPageSearch, clearPageSearch]);
 
+  React.useEffect(() => {
     return () => {
       clearPageSearch();
     };
-  }, [onSearchChange, searchPlaceholder, setPageSearch, clearPageSearch]);
-
-  // Keep local search in sync if external value changes (e.g. cleared by parent)
-
-  // Keep local search in sync if external value changes (e.g. cleared by parent)
-  React.useEffect(() => {
-    setLocalSearch(searchValue || '');
-  }, [searchValue]);
+  }, [clearPageSearch]);
 
   const BackIcon = dir === 'rtl' ? ArrowRight : ArrowLeft;
 

@@ -68,12 +68,34 @@ export const productsApi = {
     saveProductUoMs: async (productId: string, uoms: any[]) => {
         // product_uoms table may not exist yet — silently skip if so
         try {
-            await supabase.from('product_uoms' as any).delete().eq('product_id', productId);
-            if (uoms && uoms.length > 0) {
-                const uomsToInsert = uoms.map(u => ({ ...u, product_id: productId }));
-                return await supabase.from('product_uoms' as any).insert(uomsToInsert);
+            const { data, error } = await supabase.rpc('save_product_uoms', {
+                p_product_id: productId,
+                p_uoms: uoms
+            });
+            if (!error) return { data, error: null };
+
+            // If function is missing, fallback to client-side non-atomic sequence
+            const errCode = (error as any).code || '';
+            const errMessage = (error as any).message?.toLowerCase() || '';
+            if (errCode === 'PGRST202' || errMessage.includes('could not find the function') || errMessage.includes('404')) {
+                await supabase.from('product_uoms' as any).delete().eq('product_id', productId);
+                if (uoms && uoms.length > 0) {
+                    const uomsToInsert = uoms.map(u => ({ ...u, product_id: productId }));
+                    return await supabase.from('product_uoms' as any).insert(uomsToInsert);
+                }
+                return { error: null };
             }
-        } catch (_) { /* table not yet migrated */ }
+            return { error };
+        } catch (_) {
+            // Safe fallback for connection/unexpected exceptions
+            try {
+                await supabase.from('product_uoms' as any).delete().eq('product_id', productId);
+                if (uoms && uoms.length > 0) {
+                    const uomsToInsert = uoms.map(u => ({ ...u, product_id: productId }));
+                    return await supabase.from('product_uoms' as any).insert(uomsToInsert);
+                }
+            } catch (__) { /* table not yet migrated */ }
+        }
         return { error: null };
     },
 
@@ -117,28 +139,13 @@ export const productsApi = {
     },
 
     searchProduct: async (companyId: string, term: string) => {
-        // 1. Clean and normalize the term (support Arabic, English, Numbers)
-        // We allow letters, numbers, and spaces. We replace others with space.
-        const sanitized = term.replace(/[^\w\s\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/g, ' '); 
+        const searchPattern = `%${term.trim()}%`;
         
-        // 2. Tokenize and build tsQuery
-        const tokens = sanitized
-            .split(/\s+/)
-            .filter(word => word.length > 0);
-            
-        if (tokens.length === 0) return { data: [], error: null };
-
-        // Convert to prefix matching: "word1:* & word2:*"
-        const tsQuery = tokens.map(word => `${word}:*`).join(' & ');
-
-        // Use textSearch on the search_vector column
         return await supabase.from('products')
-            .select('id, name_ar, sku, sale_price, part_number, alternative_numbers, brand, quantity:product_stock(quantity)')
+            .select('id, name_ar, sku, sale_price, purchase_price, part_number, alternative_numbers, brand, quantity:product_stock(quantity)')
             .eq('company_id', companyId)
             .eq('status', 'active')
-            .textSearch('search_vector', tsQuery, { 
-                config: 'simple'
-            })
+            .or(`name_ar.ilike.${searchPattern},sku.ilike.${searchPattern},part_number.ilike.${searchPattern},alternative_numbers.ilike.${searchPattern},brand.ilike.${searchPattern}`)
             .order('name_ar')
             .limit(15);
     },

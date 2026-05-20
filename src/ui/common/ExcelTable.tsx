@@ -133,9 +133,65 @@ function ExcelTable<T>({
     let items = [...data];
     if (internalSearch) {
       const term = internalSearch.toLowerCase();
-      items = items.filter(item =>
-        Object.values(item as Record<string, unknown>).some(val => String(val).toLowerCase().includes(term))
-      );
+
+      // Helper to recursively extract text from any React element or primitive
+      const getStringContent = (val: any): string => {
+        if (val === null || val === undefined) return '';
+        if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+          return String(val);
+        }
+        if (Array.isArray(val)) {
+          return val.map(getStringContent).join(' ');
+        }
+        if (typeof val === 'object') {
+          if (val.props && val.props.children !== undefined) {
+            return getStringContent(val.props.children);
+          }
+          if (!val.$$typeof && typeof val.then !== 'function') {
+            try {
+              return Object.values(val).map(getStringContent).join(' ');
+            } catch (e) {
+              return '';
+            }
+          }
+        }
+        return '';
+      };
+
+      items = items.filter(item => {
+        // 1. Try to evaluate column accessors to catch custom displayed values/elements
+        const accessorMatches = columns.some(col => {
+          try {
+            const val = col.accessor(item);
+            const content = getStringContent(val);
+            if (content) {
+              return content.toLowerCase().includes(term);
+            }
+          } catch (e) {
+            // Ignore errors in custom accessors
+          }
+          return false;
+        });
+        if (accessorMatches) return true;
+
+        // 2. Fallback to recursive deep search of the item object's values
+        const deepSearch = (val: any): boolean => {
+          if (val === null || val === undefined) return false;
+          if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+            return String(val).toLowerCase().includes(term);
+          }
+          if (typeof val === 'object') {
+            if (val.$$typeof || typeof val.then === 'function') return false;
+            try {
+              return Object.values(val).some(deepSearch);
+            } catch (e) {
+              return false;
+            }
+          }
+          return false;
+        };
+        return deepSearch(item);
+      });
     }
     if (sortConfig) {
       items.sort((a, b) => {
@@ -153,7 +209,7 @@ function ExcelTable<T>({
       });
     }
     return items;
-  }, [data, sortConfig, internalSearch]);
+  }, [data, sortConfig, internalSearch, columns]);
 
   // Reset page when search/data changes
   useEffect(() => {

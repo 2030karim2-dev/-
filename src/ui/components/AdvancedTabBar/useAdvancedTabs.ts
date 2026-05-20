@@ -79,8 +79,25 @@ export const useAdvancedTabs = ({
     const tabRefs = useRef<TabRefs>({});
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Sync external tabs prop → internal state
-    useEffect(() => { setTabs(initialTabs); }, [initialTabs]);
+    // Sync external tabs prop → internal state with structural comparison to prevent inline array reference re-renders
+    const prevTabsRef = useRef<TabItem[]>(initialTabs);
+    useEffect(() => {
+        const hasChanged =
+            initialTabs.length !== prevTabsRef.current.length ||
+            initialTabs.some((tab, i) => {
+                const prevTab = prevTabsRef.current[i];
+                return !prevTab ||
+                    tab.id !== prevTab.id ||
+                    tab.label !== prevTab.label ||
+                    tab.disabled !== prevTab.disabled ||
+                    tab.icon !== prevTab.icon;
+            });
+
+        if (hasChanged) {
+            prevTabsRef.current = initialTabs;
+            setTabs(initialTabs);
+        }
+    }, [initialTabs]);
 
     // ── Config ─────────────────────────────────────────────
     const systemTheme = useSystemTheme();

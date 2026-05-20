@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../../types';
 import { useCrossReferences, useCrossReferenceMutations } from '../../hooks/index';
 import { Plus, Link as LinkIcon, Trash2, X } from 'lucide-react';
-import ProductSearch from '../../../../features/sales/components/CreateInvoice/ProductSearch';
+import ProductSearch from '../../../../features/sales/components/create/ProductSearch';
 import { cn } from '../../../../core/utils';
 
 interface CrossReferenceListProps {

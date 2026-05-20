@@ -1,5 +1,5 @@
-import React from 'react';
-import { Search, FileSpreadsheet, Keyboard, RotateCcw, Minimize2, Maximize2, Minus, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, FileSpreadsheet, Keyboard, RotateCcw, Minimize2, Maximize2, Minus, Plus, X } from 'lucide-react';
 import { cn } from '../../core/utils';
 import { TABLE_SHORTCUTS } from './useTableKeyboardNavigation';
 
@@ -38,6 +38,9 @@ const ExcelTableToolbar: React.FC<ExcelTableToolbarProps> = ({
     showShortcuts,
     setShowShortcuts,
 }) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const isActive = isFocused || !!internalSearch;
+
     const getShortcutIcon = (key: string) => {
         switch (key) {
             case 'ArrowUp': return '↑';
@@ -101,18 +104,43 @@ const ExcelTableToolbar: React.FC<ExcelTableToolbarProps> = ({
 
                 <div className="flex items-center gap-2 w-full sm:w-auto flex-1 justify-end">
                     {showSearch && (
-                        <div className="relative flex-1 sm:max-w-xs group">
-                            <Search className={cn("absolute top-1/2 -translate-y-1/2 text-[var(--app-text-secondary)] group-hover:text-blue-500 transition-colors", isRTL ? "left-3 right-auto" : "right-3")} size={14} />
+                        <div className="relative flex-1 sm:max-w-xs group transition-all duration-300">
+                            {/* Search Icon positioned logically using start-3 */}
+                            <Search 
+                                className={cn(
+                                    "absolute start-3 top-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none",
+                                    isActive 
+                                        ? "text-blue-500 scale-105" 
+                                        : "text-[var(--app-text-secondary)] group-hover:text-blue-500"
+                                )} 
+                                size={14} 
+                            />
+                            
                             <input
                                 type="text"
                                 placeholder="بحث سريع في النتائج..."
                                 value={internalSearch}
                                 onChange={(e) => setInternalSearch(e.target.value)}
+                                onFocus={() => setIsFocused(true)}
+                                onBlur={() => setIsFocused(false)}
                                 className={cn(
-                                    "w-full py-2 bg-[var(--app-surface)] border-2 border-[var(--app-border)] rounded-lg text-[11px] font-medium text-[var(--app-text)] outline-none focus:border-blue-500/50 transition-all shadow-sm focus:shadow-md",
-                                    isRTL ? "pl-3 pr-9" : "pr-9 pl-3"
+                                    "w-full py-1.5 ps-9 pe-9 rounded-xl text-[11px] outline-none transition-all duration-300 shadow-sm",
+                                    isActive
+                                        ? "bg-blue-50/50 dark:bg-blue-900/20 border border-blue-500/30 text-[var(--app-text)] font-bold placeholder:text-blue-400 dark:placeholder:text-blue-300 ring-1 ring-blue-500/10 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500/50"
+                                        : "bg-[var(--app-surface)] border border-[var(--app-border)] text-[var(--app-text)] font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-blue-50/50 dark:focus:bg-blue-900/20 focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/20"
                                 )}
                             />
+
+                            {/* Clear Button positioned logically using end-3 */}
+                            {internalSearch && (
+                                <button
+                                    onClick={() => setInternalSearch('')}
+                                    className="absolute end-3 top-1/2 -translate-y-1/2 text-blue-400 hover:text-rose-500 transition-colors bg-transparent rounded-full p-0.5 active:scale-90 flex items-center justify-center"
+                                    title="مسح البحث"
+                                >
+                                    <X size={12} />
+                                </button>
+                            )}
                         </div>
                     )}
                     {onExport && (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Car, Menu, Search, X } from 'lucide-react';
 import HeaderActions from './header/HeaderActions';
@@ -17,6 +17,15 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   const { pageSearchValue, pageSearchPlaceholder, onPageSearchChange } = useSearchStore();
   const isPageSearchActive = !!onPageSearchChange;
+
+  const [globalSearchVal, setGlobalSearchVal] = useState('');
+
+  const handleGlobalSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (globalSearchVal.trim()) {
+      navigate(`/inventory?search=${encodeURIComponent(globalSearchVal.trim())}`);
+    }
+  };
 
   const currentRoute = MENU_ITEMS.find((item) => (
     item.path === '/'
@@ -70,16 +79,27 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               )}
             </div>
           ) : (
-            <>
+            <form onSubmit={handleGlobalSearchSubmit} className="w-full relative">
               <input
                 type="text"
                 placeholder={t('global_search_placeholder')}
+                value={globalSearchVal}
+                onChange={(e) => setGlobalSearchVal(e.target.value)}
                 autoComplete="off"
                 aria-label={t('global_search_placeholder')}
-                className="w-full bg-[var(--app-bg)] border border-[var(--app-border)] rounded-lg py-1.5 ps-9 pe-4 text-xs text-[var(--app-text)] placeholder:text-[var(--app-text-secondary)] focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all font-bold"
+                className="w-full bg-[var(--app-bg)] border border-[var(--app-border)] rounded-lg py-1.5 ps-9 pe-10 text-xs text-[var(--app-text)] placeholder:text-[var(--app-text-secondary)] focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all font-bold"
               />
               <Search className={`absolute top-2.5 text-[var(--app-text-secondary)] group-focus-within:text-blue-500 transition-colors ${dir === 'rtl' ? 'right-3' : 'left-3'}`} size={14} />
-            </>
+              {globalSearchVal && (
+                <button 
+                  type="button"
+                  onClick={() => setGlobalSearchVal('')}
+                  className={`absolute top-2.5 text-gray-400 hover:text-rose-500 transition-colors ${dir === 'rtl' ? 'left-3' : 'right-3'}`}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </form>
           )}
         </div>
       </div>

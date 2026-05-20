@@ -3,7 +3,7 @@ import { Trash2, Plus, Minus, ShoppingCart, CreditCard, PauseCircle, Coins } fro
 import { useSalesStore } from '../../sales/store';
 import { useDiscountStore } from '../../settings/taxDiscountStore';
 import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
-import CustomerSelector from '../../sales/components/CreateInvoice/CustomerSelector';
+import CustomerSelector from '../../sales/components/create/CustomerSelector';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 
 interface POSCartProps {

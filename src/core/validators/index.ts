@@ -3,7 +3,7 @@
  * Re-exports all Zod validation schemas
  */
 
-export * from './accounting';
+
 export * from './expenses';
 
 // Import reusable schemas
@@ -30,7 +30,10 @@ export const positiveNumberSchema = z.number().positive('يجب أن يكون ر
 
 export const nonNegativeNumberSchema = z.number().nonnegative('يجب أن يكون رقم غير سالب');
 
-export const dateSchema = z.string().datetime('تاريخ غير صالح');
+export const dateSchema = z.string().refine(
+    val => /^\d{4}-\d{2}-\d{2}/.test(val) || !isNaN(Date.parse(val)),
+    { message: 'تاريخ غير صالح' }
+);
 
 export const dateRangeSchema = z.object({
     from: dateSchema,
@@ -93,6 +96,7 @@ export const journalEntrySchema = z.object({
     date: dateSchema,
     description: z.string().min(1, 'الوصف مطلوب'),
     reference: z.string().optional(),
+    reference_type: z.string().optional(),
     lines: z.array(journalLineSchema).min(2, 'قيد يومية يتطلب سطرين على الأقل'),
 }).refine(
     data => {

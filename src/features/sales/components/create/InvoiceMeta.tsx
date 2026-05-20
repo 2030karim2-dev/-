@@ -6,7 +6,7 @@ import { useSalesStore } from '../../store';
 import { usePaymentAccounts } from '../../../accounting/hooks/index';
 import { useWarehouses } from '../../../inventory/hooks/useInventoryManagement';
 import { useCurrencies } from '../../../settings/hooks';
-import CustomerSelector from '../CreateInvoice/CustomerSelector';
+import CustomerSelector from './CustomerSelector';
 
 interface Props {
     invoiceNumber?: string;

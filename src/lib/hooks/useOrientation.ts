@@ -43,20 +43,20 @@ export const useOrientation = (): OrientationState => {
         window.addEventListener('resize', handleResize);
         window.addEventListener('orientationchange', handleResize);
 
-        // Also listen for screen.orientation API if available
-        if (screen.orientation) {
-            const handleOrientationChange = () => {
+        let handleOrientationChange: (() => void) | null = null;
+        if (typeof screen !== 'undefined' && screen.orientation) {
+            handleOrientationChange = () => {
                 setState(getOrientationState());
             };
             screen.orientation.addEventListener('change', handleOrientationChange);
-            return () => {
-                screen.orientation.removeEventListener('change', handleOrientationChange);
-            };
         }
 
         return () => {
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('orientationchange', handleResize);
+            if (handleOrientationChange && typeof screen !== 'undefined' && screen.orientation) {
+                screen.orientation.removeEventListener('change', handleOrientationChange);
+            }
         };
     }, []);
 

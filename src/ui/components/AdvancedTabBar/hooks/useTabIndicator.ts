@@ -49,13 +49,21 @@ export const useTabIndicator = ({ activeTab, tabRefs, containerRef }: UseTabIndi
 
     // تحديث الموضع عند تغيير التاب النشط
     useEffect(() => {
+        let t1: NodeJS.Timeout | number | undefined;
+        let t2: NodeJS.Timeout | number | undefined;
+
         if (isFirstRender.current) {
             isFirstRender.current = false;
-            setTimeout(() => updateIndicatorPosition(false), 0);
-            setTimeout(() => setIndicatorPosition(prev => ({ ...prev, opacity: 1 })), 50);
+            t1 = setTimeout(() => updateIndicatorPosition(false), 0);
+            t2 = setTimeout(() => setIndicatorPosition(prev => ({ ...prev, opacity: 1 })), 50);
         } else {
             updateIndicatorPosition(true);
         }
+
+        return () => {
+            if (t1) clearTimeout(t1);
+            if (t2) clearTimeout(t2);
+        };
     }, [activeTab, updateIndicatorPosition]);
 
     // تحديث الموضع عند تغيير حجم الـ container

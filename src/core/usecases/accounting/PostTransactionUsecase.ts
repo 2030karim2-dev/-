@@ -1,5 +1,5 @@
 
-import { journalEntrySchema } from '../../validators/accounting';
+import { journalEntrySchema } from '../../validators';
 import { journalsApi } from '../../../features/accounting/api/journalsApi';
 
 export class PostTransactionUsecase {
@@ -15,8 +15,13 @@ export class PostTransactionUsecase {
         {
             date: validatedData.date,
             description: validatedData.description,
-            lines: validatedData.lines,
-            reference_type: 'manual'
+            lines: validatedData.lines.map((line: any) => ({
+                account_id: line.account_id,
+                debit: line.debit_amount,
+                credit: line.credit_amount,
+                description: line.description
+            })),
+            reference_type: validatedData.reference_type || 'manual'
         }
     );
 
