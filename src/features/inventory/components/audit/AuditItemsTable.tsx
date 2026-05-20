@@ -37,8 +37,8 @@ const AuditItemsTable: React.FC<Props> = ({ items, register, filter, category, i
                         <th className="p-3 w-10 text-center border-l dark:border-slate-700">#</th>
                         <th className="p-3 border-l dark:border-slate-700 min-w-[200px]">اسم القطعة / الصنف</th>
                         <th className="p-3 border-l dark:border-slate-700 w-32 text-center">رقم القطعة</th>
-                        <th className="p-3 border-l dark:border-slate-700 w-32 text-center">الشركة الصانعة</th>
                         <th className="p-3 border-l dark:border-slate-700 w-24 text-center">المقاس</th>
+                        <th className="p-3 border-l dark:border-slate-700 w-24 text-center">الفئة</th>
                         <th className="p-3 border-l dark:border-slate-700 w-32 text-center">الكمية الدفترية</th>
                         <th className="p-3 border-l dark:border-slate-700 w-40 text-center">الكمية الفعلية</th>
                         <th className="p-3 text-center w-32">الفرق</th>
@@ -76,6 +76,7 @@ const AuditItemsTable: React.FC<Props> = ({ items, register, filter, category, i
                                         {product.size || '---'}
                                     </span>
                                 </td>
+                                <td className="p-3 text-center font-mono font-bold text-gray-600 dark:text-slate-400 border-l dark:border-slate-700"><span className={cn(!product.category && "text-gray-300 dark:text-slate-700 text-[10px] font-normal italic")}>{product.category || 'عام'}</span></td>
                                 <td className="p-3 text-center font-mono font-bold text-blue-600 text-xl border-l dark:border-slate-700">
                                     {formatNumberDisplay(field.expected_quantity)}
                                 </td>

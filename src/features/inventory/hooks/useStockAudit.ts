@@ -146,7 +146,7 @@ export const useInventoryMutations = () => {
 
     const addItem = useMutation({
         mutationFn: ({ sessionId, productId, expectedQuantity }: { sessionId: string; productId: string; expectedQuantity: number }) => {
-            return inventoryService.addAuditItem(sessionId, productId, expectedQuantity);
+            return inventoryService.addAuditItem(sessionId, productId, expectedQuantity, user?.company_id || '', user?.id || '');
         },
         onSuccess: (_, { sessionId }) => {
             queryClient.invalidateQueries({ queryKey: ['audit_session', sessionId] });

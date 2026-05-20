@@ -104,8 +104,8 @@ export const inventoryService = {
     return auditService.startAudit(data, companyId, userId);
   },
 
-  addAuditItem: async (sessionId: string, productId: string, expectedQuantity: number = 0) => {
-    return auditService.addAuditItem(sessionId, productId, expectedQuantity);
+  addAuditItem: async (sessionId: string, productId: string, expectedQuantity: number = 0, companyId: string, userId: string) => {
+    return auditService.addAuditItem(sessionId, productId, expectedQuantity, companyId, userId);
   },
 
   finalizeAudit: async (sessionId: string, items: { id?: string; product_id: string; counted_quantity: number }[], _companyId: string, userId: string) => {

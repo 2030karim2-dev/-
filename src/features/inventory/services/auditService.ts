@@ -37,11 +37,13 @@ export const auditService = {
     /**
      * Add a single item to an active audit session
      */
-    addAuditItem: async (sessionId: string, productId: string, expectedQuantity: number = 0) => {
+    addAuditItem: async (sessionId: string, productId: string, expectedQuantity: number = 0, companyId: string, userId: string) => {
         const { data, error } = await supabase.from('audit_items').insert({
             session_id: sessionId,
             product_id: productId,
-            expected_quantity: expectedQuantity
+            expected_quantity: expectedQuantity,
+            company_id: companyId,
+            created_by: userId
         }).select().single();
         if (error) throw error;
         return data;
