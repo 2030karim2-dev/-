@@ -32,7 +32,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, onAddToCart, inSt
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 p-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 3xl:grid-cols-8 gap-2 p-2">
                 {[...Array(10)].map((_, i) => (
                     <div key={i} className="bg-white dark:bg-slate-900 rounded-xl h-28 animate-pulse shadow-sm border dark:border-slate-800"></div>
                 ))}
@@ -79,7 +79,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, onAddToCart, inSt
             )}
 
             {/* ── Product Grid ───────────────────────────────── */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 3xl:grid-cols-8 gap-2">
                 {filteredProducts.map((product) => {
                     const hasStock = product.stock_quantity > 0;
                     const isMatchedByAlternative = isSearching &&

@@ -4,10 +4,12 @@ import { useProductMutations } from './hooks/useProducts';
 import { useInventoryView } from './hooks/useInventoryView';
 import { useProductImport } from './hooks/useProductImport';
 import ProductDetailModal from './components/ProductDetailModal';
+import ProductDetailPane from './components/ProductDetailPane';
 import AddProductModal from './components/AddProductModal';
 import MicroHeader from '../../ui/base/MicroHeader';
 import { Database, Plus, List, LayoutGrid, CheckCircle, AlertTriangle } from 'lucide-react';
-import { useBreakpoint } from '../../lib/hooks/useBreakpoint';
+import { useBreakpoint, useCurrentBreakpoint } from '../../lib/hooks/useBreakpoint';
+import ContentContainer from '../../ui/layout/ContentContainer';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import ErrorDisplay from '../../ui/base/ErrorDisplay';
 import FullscreenContainer from '../../ui/base/FullscreenContainer';
@@ -33,6 +35,11 @@ const InventoryPage: React.FC = () => {
 
     const { t } = useTranslation();
     const isDesktop = useBreakpoint('lg');
+    const breakpoint = useCurrentBreakpoint();
+    const isWideDesktop = breakpoint === '3xl' || breakpoint === '4xl' || breakpoint === '5xl';
+
+    // Show split-view detail pane on wide desktops (1920px+) when a product is selected
+    const showSplitDetail = isWideDesktop && !!selectedProduct;
 
     const {
         products, totalCount, totalPages, page, isFetching,
@@ -65,8 +72,8 @@ const InventoryPage: React.FC = () => {
 
 
     return (
-        <FullscreenContainer 
-            isMaximized={isMaximized} 
+        <FullscreenContainer
+            isMaximized={isMaximized}
             onToggleMaximize={() => {
                 setIsMaximized(false);
                 setIsZenMode(false);
@@ -129,53 +136,111 @@ const InventoryPage: React.FC = () => {
                     "flex-1 overflow-hidden flex flex-col relative z-20 transition-all duration-500",
                     isZenMode ? "bg-white dark:bg-slate-900" : ""
                 )}>
-                    <div className="flex-1 overflow-hidden flex flex-col transition-all duration-500">
-                        {isError ? (
-                            <ErrorDisplay error={error?.message || null} onRetry={() => goToPage(page)} variant="full" />
-                        ) : (
-                            <>
-                                <InventoryViewRenderer
-                                    activeView={activeView}
-                                    products={products}
-                                    isLoading={isLoading}
-                                    isDesktop={isDesktop}
-                                    displayMode={displayMode}
-                                    selectedProduct={selectedProduct}
-                                    searchTerm={searchTerm}
-                                    setSearchTerm={handleSearch}
-                                    setActiveView={setActiveView}
-                                    setSelectedProduct={setSelectedProduct}
-                                    handleEdit={handleEdit}
-                                    deleteProduct={deleteProduct}
-                                    handleSmartImportConfirm={handleSmartImportConfirm}
-                                    onMaximizeProduct={() => setIsDetailsMaximized(true)}
-                                />
-                                {activeView === 'products' && (
-                                    <ServerPaginationBar
-                                        page={page}
-                                        totalPages={totalPages}
-                                        totalCount={totalCount}
-                                        pageSize={pageSize}
-                                        isFetching={isFetching}
-                                        onPageChange={goToPage}
-                                        onPageSizeChange={setPageSize}
-                                        pageSizeOptions={[25, 50, 100, 200]}
+                    <ContentContainer>
+                        {/* Wide Desktop: Split View — detail pane + table side by side */}
+                        {showSplitDetail ? (
+                            <div className="flex-1 flex overflow-hidden gap-0">
+                                {/* Detail Pane — left side on RTL */}
+                                <div className="w-[480px] 4xl:w-[560px] 5xl:w-[640px] border-l border-[var(--app-border)] overflow-y-auto custom-scrollbar bg-[var(--app-surface)]">
+                                    <div className="p-4">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="font-bold text-sm text-[var(--app-text)]">تفاصيل المنتج</h3>
+                                            <button
+                                                onClick={() => setSelectedProduct(null)}
+                                                className="p-1.5 rounded-lg hover:bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] transition-colors"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                        <ProductDetailPane
+                                            product={selectedProduct}
+                                            onEdit={handleEdit}
+                                        />
+                                    </div>
+                                </div>
+                                {/* Table/Grid — right side */}
+                                <div className="flex-1 overflow-hidden flex flex-col min-w-0">
+                                    <InventoryViewRenderer
+                                        activeView={activeView}
+                                        products={products}
+                                        isLoading={isLoading}
+                                        isDesktop={isDesktop}
+                                        displayMode={displayMode}
+                                        selectedProduct={selectedProduct}
+                                        searchTerm={searchTerm}
+                                        setSearchTerm={handleSearch}
+                                        setActiveView={setActiveView}
+                                        setSelectedProduct={setSelectedProduct}
+                                        handleEdit={handleEdit}
+                                        deleteProduct={deleteProduct}
+                                        handleSmartImportConfirm={handleSmartImportConfirm}
+                                        onMaximizeProduct={() => setIsDetailsMaximized(true)}
                                     />
+                                    {activeView === 'products' && (
+                                        <ServerPaginationBar
+                                            page={page}
+                                            totalPages={totalPages}
+                                            totalCount={totalCount}
+                                            pageSize={pageSize}
+                                            isFetching={isFetching}
+                                            onPageChange={goToPage}
+                                            onPageSizeChange={setPageSize}
+                                            pageSizeOptions={[25, 50, 100, 200]}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            /* Standard Layout: single column */
+                            <div className="flex-1 overflow-hidden flex flex-col transition-all duration-500">
+                                {isError ? (
+                                    <ErrorDisplay error={error?.message || null} onRetry={() => goToPage(page)} variant="full" />
+                                ) : (
+                                    <>
+                                        <InventoryViewRenderer
+                                            activeView={activeView}
+                                            products={products}
+                                            isLoading={isLoading}
+                                            isDesktop={isDesktop}
+                                            displayMode={displayMode}
+                                            selectedProduct={selectedProduct}
+                                            searchTerm={searchTerm}
+                                            setSearchTerm={handleSearch}
+                                            setActiveView={setActiveView}
+                                            setSelectedProduct={setSelectedProduct}
+                                            handleEdit={handleEdit}
+                                            deleteProduct={deleteProduct}
+                                            handleSmartImportConfirm={handleSmartImportConfirm}
+                                            onMaximizeProduct={() => setIsDetailsMaximized(true)}
+                                        />
+                                        {activeView === 'products' && (
+                                            <ServerPaginationBar
+                                                page={page}
+                                                totalPages={totalPages}
+                                                totalCount={totalCount}
+                                                pageSize={pageSize}
+                                                isFetching={isFetching}
+                                                onPageChange={goToPage}
+                                                onPageSizeChange={setPageSize}
+                                                pageSizeOptions={[25, 50, 100, 200]}
+                                            />
+                                        )}
+                                    </>
                                 )}
-                            </>
+                            </div>
                         )}
-                    </div>
+                    </ContentContainer>
                 </div>
 
-                {/* Show modal if is mobile OR if desktop and explicitly maximized */}
-                {(selectedProduct && (!isDesktop || isDetailsMaximized)) && (
-                    <ProductDetailModal 
-                        product={selectedProduct} 
+                {/* Show modal on mobile/non-wide desktop, or when explicitly maximized */}
+                {(selectedProduct && (!isWideDesktop && (!isDesktop || isDetailsMaximized))) && (
+                    <ProductDetailModal
+                        product={selectedProduct}
                         onClose={() => {
                             setSelectedProduct(null);
                             setIsDetailsMaximized(false);
-                        }} 
-                        onEdit={handleEdit} 
+                        }}
+                        onEdit={handleEdit}
                     />
                 )}
 
@@ -199,4 +264,4 @@ const InventoryPage: React.FC = () => {
     );
 };
 
-export default InventoryPage;
+export default InventoryPage;

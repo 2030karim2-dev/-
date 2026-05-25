@@ -1,5 +1,6 @@
 
 import React, { Suspense, lazy } from 'react';
+import ContentContainer from '../../ui/layout/ContentContainer';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 
@@ -108,120 +109,123 @@ const DashboardPage: React.FC = () => {
             />
 
             <div className="flex-1 overflow-y-auto px-1.5 md:px-3 py-3 custom-scrollbar pb-24 relative z-10">
+                <ContentContainer>
 
-                <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <FinancialHealthScore
-                            stats={stats || { sales: '0', purchases: '0', expenses: '0', debts: '0' }}
-                            cashFlow={cashFlow}
-                            targets={targets}
-                        />
-                        <QuickActions />
-                    </div>
-                </Suspense>
-
-                <Suspense fallback={<div className="h-32 mt-3 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                    <div className="mt-3">
-                        <StatsGrid stats={stats || { sales: '0', purchases: '0', expenses: '0', debts: '0' }} />
-                    </div>
-                </Suspense>
-
-                <Suspense fallback={null}>
-                    <div className="mt-3">
-                        <AISmartNotifications stats={stats} lowStockProducts={lowStockProducts} alerts={alerts} />
-                    </div>
-                </Suspense>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                    <Suspense fallback={<ChartSkeleton />}>
-                        <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-4 rounded-2xl relative overflow-hidden group hover:border-[var(--accent)]/30 transition-all duration-500">
-                            <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-[60px] group-hover:bg-emerald-400/20 transition-all duration-700 pointer-events-none"></div>
-                            <div className="flex justify-between items-center mb-3 relative z-10">
-                                <div className="flex items-center gap-2">
-                                    <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/30">
-                                        <TrendingUp size={16} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xs font-bold text-[var(--app-text)]">
-                                            {t('sales_flow_analysis')} <span className="text-emerald-400 text-[9px]">(قطع الغيار)</span>
-                                        </h3>
-                                        <p className="text-[9px] font-bold text-[var(--app-text-secondary)]">تدفق المبيعات اليومية</p>
-                                    </div>
-                                </div>
-                                <div className="text-left bg-black/20 px-2 py-1 rounded-lg border border-white/5">
-                                    <span className={`text-sm font-bold font-mono tracking-tighter ${growthRate >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                        {growthRate > 0 ? '+' : ''}{growthRate.toFixed(1)}%
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="relative z-10">
-                                <SalesFlowChart data={salesData as any} showPeriodSelector={true} />
-                            </div>
+                    <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <FinancialHealthScore
+                                stats={stats || { sales: '0', purchases: '0', expenses: '0', debts: '0' }}
+                                cashFlow={cashFlow}
+                                targets={targets}
+                            />
+                            <QuickActions />
                         </div>
                     </Suspense>
 
-                    <GlobalErrorBoundary sectionName="الإيرادات والمصروفات">
-                        <Suspense fallback={<div className="h-[220px] min-h-[220px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                            <RevenueExpensesChart data={revenueExpensesData} />
+                    <Suspense fallback={<div className="h-32 mt-3 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                        <div className="mt-3">
+                            <StatsGrid stats={stats || { sales: '0', purchases: '0', expenses: '0', debts: '0' }} />
+                        </div>
+                    </Suspense>
+
+                    <Suspense fallback={null}>
+                        <div className="mt-3">
+                            <AISmartNotifications stats={stats} lowStockProducts={lowStockProducts} alerts={alerts} />
+                        </div>
+                    </Suspense>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 4xl:grid-cols-5 gap-3 mt-3">
+                        <Suspense fallback={<ChartSkeleton />}>
+                            <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-4 rounded-2xl relative overflow-hidden group hover:border-[var(--accent)]/30 transition-all duration-500">
+                                <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-[60px] group-hover:bg-emerald-400/20 transition-all duration-700 pointer-events-none"></div>
+                                <div className="flex justify-between items-center mb-3 relative z-10">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/30">
+                                            <TrendingUp size={16} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xs font-bold text-[var(--app-text)]">
+                                                {t('sales_flow_analysis')} <span className="text-emerald-400 text-[9px]">(قطع الغيار)</span>
+                                            </h3>
+                                            <p className="text-[9px] font-bold text-[var(--app-text-secondary)]">تدفق المبيعات اليومية</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-left bg-black/20 px-2 py-1 rounded-lg border border-white/5">
+                                        <span className={`text-sm font-bold font-mono tracking-tighter ${growthRate >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                            {growthRate > 0 ? '+' : ''}{growthRate.toFixed(1)}%
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="relative z-10">
+                                    <SalesFlowChart data={salesData as any} showPeriodSelector={true} />
+                                </div>
+                            </div>
                         </Suspense>
-                    </GlobalErrorBoundary>
 
-                    <Suspense fallback={<div className="h-40 min-h-[160px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                        <PerformanceGauge
-                            value={salesValue}
-                            target={100000}
-                            title="هدف المبيعات الشهري"
-                        />
-                    </Suspense>
+                        <GlobalErrorBoundary sectionName="الإيرادات والمصروفات">
+                            <Suspense fallback={<div className="h-[220px] min-h-[220px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                                <RevenueExpensesChart data={revenueExpensesData} />
+                            </Suspense>
+                        </GlobalErrorBoundary>
 
-                    <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                        <CashFlowWidget data={cashFlow} />
-                    </Suspense>
+                        <Suspense fallback={<div className="h-40 min-h-[160px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                            <PerformanceGauge
+                                value={salesValue}
+                                target={100000}
+                                title="هدف المبيعات الشهري"
+                            />
+                        </Suspense>
 
-                    <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                        <InventoryOverview lowStockProducts={lowStockProducts} />
-                    </Suspense>
+                        <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                            <CashFlowWidget data={cashFlow} />
+                        </Suspense>
 
-                    <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                        <QuotationSummaryWidget />
-                    </Suspense>
+                        <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                            <InventoryOverview lowStockProducts={lowStockProducts} />
+                        </Suspense>
 
-                    <Suspense fallback={<div className="h-[300px] min-h-[300px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                        <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] rounded-2xl p-4 h-[350px]">
-                            <h3 className="text-xs font-bold text-[var(--app-text)] mb-4">التصنيفات الأكثر حركة</h3>
-                            <div className="flex flex-col h-full items-center p-2">
-                                <CategoriesChart data={categoryData as any} />
+                        <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                            <QuotationSummaryWidget />
+                        </Suspense>
+
+                        <Suspense fallback={<div className="h-[300px] min-h-[300px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                            <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] rounded-2xl p-4 h-[350px]">
+                                <h3 className="text-xs font-bold text-[var(--app-text)] mb-4">التصنيفات الأكثر حركة</h3>
+                                <div className="flex flex-col h-full items-center p-2">
+                                    <CategoriesChart data={categoryData as any} />
+                                </div>
                             </div>
-                        </div>
-                    </Suspense>
+                        </Suspense>
 
-                    <Suspense fallback={<div className="h-60 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                        <TopPerformers
-                            products={topProducts as any}
-                            customers={topCustomers as any}
-                        />
-                    </Suspense>
+                        <Suspense fallback={<div className="h-60 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
+                            <TopPerformers
+                                products={topProducts as any}
+                                customers={topCustomers as any}
+                            />
+                        </Suspense>
 
-                    <Suspense fallback={null}>
-                        <WarehouseTransferSuggestions />
-                    </Suspense>
+                        <Suspense fallback={null}>
+                            <WarehouseTransferSuggestions />
+                        </Suspense>
 
-                    <Suspense fallback={null}>
-                        <CustomerSegmentation companyId="" />
-                    </Suspense>
+                        <Suspense fallback={null}>
+                            <CustomerSegmentation companyId="" />
+                        </Suspense>
 
-                    <Suspense fallback={null}>
-                        <AlertsPanel alerts={alerts as any} />
-                    </Suspense>
+                        <Suspense fallback={null}>
+                            <AlertsPanel alerts={alerts as any} />
+                        </Suspense>
 
-                    <Suspense fallback={null}>
-                        <SmartPurchaseAlert lowStockItems={lowStockProducts as any} />
-                    </Suspense>
+                        <Suspense fallback={null}>
+                            <SmartPurchaseAlert lowStockItems={lowStockProducts as any} />
+                        </Suspense>
 
-                    <Suspense fallback={null}>
-                        <SmartTargets targets={targets} />
-                    </Suspense>
-                </div>
+                        <Suspense fallback={null}>
+                            <SmartTargets targets={targets} />
+                        </Suspense>
+                    </div>
+
+                </ContentContainer>
             </div>
 
         </div>

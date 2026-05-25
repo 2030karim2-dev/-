@@ -1,8 +1,3 @@
-/**
- * POS Smart Search Hook
- * Provides debounced, instant search with popularity scoring,
- * spell correction, and comprehensive autocomplete.
- */
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../auth/store';
@@ -30,6 +25,11 @@ export interface UsePOSSearchOptions {
 
 // ── Hook ───────────────────────────────────────────────────────────
 
+/**
+ * POS Smart Search Hook
+ * Provides debounced, instant search with popularity scoring,
+ * spell correction, and comprehensive autocomplete.
+ */
 export function usePOSSearch(options: UsePOSSearchOptions = {}) {
     const {
         debounceMs = 200,
@@ -50,6 +50,7 @@ export function usePOSSearch(options: UsePOSSearchOptions = {}) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const inputRef = useRef<HTMLInputElement>(null);
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const suppressDropdownRef = useRef(false);
 
     // ── Debounce ───────────────────────────────────────────────────
     useEffect(() => {
@@ -65,7 +66,11 @@ export function usePOSSearch(options: UsePOSSearchOptions = {}) {
 
         debounceTimer.current = setTimeout(() => {
             setDebouncedQuery(query);
-            setIsDropdownOpen(true);
+            if (suppressDropdownRef.current) {
+                suppressDropdownRef.current = false;
+            } else {
+                setIsDropdownOpen(true);
+            }
         }, debounceMs);
 
         return () => {
@@ -147,6 +152,11 @@ export function usePOSSearch(options: UsePOSSearchOptions = {}) {
     }, []);
 
     const handleSelectResult = useCallback((result: POSSearchResult) => {
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+            debounceTimer.current = null;
+        }
+        suppressDropdownRef.current = true;
         setQuery(result.name_ar);
         setIsDropdownOpen(false);
         inputRef.current?.blur();

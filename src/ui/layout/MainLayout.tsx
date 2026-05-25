@@ -14,7 +14,7 @@ import { useTranslation } from '../../lib/hooks/useTranslation';
 import { useNetworkStatus } from '../../lib/hooks/useNetworkStatus';
 import { useDevice } from '../../lib/hooks/useDevice';
 import { useOrientation } from '../../lib/hooks/useOrientation';
-import { getCollapsedSidebarWidth, getMainLayoutOffsetClasses } from './sidebarSizing';
+import { getCollapsedSidebarWidth, getMainLayoutOffsetClasses, shouldPersistExpandedSidebar } from './sidebarSizing';
 import { useConnectionStore } from '../../core/store/connectionStore';
 import { Activity } from 'lucide-react';
 
@@ -23,7 +23,10 @@ const MainLayout: React.FC = () => {
   const breakpoint = useCurrentBreakpoint();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return window.innerWidth >= getBreakpointValue('md');
+    // On wide desktops (1920px+), sidebar starts expanded by default
+    const width = window.innerWidth;
+    if (width >= getBreakpointValue('3xl')) return false; // expanded
+    return width >= getBreakpointValue('md'); // collapsed on tablet+
   });
   const previousIsDesktop = useRef(isDesktop);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -45,10 +48,10 @@ const MainLayout: React.FC = () => {
     isTabletLandscape,
   }), [breakpoint, isIPad, isTabletLandscape]);
 
-  // Dynamic content max-width for large screens
+  // Dynamic content max-width for large screens — removed; handled by ContentContainer per-page
   const contentMaxWidth = useMemo(() => {
     return 'max-w-none px-0';
-  }, [breakpoint]);
+  }, []);
 
   // Padding bottom for main content (to account for mobile nav)
   const mainPaddingBottom = useMemo(() => {
@@ -59,10 +62,12 @@ const MainLayout: React.FC = () => {
 
   useEffect(() => {
     if (previousIsDesktop.current !== isDesktop) {
-      setIsSidebarCollapsed(isDesktop);
+      const isWide = shouldPersistExpandedSidebar(breakpoint);
+      // On wide screens: expand; on smaller: collapse
+      setIsSidebarCollapsed(isWide ? false : isDesktop);
       previousIsDesktop.current = isDesktop;
     }
-  }, [isDesktop]);
+  }, [isDesktop, breakpoint]);
 
   useEffect(() => {
     initializeTheme();

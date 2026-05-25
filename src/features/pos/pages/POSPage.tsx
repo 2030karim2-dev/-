@@ -237,8 +237,8 @@ const POSPage: React.FC = () => {
               onClick={() => setInStockOnly(!inStockOnly)}
               className={`
                 flex items-center justify-center gap-1.5 px-3 rounded-xl text-[10px] md:text-xs font-black transition-all active:scale-95 border-2 h-[34px] md:h-[38px] shrink-0
-                ${inStockOnly 
-                  ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20' 
+                ${inStockOnly
+                  ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
                   : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                 }
               `}
@@ -265,7 +265,7 @@ const POSPage: React.FC = () => {
       <div className="flex-1 flex overflow-hidden divide-x dark:divide-slate-800 flex-row-reverse relative">
         {/* Cart Sidebar / Mobile View */}
         <aside className={`
-          ${isDesktop ? 'w-[400px] lg:w-[450px] border-r' : (activeMobileTab === 'cart' ? 'w-full' : 'hidden')} 
+          ${isDesktop ? 'w-[380px] lg:w-[420px] xl:w-[480px] 2xl:w-[540px] 3xl:w-[600px] 5xl:w-[680px] border-r' : (activeMobileTab === 'cart' ? 'w-full' : 'hidden')}
           flex flex-col h-full bg-white dark:bg-slate-900 shadow-2xl relative z-20 transition-all duration-300 dark:border-slate-800
         `}>
           {!isDesktop && (
@@ -348,7 +348,7 @@ const POSPage: React.FC = () => {
                 إغلاق
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
               {suspendedOrders.length === 0 ? (
                 <div className="text-center py-10 text-slate-400 dark:text-slate-500">

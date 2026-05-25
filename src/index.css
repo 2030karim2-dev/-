@@ -33,8 +33,32 @@
 
   html {
     scrollbar-gutter: stable;
-    /* Base scaling for different screen sizes — smoother curve */
-    font-size: clamp(14px, calc(14px + 0.25vw), 20px);
+    /* Stepped responsive typography — more predictable than clamp */
+    font-size: 14px;
+  }
+
+  @media (min-width: 768px) {
+    html {
+      font-size: 15px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    html {
+      font-size: 16px;
+    }
+  }
+
+  @media (min-width: 1920px) {
+    html {
+      font-size: 17px;
+    }
+  }
+
+  @media (min-width: 2560px) {
+    html {
+      font-size: 18px;
+    }
   }
 
   /* تطبيق ألوان الثيم على الخلفية الأساسية */
@@ -313,13 +337,25 @@ a:focus-visible {
   }
 
   /* Slightly bigger spacing */
-  [data-theme-scope] .p-2 { padding: 0.625rem; }
-  [data-theme-scope] .p-3 { padding: 0.875rem; }
-  [data-theme-scope] .gap-2 { gap: 0.625rem; }
-  [data-theme-scope] .gap-4 { gap: 1.125rem; }
+  [data-theme-scope] .p-2 {
+    padding: 0.625rem;
+  }
+
+  [data-theme-scope] .p-3 {
+    padding: 0.875rem;
+  }
+
+  [data-theme-scope] .gap-2 {
+    gap: 0.625rem;
+  }
+
+  [data-theme-scope] .gap-4 {
+    gap: 1.125rem;
+  }
 
   /* Slightly bigger table cells */
-  table td, table th {
+  table td,
+  table th {
     padding-top: 0.875rem;
     padding-bottom: 0.875rem;
   }
@@ -348,7 +384,8 @@ a:focus-visible {
     padding: 1.25rem 1.5rem;
   }
 
-  table td, table th {
+  table td,
+  table th {
     padding-top: 1rem;
     padding-bottom: 1rem;
   }
@@ -405,7 +442,8 @@ a:focus-visible {
     font-size: 1rem;
   }
 
-  table td, table th {
+  table td,
+  table th {
     padding-top: 1.125rem;
     padding-bottom: 1.125rem;
   }
@@ -421,9 +459,17 @@ a:focus-visible {
   }
 
   /* Bigger rounded corners */
-  .rounded-xl { border-radius: 1rem; }
-  .rounded-2xl { border-radius: 1.5rem; }
-  .rounded-3xl { border-radius: 2rem; }
+  .rounded-xl {
+    border-radius: 1rem;
+  }
+
+  .rounded-2xl {
+    border-radius: 1.5rem;
+  }
+
+  .rounded-3xl {
+    border-radius: 2rem;
+  }
 }
 
 /* ============================================================
@@ -554,6 +600,44 @@ a:focus-visible {
   .icon-crisp {
     transform: translateZ(0);
     backface-visibility: hidden;
+  }
+}
+
+/* ============================================================
+   Responsive Content Density System
+   ============================================================ */
+
+/* Laptop: زيادة المسافات البيضاء بشكل مريح */
+@media (min-width: 1280px) {
+  :root {
+    --content-padding: 2rem;
+    --card-padding: 1.5rem;
+    --section-gap: 1.5rem;
+  }
+}
+
+/* Desktop: مساحات أوسع + قراءة مريحة */
+@media (min-width: 1920px) {
+  :root {
+    --content-padding: 2.5rem;
+    --card-padding: 2rem;
+    --section-gap: 2rem;
+  }
+
+  /* تحسين قابلية قراءة النصوص الطويلة */
+  .prose-container {
+    max-width: 75ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Ultra-wide: تنظيم المحتوى في أعمدة متعددة */
+@media (min-width: 2560px) {
+  :root {
+    --content-padding: 3rem;
+    --card-padding: 2.25rem;
+    --section-gap: 2.25rem;
   }
 }
 
