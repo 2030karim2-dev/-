@@ -1,6 +1,7 @@
-import React from 'react';
-import { BrainCircuit, RefreshCw, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { BrainCircuit, RefreshCw, AlertCircle, Activity } from 'lucide-react';
 import { useDebtManagement } from './hooks/useDebtManagement';
+import { AIMetricsDashboard } from './components/AIMetricsDashboard';
 import { DebtOverviewCards } from './components/debt/DebtOverviewCards';
 import { UrgentAlertsList } from './components/debt/UrgentAlertsList';
 import { SmartRemindersPanel } from './components/debt/SmartRemindersPanel';
@@ -10,6 +11,7 @@ import PageLoader from '../../ui/base/PageLoader';
 
 const AIBrainPage: React.FC = () => {
     const { loading, error, metrics, customers, alerts, reminders, refreshData } = useDebtManagement();
+    const [activeTab, setActiveTab] = useState<'debt' | 'metrics'>('debt');
 
     if (loading) return <PageLoader />;
 
@@ -28,12 +30,24 @@ const AIBrainPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                     <button
+                    <button
+                        onClick={() => setActiveTab('debt')}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === 'debt' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 bg-gray-100 hover:bg-gray-200'}`}
+                    >
+                        <BrainCircuit className="w-4 h-4" /> إدارة الديون
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('metrics')}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === 'metrics' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 bg-gray-100 hover:bg-gray-200'}`}
+                    >
+                        <Activity className="w-4 h-4" /> أداء الذكاء الاصطناعي
+                    </button>
+                    <button
                         onClick={refreshData}
                         className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                     >
-                         <RefreshCw className="w-4 h-4" /> تحديث البيانات
-                     </button>
+                    >
+                        <RefreshCw className="w-4 h-4" /> تحديث البيانات
+                    </button>
                 </div>
             </div>
 
@@ -46,9 +60,11 @@ const AIBrainPage: React.FC = () => {
                         onClick={refreshData}
                         className="mt-6 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
                     >
-                       <RefreshCw size={16} /> إعادة المحاولة
+                        <RefreshCw size={16} /> إعادة المحاولة
                     </button>
                 </div>
+            ) : activeTab === 'metrics' ? (
+                <AIMetricsDashboard />
             ) : (
                 <>
                     {/* Metrics Overview */}
@@ -56,23 +72,23 @@ const AIBrainPage: React.FC = () => {
 
                     {/* Main Content Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                         {/* Left/Middle Column - Risk Table & Reminders */}
-                         <div className="lg:col-span-2 flex flex-col gap-6">
-                              <div className="flex-1">
-                                  <CustomerRiskTable customers={customers} />
-                              </div>
-                              <div className="h-[400px]">
-                                   <SmartRemindersPanel reminders={reminders} />
-                              </div>
-                         </div>
+                        {/* Left/Middle Column - Risk Table & Reminders */}
+                        <div className="lg:col-span-2 flex flex-col gap-6">
+                            <div className="flex-1">
+                                <CustomerRiskTable customers={customers} />
+                            </div>
+                            <div className="h-[400px]">
+                                <SmartRemindersPanel reminders={reminders} />
+                            </div>
+                        </div>
 
-                         {/* Right Column - Alerts and AI Chat */}
-                         <div className="lg:col-span-1 flex flex-col gap-6 h-full">
-                              <UrgentAlertsList alerts={alerts} />
-                              <div className="flex-1 min-h-[500px]">
-                                   <DebtChatAssistant debtContext={{ metrics, customers, alerts, reminders }} />
-                              </div>
-                         </div>
+                        {/* Right Column - Alerts and AI Chat */}
+                        <div className="lg:col-span-1 flex flex-col gap-6 h-full">
+                            <UrgentAlertsList alerts={alerts} />
+                            <div className="flex-1 min-h-[500px]">
+                                <DebtChatAssistant debtContext={{ metrics, customers, alerts, reminders }} />
+                            </div>
+                        </div>
                     </div>
                 </>
             )}

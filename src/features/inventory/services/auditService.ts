@@ -124,6 +124,14 @@ export const auditService = {
         }));
         const { error } = await supabase.from('audit_items').upsert(updates as any); // using any for now since upsert requires full type OR we can map it.
         if (error) throw error;
+    },
+
+    /**
+     * Delete an item from an active audit session
+     */
+    deleteAuditItem: async (itemId: string) => {
+        const { error } = await supabase.from('audit_items').delete().eq('id', itemId);
+        if (error) throw error;
     }
 };
 

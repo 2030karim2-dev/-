@@ -73,6 +73,11 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
 
   // Debounce search: 300 ms delay before sending to server
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, []);
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
     if (debounceTimer.current) clearTimeout(debounceTimer.current);

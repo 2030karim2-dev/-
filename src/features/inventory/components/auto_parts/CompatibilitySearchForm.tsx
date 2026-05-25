@@ -1,5 +1,6 @@
 import React from 'react';
-import { Search, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import SearchInput from '../../../../ui/components/SearchInput';
 
 interface Props {
     searchInput: string;
@@ -24,18 +25,17 @@ const CompatibilitySearchForm: React.FC<Props> = ({ searchInput, setSearchInput,
                 </div>
 
                 <form onSubmit={handleSearch} className="relative w-full max-w-2xl mx-auto mt-6 group">
-                    <div className="absolute inset-y-0 right-0 pl-3 flex items-center pointer-events-none pr-5 z-20">
-                        <Search className="h-6 w-6 text-indigo-400 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors" />
-                    </div>
-                    <input
-                        type="text"
-                        className="block w-full pl-5 pr-14 py-5 border-2 border-indigo-100 dark:border-slate-700/50 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl text-base md:text-lg placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white dark:focus:border-indigo-500 shadow-2xl shadow-indigo-500/5 placeholder:text-slate-400/70"
-                        placeholder="مثال: C 2029..."
+                    <SearchInput
                         value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
+                        onChange={setSearchInput}
+                        placeholder="مثال: C 2029..."
+                        loading={isLoading}
+                        variant="primary"
+                        size="lg"
                         dir="ltr"
+                        onSubmit={handleSearch}
+                        className="w-full"
                     />
-
                     <button
                         type="submit"
                         disabled={isLoading || !searchInput.trim()}

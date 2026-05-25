@@ -3,7 +3,7 @@
 // Local Storage Persistence System
 // ============================================
 
-import { STORAGE_KEYS } from '../../constants';
+import { STORAGE_KEYS } from '../constants';
 import { logger } from '../utils/logger';
 
 // ------------------------------------------

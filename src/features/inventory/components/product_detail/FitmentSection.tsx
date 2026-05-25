@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { Car, Plus, X, Trash2, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Car, Plus, X, Trash2, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../../../auth/store';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useDebounce } from 'use-debounce';
 import { inventoryApi } from '../../api';
 import { useTranslation } from '../../../../lib/hooks/useTranslation';
 import { cn } from '../../../../core/utils';
+import SearchInput from '../../../../ui/components/SearchInput';
 
 interface Props {
     productId: string;
@@ -17,6 +19,9 @@ const FitmentSection: React.FC<Props> = ({ productId }) => {
     const [isAdding, setIsAdding] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [foundVehicles, setFoundVehicles] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchError, setSearchError] = useState(false);
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
 
     const { data: fitments, isLoading } = useQuery({
         queryKey: ['product_fitment', productId],
@@ -29,6 +34,7 @@ const FitmentSection: React.FC<Props> = ({ productId }) => {
             queryClient.invalidateQueries({ queryKey: ['product_fitment', productId] });
             setIsAdding(false);
             setSearchTerm('');
+            setFoundVehicles([]);
         }
     });
 
@@ -37,34 +43,55 @@ const FitmentSection: React.FC<Props> = ({ productId }) => {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['product_fitment', productId] })
     });
 
-    const handleSearch = async (term: string) => {
-        setSearchTerm(term);
-        if (term.length > 2) {
-            const res = await inventoryApi.searchVehicles(term);
-            setFoundVehicles(res.data || []);
-        } else {
+    // Debounced vehicle search
+    useEffect(() => {
+        if (!isAdding || debouncedSearchTerm.length < 2) {
             setFoundVehicles([]);
+            setSearchError(false);
+            return;
         }
-    };
+        setIsSearching(true);
+        setSearchError(false);
+        inventoryApi.searchVehicles(debouncedSearchTerm)
+            .then((res) => setFoundVehicles(res.data || []))
+            .catch(() => {
+                setFoundVehicles([]);
+                setSearchError(true);
+            })
+            .finally(() => setIsSearching(false));
+    }, [debouncedSearchTerm, isAdding]);
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-slate-950">
             {/* Toolbar */}
             <div className="flex justify-between items-center px-4 py-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                <div className="flex items-center gap-2">
-                    <Search size={12} className="text-slate-400" />
-                    <input
-                        type="text"
-                        placeholder="بحث سريعة..."
-                        className="bg-transparent border-none outline-none text-[10px] w-32 focus:w-48 transition-all font-bold"
-                        value={searchTerm}
-                        onChange={e => handleSearch(e.target.value)}
-                    />
+                <div className="flex-1">
+                    {isAdding && (
+                        <SearchInput
+                            value={searchTerm}
+                            onChange={setSearchTerm}
+                            placeholder="بحث سريع..."
+                            loading={isSearching}
+                            variant="minimal"
+                            size="sm"
+                            dir="ltr"
+                            onEscape={() => {
+                                setSearchTerm('');
+                                setFoundVehicles([]);
+                            }}
+                        />
+                    )}
                 </div>
-                <button 
-                    onClick={() => setIsAdding(!isAdding)} 
+                <button
+                    onClick={() => {
+                        setIsAdding(!isAdding);
+                        if (isAdding) {
+                            setSearchTerm('');
+                            setFoundVehicles([]);
+                        }
+                    }}
                     className={cn(
-                        "flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded transition-colors",
+                        "flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded transition-colors ms-2",
                         isAdding ? "bg-rose-50 text-rose-600 dark:bg-rose-900/20" : "bg-blue-50 text-blue-600 dark:bg-blue-900/20 hover:bg-blue-100"
                     )}
                 >
@@ -73,9 +100,20 @@ const FitmentSection: React.FC<Props> = ({ productId }) => {
             </div>
 
             {/* Results for adding */}
-            {isAdding && foundVehicles.length > 0 && (
+            {isAdding && (
                 <div className="max-h-32 overflow-y-auto border-b border-slate-200 dark:border-slate-800 bg-blue-50/30 dark:bg-blue-900/10">
-                    {foundVehicles.map((v: any) => (
+                    {isSearching && (
+                        <div className="p-3 text-center">
+                            <Loader2 size={14} className="animate-spin inline-block text-blue-500" />
+                            <span className="text-[10px] font-bold text-blue-500 mr-2">جاري البحث...</span>
+                        </div>
+                    )}
+                    {!isSearching && foundVehicles.length === 0 && searchTerm.length >= 2 && (
+                        <div className="p-3 text-center text-[10px] text-slate-400 font-bold">
+                            {searchError ? 'حدث خطأ أثناء البحث' : 'لا توجد سيارات مطابقة'}
+                        </div>
+                    )}
+                    {!isSearching && foundVehicles.map((v: any) => (
                         <button
                             key={v.id}
                             onClick={() => addMutation.mutate({ company_id: user?.company_id || '', product_id: productId, vehicle_id: v.id })}
@@ -136,3 +174,4 @@ const FitmentSection: React.FC<Props> = ({ productId }) => {
 };
 
 export default FitmentSection;
+

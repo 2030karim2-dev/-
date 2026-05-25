@@ -8,12 +8,29 @@ import { useConnectionStore } from '../core/store/connectionStore';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
+// Feature flags
+export const AI_FEATURES_ENABLED = import.meta.env.VITE_ENABLE_AI_FEATURES === 'true';
+export const IS_DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+
+// Validate URL format (should end with .supabase.co)
+const isValidSupabaseUrl = (url: string): boolean => {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.endsWith('.supabase.co');
+  } catch {
+    return false;
+  }
+};
+
 // Allow app to work without Supabase for development
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('[Supabase] Missing environment variables. App will run in offline/demo mode.');
+} else if (!isValidSupabaseUrl(supabaseUrl)) {
+  console.error('[Supabase] Invalid URL format. Expected: https://your-project.supabase.co');
 }
 
-export const isSupabasePlaceholder = !supabaseUrl || !supabaseAnonKey;
+export const isSupabasePlaceholder = !supabaseUrl || !supabaseAnonKey || !isValidSupabaseUrl(supabaseUrl);
 
 // Custom fetch with timeout and retry logic
 const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): Promise<Response> => {
@@ -55,10 +72,10 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
         signal,
       });
       clearTimeout(timeoutId);
-      
+
       // Notify store of success
       useConnectionStore.getState().reportSuccess();
-      
+
       return response;
     } catch (error: unknown) {
       clearTimeout(timeoutId);

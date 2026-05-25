@@ -21,6 +21,7 @@ interface InventoryViewRendererProps {
     isDesktop: boolean;
     displayMode: 'table' | 'grid';
     selectedProduct: Product | null;
+    searchTerm: string;
     setSearchTerm: (term: string) => void;
     setActiveView: (view: string) => void;
     setSelectedProduct: (product: Product | null) => void;
@@ -37,6 +38,7 @@ const InventoryViewRenderer: React.FC<InventoryViewRendererProps> = ({
     isDesktop,
     displayMode,
     selectedProduct,
+    searchTerm,
     setSearchTerm,
     setActiveView,
     setSelectedProduct,
@@ -62,7 +64,7 @@ const InventoryViewRenderer: React.FC<InventoryViewRendererProps> = ({
         case 'low_stock':
             const lowStockProducts = products.filter(p => p.stock_quantity <= (p.min_stock_level || 0) && (p.min_stock_level || 0) > 0);
             return (
-                <div className="space-y-4 h-full flex flex-col">
+                <div className="space-y-4 flex-1 min-h-0 flex flex-col">
                     <div className="bg-rose-50 border border-rose-200 p-4 rounded-xl flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-3 text-rose-800">
                             <Activity className="animate-pulse" />
@@ -86,14 +88,16 @@ const InventoryViewRenderer: React.FC<InventoryViewRendererProps> = ({
         default: // Products View
             if (isDesktop) {
                 return (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 h-full overflow-hidden">
-                        <div className={`h-full overflow-hidden flex flex-col transition-all duration-300 ${selectedProduct ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0 overflow-hidden">
+                        <div className={`flex-1 min-h-0 overflow-hidden flex flex-col transition-all duration-300 ${selectedProduct ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
                             <ProductExcelGrid
                                 products={products}
                                 isLoading={isLoading}
                                 onDelete={deleteProduct}
                                 onViewDetails={setSelectedProduct}
                                 onEdit={handleEdit}
+                                searchValue={searchTerm}
+                                onSearchChange={setSearchTerm}
                             />
                         </div>
                         {selectedProduct && (
@@ -118,6 +122,8 @@ const InventoryViewRenderer: React.FC<InventoryViewRendererProps> = ({
                     onDelete={deleteProduct}
                     onViewDetails={setSelectedProduct}
                     onEdit={handleEdit}
+                    searchValue={searchTerm}
+                    onSearchChange={setSearchTerm}
                 />
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">

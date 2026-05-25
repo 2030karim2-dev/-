@@ -124,6 +124,10 @@ export const inventoryService = {
     return auditService.saveAuditProgress(items);
   },
 
+  deleteAuditItem: async (itemId: string) => {
+    return auditService.deleteAuditItem(itemId);
+  },
+
   // ==========================================
   // Category Operations (delegated to categoryService)
   // ==========================================

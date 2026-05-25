@@ -22,6 +22,8 @@ interface Props {
     subtitle?: string;
     colorTheme?: string;
     onCellUpdate?: (rowIndex: number, accessorKey: string, value: any) => void;
+    searchValue?: string;
+    onSearchChange?: (value: string) => void;
 }
 
 const ProductExcelGrid: React.FC<Props> = ({ 
@@ -37,7 +39,9 @@ const ProductExcelGrid: React.FC<Props> = ({
     title = "المنتجات",
     subtitle = `${products.length} منتج في المستودع`,
     colorTheme = "indigo",
-    onCellUpdate
+    onCellUpdate,
+    searchValue,
+    onSearchChange
 }) => {
     const { saveProduct, bulkDeleteProducts } = useProductMutations();
     const { showToast } = useFeedbackStore();
@@ -86,7 +90,7 @@ const ProductExcelGrid: React.FC<Props> = ({
     if (isLoading) return <TableSkeleton rows={10} cols={6} />;
 
     return (
-        <div className="relative h-full flex flex-col">
+        <div className="relative h-full flex flex-col bg-white dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-none border border-slate-200/50 dark:border-slate-800/80 p-1.5 transition-all duration-300">
             {!hideBulkActions && selectedRowIds.size > 0 && (
                 <BulkActionsBar
                     selectedCount={selectedRowIds.size}
@@ -112,6 +116,8 @@ const ProductExcelGrid: React.FC<Props> = ({
                 selectedRowIds={selectedRowIds}
                 onSelectionChange={setSelectedRowIds}
                 getRowId={(p) => p.id}
+                searchValue={searchValue || ''}
+                onSearchChange={onSearchChange}
             />
 
             <ConfirmModal

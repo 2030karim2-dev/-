@@ -9,6 +9,7 @@ import { logger } from '../../../core/utils/logger';
 import { syncStore } from '../../../core/lib/sync-store';
 
 export const useProducts = (searchTerm: string = '', options: { limitNum?: number, enabled?: boolean } = {}) => {
+    const queryClient = useQueryClient();
     const { user } = useAuthStore();
     const companyId = user?.company_id;
 
@@ -34,7 +35,7 @@ export const useProducts = (searchTerm: string = '', options: { limitNum?: numbe
                 },
                 (payload: any) => {
                     logger.debug('Products', 'Inventory updated via realtime', JSON.stringify(payload));
-                    query.refetch(); // Invalidate directly via refetch
+                    queryClient.invalidateQueries({ queryKey: ['products', companyId] });
                 }
             )
             .subscribe();
@@ -42,7 +43,7 @@ export const useProducts = (searchTerm: string = '', options: { limitNum?: numbe
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [companyId, query.refetch]);
+    }, [companyId, queryClient]);
 
     const filteredProducts = useMemo(() => {
         const products = query.data || [];
@@ -198,8 +199,8 @@ export const useSearchProducts = (searchTerm: string) => {
 
     return useQuery({
         queryKey: ['products_search', companyId, searchTerm],
-        queryFn: () => (companyId && searchTerm.length > 1) 
-            ? inventoryService.searchProducts(companyId, searchTerm) 
+        queryFn: () => (companyId && searchTerm.length > 1)
+            ? inventoryService.searchProducts(companyId, searchTerm)
             : Promise.resolve([]),
         enabled: !!companyId && searchTerm.length > 1,
     });

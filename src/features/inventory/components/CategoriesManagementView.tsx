@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useInventoryCategories, useInventoryCategoryMutations } from '../hooks/index';
+import { filterByArabicSearch } from '../../../core/utils/search';
 import CategoryExcelGrid from './CategoryExcelGrid';
 import Spinner from '../../../ui/base/Spinner';
 import CategoryStats from './categories/CategoryStats';
@@ -33,7 +34,7 @@ const CategoriesManagementView: React.FC<Props> = ({ onFilterProduct }) => {
     const filteredCategories = useMemo(() => {
         if (!categories) return [];
         if (!searchQuery) return categories;
-        return categories.filter((c: any) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        return filterByArabicSearch(categories, searchQuery, (c: any) => c.name);
     }, [categories, searchQuery]);
 
     const handleAdd = (e: React.FormEvent) => {
@@ -54,10 +55,10 @@ const CategoriesManagementView: React.FC<Props> = ({ onFilterProduct }) => {
 
     return (
         <div className="space-y-2 animate-in fade-in duration-500">
-            <CategoryStats 
-                categoriesCount={categories?.length || 0} 
-                totalProducts={totalProducts} 
-                alertedCategories={alertedCategories} 
+            <CategoryStats
+                categoriesCount={categories?.length || 0}
+                totalProducts={totalProducts}
+                alertedCategories={alertedCategories}
             />
 
             <CategoryControlBar
@@ -72,7 +73,7 @@ const CategoriesManagementView: React.FC<Props> = ({ onFilterProduct }) => {
                 onOpenAICategorize={() => setIsAIModalOpen(true)}
             />
 
-            <AICategoryReviewModal 
+            <AICategoryReviewModal
                 isOpen={isAIModalOpen}
                 onClose={() => setIsAIModalOpen(false)}
                 onComplete={() => {
@@ -84,10 +85,10 @@ const CategoriesManagementView: React.FC<Props> = ({ onFilterProduct }) => {
             {displayMode === 'table' ? (
                 <CategoryExcelGrid categories={filteredCategories as Category[]} onFilterProduct={onFilterProduct} />
             ) : (
-                <CategoryGrid 
-                    categories={filteredCategories as Category[]} 
-                    onFilterProduct={onFilterProduct} 
-                    deleteCategory={deleteCategory} 
+                <CategoryGrid
+                    categories={filteredCategories as Category[]}
+                    onFilterProduct={onFilterProduct}
+                    deleteCategory={deleteCategory}
                 />
             )}
         </div>

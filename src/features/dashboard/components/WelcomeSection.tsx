@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuthStore } from '../../auth/store'; // Assuming auth store exists
 import { Calendar } from 'lucide-react';
-import { APP_NAME } from '../../../constants';
+import { APP_NAME } from '../../../core/constants';
 
 const WelcomeSection: React.FC = () => {
     const { user } = useAuthStore();

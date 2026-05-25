@@ -119,7 +119,7 @@ serve(async (req) => {
     })
 
     const chatResponse = await openai.chat.completions.create({
-      model: "google/gemini-2.0-flash-thinking-exp:free",
+      model: "google/gemini-2.5-flash",
       messages: [
         { role: "system", content: systemPrompt },
         ...messages
@@ -148,7 +148,7 @@ serve(async (req) => {
       }
 
       const secondResponse = await openai.chat.completions.create({
-        model: "google/gemini-2.0-flash-thinking-exp:free",
+        model: "google/gemini-2.5-flash",
         messages: [
            { role: "system", content: systemPrompt },
            ...updatedMessages

@@ -32,6 +32,10 @@ interface ExcelTableProps<T> {
   colorTheme?: 'blue' | 'green' | 'orange' | 'indigo';
   onExport?: (() => void) | undefined;
   showSearch?: boolean;
+  /** External search value for a "main" search box (bypasses internal client-side filtering). */
+  searchValue?: string;
+  /** Callback when the toolbar search input changes. If provided, internal search is disabled. */
+  onSearchChange?: ((value: string) => void) | undefined;
   onRowClick?: ((row: T) => void) | undefined;
   onRowDoubleClick?: ((row: T) => void) | undefined;
   onOrderChange?: ((reorderedData: T[]) => void) | undefined;
@@ -51,7 +55,7 @@ interface ExcelTableProps<T> {
 
 function ExcelTable<T>({
   columns, data, title, emptyMessage, colorTheme = 'blue',
-  onExport, showSearch = true, onRowClick, onRowDoubleClick, onOrderChange,
+  onExport, showSearch = true, searchValue, onSearchChange, onRowClick, onRowDoubleClick, onOrderChange,
   onCellUpdate, enablePagination = true, pageSize = 20,
   enableSelection = false, selectedRowIds = new Set(), onSelectionChange, getRowId,
   isRTL = false, showShortcutsPanel = false, enableResize = true, enableDrag = false,
@@ -59,6 +63,8 @@ function ExcelTable<T>({
 }: ExcelTableProps<T>) {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [internalSearch, setInternalSearch] = useState('');
+  const isMainSearch = !!onSearchChange;
+  const effectiveSearch = isMainSearch ? (searchValue ?? '') : internalSearch;
   const [isZoomed, setIsZoomed] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(showShortcutsPanel);
   const tableRef = useRef<HTMLDivElement>(null);
@@ -131,8 +137,8 @@ function ExcelTable<T>({
 
   const processedData = useMemo(() => {
     let items = [...data];
-    if (internalSearch) {
-      const term = internalSearch.toLowerCase();
+    if (!isMainSearch && effectiveSearch) {
+      const term = effectiveSearch.toLowerCase();
 
       // Helper to recursively extract text from any React element or primitive
       const getStringContent = (val: any): string => {
@@ -209,12 +215,12 @@ function ExcelTable<T>({
       });
     }
     return items;
-  }, [data, sortConfig, internalSearch, columns]);
+  }, [data, sortConfig, effectiveSearch, columns, isMainSearch]);
 
   // Reset page when search/data changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [internalSearch, data.length]);
+  }, [effectiveSearch, data.length]);
 
   const paginatedData = useMemo(() => {
     if (!enablePagination) return processedData;
@@ -445,173 +451,173 @@ function ExcelTable<T>({
   return (
     <FullscreenContainer isMaximized={isZoomed} onToggleMaximize={() => setIsZoomed(false)}>
       <div className={cn(
-        "w-full flex flex-col transition-all duration-300 relative", 
+        "w-full flex flex-col transition-all duration-300 relative",
         isZoomed ? "h-full bg-white dark:bg-slate-950 p-4" : "h-full"
       )}>
-      <ExcelTableToolbar
-        title={title}
-        currentTheme={currentTheme}
-        showSearch={showSearch}
-        internalSearch={internalSearch}
-        setInternalSearch={setInternalSearch}
-        isRTL={isRTL}
-        onExport={onExport}
-        enableResize={enableResize}
-        handleResetSize={handleResetSize}
-        isZoomed={isZoomed}
-        setIsZoomed={setIsZoomed}
-        zoomLevel={zoomLevel}
-        setZoomLevel={setZoomLevel}
-        showShortcuts={showShortcuts}
-        setShowShortcuts={setShowShortcuts}
-      />
-
-      {/* Table Wrapper with Resize Handles */}
-      <div
-        ref={tableWrapperRef}
-        className="flex-1 border border-[var(--app-border)] shadow-sm bg-[var(--app-surface)] overflow-hidden rounded-xl relative flex flex-col"
-        style={{
-          ...(customSize.width ? { width: customSize.width } : {}),
-          ...(customSize.height ? { maxHeight: customSize.height } : {}),
-          ...(position.x !== 0 || position.y !== 0 ? { transform: `translate(${position.x}px, ${position.y}px)` } : {}),
-          ...(isDragging ? { cursor: 'grabbing', opacity: 0.9 } : {})
-        }}
-        onMouseDown={handleTableDragStart}
-      >
-        {/* Resize Handles */}
-        {enableResize && !isZoomed && (
-          <>
-            {/* Top */}
-            <div
-              className="absolute top-0 left-0 right-0 h-1.5 cursor-n-resize hover:bg-blue-500/30 transition-colors z-10"
-              onMouseDown={(e) => handleWrapperResizeStart('n', e)}
-            />
-            {/* Bottom */}
-            <div
-              className="absolute bottom-0 left-0 right-0 h-1.5 cursor-s-resize hover:bg-blue-500/30 transition-colors z-10"
-              onMouseDown={(e) => handleWrapperResizeStart('s', e)}
-            />
-            {/* Left */}
-            <div
-              className="absolute top-0 bottom-0 left-0 w-1.5 cursor-w-resize hover:bg-blue-500/30 transition-colors z-10"
-              onMouseDown={(e) => handleWrapperResizeStart('w', e)}
-            />
-            {/* Right */}
-            <div
-              className="absolute top-0 bottom-0 right-0 w-1.5 cursor-e-resize hover:bg-blue-500/30 transition-colors z-10"
-              onMouseDown={(e) => handleWrapperResizeStart('e', e)}
-            />
-            {/* Corners */}
-            <div className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('nw', e)} />
-            <div className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('ne', e)} />
-            <div className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('sw', e)} />
-            <div className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('se', e)} />
-          </>
-        )}
-        {/* Drag Handle in Title */}
-        {enableDrag && !isZoomed && (
-          <div className="absolute top-2 left-2 z-20 cursor-grab active:cursor-grabbing text-[var(--app-text-secondary)] hover:text-blue-500">
-            <GripVertical size={14} />
-          </div>
-        )}
-        <div
-          ref={tableRef}
-          tabIndex={-1}
-          className="flex-1 overflow-auto custom-scrollbar outline-none"
-          onMouseDown={() => setIsMouseDown(true)}
-          onMouseUp={() => { setIsMouseDown(false); endSelection(); }}
-          onMouseLeave={() => { setIsMouseDown(false); endSelection(); }}
-        >
-          <table
-            style={{ fontSize: `${zoomLevel * 11}px` }}
-            className={cn(
-              "w-full border-collapse table-auto min-w-[800px] border-l border-t border-[var(--app-border)]",
-              isRTL ? "text-right" : "text-left"
-            )}
-          >
-            <ExcelTableHeader
-              columns={columns}
-              enableSelection={enableSelection}
-              orderedDataLength={orderedData.length}
-              selectedRowIdsSize={selectedRowIds.size}
-              toggleAllSelection={toggleAllSelection}
-              columnWidths={columnWidths}
-              handleSort={handleSort}
-              sortConfig={sortConfig}
-              isRTL={isRTL}
-              handleMouseDown={handleMouseDown}
-              isLoading={isLoading}
-            />
-            <ExcelTableBody
-              isLoading={isLoading}
-              orderedData={orderedData}
-              columns={columns}
-              enableSelection={enableSelection}
-              emptyMessage={emptyMessage}
-              selectedRowIds={selectedRowIds}
-              selection={selection}
-              getRowId={getRowId}
-              handleDragStart={handleDragStart as any}
-              handleDragEnter={handleDragEnter as any}
-              handleDragEnd={handleDragEnd as any}
-              handleDrop={handleDrop as any}
-              onRowClick={onRowClick}
-              onOrderChange={onOrderChange}
-              currentTheme={currentTheme}
-              toggleRowSelection={toggleRowSelection}
-              currentPage={currentPage}
-              itemsPerPage={itemsPerPage}
-              focusedCell={focusedCell}
-              editingCell={editingCell}
-              handleCellClick={handleCellClick}
-              handleMouseDownCell={handleMouseDownCell}
-              handleMouseEnterCell={handleMouseEnterCell}
-              onRowDoubleClick={onRowDoubleClick as any}
-              startEditing={startEditing}
-              editValue={editValue}
-              setEditValue={setEditValue}
-              saveEdit={saveEdit}
-              handleEditInputKeyDown={handleEditInputKeyDown}
-              isRTL={isRTL}
-              scrollRef={tableRef as React.RefObject<HTMLDivElement>}
-            />
-            {columns.some(c => c.footer) && (
-              <tfoot className="border-t-2 border-[var(--app-border)] bg-[var(--app-bg)]">
-                <tr>
-                  <td className="p-2 border-r border-[var(--app-border)]"></td>
-                  {columns.map((col, idx) => (
-                    <td key={idx} className={cn("p-2 text-[11px] font-bold border-r border-[var(--app-border)]", col.className)}>
-                      {col.footer ? col.footer(orderedData) : ''}
-                    </td>
-                  ))}
-                </tr>
-              </tfoot>
-            )}
-          </table>
-        </div>
-
-        <ExcelTableStatusBar
-          focusedCell={focusedCell}
-          selection={selection}
-          totalRows={orderedData.length}
-          totalCols={columns.length}
-          copySelection={copySelection}
-          pasteCells={pasteCells}
-        />
-
-        {/* Pagination Footer */}
-        <ExcelTablePagination
-          enablePagination={enablePagination}
-          totalPages={totalPages}
-          processedDataLength={processedData.length}
-          itemsPerPage={itemsPerPage}
-          setItemsPerPage={setItemsPerPage}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          isRTL={isRTL}
+        <ExcelTableToolbar
+          title={title}
           currentTheme={currentTheme}
+          showSearch={showSearch}
+          internalSearch={effectiveSearch}
+          setInternalSearch={isMainSearch ? onSearchChange! : setInternalSearch}
+          isRTL={isRTL}
+          onExport={onExport}
+          enableResize={enableResize}
+          handleResetSize={handleResetSize}
+          isZoomed={isZoomed}
+          setIsZoomed={setIsZoomed}
+          zoomLevel={zoomLevel}
+          setZoomLevel={setZoomLevel}
+          showShortcuts={showShortcuts}
+          setShowShortcuts={setShowShortcuts}
         />
-      </div>
+
+        {/* Table Wrapper with Resize Handles */}
+        <div
+          ref={tableWrapperRef}
+          className="flex-1 border border-[var(--app-border)] shadow-sm bg-[var(--app-surface)] overflow-hidden rounded-xl relative flex flex-col"
+          style={{
+            ...(customSize.width ? { width: customSize.width } : {}),
+            ...(customSize.height ? { maxHeight: customSize.height } : {}),
+            ...(position.x !== 0 || position.y !== 0 ? { transform: `translate(${position.x}px, ${position.y}px)` } : {}),
+            ...(isDragging ? { cursor: 'grabbing', opacity: 0.9 } : {})
+          }}
+          onMouseDown={handleTableDragStart}
+        >
+          {/* Resize Handles */}
+          {enableResize && !isZoomed && (
+            <>
+              {/* Top */}
+              <div
+                className="absolute top-0 left-0 right-0 h-1.5 cursor-n-resize hover:bg-blue-500/30 transition-colors z-10"
+                onMouseDown={(e) => handleWrapperResizeStart('n', e)}
+              />
+              {/* Bottom */}
+              <div
+                className="absolute bottom-0 left-0 right-0 h-1.5 cursor-s-resize hover:bg-blue-500/30 transition-colors z-10"
+                onMouseDown={(e) => handleWrapperResizeStart('s', e)}
+              />
+              {/* Left */}
+              <div
+                className="absolute top-0 bottom-0 left-0 w-1.5 cursor-w-resize hover:bg-blue-500/30 transition-colors z-10"
+                onMouseDown={(e) => handleWrapperResizeStart('w', e)}
+              />
+              {/* Right */}
+              <div
+                className="absolute top-0 bottom-0 right-0 w-1.5 cursor-e-resize hover:bg-blue-500/30 transition-colors z-10"
+                onMouseDown={(e) => handleWrapperResizeStart('e', e)}
+              />
+              {/* Corners */}
+              <div className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('nw', e)} />
+              <div className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('ne', e)} />
+              <div className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('sw', e)} />
+              <div className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('se', e)} />
+            </>
+          )}
+          {/* Drag Handle in Title */}
+          {enableDrag && !isZoomed && (
+            <div className="absolute top-2 left-2 z-20 cursor-grab active:cursor-grabbing text-[var(--app-text-secondary)] hover:text-blue-500">
+              <GripVertical size={14} />
+            </div>
+          )}
+          <div
+            ref={tableRef}
+            tabIndex={-1}
+            className="flex-1 overflow-auto custom-scrollbar outline-none"
+            onMouseDown={() => setIsMouseDown(true)}
+            onMouseUp={() => { setIsMouseDown(false); endSelection(); }}
+            onMouseLeave={() => { setIsMouseDown(false); endSelection(); }}
+          >
+            <table
+              style={{ fontSize: `${zoomLevel * 11}px` }}
+              className={cn(
+                "w-full border-collapse table-auto min-w-[800px] border-l border-t border-[var(--app-border)]",
+                isRTL ? "text-right" : "text-left"
+              )}
+            >
+              <ExcelTableHeader
+                columns={columns}
+                enableSelection={enableSelection}
+                orderedDataLength={orderedData.length}
+                selectedRowIdsSize={selectedRowIds.size}
+                toggleAllSelection={toggleAllSelection}
+                columnWidths={columnWidths}
+                handleSort={handleSort}
+                sortConfig={sortConfig}
+                isRTL={isRTL}
+                handleMouseDown={handleMouseDown}
+                isLoading={isLoading}
+              />
+              <ExcelTableBody
+                isLoading={isLoading}
+                orderedData={orderedData}
+                columns={columns}
+                enableSelection={enableSelection}
+                emptyMessage={emptyMessage}
+                selectedRowIds={selectedRowIds}
+                selection={selection}
+                getRowId={getRowId}
+                handleDragStart={handleDragStart as any}
+                handleDragEnter={handleDragEnter as any}
+                handleDragEnd={handleDragEnd as any}
+                handleDrop={handleDrop as any}
+                onRowClick={onRowClick}
+                onOrderChange={onOrderChange}
+                currentTheme={currentTheme}
+                toggleRowSelection={toggleRowSelection}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                focusedCell={focusedCell}
+                editingCell={editingCell}
+                handleCellClick={handleCellClick}
+                handleMouseDownCell={handleMouseDownCell}
+                handleMouseEnterCell={handleMouseEnterCell}
+                onRowDoubleClick={onRowDoubleClick as any}
+                startEditing={startEditing}
+                editValue={editValue}
+                setEditValue={setEditValue}
+                saveEdit={saveEdit}
+                handleEditInputKeyDown={handleEditInputKeyDown}
+                isRTL={isRTL}
+                scrollRef={tableRef as React.RefObject<HTMLDivElement>}
+              />
+              {columns.some(c => c.footer) && (
+                <tfoot className="border-t-2 border-[var(--app-border)] bg-[var(--app-bg)]">
+                  <tr>
+                    <td className="p-2 border-r border-[var(--app-border)]"></td>
+                    {columns.map((col, idx) => (
+                      <td key={idx} className={cn("p-2 text-[11px] font-bold border-r border-[var(--app-border)]", col.className)}>
+                        {col.footer ? col.footer(orderedData) : ''}
+                      </td>
+                    ))}
+                  </tr>
+                </tfoot>
+              )}
+            </table>
+          </div>
+
+          <ExcelTableStatusBar
+            focusedCell={focusedCell}
+            selection={selection}
+            totalRows={orderedData.length}
+            totalCols={columns.length}
+            copySelection={copySelection}
+            pasteCells={pasteCells}
+          />
+
+          {/* Pagination Footer */}
+          <ExcelTablePagination
+            enablePagination={enablePagination}
+            totalPages={totalPages}
+            processedDataLength={processedData.length}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            isRTL={isRTL}
+            currentTheme={currentTheme}
+          />
+        </div>
       </div>
     </FullscreenContainer>
   );

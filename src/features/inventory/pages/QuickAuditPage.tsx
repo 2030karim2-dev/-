@@ -1,10 +1,10 @@
 // ============================================
 // QuickAuditPage — صفحة التسوية السريعة للمخزون
-// تم التقسيم: UI → AuditSearchPanel + AuditItemsTable
+// تم التقسيم: UI → AuditSearchPanel + QuickAuditItemsTable
 // ============================================
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardCheck, Save } from 'lucide-react';
+import { ClipboardCheck, Save, Zap } from 'lucide-react';
 import MicroHeader from '../../../ui/base/MicroHeader';
 import Button from '../../../ui/base/Button';
 import ScannerOverlay from '../../../ui/base/ScannerOverlay';
@@ -25,6 +25,9 @@ const QuickAuditPage: React.FC = () => {
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const [adjustedItems, setAdjustedItems] = useState<AdjustedItem[]>([]);
 
+    /** toggle: عند التفعيل يُضاف الصنف فوراً بكمية = 1 لحظة مسح الباركود */
+    const [instantApprove, setInstantApprove] = useState(false);
+
     const { data: searchResults, isLoading: isLoadingSearch } = useSearchProducts(debouncedFilter);
 
     // ── Handlers ───────────────────────────────────────────────
@@ -38,10 +41,24 @@ const QuickAuditPage: React.FC = () => {
             alert('الرجاء اختيار المستودع أولاً');
             return;
         }
-        if (adjustedItems.find(i => i.product_id === product.id)) return;
+
+        // إذا كان الصنف موجوداً بالفعل، ارفع الكمية بمقدار 1 (في وضع الاعتماد الفوري)
+        const existingIndex = adjustedItems.findIndex(i => i.product_id === product.id);
+        if (existingIndex >= 0) {
+            if (instantApprove) {
+                setAdjustedItems(prev => prev.map((item, idx) =>
+                    idx === existingIndex ? { ...item, quantity: item.quantity + 1 } : item
+                ));
+                setFilter('');
+            }
+            return;
+        }
 
         const stockInfo = product.warehouse_distribution?.find((w: any) => w.warehouse_id === selectedWarehouseId);
         const currentQty = stockInfo ? stockInfo.quantity : (product.stock_quantity || 0);
+
+        // في وضع الاعتماد الفوري: الكمية الفعلية = 1، وإلا = الكمية الحالية
+        const initialQty = instantApprove ? 1 : currentQty;
 
         setAdjustedItems(prev => [{
             product_id: product.id,
@@ -53,7 +70,7 @@ const QuickAuditPage: React.FC = () => {
             size: product.size,
             warehouse_id: selectedWarehouseId,
             system_quantity: currentQty,
-            quantity: currentQty,
+            quantity: initialQty,
         }, ...prev]);
         setFilter('');
     };
@@ -82,6 +99,9 @@ const QuickAuditPage: React.FC = () => {
         );
     };
 
+    // إجمالي الفروقات
+    const totalDiff = adjustedItems.reduce((sum, i) => sum + (i.quantity - i.system_quantity), 0);
+
     // ── Render ─────────────────────────────────────────────────
     return (
         <div className="flex flex-col h-full bg-gray-50 dark:bg-slate-950">
@@ -89,18 +109,49 @@ const QuickAuditPage: React.FC = () => {
                 title="تسوية جرد سريعة"
                 icon={ClipboardCheck}
                 actions={
-                    <Button
-                        variant="success"
-                        size="sm"
-                        onClick={handleSave}
-                        isLoading={isQuickAdjusting}
-                        disabled={adjustedItems.length === 0}
-                        leftIcon={<Save size={14} />}
-                    >
-                        اعتماد التسوية ({adjustedItems.length})
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        {/* ── Toggle: اعتماد فوري ── */}
+                        <button
+                            onClick={() => setInstantApprove(v => !v)}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-black transition-all active:scale-95 ${
+                                instantApprove
+                                    ? 'bg-amber-500 text-white border-amber-500 shadow-md shadow-amber-500/25'
+                                    : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-700'
+                            }`}
+                            title="عند التفعيل: يُضاف الصنف فوراً بكمية 1 عند مسح الباركود"
+                        >
+                            <Zap size={12} strokeWidth={3} className={instantApprove ? 'animate-pulse' : ''} />
+                            {instantApprove ? 'اعتماد فوري: مفعّل' : 'اعتماد فوري'}
+                        </button>
+
+                        <Button
+                            variant="success"
+                            size="sm"
+                            onClick={handleSave}
+                            isLoading={isQuickAdjusting}
+                            disabled={adjustedItems.length === 0}
+                            leftIcon={<Save size={14} />}
+                        >
+                            اعتماد ({adjustedItems.length})
+                            {totalDiff !== 0 && (
+                                <span className={`mr-1 font-mono ${totalDiff > 0 ? 'text-emerald-200' : 'text-rose-200'}`}>
+                                    {totalDiff > 0 ? `+${totalDiff}` : totalDiff}
+                                </span>
+                            )}
+                        </Button>
+                    </div>
                 }
             />
+
+            {/* ── Instant Approve Banner ── */}
+            {instantApprove && (
+                <div className="bg-amber-500/10 border-b border-amber-200 dark:border-amber-900/30 px-4 py-2 flex items-center gap-2 shrink-0">
+                    <Zap size={13} className="text-amber-600 dark:text-amber-400 animate-pulse shrink-0" strokeWidth={3} />
+                    <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                        وضع الاعتماد الفوري مفعّل — كل صنف يُمسح يُضاف بكمية 1 تلقائياً. المسح المتكرر يرفع الكمية بمقدار 1.
+                    </p>
+                </div>
+            )}
 
             <div className="flex-1 overflow-y-auto p-4 pb-16 custom-scrollbar">
                 <div className="w-full space-y-6">

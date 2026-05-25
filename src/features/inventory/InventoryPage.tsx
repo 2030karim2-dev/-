@@ -129,7 +129,7 @@ const InventoryPage: React.FC = () => {
                     "flex-1 overflow-hidden flex flex-col relative z-20 transition-all duration-500",
                     isZenMode ? "bg-white dark:bg-slate-900" : ""
                 )}>
-                    <div className="flex-1 overflow-hidden transition-all duration-500">
+                    <div className="flex-1 overflow-hidden flex flex-col transition-all duration-500">
                         {isError ? (
                             <ErrorDisplay error={error?.message || null} onRetry={() => goToPage(page)} variant="full" />
                         ) : (
@@ -141,6 +141,7 @@ const InventoryPage: React.FC = () => {
                                     isDesktop={isDesktop}
                                     displayMode={displayMode}
                                     selectedProduct={selectedProduct}
+                                    searchTerm={searchTerm}
                                     setSearchTerm={handleSearch}
                                     setActiveView={setActiveView}
                                     setSelectedProduct={setSelectedProduct}

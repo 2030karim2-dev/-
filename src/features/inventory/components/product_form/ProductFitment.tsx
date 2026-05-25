@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Car, Plus, X, Search, Loader2 } from 'lucide-react';
+import { Car, Plus, X, Loader2 } from 'lucide-react';
+import { useDebounce } from 'use-debounce';
 import { inventoryApi } from '../../api';
 import { useTranslation } from '../../../../lib/hooks/useTranslation';
 import { useAuthStore } from '../../../auth/store';
 import { Vehicle } from '../../types';
+import SearchInput from '../../../../ui/components/SearchInput';
+import SearchDropdown from '../../../../ui/components/SearchDropdown';
 
 interface Props {
     productId?: string | undefined;
@@ -15,8 +18,11 @@ const ProductFitment: React.FC<Props> = ({ productId }) => {
     const { user } = useAuthStore();
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
-    const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<Vehicle[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchError, setSearchError] = useState(false);
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     // Fetch existing fitment
     const { data: fitments, isLoading } = useQuery({
@@ -28,21 +34,27 @@ const ProductFitment: React.FC<Props> = ({ productId }) => {
         enabled: !!productId
     });
 
-    // Search vehicles
-    const handleSearch = async (term: string) => {
-        setSearchTerm(term);
-        if (term.length < 2) {
+    // Debounced search vehicles
+    useEffect(() => {
+        if (debouncedSearchTerm.length < 2) {
             setSearchResults([]);
+            setSearchError(false);
+            setDropdownOpen(false);
             return;
         }
         setIsSearching(true);
-        try {
-            const { data } = await inventoryApi.searchVehicles(term);
-            setSearchResults(data || []);
-        } finally {
-            setIsSearching(false);
-        }
-    };
+        setSearchError(false);
+        setDropdownOpen(true);
+        inventoryApi.searchVehicles(debouncedSearchTerm)
+            .then(({ data }) => {
+                setSearchResults(data || []);
+            })
+            .catch(() => {
+                setSearchResults([]);
+                setSearchError(true);
+            })
+            .finally(() => setIsSearching(false));
+    }, [debouncedSearchTerm]);
 
     const addMutation = useMutation({
         mutationFn: (vehicleId: string) => inventoryApi.addFitment({
@@ -54,6 +66,7 @@ const ProductFitment: React.FC<Props> = ({ productId }) => {
             queryClient.invalidateQueries({ queryKey: ['product_fitment', productId] });
             setSearchTerm('');
             setSearchResults([]);
+            setDropdownOpen(false);
         }
     });
 
@@ -82,36 +95,39 @@ const ProductFitment: React.FC<Props> = ({ productId }) => {
 
             {/* Search & Add */}
             <div className="relative">
-                <div className="relative">
-                    <input
-                        type="text"
-                        value={searchTerm}
-                        onChange={(e) => handleSearch(e.target.value)}
-                        placeholder="ابحث عن سيارة (مثال: Toyota Camry)..."
-                        className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-xs font-bold focus:ring-2 focus:ring-indigo-500 outline-none"
-                    />
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    {isSearching && <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-indigo-500 animate-spin" />}
-                </div>
+                <SearchInput
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    placeholder="ابحث عن سيارة (مثال: Toyota Camry)..."
+                    loading={isSearching}
+                    variant="default"
+                    size="md"
+                    dir="ltr"
+                    onEscape={() => setDropdownOpen(false)}
+                />
 
-                {/* Search Results Dropdown */}
-                {searchResults.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-xl max-h-48 overflow-y-auto">
-                        {searchResults.map(vehicle => (
-                            <button
-                                key={vehicle.id}
-                                onClick={() => addMutation.mutate(vehicle.id)}
-                                disabled={addMutation.isPending}
-                                className="w-full text-right p-2 hover:bg-indigo-50 dark:hover:bg-slate-700 text-xs flex justify-between items-center border-b dark:border-slate-700 last:border-0"
-                            >
-                                <span className="font-bold text-gray-700 dark:text-gray-200">
-                                    {vehicle.make} {vehicle.model} ({vehicle.year_start}-{vehicle.year_end})
-                                </span>
-                                <Plus size={14} className="text-indigo-500" />
-                            </button>
-                        ))}
-                    </div>
-                )}
+                <SearchDropdown
+                    open={dropdownOpen}
+                    onClose={() => setDropdownOpen(false)}
+                    loading={isSearching}
+                    hasResults={searchResults.length > 0}
+                    emptyMessage={searchError ? 'حدث خطأ أثناء البحث' : 'لا توجد سيارات مطابقة'}
+                    className="z-10 rounded-xl shadow-xl max-h-48 overflow-y-auto"
+                >
+                    {searchResults.map(vehicle => (
+                        <button
+                            key={vehicle.id}
+                            onClick={() => addMutation.mutate(vehicle.id)}
+                            disabled={addMutation.isPending}
+                            className="w-full text-right p-2 hover:bg-indigo-50 dark:hover:bg-slate-700 text-xs flex justify-between items-center border-b dark:border-slate-700 last:border-0"
+                        >
+                            <span className="font-bold text-gray-700 dark:text-gray-200">
+                                {vehicle.make} {vehicle.model} ({vehicle.year_start}-{vehicle.year_end})
+                            </span>
+                            <Plus size={14} className="text-indigo-500" />
+                        </button>
+                    ))}
+                </SearchDropdown>
             </div>
 
             {/* List of Linked Vehicles */}

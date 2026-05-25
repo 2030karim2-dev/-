@@ -156,6 +156,19 @@ export const useInventoryMutations = () => {
         }
     });
 
+    const removeItem = useMutation({
+        mutationFn: (itemId: string) => {
+            return inventoryService.deleteAuditItem(itemId);
+        },
+        onSuccess: (_, _itemId) => {
+            queryClient.invalidateQueries({ queryKey: ['audit_session'] });
+            showToast("تم إزالة الصنف من الجلسة", 'info');
+        },
+        onError: (err: any) => {
+            showToast("فشل إزالة الصنف: " + err.message, 'error');
+        }
+    });
+
     return {
         createTransfer: transfer.mutate,
         isTransferring: transfer.isPending,
@@ -169,5 +182,7 @@ export const useInventoryMutations = () => {
         isQuickAdjusting: quickAdjust.isPending,
         addItemToAudit: addItem.mutate,
         isAddingItem: addItem.isPending,
+        removeItemFromAudit: removeItem.mutate,
+        isRemovingItem: removeItem.isPending,
     };
 };

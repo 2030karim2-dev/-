@@ -124,28 +124,30 @@ export const getProductColumns = ({
         finalColumns.push({
             header: 'إجراءات',
             accessor: (p) => (
-                <div className="flex justify-center items-center gap-1.5">
+                <div className="flex justify-center items-center gap-2">
                     {onEdit && (
                         <button
                             onClick={(e) => { e.stopPropagation(); onEdit(p); }}
-                            className="p-1.5 text-blue-600 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800/50 transition-colors border border-blue-100 dark:border-blue-800/50"
-                            title="تعديل"
+                            className="flex items-center gap-1 px-2 py-1.5 text-blue-600 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800/50 transition-all border border-blue-100 dark:border-blue-800/50 active:scale-95 group"
+                            title="تعديل بيانات المنتج"
                         >
-                            <Edit size={13} />
+                            <Edit size={12} />
+                            <span className="text-[9px] font-bold hidden group-hover:inline">تعديل</span>
                         </button>
                     )}
                     {onDeleteRequest && (
                         <button
                             onClick={(e) => { e.stopPropagation(); onDeleteRequest(p); }}
-                            className="p-1.5 text-rose-600 bg-rose-50 dark:bg-rose-900/30 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-800/50 transition-colors border border-rose-100 dark:border-rose-800/50"
-                            title="حذف"
+                            className="flex items-center gap-1 px-2 py-1.5 text-rose-600 bg-rose-50 dark:bg-rose-900/30 rounded-lg hover:bg-rose-600 hover:text-white dark:hover:bg-rose-700 transition-all border border-rose-200 dark:border-rose-900/50 active:scale-95 group shadow-sm hover:shadow-rose-500/20 hover:shadow-md"
+                            title="حذف المنتج نهائياً (لا يمكن التراجع)"
                         >
-                            <Trash2 size={13} />
+                            <Trash2 size={12} />
+                            <span className="text-[9px] font-bold hidden group-hover:inline">حذف</span>
                         </button>
                     )}
                 </div>
             ),
-            width: 'w-24',
+            width: 'w-28',
             className: 'text-center'
         });
     }

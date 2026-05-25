@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ClipboardCheck, Save, CheckCircle, Loader2, ScanBarcode, Layers, Search } from 'lucide-react';
+import { ClipboardCheck, Save, CheckCircle, Loader2, ScanBarcode, Layers, PackageSearch } from 'lucide-react';
 import { useAuditSession, useInventoryMutations, useInventoryCategories } from '../hooks/useInventoryManagement';
 import { useSearchProducts } from '../hooks/useProducts';
 import MicroHeader from '../../../ui/base/MicroHeader';
@@ -10,12 +10,24 @@ import AuditItemsTable from '../components/audit/AuditItemsTable';
 import { useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 import ScannerOverlay from '../../../ui/base/ScannerOverlay';
+import SearchInput from '../../../ui/components/SearchInput';
+import SearchDropdown from '../../../ui/components/SearchDropdown';
+import { ConfirmModal } from '../../../ui/base/ConfirmModal';
 
 const AuditSessionPage: React.FC = () => {
     const { sessionId } = useParams<{ sessionId: string }>();
     const navigate = useNavigate();
     const { data, isLoading, isError } = useAuditSession(sessionId);
-    const { saveAuditProgress, isSavingProgress, finalizeAudit, isFinalizing, addItemToAudit, isAddingItem } = useInventoryMutations();
+    const { 
+        saveAuditProgress, 
+        isSavingProgress, 
+        finalizeAudit, 
+        isFinalizing, 
+        addItemToAudit, 
+        isAddingItem,
+        removeItemFromAudit,
+        isRemovingItem
+    } = useInventoryMutations();
     const { data: categories } = useInventoryCategories();
 
     const [filter, setFilter] = useState('');
@@ -23,6 +35,10 @@ const AuditSessionPage: React.FC = () => {
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const [debouncedFilter] = useDebounce(filter, 300);
     const [showResults, setShowResults] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+    const [isBulkAdding, setIsBulkAdding] = useState(false);
+    const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
+    const [showBulkConfirm, setShowBulkConfirm] = useState(false);
 
     const { data: searchResults, isLoading: isLoadingSearch } = useSearchProducts(debouncedFilter);
 
@@ -108,9 +124,61 @@ const AuditSessionPage: React.FC = () => {
                 setShowResults(false);
             }
         });
-    };
+     };
 
-    if (isLoading) return <div className="p-20 text-center"><Loader2 className="animate-spin text-blue-500" /></div>;
+     const confirmRemoveItem = () => {
+         if (itemToDelete) {
+             removeItemFromAudit(itemToDelete, {
+                 onSuccess: () => setItemToDelete(null)
+             });
+         }
+     };
+
+    /** إضافة كل منتجات المستودع المحدد للجلسة دفعةً واحدة */
+    const handleBulkAddWarehouseProducts = useCallback(async () => {
+        if (!sessionId || !data?.session?.warehouse_id) return;
+        const warehouseId = data.session.warehouse_id;
+        const currentItems = getValues('items') as any[];
+        const existingProductIds = new Set(currentItems.map((i: any) => i.product_id));
+
+        // جلب كل منتجات الشركة (نأخذ أكبر صفحة)
+        const { products: allProducts } = await import('../service').then(async (m) => {
+            // نستخدم inventoryService مباشرة
+            const result = await m.inventoryService.getProducts({ pageSize: 9999, page: 1, search: '' } as any);
+            return { products: Array.isArray(result) ? result : (result as any).data ?? [] };
+        }).catch(() => ({ products: [] as any[] }));
+
+        const newProducts = allProducts.filter((p: any) => !existingProductIds.has(p.id));
+        if (newProducts.length === 0) {
+            setShowBulkConfirm(false);
+            return;
+        }
+
+        setIsBulkAdding(true);
+        setBulkProgress({ current: 0, total: newProducts.length });
+
+        // حفظ التقدم الحالي أولاً
+        if (currentItems.length > 0) saveAuditProgress(currentItems);
+
+        for (let i = 0; i < newProducts.length; i++) {
+            const p = newProducts[i];
+            const stockInfo = p.warehouse_distribution?.find((w: any) => w.warehouse_id === warehouseId);
+            const expectedQuantity = stockInfo ? stockInfo.quantity : (p.stock_quantity || 0);
+            await new Promise<void>((resolve) => {
+                addItemToAudit(
+                    { sessionId, productId: p.id, expectedQuantity },
+                    { onSuccess: resolve, onError: () => resolve() }
+                );
+            });
+            setBulkProgress({ current: i + 1, total: newProducts.length });
+        }
+
+        setIsBulkAdding(false);
+        setShowBulkConfirm(false);
+        setBulkProgress({ current: 0, total: 0 });
+    }, [sessionId, data, getValues, saveAuditProgress, addItemToAudit]);
+
+     if (isLoading) return <div className="p-20 text-center"><Loader2 className="animate-spin text-blue-500" /></div>;
     if (isError) return <div>حدث خطأ أثناء تحميل بيانات الجرد.</div>;
 
     const session = data?.session;
@@ -122,8 +190,24 @@ const AuditSessionPage: React.FC = () => {
                 icon={ClipboardCheck}
                 actions={
                     <div className="flex gap-2">
+                        {session?.status !== 'completed' && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowBulkConfirm(true)}
+                                isLoading={isBulkAdding}
+                                leftIcon={isBulkAdding
+                                    ? <Loader2 size={14} className="animate-spin" />
+                                    : <PackageSearch size={14} />}
+                                title="إضافة كل منتجات المستودع للجلسة"
+                            >
+                                {isBulkAdding
+                                    ? `${bulkProgress.current}/${bulkProgress.total}`
+                                    : 'جرد كامل'}
+                            </Button>
+                        )}
                         <Button variant="outline" size="sm" onClick={handleSave} isLoading={isSavingProgress} leftIcon={<Save size={14} />}>
-                            حفظ التقدم
+                            حفظ
                         </Button>
                         <Button
                             variant="success"
@@ -133,7 +217,7 @@ const AuditSessionPage: React.FC = () => {
                             disabled={session?.status === 'completed'}
                             leftIcon={<CheckCircle size={14} />}
                         >
-                            {session?.status === 'completed' ? 'تم الإغلاق' : 'إنهاء وترحيل الفروقات'}
+                            {session?.status === 'completed' ? 'تم الإغلاق' : 'إنهاء وترحيل'}
                         </Button>
                     </div>
                 }
@@ -144,34 +228,37 @@ const AuditSessionPage: React.FC = () => {
                 <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-4 sticky top-0 z-40 shadow-sm">
                     <div className="max-w-[1600px] mx-auto relative">
                         <div className="flex gap-2 relative">
-                            <div className="relative flex-1">
-                                <input
-                                    type="text"
-                                    placeholder="ابحث عن صنف لجرده (مسح باركود، رقم قطعة، أو اسم)..."
-                                    value={filter}
-                                    onChange={(e) => {
-                                        setFilter(e.target.value);
-                                        setShowResults(true);
-                                    }}
-                                    onFocus={() => setShowResults(true)}
-                                    className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl py-3 px-10 text-sm font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
-                                />
-                                <Search className="absolute right-3 top-3.5 text-gray-400" size={18} />
-                                {(isLoadingSearch || isAddingItem) && (
-                                    <Loader2 className="absolute left-3 top-3.5 text-blue-500 animate-spin" size={18} />
-                                )}
-                            </div>
+                            <SearchInput
+                                value={filter}
+                                onChange={(val) => {
+                                    setFilter(val);
+                                    if (val.trim()) setShowResults(true);
+                                }}
+                                placeholder="ابحث عن صنف لجرده (مسح باركود، رقم قطعة، أو اسم)..."
+                                loading={isLoadingSearch || isAddingItem}
+                                variant="default"
+                                size="md"
+                                className="flex-1"
+                                onEscape={() => setShowResults(false)}
+                            />
                             <button
                                 onClick={() => setIsScannerOpen(true)}
-                                className="flex items-center justify-center bg-blue-600 text-white w-12 rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+                                className="flex items-center justify-center bg-blue-600 text-white w-12 rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all shrink-0"
                             >
                                 <ScanBarcode size={22} />
                             </button>
                         </div>
 
                         {/* Search Results Dropdown */}
-                        {showResults && filter && (searchResults && searchResults.length > 0) && (
-                            <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-white dark:bg-slate-900 shadow-2xl border-2 border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-[60vh] overflow-y-auto">
+                        <SearchDropdown
+                            open={showResults && !!filter.trim()}
+                            onClose={() => setShowResults(false)}
+                            loading={isLoadingSearch || isAddingItem}
+                            hasResults={(searchResults?.length ?? 0) > 0}
+                            emptyMessage="لا توجد نتائج مطابقة"
+                            className="z-50"
+                        >
+                            <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
                                 <table className="w-full text-right text-xs border-collapse">
                                     <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0">
                                         <tr className="text-slate-600 dark:text-gray-300">
@@ -181,10 +268,13 @@ const AuditSessionPage: React.FC = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-                                        {searchResults.map((p: any) => (
+                                        {searchResults?.map((p: any) => (
                                             <tr 
                                                 key={p.id} 
-                                                onClick={() => handleAddItem(p)}
+                                                onClick={() => {
+                                                    handleAddItem(p);
+                                                    setShowResults(false);
+                                                }}
                                                 className="hover:bg-blue-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
                                             >
                                                 <td className="py-3 px-4 font-bold">{p.name_ar || p.name}</td>
@@ -195,7 +285,7 @@ const AuditSessionPage: React.FC = () => {
                                     </tbody>
                                 </table>
                             </div>
-                        )}
+                        </SearchDropdown>
                     </div>
                 </div>
             )}
@@ -233,6 +323,7 @@ const AuditSessionPage: React.FC = () => {
                         filter={""} 
                         category={selectedCategory}
                         isCompleted={session?.status === 'completed'}
+                        onRemoveItem={setItemToDelete}
                     />
                 </div>
             </div>
@@ -243,6 +334,27 @@ const AuditSessionPage: React.FC = () => {
                     onClose={() => setIsScannerOpen(false)} 
                 />
             )}
+
+            <ConfirmModal
+                isOpen={!!itemToDelete}
+                onClose={() => setItemToDelete(null)}
+                onConfirm={confirmRemoveItem}
+                title="إزالة الصنف من الجرد"
+                message="هل أنت متأكد من رغبتك في إزالة هذا الصنف من جلسة الجرد الميداني الحالية؟"
+                variant="danger"
+                confirmLabel="نعم، إزالة الصنف"
+                isLoading={isRemovingItem}
+            />
+
+            <ConfirmModal
+                isOpen={showBulkConfirm}
+                onClose={() => setShowBulkConfirm(false)}
+                onConfirm={handleBulkAddWarehouseProducts}
+                title="جرد كامل المستودع"
+                message="سيتم إضافة جميع منتجات هذا المستودع إلى جلسة الجرد الحالية تلقائياً. هذه العملية قد تستغرق بعض الوقت. هل تريد المتابعة؟"
+                variant="warning"
+                confirmLabel="نعم، أضف كل المنتجات"
+            />
         </div>
     );
 };

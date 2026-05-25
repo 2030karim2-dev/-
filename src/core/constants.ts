@@ -34,3 +34,17 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 'ai-brain', labelKey: 'ai_brain', icon: Brain, path: '/ai-brain', color: 'purple' },
   { id: 'settings', labelKey: 'settings', icon: Settings, path: ROUTES.DASHBOARD.SETTINGS, isOwner: true, color: 'slate' },
 ];
+
+export const APP_NAME = 'Alzhra Smart';
+export const APP_VERSION = '1.0.0';
+export const APP_DESCRIPTION = 'نظام متكامل لإدارة الأعمال';
+
+export const STORAGE_KEYS = {
+  AUTH_TOKEN: 'auth_token',
+  USER_DATA: 'user_data',
+  COMPANY_DATA: 'company_data',
+  THEME: 'theme',
+  LANGUAGE: 'language',
+  SIDEBAR_COLLAPSED: 'sidebar_collapsed',
+  LAST_INVOICE_NUMBER: 'last_invoice_number',
+} as const;

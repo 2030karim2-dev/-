@@ -1,7 +1,8 @@
 import React from 'react';
-import { Layers, Search, LayoutGrid, List, Sparkles } from 'lucide-react';
+import { Layers, LayoutGrid, List, Sparkles } from 'lucide-react';
 import Button from '../../../../ui/base/Button';
 import { cn } from '../../../../core/utils';
+import SearchInput from '../../../../ui/components/SearchInput';
 
 interface Props {
     newCatName: string;
@@ -24,7 +25,7 @@ const CategoryControlBar: React.FC<Props> = ({
         <div className="flex flex-col md:flex-row gap-1.5 bg-white dark:bg-slate-900 p-1.5 border border-gray-100 dark:border-slate-800 shadow-sm">
             <form onSubmit={handleAdd} className="flex-1 flex gap-1.5">
                 <div className="relative flex-1">
-                    <Layers className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
+                    <Layers className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 z-10" size={12} />
                     <input
                         type="text"
                         value={newCatName}
@@ -36,10 +37,10 @@ const CategoryControlBar: React.FC<Props> = ({
                 <Button type="submit" isLoading={isCreating} size="sm" className="px-3 rounded-none text-[9px]">حفظ</Button>
             </form>
 
-            <Button 
+            <Button
                 onClick={onOpenAICategorize}
-                variant="ghost" 
-                size="sm" 
+                variant="ghost"
+                size="sm"
                 className="gap-2 text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-900/30 hover:bg-blue-100 rounded-none px-4"
             >
                 <Sparkles size={12} />
@@ -72,14 +73,15 @@ const CategoryControlBar: React.FC<Props> = ({
                 </button>
             </div>
 
-            <div className="relative md:w-48">
-                <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
-                <input
-                    type="text"
+            <div className="md:w-48">
+                <SearchInput
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={setSearchQuery}
                     placeholder="بحث سريع..."
-                    className="w-full bg-gray-50 dark:bg-slate-800 border-none py-2 pr-8 text-[9px] font-bold outline-none dark:text-white"
+                    variant="default"
+                    size="sm"
+                    className="h-full"
+                    inputClassName="text-[9px]"
                 />
             </div>
         </div>

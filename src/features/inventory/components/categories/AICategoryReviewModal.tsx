@@ -6,6 +6,7 @@ import { aiCategoryService, ClassificationResult } from '../../services/aiCatego
 import { useAuthStore } from '../../../auth/store';
 import { useFeedbackStore } from '../../../feedback/store';
 import { useInventoryCategories } from '../../hooks/useInventoryManagement';
+import { aiFeedback } from '../../../ai/core/feedback';
 
 interface Props {
     isOpen: boolean;
@@ -17,7 +18,7 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
     const { user } = useAuthStore();
     const { showToast } = useFeedbackStore();
     const { data: currentCategories } = useInventoryCategories();
-    
+
     const [step, setStep] = useState<'scan' | 'review' | 'applying'>('scan');
     const [results, setResults] = useState<ClassificationResult[]>([]);
     const [acceptedIds, setAcceptedIds] = useState<Set<string>>(new Set());
@@ -26,12 +27,12 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
 
     const startClassification = async () => {
         if (!user?.company_id || !currentCategories) return;
-        
+
         setIsProcessing(true);
         try {
             // Get a batch of 15 products for preview
             const uncategorized = await aiCategoryService.getUncategorizedProducts(user.company_id, 15);
-            
+
             if (uncategorized.length === 0) {
                 showToast('جميع المنتجات مصنفة بالفعل', 'info');
                 onClose();
@@ -39,10 +40,10 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
             }
 
             const classifications = await aiCategoryService.classifyBatch(
-                (uncategorized || []) as { id: string; name_ar: string }[], 
+                (uncategorized || []) as { id: string; name_ar: string }[],
                 (currentCategories || []) as { id: string; name: string }[]
             );
-            
+
             setResults(classifications);
             setAcceptedIds(new Set(classifications.map(r => r.product_id)));
             setStep('review');
@@ -56,9 +57,19 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
 
     const handleApply = async () => {
         if (!user?.company_id) return;
-        
+
         const toApply = results.filter(r => acceptedIds.has(r.product_id));
         if (toApply.length === 0) return;
+
+        // Record feedback for all results
+        results.forEach(r => {
+            aiFeedback.recordFeedback({
+                taskType: 'product_categorization',
+                originalInput: { product_id: r.product_id, name_ar: r.product_name },
+                aiOutput: { category_id: r.suggested_category_id, confidence: r.confidence },
+                userAccepted: acceptedIds.has(r.product_id)
+            });
+        });
 
         setIsProcessing(true);
         setStep('applying');
@@ -66,7 +77,7 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
             await aiCategoryService.applyChanges(user.company_id, toApply);
             showToast(`تم تحديث ${toApply.length} منتج بنجاح`, 'success');
             onComplete();
-            
+
             // Instead of closing, prepare for next batch
             setResults([]);
             setAcceptedIds(new Set());
@@ -89,11 +100,11 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
     };
 
     const updateResult = <K extends keyof ClassificationResult>(
-        id: string, 
-        field: K, 
+        id: string,
+        field: K,
         value: ClassificationResult[K]
     ) => {
-        setResults(prev => prev.map(r => 
+        setResults(prev => prev.map(r =>
             r.product_id === id ? { ...r, [field]: value } : r
         ));
     };
@@ -156,7 +167,7 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
                                     <AlertCircle size={14} />
                                     <span>تم العثور على {results.length} اقتراح، يرجى مراجعتها والموافقة عليها.</span>
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => setAcceptedIds(new Set(results.map(r => r.product_id)))}
                                     className="text-[10px] underline"
                                 >
@@ -180,8 +191,8 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
                                                 `transition-colors ${acceptedIds.has(res.product_id) ? "bg-white dark:bg-slate-900" : "bg-gray-50/50 dark:bg-slate-900/20 opacity-60"}`
                                             }>
                                                 <td className="p-3 text-center">
-                                                    <input 
-                                                        type="checkbox" 
+                                                    <input
+                                                        type="checkbox"
                                                         checked={acceptedIds.has(res.product_id)}
                                                         onChange={() => toggleAccepted(res.product_id)}
                                                         className="h-3.5 w-3.5 rounded border-gray-300 text-blue-600"
@@ -192,14 +203,14 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
                                                 </td>
                                                 <td className="p-3">
                                                     <div className="flex flex-col gap-1">
-                                                        <input 
+                                                        <input
                                                             type="text"
                                                             value={res.suggested_category_name}
                                                             onChange={(e) => updateResult(res.product_id, 'suggested_category_name', e.target.value)}
                                                             className="text-[10px] bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none py-0.5 px-0 dark:text-slate-200"
                                                         />
                                                         <label className="flex items-center gap-1 cursor-pointer">
-                                                            <input 
+                                                            <input
                                                                 type="checkbox"
                                                                 checked={res.is_new_category}
                                                                 onChange={(e) => updateResult(res.product_id, 'is_new_category', e.target.checked)}
@@ -235,10 +246,10 @@ const AICategoryReviewModal: React.FC<Props> = ({ isOpen, onClose, onComplete })
                     {step === 'review' && (
                         <div className="flex items-center gap-3">
                             <p className="text-[10px] text-gray-500 font-bold">تم اختيار {acceptedIds.size} من أصل {results.length}</p>
-                            <Button 
-                                onClick={handleApply} 
-                                isLoading={isProcessing} 
-                                size="sm" 
+                            <Button
+                                onClick={handleApply}
+                                isLoading={isProcessing}
+                                size="sm"
                                 className="px-6 rounded-none bg-blue-600 hover:bg-blue-700"
                             >
                                 <Save size={14} className="ml-2" />

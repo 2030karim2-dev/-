@@ -1,6 +1,8 @@
 import React from 'react';
 import { Search, X, Box } from 'lucide-react';
 import { cn } from '../../../../core/utils';
+import SearchInput from '../../../../ui/components/SearchInput';
+import SearchDropdown from '../../../../ui/components/SearchDropdown';
 
 interface AuditProductPickerProps {
     selectedProduct: any;
@@ -53,61 +55,59 @@ const AuditProductPicker: React.FC<AuditProductPickerProps> = ({
                         </button>
                     </div>
                 ) : (
-                    <input
-                        type="text"
-                        placeholder="ابحث عن صنف بالاسم أو الكود... (اضغط Enter للبحث)"
+                    <SearchInput
                         value={searchQuery}
+                        onChange={(val) => {
+                            setSearchQuery(val);
+                            if (val.trim()) setIsDropdownOpen(true);
+                        }}
+                        placeholder="ابحث عن صنف بالاسم أو الكود... (اضغط Enter للبحث)"
+                        variant="minimal"
+                        size="sm"
+                        clearable={false}
                         onKeyDown={handleKeyDown}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="flex-1 bg-transparent border-none outline-none text-sm font-bold placeholder:text-gray-400 dark:text-white"
+                        onEscape={() => setIsDropdownOpen(false)}
+                        className="flex-1 border-none shadow-none ring-0"
+                        inputClassName="placeholder:text-gray-400 dark:placeholder:text-slate-400"
                     />
                 )}
             </div>
 
-            {isDropdownOpen && searchQuery.trim() && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-[2rem] shadow-2xl z-[100] overflow-hidden animate-in zoom-in-95 duration-200 backdrop-blur-xl">
-                    <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
-                        {isProductsLoading ? (
-                            <div className="p-8 text-center space-y-2">
-                                <div className="w-6 h-6 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mx-auto" />
-                                <p className="text-[10px] font-bold text-gray-400">جاري البحث عن الأصناف...</p>
+            <SearchDropdown
+                open={isDropdownOpen && searchQuery.trim().length > 0}
+                onClose={() => setIsDropdownOpen(false)}
+                loading={isProductsLoading}
+                hasResults={products.length > 0}
+                emptyMessage="لا توجد نتائج مطابقة"
+                className="rounded-[2rem] backdrop-blur-xl shadow-2xl z-[100]"
+            >
+                <div className="max-h-[300px] overflow-y-auto custom-scrollbar p-2 grid grid-cols-1 gap-1">
+                    {products.map((p: any) => (
+                        <button
+                            key={p.id}
+                            onClick={() => {
+                                setSelectedProduct(p);
+                                setIsDropdownOpen(false);
+                            }}
+                            className="flex items-center justify-between p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl transition-all group text-right"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                    <Box size={16} />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold text-gray-800 dark:text-slate-200">{p.name}</p>
+                                    <p className="text-[10px] text-gray-400 font-mono mt-0.5">{p.sku}</p>
+                                </div>
                             </div>
-                        ) : products.length === 0 ? (
-                            <div className="p-8 text-center text-gray-400">
-                                <Box size={32} className="mx-auto mb-2 opacity-20" />
-                                <p className="text-xs font-bold">لا توجد نتائج مطابقة</p>
+                            <div className="text-left">
+                                <p className="text-[10px] font-bold text-emerald-600">{p.stock_quantity ?? 0} في المخزن</p>
+                                <p className="text-[9px] text-gray-400 font-bold">{p.brand || 'ماركة غير محددة'}</p>
                             </div>
-                        ) : (
-                            <div className="p-2 grid grid-cols-1 gap-1">
-                                {products.map((p: any) => (
-                                    <button
-                                        key={p.id}
-                                        onClick={() => {
-                                            setSelectedProduct(p);
-                                            setIsDropdownOpen(false);
-                                        }}
-                                        className="flex items-center justify-between p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl transition-all group text-right"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                                <Box size={16} />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-bold text-gray-800 dark:text-slate-200">{p.name}</p>
-                                                <p className="text-[10px] text-gray-400 font-mono mt-0.5">{p.sku}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-left">
-                                            <p className="text-[10px] font-bold text-emerald-600">{p.stock_quantity ?? 0} في المخزن</p>
-                                            <p className="text-[9px] text-gray-400 font-bold">{p.brand || 'ماركة غير محددة'}</p>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                        </button>
+                    ))}
                 </div>
-            )}
+            </SearchDropdown>
         </div>
     );
 };
