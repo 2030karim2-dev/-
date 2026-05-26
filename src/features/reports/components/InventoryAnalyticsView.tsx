@@ -61,6 +61,8 @@ const InventoryAnalyticsView: React.FC = () => {
         );
     }
 
+    if (!analyticsData) return <div className="p-8 text-center text-slate-500 font-bold">لا توجد تحليلات مخزون متاحة حالياً</div>;
+
     const abcData = [
         { name: 'A', value: analyticsData?.abcAnalysis?.A?.length || 0, color: '#10b981' },
         { name: 'B', value: analyticsData?.abcAnalysis?.B?.length || 0, color: '#f59e0b' },

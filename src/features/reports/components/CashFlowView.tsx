@@ -23,6 +23,10 @@ const CashFlowView: React.FC = () => {
         </div>
     );
 
+    if (!data) return (
+        <div className="p-8 text-center text-slate-500 font-bold">لا توجد بيانات تدفقات نقدية متاحة حالياً</div>
+    );
+
     // Compute latest month stats from trend data
     const trend = data?.monthlyTrend || [];
     const latestMonth = trend.length > 0 ? trend[trend.length - 1] : null;

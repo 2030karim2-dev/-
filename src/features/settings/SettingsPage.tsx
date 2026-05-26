@@ -84,7 +84,7 @@ const SettingsPage: React.FC = () => {
 
   const renderActiveSection = () => {
     switch (activeSection) {
-      case 'profile': return <PersonalProfile />;
+      case 'profile': return <PersonalProfile onNavigateToSection={setActiveSection} />;
       case 'company': return <CompanyProfile />;
       case 'financial': return <FinancialSettings />;
       case 'invoice': return <InvoiceSettings />;

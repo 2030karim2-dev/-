@@ -345,5 +345,10 @@
   "general": "General",
   "phone_number": "Phone Number",
   "email_address": "Email Address",
-  "address": "Address"
+  "address": "Address",
+  "tax_number": "Tax Number",
+  "sales_and_inventory": "Sales & Inventory",
+  "financial_statements": "Financial Statements",
+  "accounting_and_debts": "Accounting & Debts",
+  "all": "All"
 }

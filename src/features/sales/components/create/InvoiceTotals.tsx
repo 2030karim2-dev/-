@@ -6,7 +6,7 @@ import { formatCurrency, cn } from '../../../../core/utils';
 import { Wallet } from 'lucide-react';
 
 const InvoiceTotals: React.FC = () => {
-    const { summary, currency } = useSalesStore();
+    const { summary, currency, notes, setMetadata } = useSalesStore();
 
     return (
         <div className="p-2 md:p-3 bg-white dark:bg-slate-900 border-t-2 border-gray-100 dark:border-slate-800">
@@ -16,6 +16,8 @@ const InvoiceTotals: React.FC = () => {
                     <textarea
                         className="w-full h-full mt-2 bg-transparent text-xs font-bold outline-none resize-none"
                         placeholder="أضف أي ملاحظات أو شروط خاصة بالفاتورة هنا..."
+                        value={notes}
+                        onChange={(e) => setMetadata('notes', e.target.value)}
                     />
                 </div>
 

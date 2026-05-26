@@ -243,6 +243,129 @@ export const useTableKeyboardNavigation = <T,>({
         // Selection is finalized
     }, []);
 
+    const handleNavigationKeys = useCallback((e: KeyboardEvent, row: number, col: number, isShift: boolean, isCtrl: boolean) => {
+        switch (e.key) {
+            case 'ArrowUp':
+                e.preventDefault();
+                moveFocus(row - 1, col);
+                return true;
+            case 'ArrowDown':
+                e.preventDefault();
+                moveFocus(row + 1, col);
+                return true;
+            case 'ArrowLeft': {
+                e.preventDefault();
+                const delta = getLeftRightDelta(false);
+                if (isShift && selection) {
+                    const newCol = wrapCol(col + delta);
+                    setSelection({ ...selection, end: { row, col: newCol } });
+                } else {
+                    moveFocus(row, col + delta);
+                }
+                return true;
+            }
+            case 'ArrowRight': {
+                e.preventDefault();
+                const delta = getLeftRightDelta(true);
+                if (isShift && selection) {
+                    const newCol = wrapCol(col + delta);
+                    setSelection({ ...selection, end: { row, col: newCol } });
+                } else {
+                    moveFocus(row, col + delta);
+                }
+                return true;
+            }
+            case 'Home':
+                e.preventDefault();
+                if (isCtrl) {
+                    moveFocus(0, 0);
+                } else {
+                    moveFocus(row, 0);
+                }
+                return true;
+            case 'End':
+                e.preventDefault();
+                if (isCtrl) {
+                    moveFocus(maxRow, maxCol);
+                } else {
+                    moveFocus(row, maxCol);
+                }
+                return true;
+            case 'PageUp':
+                e.preventDefault();
+                moveFocus(Math.max(0, row - pageSizeRef.current), col, false);
+                return true;
+            case 'PageDown':
+                e.preventDefault();
+                moveFocus(Math.min(maxRow, row + pageSizeRef.current), col, false);
+                return true;
+            default:
+                return false;
+        }
+    }, [moveFocus, getLeftRightDelta, selection, wrapCol, maxRow, maxCol, setSelection]);
+
+    const handleEditAndActionKeys = useCallback((e: KeyboardEvent, row: number, col: number, isShift: boolean) => {
+        switch (e.key) {
+            case 'Tab':
+                e.preventDefault();
+                if (isShift) {
+                    if (col > 0) {
+                        moveFocus(row, col - 1);
+                    } else if (row > 0) {
+                        moveFocus(row - 1, columns.length - 1);
+                    }
+                } else {
+                    if (col < columns.length - 1) {
+                        moveFocus(row, col + 1);
+                    } else if (row < orderedData.length - 1) {
+                        moveFocus(row + 1, 0);
+                    }
+                }
+                return true;
+            case 'Enter':
+                e.preventDefault();
+                if (columns[col]?.isEditable) {
+                    startEditing(row, col);
+                } else if (onRowDoubleClick) {
+                    if (orderedData[row]) onRowDoubleClick(orderedData[row]);
+                } else {
+                    if (isShift) {
+                        moveFocus(row - 1, col);
+                    } else {
+                        moveFocus(row + 1, col);
+                    }
+                }
+                return true;
+            case 'Escape':
+                e.preventDefault();
+                cancelEdit();
+                return true;
+            case 'Delete':
+            case 'Backspace':
+                e.preventDefault();
+                clearCell();
+                return true;
+            default:
+                return false;
+        }
+    }, [columns, orderedData, moveFocus, startEditing, onRowDoubleClick, cancelEdit, clearCell]);
+
+    const handleClipboardKeys = useCallback((e: KeyboardEvent, isCtrl: boolean) => {
+        if (!isCtrl) return false;
+        switch (e.key) {
+            case 'c':
+                e.preventDefault();
+                copySelection();
+                return true;
+            case 'v':
+                e.preventDefault();
+                pasteCells();
+                return true;
+            default:
+                return false;
+        }
+    }, [copySelection, pasteCells]);
+
     useEffect(() => {
         const tableEl = tableRef.current;
         if (!tableEl) return;
@@ -277,144 +400,17 @@ export const useTableKeyboardNavigation = <T,>({
             const isShift = e.shiftKey;
             const isCtrl = e.ctrlKey || e.metaKey;
 
-            switch (e.key) {
-                // Arrow keys with RTL support
-                case 'ArrowUp':
-                    e.preventDefault();
-                    moveFocus(row - 1, col);
-                    break;
-                case 'ArrowDown':
-                    e.preventDefault();
-                    moveFocus(row + 1, col);
-                    break;
-                case 'ArrowLeft': {
-                    e.preventDefault();
-                    const delta = getLeftRightDelta(false);
-                    if (isShift && selection) {
-                        const newCol = wrapCol(col + delta);
-                        setSelection({ ...selection, end: { row, col: newCol } });
-                    } else {
-                        moveFocus(row, col + delta);
-                    }
-                    break;
-                }
-                case 'ArrowRight': {
-                    e.preventDefault();
-                    const delta = getLeftRightDelta(true);
-                    if (isShift && selection) {
-                        const newCol = wrapCol(col + delta);
-                        setSelection({ ...selection, end: { row, col: newCol } });
-                    } else {
-                        moveFocus(row, col + delta);
-                    }
-                    break;
-                }
-
-                // Tab navigation
-                case 'Tab':
-                    e.preventDefault();
-                    if (isShift) {
-                        // Shift+Tab: go to previous cell
-                        if (col > 0) {
-                            moveFocus(row, col - 1);
-                        } else if (row > 0) {
-                            moveFocus(row - 1, columns.length - 1);
-                        }
-                    } else {
-                        // Tab: go to next cell
-                        if (col < columns.length - 1) {
-                            moveFocus(row, col + 1);
-                        } else if (row < orderedData.length - 1) {
-                            moveFocus(row + 1, 0);
-                        }
-                    }
-                    break;
-
-                // Enter for editing
-                case 'Enter':
-                    e.preventDefault();
-                    if (columns[col]?.isEditable) {
-                        startEditing(row, col);
-                    } else if (onRowDoubleClick) {
-                        if (orderedData[row]) onRowDoubleClick(orderedData[row]);
-                    } else {
-                        // Move to next row
-                        if (isShift) {
-                            moveFocus(row - 1, col);
-                        } else {
-                            moveFocus(row + 1, col);
-                        }
-                    }
-                    break;
-
-                // Escape to cancel
-                case 'Escape':
-                    e.preventDefault();
-                    cancelEdit();
-                    break;
-
-                // Home/End for first/last column
-                case 'Home':
-                    e.preventDefault();
-                    if (isCtrl) {
-                        moveFocus(0, 0);
-                    } else {
-                        moveFocus(row, 0);
-                    }
-                    break;
-                case 'End':
-                    e.preventDefault();
-                    if (isCtrl) {
-                        moveFocus(maxRow, maxCol);
-                    } else {
-                        moveFocus(row, maxCol);
-                    }
-                    break;
-
-                // PageUp/PageDown for pagination
-                case 'PageUp':
-                    e.preventDefault();
-                    // Move up by page size (simulated - actual pagination handled by parent)
-                    moveFocus(Math.max(0, row - pageSizeRef.current), col, false);
-                    break;
-                case 'PageDown':
-                    e.preventDefault();
-                    // Move down by page size
-                    moveFocus(Math.min(maxRow, row + pageSizeRef.current), col, false);
-                    break;
-
-                // Delete to clear cell
-                case 'Delete':
-                case 'Backspace':
-                    e.preventDefault();
-                    clearCell();
-                    break;
-
-                // Ctrl+C for copy
-                case 'c':
-                    if (isCtrl) {
-                        e.preventDefault();
-                        copySelection();
-                    }
-                    break;
-
-                // Ctrl+V for paste
-                case 'v':
-                    if (isCtrl) {
-                        e.preventDefault();
-                        pasteCells();
-                    }
-                    break;
-            }
+            // Delegate to specialized handlers
+            if (handleNavigationKeys(e, row, col, isShift, isCtrl)) return;
+            if (handleEditAndActionKeys(e, row, col, isShift)) return;
+            if (handleClipboardKeys(e, isCtrl)) return;
         };
 
         tableEl.addEventListener('keydown', handleKeyDown);
         return () => tableEl.removeEventListener('keydown', handleKeyDown);
     }, [
-        focusedCell, orderedData, columns, isRTL,
-        editingCell, selection,
-        cancelEdit, clearCell, copyCells, copySelection, pasteCells,
-        startEditing, moveFocus, getLeftRightDelta, maxRow, maxCol, tableRef
+        focusedCell, editingCell,
+        cancelEdit, handleNavigationKeys, handleEditAndActionKeys, handleClipboardKeys, tableRef
     ]);
 
     return {

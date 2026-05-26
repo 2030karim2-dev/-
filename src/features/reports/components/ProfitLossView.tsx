@@ -13,12 +13,14 @@ const ProfitLossView: React.FC = () => {
 
    if (isLoading) return <div className="p-20 text-center animate-pulse">جاري تحليل الأداء المالي...</div>;
 
-   const isProfit = data?.netProfit! >= 0;
-   const totalRevenues = data?.revenues.reduce((s: number, r: any) => s + Math.abs(r.netBalance), 0) || 0;
-   const totalExpenses = data?.expenses.reduce((s: number, r: any) => s + Math.abs(r.netBalance), 0) || 0;
+   if (!data) return <div className="p-8 text-center text-slate-500 font-bold">لا توجد بيانات مالية متاحة حالياً</div>;
 
-   const displayedRevenues = showAllRevenues ? data?.revenues : data?.revenues.slice(0, 5);
-   const displayedExpenses = showAllExpenses ? data?.expenses : data?.expenses.slice(0, 5);
+   const isProfit = data?.netProfit >= 0;
+   const totalRevenues = data?.revenues?.reduce((s: number, r: any) => s + Math.abs(r.netBalance), 0) || 0;
+   const totalExpenses = data?.expenses?.reduce((s: number, r: any) => s + Math.abs(r.netBalance), 0) || 0;
+
+   const displayedRevenues = showAllRevenues ? data?.revenues : data?.revenues?.slice(0, 5);
+   const displayedExpenses = showAllExpenses ? data?.expenses : data?.expenses?.slice(0, 5);
 
    return (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">

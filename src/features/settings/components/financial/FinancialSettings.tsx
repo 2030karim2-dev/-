@@ -42,12 +42,10 @@ const FinancialSettings: React.FC = () => {
             <div className="flex items-center gap-1.5 px-1">
                <div className="w-1 h-3.5 bg-amber-500 rounded-full"></div>
                <h3 className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em]">
-                  {t.tax_discount_settings || 'إعدادات الخصومات'}
+                  {t.tax_discount_settings || 'إعدادات الخصومات والضرائب'}
                </h3>
             </div>
-            <div className="hidden">
-               <DiscountSettings />
-            </div>
+            <DiscountSettings />
          </div>
 
          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

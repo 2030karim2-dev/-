@@ -31,6 +31,7 @@ interface PurchaseState {
   // UI Settings
 
   showDiscount: boolean;
+  notes: string;
 
   // Actions
   initializeItems: (count: number) => void;
@@ -72,6 +73,7 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
   cashboxId: '',
 
   showDiscount: false,
+  notes: '',
 
   initializeItems: (count) => {
     // Only initialize if empty
@@ -178,6 +180,7 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
     invoiceType: 'cash',
     cashboxId: '',
     invoiceNumber: '',
-    issueDate: new Date().toISOString().split('T')[0]
+    issueDate: new Date().toISOString().split('T')[0],
+    notes: ''
   })
 }));

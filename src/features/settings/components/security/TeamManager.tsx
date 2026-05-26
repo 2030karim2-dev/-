@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Users, Mail, Plus, Clock, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { Users, Mail, Plus, Clock, CheckCircle, XCircle, Trash2, Loader2 } from 'lucide-react';
 import Button from '../../../../ui/base/Button';
 import Input from '../../../../ui/base/Input';
 import { useForm } from 'react-hook-form';
@@ -9,6 +9,7 @@ import { settingsApi } from '../../api';
 import { useAuthStore } from '../../../auth/store';
 import { useFeedbackStore } from '../../../feedback/store';
 import { useI18nStore } from '@/lib/i18nStore';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const TeamManager: React.FC = () => {
     const { dictionary: t } = useI18nStore();
@@ -16,16 +17,30 @@ const TeamManager: React.FC = () => {
     const { showToast } = useFeedbackStore();
     const { register, handleSubmit, reset } = useForm();
     const [isInviting, setIsInviting] = useState(false);
+    const queryClient = useQueryClient();
 
-    // ملاحظة: في النسخة الحقيقية يجب جلب هذه القائمة من جدول invitations عبر API Hook
-    const [invitations, setInvitations] = useState([
-        { id: '1', email: 'accountant@company.com', role_name: 'accountant', status: 'pending', expires_at: '2023-12-30' }
-    ]);
+    // جلب قائمة الدعوات الفعلية من قاعدة البيانات
+    const { data: invitations = [], isLoading } = useQuery({
+        queryKey: ['invitations', user?.company_id],
+        queryFn: async () => {
+            if (!user?.company_id) return [];
+            const { data, error } = await settingsApi.getInvitations(user.company_id);
+            if (error) throw error;
+            return data || [];
+        },
+        enabled: !!user?.company_id
+    });
 
-    const handleRemoveInvitation = (id: string) => {
+    const handleRemoveInvitation = async (id: string) => {
         if (window.confirm(t.confirm_delete || 'هل أنت متأكد من الحذف؟')) {
-            setInvitations(invitations.filter(i => i.id !== id));
-            showToast('تم إلغاء الدعوة بنجاح', 'success');
+            try {
+                const { error } = await settingsApi.revokeInvitation(id);
+                if (error) throw error;
+                showToast('تم إلغاء الدعوة بنجاح', 'success');
+                queryClient.invalidateQueries({ queryKey: ['invitations'] });
+            } catch (err: any) {
+                showToast(err.message || 'فشل إلغاء الدعوة', 'error');
+            }
         }
     };
 
@@ -38,13 +53,7 @@ const TeamManager: React.FC = () => {
             if (error) throw error;
 
             showToast(t.invitation_sent || 'تم إرسال الدعوة بنجاح', 'success');
-            setInvitations([...invitations, {
-                id: Date.now().toString(),
-                email: data.email,
-                role_name: data.role,
-                status: 'pending',
-                expires_at: 'قريباً'
-            }]);
+            queryClient.invalidateQueries({ queryKey: ['invitations'] });
             reset();
         } catch (err: any) {
             showToast(err.message || (t.invitation_failed || 'فشل إرسال الدعوة'), 'error');
@@ -111,28 +120,38 @@ const TeamManager: React.FC = () => {
                         {t.sent_invitations || 'الدعوات المرسلة'}
                     </h4>
                     <div className="space-y-2">
-                        {invitations.map(inv => (
-                            <MicroListItem
-                                key={inv.id}
-                                icon={inv.status === 'pending' ? Clock : (inv.status === 'accepted' ? CheckCircle : XCircle)}
-                                iconColorClass={inv.status === 'pending' ? 'text-amber-500' : (inv.status === 'accepted' ? 'text-emerald-500' : 'text-rose-500')}
-                                title={inv.email}
-                                subtitle={`${t.job_role || 'الدور'}: ${inv.role_name} | ${t.expires_at || 'صلاحية'}: ${inv.expires_at}`}
-                                tags={[
-                                    { label: inv.status === 'pending' ? (t.waiting_for_acceptance || 'بانتظار القبول') : (t.accepted || 'مقبولة'), color: inv.status === 'pending' ? 'amber' : 'emerald' }
-                                ]}
-                                actions={
-                                    inv.status === 'pending' && (
-                                        <button
-                                            onClick={() => handleRemoveInvitation(inv.id)}
-                                            className="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                    )
-                                }
-                            />
-                        ))}
+                        {isLoading ? (
+                            <div className="flex items-center justify-center p-8">
+                                <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+                            </div>
+                        ) : invitations.length > 0 ? (
+                            invitations.map((inv: any) => (
+                                <MicroListItem
+                                    key={inv.id}
+                                    icon={inv.status === 'pending' ? Clock : (inv.status === 'accepted' ? CheckCircle : XCircle)}
+                                    iconColorClass={inv.status === 'pending' ? 'text-amber-500' : (inv.status === 'accepted' ? 'text-emerald-500' : 'text-rose-500')}
+                                    title={inv.email}
+                                    subtitle={`${t.job_role || 'الدور'}: ${inv.role || inv.role_name || ''} | تاريخ الإرسال: ${inv.created_at ? new Date(inv.created_at).toLocaleDateString() : ''}`}
+                                    tags={[
+                                        { label: inv.status === 'pending' ? (t.waiting_for_acceptance || 'بانتظار القبول') : (t.accepted || 'مقبولة'), color: inv.status === 'pending' ? 'amber' : 'emerald' }
+                                    ]}
+                                    actions={
+                                        inv.status === 'pending' && (
+                                            <button
+                                                onClick={() => handleRemoveInvitation(inv.id)}
+                                                className="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        )
+                                    }
+                                />
+                            ))
+                        ) : (
+                            <div className="p-8 text-center text-[10px] font-bold text-gray-400 uppercase">
+                                لا توجد دعوات مرسلة حالياً
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

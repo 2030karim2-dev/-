@@ -259,7 +259,7 @@ const InventoryMovementView: React.FC = () => {
                             <div className="h-full w-full">
                                 <ResponsiveContainer width="100%" height={200} minWidth={1} minHeight={1}>
                                     <AreaChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                                        <XAxis dataKey="entry_date" hide />
+                                        <XAxis dataKey="date" hide />
                                         <YAxis hide />
                                         <defs>
                                             <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">

@@ -132,6 +132,7 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
 // Create a mock client for development without Supabase
 const createMockClient = () => {
   return {
+    // Minimal mock of Supabase client methods used in the app
     from: () => ({
       select: () => Promise.resolve({ data: [], error: null }),
       insert: () => Promise.resolve({ data: null, error: null }),
@@ -142,8 +143,16 @@ const createMockClient = () => {
       getSession: () => Promise.resolve({ data: { session: null }, error: null }),
       signInWithPassword: () => Promise.resolve({ data: null, error: null }),
       signOut: () => Promise.resolve({ error: null }),
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
     },
+    // Add a mock realtime channel to prevent "supabase.channel is not a function" errors
+    channel: () => ({
+      subscribe: (callback: any) => {
+        // No-op subscription; immediately invoke the callback with empty payload
+        if (callback?.on) callback.on('postgres_changes', () => {});
+        return { unsubscribe: () => {} };
+      },
+    }),
   };
 };
 

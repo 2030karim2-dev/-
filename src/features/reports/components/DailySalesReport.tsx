@@ -144,7 +144,9 @@ const DailySalesReport: React.FC = () => {
 
     if (isLoading) return <div className="p-20 text-center animate-pulse">جاري تحليل بيانات المبيعات...</div>;
 
-    const displayInvoices = showAllInvoices ? data?.invoices : data?.invoices.slice(0, 10);
+    if (!data) return <div className="p-8 text-center text-slate-500 font-bold">لا توجد بيانات مبيعات متاحة حالياً</div>;
+
+    const displayInvoices = showAllInvoices ? data?.invoices : data?.invoices?.slice(0, 10);
 
     return (
         <div className="space-y-3">

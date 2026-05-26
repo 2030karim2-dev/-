@@ -9,19 +9,23 @@ import ToggleSwitch from './ToggleSwitch';
 const NotificationSettings: React.FC = () => {
   const { showToast } = useFeedbackStore();
   const [isSaving, setIsSaving] = useState(false);
-  const [prefs, setPrefs] = useState({
-    stock: true,
-    debt: true,
-    marketing: false,
-    system: true
+  const [prefs, setPrefs] = useState(() => {
+    const stored = localStorage.getItem('alz_notification_prefs');
+    return stored ? JSON.parse(stored) : {
+      stock: true,
+      debt: true,
+      marketing: false,
+      system: true
+    };
   });
 
   const handleSave = () => {
     setIsSaving(true);
     setTimeout(() => {
+      localStorage.setItem('alz_notification_prefs', JSON.stringify(prefs));
       setIsSaving(false);
-      showToast("تم حفظ تفضيلات الإشعارات", 'success');
-    }, 1000);
+      showToast("تم حفظ تفضيلات الإشعارات بنجاح ✓", 'success');
+    }, 600);
   };
 
   const settings = [

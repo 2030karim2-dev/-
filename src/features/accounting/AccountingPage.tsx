@@ -1,4 +1,5 @@
 import React, {  useMemo, Suspense, lazy } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 // Fix: Corrected import path to point to the barrel file.
 import { useJournalMutation, useAccountingView } from './hooks/index';
 import { AccountingView } from './types/index';
@@ -22,6 +23,7 @@ const BalanceSheet = lazy(() => import('./components/reports/BalanceSheet'));
 const AddJournalEntryModal = lazy(() => import('./components/journals/AddJournalEntryModal'));
 
 const AccountingPage: React.FC = () => {
+  const queryClient = useQueryClient();
   const {
     activeView,
     setActiveView,
@@ -97,12 +99,24 @@ const AccountingPage: React.FC = () => {
             />
           </div>
         </div>
-        <button className="p-1 text-blue-400 hover:text-blue-600 transition-colors">
+        <button
+          onClick={() => {
+            const defaultFrom = new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
+            const defaultTo = new Date().toISOString().split('T')[0];
+            setDateRange({ from: defaultFrom, to: defaultTo });
+            queryClient.invalidateQueries({ queryKey: ['ledger'] });
+            queryClient.invalidateQueries({ queryKey: ['trial_balance'] });
+            queryClient.invalidateQueries({ queryKey: ['financials'] });
+            queryClient.invalidateQueries({ queryKey: ['treasury'] });
+          }}
+          className="p-1 text-blue-400 hover:text-blue-600 transition-colors active:rotate-180 duration-500"
+          title="إعادة ضبط الفلتر وتحديث البيانات"
+        >
           <RefreshCw size={12} />
         </button>
       </div>
     );
-  }, [activeView, dateRange, setDateRange, t]);
+  }, [activeView, dateRange, setDateRange, t, queryClient]);
 
   const renderContent = () => {
     switch (activeView) {

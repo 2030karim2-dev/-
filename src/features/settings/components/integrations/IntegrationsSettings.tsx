@@ -1,19 +1,33 @@
 // Integrations Settings Component
-import React from 'react';
+import React, { useState } from 'react';
 import { Link,  Mail, MessageSquare,  Key, Save, CheckCircle, XCircle } from 'lucide-react';
 import { useSettingsStore } from '../../settingsStore';
 import { useI18nStore } from '@/lib/i18nStore';
 import Card from '@/ui/base/Card';
 import MessagingIntegration from './MessagingIntegration';
 import { useAuthStore } from '@/features/auth/store';
+import { useFeedbackStore } from '../../../feedback/store';
 
 export const IntegrationsSettings: React.FC = () => {
     const { dictionary: t } = useI18nStore();
     const { integration, setIntegrationSettings } = useSettingsStore();
     const companyId = useAuthStore(s => s.user?.company_id);
+    const { showToast } = useFeedbackStore();
+    const [saved, setSaved] = useState(false);
 
     const handleUpdate = (updates: Partial<typeof integration>) => {
         setIntegrationSettings(updates);
+    };
+
+    const handleSave = () => {
+        setSaved(true);
+        showToast('تم حفظ إعدادات التكامل بنجاح ✓', 'success');
+        setTimeout(() => setSaved(false), 3000);
+    };
+
+    const handleCopy = (text: string, label: string) => {
+        navigator.clipboard.writeText(text);
+        showToast(`تم نسخ ${label} إلى الحافظة ✓`, 'success');
     };
 
     return (
@@ -33,9 +47,12 @@ export const IntegrationsSettings: React.FC = () => {
                         </p>
                     </div>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-                    <Save className="w-4 h-4" />
-                    <span className="text-sm font-medium">{t.save || 'حفظ'}</span>
+                <button
+                    onClick={handleSave}
+                    className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors active:scale-95 shadow-sm ${saved ? 'bg-emerald-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                >
+                    {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                    <span className="text-sm font-medium">{saved ? 'تم الحفظ ✓' : (t.save || 'حفظ')}</span>
                 </button>
             </div>
 
@@ -220,7 +237,11 @@ export const IntegrationsSettings: React.FC = () => {
                             <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                                 {t.public_key || 'المفتاح العام'}
                             </span>
-                            <button className="text-xs text-indigo-600 hover:text-indigo-700">
+                            <button
+                                type="button"
+                                onClick={() => handleCopy(integration.api_public_key || 'pk_xxxxxxxxxxxx', 'المفتاح العام')}
+                                className="text-xs text-indigo-600 hover:text-indigo-700"
+                            >
                                 {t.copy || 'نسخ'}
                             </button>
                         </div>
@@ -233,7 +254,11 @@ export const IntegrationsSettings: React.FC = () => {
                             <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                                 {t.secret_key || 'المفتاح السري'}
                             </span>
-                            <button className="text-xs text-indigo-600 hover:text-indigo-700">
+                            <button
+                                type="button"
+                                onClick={() => handleCopy(integration.api_secret_key || 'sk_xxxxxxxxxxxx', 'المفتاح السري')}
+                                className="text-xs text-indigo-600 hover:text-indigo-700"
+                            >
                                 {t.copy || 'نسخ'}
                             </button>
                         </div>

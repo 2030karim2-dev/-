@@ -1,13 +1,16 @@
 // Localization Settings Component
-import React from 'react';
-import { Globe, Languages, DollarSign, Clock, Calendar, Hash, Save } from 'lucide-react';
+import React, { useState } from 'react';
+import { Globe, Languages, DollarSign, Clock, Calendar, Hash, Save, CheckCircle } from 'lucide-react';
 import { useSettingsStore } from '../../settingsStore';
 import { useI18nStore } from '@/lib/i18nStore';
 import Card from '@/ui/base/Card';
+import { useFeedbackStore } from '../../../feedback/store';
 
 export const LocalizationSettings: React.FC = () => {
     const { dictionary: t, setLang } = useI18nStore();
     const { localization, setLocalizationSettings } = useSettingsStore();
+    const { showToast } = useFeedbackStore();
+    const [saved, setSaved] = useState(false);
 
     const handleUpdate = (updates: Partial<typeof localization>) => {
         setLocalizationSettings(updates);
@@ -16,6 +19,12 @@ export const LocalizationSettings: React.FC = () => {
     const handleLanguageChange = (lang: 'ar' | 'en') => {
         setLang(lang);
         handleUpdate({ default_language: lang });
+    };
+
+    const handleSave = () => {
+        setSaved(true);
+        showToast('تم حفظ إعدادات اللغة والموقع بنجاح ✓', 'success');
+        setTimeout(() => setSaved(false), 3000);
     };
 
     return (
@@ -35,9 +44,12 @@ export const LocalizationSettings: React.FC = () => {
                         </p>
                     </div>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
-                    <Save className="w-4 h-4" />
-                    <span className="text-sm font-medium">{t.save || 'حفظ'}</span>
+                <button
+                    onClick={handleSave}
+                    className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors active:scale-95 shadow-sm ${saved ? 'bg-emerald-600' : 'bg-teal-600 hover:bg-teal-700'}`}
+                >
+                    {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                    <span className="text-sm font-medium">{saved ? 'تم الحفظ ✓' : (t.save || 'حفظ')}</span>
                 </button>
             </div>
 

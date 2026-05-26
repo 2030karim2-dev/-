@@ -9,8 +9,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { customerApi } from '../../api';
 import CustomerTimeline from './CustomerTimeline';
 import AddActivityModal from './AddActivityModal';
+import AddNoteModal from './AddNoteModal';
 import type { Party } from '../../types';
-import type { CustomerActivityFormData } from '../../types/enhanced';
+import type { CustomerActivityFormData, CustomerNoteFormData } from '../../types/enhanced';
 import { useState } from 'react';
 
 interface CustomerTimelineModalProps {
@@ -26,6 +27,7 @@ export const CustomerTimelineModal: React.FC<CustomerTimelineModalProps> = ({
 }) => {
     const queryClient = useQueryClient();
     const [isAddActivityOpen, setIsAddActivityOpen] = useState(false);
+    const [isAddNoteOpen, setIsAddNoteOpen] = useState(false);
 
     // Fetch customer activities
     const { data: activities = [], isLoading: activitiesLoading } = useQuery({
@@ -73,15 +75,15 @@ export const CustomerTimelineModal: React.FC<CustomerTimelineModalProps> = ({
 
     // Add note mutation
     const addNoteMutation = useMutation({
-        mutationFn: (content: string) =>
+        mutationFn: (data: CustomerNoteFormData) =>
             customerApi.addNote({
-                noteType: 'general',
-                content,
+                ...data,
                 customerId: customer!.id,
                 companyId: customer!.company_id
             }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['customer-notes', customer?.id] });
+            setIsAddNoteOpen(false);
         }
     });
 
@@ -127,10 +129,7 @@ export const CustomerTimelineModal: React.FC<CustomerTimelineModalProps> = ({
                                 activities={activities}
                                 notes={notes}
                                 onAddActivity={() => setIsAddActivityOpen(true)}
-                                onAddNote={() => {
-                                    const content = prompt('أدخل الملاحظة:');
-                                    if (content) addNoteMutation.mutate(content);
-                                }}
+                                onAddNote={() => setIsAddNoteOpen(true)}
                                 onEditActivity={(activity) => {
                                     // For now, just alert. Can be expanded later
                                     alert(`تعديل النشاط: ${activity.subject}`);
@@ -154,6 +153,14 @@ export const CustomerTimelineModal: React.FC<CustomerTimelineModalProps> = ({
                 isOpen={isAddActivityOpen}
                 onClose={() => setIsAddActivityOpen(false)}
                 onSubmit={(data) => addActivityMutation.mutate(data)}
+                customerName={customer.name}
+            />
+
+            {/* Add Note Modal */}
+            <AddNoteModal
+                isOpen={isAddNoteOpen}
+                onClose={() => setIsAddNoteOpen(false)}
+                onSubmit={(data) => addNoteMutation.mutate(data)}
                 customerName={customer.name}
             />
         </>

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { User, Mail, Shield, Save, CheckCircle, Camera } from 'lucide-react';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
@@ -7,12 +7,17 @@ import Input from '../../../ui/base/Input';
 import { cn } from '../../../core/utils';
 import { supabase } from '../../../lib/supabaseClient';
 
-const PersonalProfile: React.FC = () => {
+interface PersonalProfileProps {
+    onNavigateToSection?: (section: any) => void;
+}
+
+const PersonalProfile: React.FC<PersonalProfileProps> = ({ onNavigateToSection }) => {
     const { user, login } = useAuthStore();
     const { showToast } = useFeedbackStore();
     const [fullName, setFullName] = useState(user?.full_name || '');
     const [isPending, setIsPending] = useState(false);
     const [saved, setSaved] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,11 +46,49 @@ const PersonalProfile: React.FC = () => {
         }
     };
 
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsPending(true);
+        try {
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                const base64String = reader.result as string;
+                const { data, error } = await supabase.auth.updateUser({
+                    data: { avatar_url: base64String }
+                });
+                if (error) throw error;
+
+                if (data.user) {
+                    login({
+                        ...user!,
+                        avatar_url: base64String,
+                    });
+                    showToast('تم تحديث الصورة الشخصية بنجاح ✓', 'success');
+                }
+            };
+            reader.readAsDataURL(file);
+        } catch (err: any) {
+            showToast(err.message || 'فشل تحديث الصورة الشخصية', 'error');
+        } finally {
+            setIsPending(false);
+        }
+    };
+
     const userInitial = fullName ? fullName.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U');
 
     return (
         <div className="p-3 md:p-6 animate-in fade-in duration-500">
             <div className="max-w-none mx-auto space-y-6">
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleAvatarChange}
+                    accept="image/*"
+                    className="hidden"
+                />
+
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -68,10 +111,18 @@ const PersonalProfile: React.FC = () => {
                     <div className="p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 border-b border-gray-100 dark:border-slate-800">
                         {/* Avatar Section */}
                         <div className="relative group">
-                            <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-3xl md:text-5xl font-black shadow-2xl shadow-indigo-500/30">
-                                {userInitial}
+                            <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center text-3xl md:text-5xl font-black shadow-2xl shadow-indigo-500/30 overflow-hidden">
+                                {user?.avatar_url ? (
+                                    <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    userInitial
+                                )}
                             </div>
-                            <button className="absolute -bottom-2 -right-2 p-2.5 bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 rounded-xl text-gray-400 hover:text-indigo-600 hover:scale-110 active:scale-90 transition-all shadow-lg">
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="absolute -bottom-2 -right-2 p-2.5 bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 rounded-xl text-gray-400 hover:text-indigo-600 hover:scale-110 active:scale-90 transition-all shadow-lg"
+                            >
                                 <Camera size={18} />
                             </button>
                         </div>
@@ -146,7 +197,11 @@ const PersonalProfile: React.FC = () => {
                             <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 mt-1">تأكد من استخدام كلمة مرور قوية وتغييرها دورياً</p>
                         </div>
                     </div>
-                    <button className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black rounded-lg transition-all shadow-lg shadow-amber-500/20">
+                    <button
+                        type="button"
+                        onClick={() => onNavigateToSection?.('security')}
+                        className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black rounded-lg transition-all shadow-lg shadow-amber-500/20"
+                    >
                         تغيير كلمة المرور
                     </button>
                 </div>

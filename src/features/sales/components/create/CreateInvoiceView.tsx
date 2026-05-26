@@ -24,7 +24,7 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
   const { data: nextInvoiceNumber, isLoading: numberLoading, error: numberError } = useNextInvoiceNumber();
   const {
     items, selectedCustomer, summary, resetCart, invoiceType, cashboxId, currency, exchangeRate,
-    setMetadata, setCustomer
+    setMetadata, setCustomer, notes
   } = useSalesStore();
   const { mutate: createInvoice, isPending } = useCreateInvoice();
   const { invoice: invoiceSettings } = useSettingsStore();
@@ -96,7 +96,8 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
       paymentMethod: invoiceType,
       treasuryAccountId: cashboxId,
       currency: currency || 'SAR',
-      exchangeRate: (currency === 'SAR') ? 1 : (exchangeRate || 1)
+      exchangeRate: (currency === 'SAR') ? 1 : (exchangeRate || 1),
+      notes: notes
     }, {
       onSuccess: () => {
         resetCart();
@@ -122,6 +123,7 @@ const CreateInvoiceView: React.FC<CreateInvoiceViewProps> = ({ onSuccess }) => {
     total_amount: summary.totalAmount,
     tax_amount: 0,
     currency_code: currency || 'SAR',
+    notes: notes,
   };
 
   if (companyLoading || numberLoading) return <PageLoader />;

@@ -32,10 +32,10 @@ const ReportsPage: React.FC = () => {
   const [isZenMode, setIsZenMode] = useState(false);
 
   const categories: { id: ReportCategory; label: string; icon: any; color: string }[] = [
-    { id: 'all', label: 'الكل', icon: LayoutGrid, color: 'text-slate-500' },
-    { id: 'sales', label: 'المبيعات والمخزون', icon: Activity, color: 'text-emerald-500' },
-    { id: 'financial', label: 'القوائم المالية', icon: FileText, color: 'text-amber-500' },
-    { id: 'accounting', label: 'المحاسبة والديون', icon: Layers, color: 'text-purple-500' },
+    { id: 'all', label: t('all'), icon: LayoutGrid, color: 'text-slate-500' },
+    { id: 'sales', label: t('sales_and_inventory'), icon: Activity, color: 'text-emerald-500' },
+    { id: 'financial', label: t('financial_statements'), icon: FileText, color: 'text-amber-500' },
+    { id: 'accounting', label: t('accounting_and_debts'), icon: Layers, color: 'text-purple-500' },
   ];
 
   const allTabs: { id: ReportTab; label: string; icon: any; category: ReportCategory }[] = [
@@ -49,7 +49,7 @@ const ReportsPage: React.FC = () => {
     { id: 'cash_flow', label: t('cash_flow'), icon: Droplets, category: 'financial' },
     { id: 'currency_diff', label: t('currency_differences'), icon: RefreshCw, category: 'accounting' },
     { id: 'p_and_l', label: t('profit_and_loss'), icon: PieChart, category: 'financial' },
-    { id: 'balance_sheet', label: t('バランスシート'), icon: Landmark, category: 'financial' },
+    { id: 'balance_sheet', label: t('balance_sheet'), icon: Landmark, category: 'financial' },
   ];
 
   const filteredTabs = useMemo(() => {

@@ -12,15 +12,21 @@ const SecuritySettings: React.FC = () => {
   const { dictionary: t } = useI18nStore();
   const { showToast } = useFeedbackStore();
   const { register, handleSubmit, formState: { errors }, watch, reset } = useForm();
-  const { changePassword, isLoading } = usePasswordChange();
+  const { changePassword, isLoading, error } = usePasswordChange();
+
+  React.useEffect(() => {
+    if (error) {
+      showToast(error, 'error');
+    }
+  }, [error, showToast]);
 
   const onSubmit = async (data: any) => {
     if (data.newPassword !== data.confirmPassword) {
-      // This is now handled by form validation, but kept as a safeguard
       return;
     }
     const success = await changePassword(data.newPassword);
     if (success) {
+      showToast('تم تحديث كلمة المرور بنجاح ✓', 'success');
       reset();
     }
   };

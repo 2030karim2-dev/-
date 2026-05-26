@@ -24,26 +24,43 @@ const CompatibilitySearchForm: React.FC<Props> = ({ searchInput, setSearchInput,
                     </p>
                 </div>
 
-                <form onSubmit={handleSearch} className="relative w-full max-w-2xl mx-auto mt-6 group">
-                    <SearchInput
-                        value={searchInput}
-                        onChange={setSearchInput}
-                        placeholder="مثال: C 2029..."
-                        loading={isLoading}
-                        variant="primary"
-                        size="lg"
-                        dir="ltr"
-                        onSubmit={handleSearch}
-                        className="w-full"
-                    />
+                <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 w-full max-w-2xl mx-auto mt-6">
+                    <div className="flex-1">
+                        <SearchInput
+                            value={searchInput}
+                            onChange={setSearchInput}
+                            placeholder="مثال: C 2029..."
+                            loading={isLoading}
+                            variant="primary"
+                            size="lg"
+                            dir="ltr"
+                            onSubmit={handleSearch}
+                            className="w-full"
+                        />
+                    </div>
                     <button
                         type="submit"
                         disabled={isLoading || !searchInput.trim()}
-                        className="absolute left-2.5 top-2.5 bottom-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold py-2 px-8 rounded-xl transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 overflow-hidden"
+                        className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold py-4 px-8 rounded-xl transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 shrink-0 text-sm md:text-base"
                     >
                         {isLoading ? <Loader2 size={18} className="animate-spin" /> : <span>عرض النتائج</span>}
                     </button>
                 </form>
+
+                {/* Popular Search Suggestions Tags */}
+                <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-bold mt-4 relative z-10 text-slate-500">
+                    <span>أصناف شائعة للبحث:</span>
+                    {['C 2029', '04152-YZZA1', '90915-10001', 'NGK-7092', 'BOSCH-123'].map((tag) => (
+                        <button
+                            key={tag}
+                            type="button"
+                            onClick={() => setSearchInput(tag)}
+                            className="px-3 py-1 bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-850 rounded-lg font-mono text-[10px] text-indigo-600 dark:text-indigo-400 transition-all active:scale-95"
+                        >
+                            {tag}
+                        </button>
+                    ))}
+                </div>
             </div>
         </div>
     );

@@ -155,6 +155,7 @@ const InventoryPage: React.FC = () => {
                                         <ProductDetailPane
                                             product={selectedProduct}
                                             onEdit={handleEdit}
+                                            onDelete={deleteProduct}
                                         />
                                     </div>
                                 </div>

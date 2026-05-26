@@ -147,7 +147,7 @@ const PartyModal: React.FC<PartyModalProps> = ({ isOpen, onClose, onSubmit, isSu
                 className="bg-gray-50/50"
               />
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
                     {t('category')}
@@ -175,6 +175,13 @@ const PartyModal: React.FC<PartyModalProps> = ({ isOpen, onClose, onSubmit, isSu
                     </button>
                   </div>
                 </div>
+
+                <Input
+                  label={t('tax_number')}
+                  {...register('tax_number')}
+                  placeholder="300000000000003"
+                  className="bg-gray-50/50 font-mono"
+                />
               </div>
             </div>
           </div>

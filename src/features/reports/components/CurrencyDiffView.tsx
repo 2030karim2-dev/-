@@ -17,6 +17,10 @@ const CurrencyDiffView: React.FC = () => {
     );
   }
 
+  if (!data) return (
+    <div className="p-8 text-center text-slate-500 font-bold">لا توجد أرصدة عملات أجنبية نشطة حالياً</div>
+  );
+
   const totalDiff = data?.reduce((s: number, a: any) => s + a.unrealizedGain, 0) || 0;
 
   const columns = [

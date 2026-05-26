@@ -12,6 +12,7 @@ import { exportStatementToExcel } from '../utils/statementExcelExporter';
 import { partiesService, StatementMovement } from '../service';
 import { useAuthStore } from '../../auth/store';
 import { FileDown } from 'lucide-react';
+import { useCompany } from '../../settings/hooks';
 
 const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
   const [selectedPartyId, setSelectedPartyId] = useState<string>('');
@@ -19,6 +20,7 @@ const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
   const { data: statement, isLoading } = useStatement(selectedPartyId, partyType);
   const [isExporting, setIsExporting] = useState(false);
   const user = useAuthStore(state => state.user);
+  const { data: company } = useCompany();
 
   const selectedParty = parties.find(p => p.id === selectedPartyId);
 
@@ -72,6 +74,36 @@ const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
 
   return (
     <div className="space-y-3 print-area">
+      {/* Printable Company Header (Hidden on Screen, Shown on Print) */}
+      {selectedPartyId && selectedParty && company && (
+        <div className="hidden print:block mb-8 border-b-2 border-slate-900 pb-4 text-right" dir="rtl">
+          <div className="flex justify-between items-center">
+            <div className="text-right">
+              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">{company.name_ar || company.name_en || 'اسم المنشأة'}</h1>
+              {company.name_en && company.name_ar && <p className="text-sm font-bold text-slate-500 font-sans">{company.name_en}</p>}
+              <p className="text-xs text-slate-500 mt-1">{company.address || 'المملكة العربية السعودية'}</p>
+              <div className="flex gap-4 text-[10px] text-slate-400 font-bold mt-1">
+                {company.phone && <span>هاتف: {company.phone}</span>}
+                {company.tax_number && <span>الرقم الضريبي: {company.tax_number}</span>}
+              </div>
+            </div>
+            
+            <div className="text-left text-xs text-slate-500 font-bold">
+              <h2 className="text-lg font-extrabold text-blue-600">كشف حساب {partyType === 'customer' ? 'عميل' : 'مورد'}</h2>
+              <p className="mt-1">رقم الحساب: <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{selectedParty.id.slice(0, 8).toUpperCase()}</span></p>
+              <p>تاريخ الاستخراج: <span className="font-mono">{new Date().toLocaleDateString('ar-SA')}</span></p>
+            </div>
+          </div>
+          
+          <div className="mt-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-4 text-xs font-bold text-slate-700 dark:text-slate-300">
+            <div><strong>اسم الحساب:</strong> <span>{selectedParty.name}</span></div>
+            <div><strong>الهاتف:</strong> <span>{selectedParty.phone || 'غير مسجل'}</span></div>
+            {selectedParty.tax_number && <div><strong>الرقم الضريبي للحساب:</strong> <span>{selectedParty.tax_number}</span></div>}
+            {selectedParty.address && <div><strong>العنوان:</strong> <span>{selectedParty.address}</span></div>}
+          </div>
+        </div>
+      )}
+
       <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border dark:border-slate-800 flex gap-4 items-center no-print">
         <div className="flex-1">
           <label className="text-xs font-bold text-gray-500">اختر {partyType === 'customer' ? 'العميل' : 'المورد'}</label>
@@ -191,6 +223,21 @@ const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
                   </div>
                 </div>
               )}
+              {/* Signatures Area (Print Only) */}
+              <div className="hidden print:flex justify-between mt-12 pt-12 border-t border-gray-200 dark:border-slate-800">
+                <div className="text-center w-1/3">
+                  <p className="font-bold text-gray-600 dark:text-slate-400 mb-12">أمين الصندوق</p>
+                  <div className="border-t border-gray-400 w-24 mx-auto"></div>
+                </div>
+                <div className="text-center w-1/3">
+                  <p className="font-bold text-gray-600 dark:text-slate-400 mb-12">المحاسب</p>
+                  <div className="border-t border-gray-400 w-24 mx-auto"></div>
+                </div>
+                <div className="text-center w-1/3">
+                  <p className="font-bold text-gray-600 dark:text-slate-400 mb-12">توقيع العميل/المورد</p>
+                  <div className="border-t border-gray-400 w-24 mx-auto"></div>
+                </div>
+              </div>
             </>
         ) : (
           <div className="p-20 text-center text-gray-400 border-2 border-dashed rounded-lg bg-gray-50/50">

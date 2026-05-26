@@ -344,5 +344,10 @@
     "phone_number": "رقم الهاتف",
     "email_address": "البريد الإلكتروني",
     "address": "العنوان",
-    "vehicle_compatibility_search": "بحث التوافق مع المركبات"
+    "tax_number": "الرقم الضريبي",
+    "vehicle_compatibility_search": "بحث التوافق مع المركبات",
+    "sales_and_inventory": "المبيعات والمخزون",
+    "financial_statements": "القوائم المالية",
+    "accounting_and_debts": "المحاسبة والديون",
+    "all": "الكل"
 }

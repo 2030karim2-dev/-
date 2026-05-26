@@ -142,6 +142,8 @@ const DebtAgingReport: React.FC = () => {
 
     if (isLoading) return <div className="p-20 text-center animate-pulse">جاري تحليل أعمار الديون...</div>;
 
+    if (!data) return <div className="p-8 text-center text-slate-500 font-bold">لا توجد بيانات أعمار ديون متاحة حالياً</div>;
+
     return (
         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Header */}

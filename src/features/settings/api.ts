@@ -16,7 +16,6 @@ export const settingsApi = {
       .update(data)
       .eq('id', companyId)
       .select()
-      .select()
       .single();
   },
 
@@ -26,7 +25,6 @@ export const settingsApi = {
       .from('invitations')
       .select('*')
       .eq('company_id', companyId)
-      .order('created_at', { ascending: false })
       .order('created_at', { ascending: false });
   },
 
@@ -39,7 +37,6 @@ export const settingsApi = {
         company_id: companyId,
         created_by: userId
       })
-      .select()
       .select()
       .single();
   },
@@ -54,7 +51,6 @@ export const settingsApi = {
       .select('*, profiles:user_id(full_name)')
       .eq('company_id', companyId)
       .order('created_at', { ascending: false })
-      .limit(100)
       .limit(100);
   },
 
@@ -64,7 +60,6 @@ export const settingsApi = {
       .select('*')
       .eq('company_id', companyId)
       .is('deleted_at', null)
-      .order('name_ar', { ascending: true })
       .order('name_ar', { ascending: true });
   },
 
@@ -72,7 +67,6 @@ export const settingsApi = {
     return await supabase
       .from('warehouses')
       .insert({ ...data, company_id: companyId })
-      .select()
       .select()
       .single();
   },
@@ -109,7 +103,6 @@ export const settingsApi = {
   },
 
   getSupportedCurrencies: async () => {
-    return await supabase.from('supported_currencies').select('*')
     return await supabase.from('supported_currencies').select('*');
   },
 
@@ -127,7 +120,6 @@ export const settingsApi = {
       .select('*')
       .eq('company_id', companyId)
       .order('effective_date', { ascending: false })
-      .order('created_at', { ascending: false })
       .order('created_at', { ascending: false });
   },
 
@@ -142,7 +134,6 @@ export const settingsApi = {
         created_by: userId
       })
       .select()
-      .select()
       .single();
   },
 
@@ -151,7 +142,6 @@ export const settingsApi = {
       .from('fiscal_years')
       .select('*')
       .eq('company_id', companyId)
-      .order('start_date', { ascending: false })
       .order('start_date', { ascending: false });
   },
 
@@ -159,7 +149,6 @@ export const settingsApi = {
     return await supabase
       .from('fiscal_years')
       .insert({ ...data, company_id: companyId, is_closed: false })
-      .select()
       .select()
       .single();
   },

@@ -18,9 +18,15 @@ const DebtReportView: React.FC = () => {
     </div>
   );
 
-  const receivables = data?.debts.filter(d => d.type === 'customer' && d.remaining_amount > 0) || [];
-  const payables = data?.debts.filter(d => d.type === 'supplier' && d.remaining_amount < 0) || [];
-  const netPosition = (data?.summary.receivables || 0) - (data?.summary.payables || 0);
+  if (!data) return (
+    <div className="flex flex-col items-center justify-center p-20 gap-4">
+      <p className="text-slate-400 font-bold uppercase text-[10px]">لا توجد بيانات مستحقات مالية متاحة حالياً</p>
+    </div>
+  );
+
+  const receivables = data?.debts?.filter(d => d.type === 'customer' && d.remaining_amount > 0) || [];
+  const payables = data?.debts?.filter(d => d.type === 'supplier' && d.remaining_amount < 0) || [];
+  const netPosition = (data?.summary?.receivables || 0) - (data?.summary?.payables || 0);
 
   const columns = [
     { header: 'الجهة المالية', accessor: (row: any) => <span className="font-bold text-slate-700 dark:text-slate-100">{row.name}</span> },
@@ -45,7 +51,7 @@ const DebtReportView: React.FC = () => {
           </div>
           <p className="text-[10px] font-bold text-emerald-600/80 uppercase tracking-[0.3em] mb-4">إجمالي مديونيات العملاء</p>
           <h3 dir="ltr" className="text-4xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2 italic">
-            {formatCurrency(data?.summary.receivables || 0)}
+            {formatCurrency(data?.summary?.receivables || 0)}
           </h3>
           <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold">
             <Users size={12} />
@@ -59,7 +65,7 @@ const DebtReportView: React.FC = () => {
           </div>
           <p className="text-[10px] font-bold text-rose-600/80 uppercase tracking-[0.3em] mb-4">ديون مستحقة للموردين</p>
           <h3 dir="ltr" className="text-4xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2 italic">
-            {formatCurrency(data?.summary.payables || 0)}
+            {formatCurrency(data?.summary?.payables || 0)}
           </h3>
           <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold">
             <Users size={12} />
@@ -82,7 +88,7 @@ const DebtReportView: React.FC = () => {
               eventType="debt_report"
               title="مشاركة المركز"
               className="bg-white/20 hover:bg-white/30 text-white rounded-xl p-2.5 transition-all"
-              message={`📊 تقرير المركز المالي - الزهراء سمارت\n━━━━━━━━━━━━━━\n✅ مستحقات (عملاء): ${formatCurrency(data?.summary.receivables || 0)}\n🔴 التزامات (موردين): ${formatCurrency(data?.summary.payables || 0)}\n📊 صافي المركز: ${formatCurrency(Math.abs(netPosition))} ${netPosition >= 0 ? '(لصالحك)' : '(عليك)'}`}
+              message={`📊 تقرير المركز المالي - الزهراء سمارت\n━━━━━━━━━━━━━━\n✅ مستحقات (عملاء): ${formatCurrency(data?.summary?.receivables || 0)}\n🔴 التزامات (موردين): ${formatCurrency(data?.summary?.payables || 0)}\n📊 صافي المركز: ${formatCurrency(Math.abs(netPosition))} ${netPosition >= 0 ? '(لصالحك)' : '(عليك)'}`}
             />
           </div>
         </div>

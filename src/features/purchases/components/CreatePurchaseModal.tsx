@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePurchaseStore } from '../store';
 // import { useTaxDiscountStore } from '../../settings/taxDiscountStore';
 import { useCreatePurchase } from '../hooks';
@@ -12,6 +12,7 @@ import InteractivePurchaseTable from './create/InteractivePurchaseTable';
 import { formatCurrency } from '../../../core/utils';
 import { Save, Printer, Wallet } from 'lucide-react';
 import Button from '../../../ui/base/Button';
+import PurchaseInvoicePrintTemplate from './PurchaseInvoicePrintTemplate';
 
 interface Props {
   onSuccess: () => void;
@@ -22,11 +23,13 @@ const CreatePurchaseModal: React.FC<Props> = ({ onSuccess }) => {
   const {
     items, supplier, totals, resetCart, initializeItems,
     invoiceNumber, issueDate, invoiceType, cashboxId, currency, exchangeRate,
-    setMetadata
+    setMetadata, notes
   } = usePurchaseStore();
   const { mutate: createPurchase, isPending } = useCreatePurchase();
   const { invoice: invoiceSettings } = useSettingsStore();
   const { showToast } = useFeedbackStore();
+
+  const [isPrinting, setIsPrinting] = useState(false);
 
   useEffect(() => {
     initializeItems(6);
@@ -69,13 +72,43 @@ const CreatePurchaseModal: React.FC<Props> = ({ onSuccess }) => {
       paymentMethod: invoiceType,
       cashAccountId: cashboxId,
       currency: currency,
-      exchangeRate: exchangeRate
+      exchangeRate: exchangeRate,
+      notes: notes
     }, {
       onSuccess: () => {
         resetCart();
         onSuccess();
       }
     });
+  };
+
+  const handlePrint = () => {
+    setIsPrinting(true);
+    setTimeout(() => {
+      window.print();
+      setIsPrinting(false);
+    }, 100);
+  };
+
+  const invoiceForPrint = {
+    party: supplier ? { name: supplier.name, phone: '', address: '' } : null,
+    issue_date: issueDate || new Date().toISOString().split('T')[0],
+    payment_method: invoiceType,
+    due_date: issueDate,
+    status: 'posted',
+    invoice_items: items
+      .filter(i => i.name && i.quantity > 0)
+      .map(i => ({
+        id: i.id,
+        description: i.name,
+        product: { sku: i.sku },
+        quantity: i.quantity,
+        unit_price: i.costPrice,
+        total: i.quantity * i.costPrice
+      })),
+    notes: notes,
+    subtotal: totals.grandTotal,
+    total_amount: totals.grandTotal
   };
 
   return (
@@ -87,8 +120,18 @@ const CreatePurchaseModal: React.FC<Props> = ({ onSuccess }) => {
 
         {/* Totals Section */}
         <div className="p-2 md:p-3 bg-white dark:bg-slate-900 border-t-2 border-gray-200 dark:border-slate-800">
-          <div className="flex justify-end">
-            <div className="w-full md:w-80 flex flex-col">
+          <div className="flex justify-between items-stretch">
+            <div className="flex-1 p-4 text-right">
+              <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ملاحظات الفاتورة</h4>
+              <textarea
+                className="w-full h-full mt-2 bg-transparent text-xs font-bold outline-none resize-none min-h-[60px]"
+                placeholder="أضف أي ملاحظات أو شروط خاصة بفاتورة المشتريات هنا..."
+                value={notes}
+                onChange={(e) => setMetadata('notes', e.target.value)}
+              />
+            </div>
+
+            <div className="w-full md:w-80 flex flex-col border-l dark:border-slate-800">
               <div className="grid grid-cols-2 border dark:border-slate-800">
                 <div className="p-2 border-l dark:border-slate-800 bg-gray-50 dark:bg-slate-950 text-right">
                   <span className="text-[7px] font-bold text-gray-400 uppercase tracking-widest block">إجمالي الفاتورة</span>
@@ -111,9 +154,15 @@ const CreatePurchaseModal: React.FC<Props> = ({ onSuccess }) => {
       </div>
 
       <div className="flex justify-end gap-2">
-        <Button variant="outline" className="border-gray-200 text-gray-500" leftIcon={<Printer size={14} />}>طباعة المستند</Button>
+        <Button onClick={handlePrint} variant="outline" className="border-gray-200 text-gray-500" leftIcon={<Printer size={14} />}>طباعة المستند</Button>
         <Button onClick={handleSave} isLoading={isPending} className="min-w-[140px]" leftIcon={<Save size={14} />}>اعتماد التوريد</Button>
       </div>
+      
+      {isPrinting && (
+        <div className="hidden print:block">
+          <PurchaseInvoicePrintTemplate invoice={invoiceForPrint} />
+        </div>
+      )}
     </div>
   );
 };
