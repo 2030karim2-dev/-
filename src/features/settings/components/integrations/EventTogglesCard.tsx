@@ -16,7 +16,7 @@ interface EventToggle {
 const EVENT_TOGGLES: EventToggle[] = [
     { id: 'notify_on_sale', label: 'المبيعات', desc: 'إشعار عند إنشاء فاتورة بيع', emoji: '🧾' },
     { id: 'notify_on_purchase', label: 'المشتريات', desc: 'إشعار عند إنشاء فاتورة شراء', emoji: '📦' },
-    { id: 'notify_on_bond', label: 'السندات', desc: 'إشعار عند إنشاء سند قبض أو صرف', emoji: '💵' },
+    { id: 'notify_on_payment_bond', label: 'السندات', desc: 'إشعار عند إنشاء سند قبض أو صرف', emoji: '💵' },
     { id: 'notify_on_expense', label: 'المصروفات', desc: 'إشعار عند تسجيل مصروف', emoji: '🏷️' },
     { id: 'notify_on_stock_transfer', label: 'تحويلات المخزون', desc: 'إشعار عند تحويل بين المستودعات', emoji: '🔄' },
     { id: 'notify_on_low_stock', label: 'تنبيه المخزون', desc: 'إشعار عند وصول صنف للحد الأدنى', emoji: '⚠️' },

@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom/client';
 import { logger } from './core/utils/logger';
 import App from './App';
 import { ReactQueryProvider } from './core/lib/react-query';
-import { OfflineManager } from './core/services/OfflineManager';
 
 // --- Production: Security & Error Masking ---
 if (import.meta.env.PROD) {
@@ -109,7 +108,6 @@ root.render(
   <React.StrictMode>
     <ErrorBoundary>
       <ReactQueryProvider>
-        <OfflineManager />
         <App />
       </ReactQueryProvider>
     </ErrorBoundary>

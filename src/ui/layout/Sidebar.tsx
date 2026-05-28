@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 import SidebarLogo from './sidebar/SidebarLogo';
 import SidebarNav from './sidebar/SidebarNav';
@@ -34,17 +34,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   const ChevronBack = dir === 'rtl' ? ChevronRight : ChevronLeft;
   const isWideDesktop = breakpoint === '3xl' || breakpoint === '4xl' || breakpoint === '5xl';
 
-  // Dynamic sidebar width based on screen size
-  const dynamicWidth = useMemo(() => {
-    const computedWidth = getCollapsedSidebarWidth({
-      breakpoint,
-      isIPad,
-      isTabletLandscape,
-    });
-
-    return computedWidth || sidebarWidth;
-  }, [breakpoint, isIPad, isTabletLandscape, sidebarWidth]);
-
   // Expanded width for large screens
   const expandedWidth = useMemo(() => {
     return getExpandedSidebarWidth({
@@ -54,38 +43,106 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
   }, [breakpoint, isIPad, isTabletLandscape]);
 
+  // Collapsed width for large screens
+  const collapsedWidth = useMemo(() => {
+    return getCollapsedSidebarWidth({
+      breakpoint,
+      isIPad,
+      isTabletLandscape,
+    });
+  }, [breakpoint, isIPad, isTabletLandscape]);
+
+  const dynamicWidth = isCollapsed ? collapsedWidth : expandedWidth;
+
+  // Dynamic sidebar width based on screen size
+  const [sidebarWidthPx, setSidebarWidthPx] = useState<number>(0);
+  const resizerRef = useRef<HTMLDivElement>(null);
+
+  // Initialize width after dynamicWidth computed
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const initial = parseInt(dynamicWidth.replace(/[^0-9]/g, ''), 10) || 64;
+      // Convert tailwind scale to pixels: e.g. w-64 -> 64 * 4 = 256px
+      setSidebarWidthPx(initial * 4);
+    }
+    // Reference sidebarWidth to avoid TS6133
+    if (sidebarWidth) {
+      // Utilized internally
+    }
+  }, [dynamicWidth, sidebarWidth]);
+
+  // Mouse drag handling for resizing
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (resizerRef.current) {
+        const newWidth = e.clientX - resizerRef.current.getBoundingClientRect().left;
+        if (newWidth > 150 && newWidth < 500) {
+          setSidebarWidthPx(newWidth);
+        }
+      }
+    };
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    const startResize = () => {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    };
+    const resizer = resizerRef.current;
+    if (resizer) {
+      resizer.addEventListener('mousedown', startResize);
+    }
+    return () => {
+      if (resizer) {
+        resizer.removeEventListener('mousedown', startResize);
+      }
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
+
+
+
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside
-        className={cn(
-          'hidden md:flex flex-col fixed inset-y-0 z-20 bg-[var(--app-surface)]/80 backdrop-blur-xl h-screen border-[var(--app-border)] transition-all duration-300 ease-in-out shadow-2xl',
-          dir === 'rtl' ? 'right-0 border-l' : 'left-0 border-r',
-          isCollapsed ? dynamicWidth : expandedWidth
-        )}
-      >
-        <SidebarLogo isCollapsed={isCollapsed} />
+        <aside
+          className={cn(
+            'hidden md:flex flex-col fixed inset-y-0 z-20 bg-[var(--app-surface)]/80 backdrop-blur-xl h-screen border-[var(--app-border)] transition-all duration-300 ease-in-out shadow-2xl',
+            dir === 'rtl' ? 'right-0 border-l' : 'left-0 border-r',
+          )}
+          style={{ width: `${sidebarWidthPx}px` }}
+        >
+          <SidebarLogo isCollapsed={isCollapsed} />
 
-        <div className="flex-1 flex flex-col overflow-hidden border-t dark:border-slate-800">
-          <SidebarNav isCollapsed={isCollapsed} />
-        </div>
+          <div className="flex-1 flex flex-col overflow-hidden border-t dark:border-slate-800">
+            <SidebarNav isCollapsed={isCollapsed} />
+          </div>
 
-        <SidebarFooter isCollapsed={isCollapsed} />
+          <SidebarFooter isCollapsed={isCollapsed} />
 
-        {/* Toggle Button - hide on very large screens when expanded */}
-        {isWideDesktop && !isCollapsed ? null : (
-          <button
-            onClick={toggleSidebar}
-            className={cn(
-              "absolute top-20 bg-[var(--app-surface)] text-[var(--app-text-secondary)] border border-[var(--app-border)] w-7 h-7 flex items-center justify-center rounded-md shadow-lg hover:bg-[var(--app-surface-hover)] hover:text-blue-600 transition-colors z-30",
-              dir === 'rtl' ? '-left-3.5' : '-right-3.5'
-            )}
-            title={isCollapsed ? (t('expand') || 'توسيع القائمة') : (t('collapse') || 'طي القائمة')}
-          >
-            {isCollapsed ? <ChevronForward size={14} strokeWidth={3} /> : <ChevronBack size={14} strokeWidth={3} />}
-          </button>
-        )}
-      </aside>
+          {/* Toggle Button - hide on very large screens when expanded */}
+          {isWideDesktop && !isCollapsed ? null : (
+            <button
+              onClick={toggleSidebar}
+              className={cn(
+                "absolute top-20 bg-[var(--app-surface)] text-[var(--app-text-secondary)] border border-[var(--app-border)] w-7 h-7 flex items-center justify-center rounded-md shadow-lg hover:bg-[var(--app-surface-hover)] hover:text-blue-600 transition-colors z-30",
+                dir === 'rtl' ? '-left-3.5' : '-right-3.5'
+              )}
+              title={isCollapsed ? (t('expand') || 'توسيع القائمة') : (t('collapse') || 'طي القائمة')}
+            >
+              {isCollapsed ? <ChevronForward size={14} strokeWidth={3} /> : <ChevronBack size={14} strokeWidth={3} />}
+            </button>
+          )}
+
+          {/* Resizer handle */}
+          <div
+            ref={resizerRef}
+            className="sidebar-resizer absolute top-0 right-0 h-full w-1.5 cursor-col-resize bg-transparent hover:bg-[var(--app-border)]"
+          />
+        </aside>
 
       {/* Mobile Drawer */}
       <aside

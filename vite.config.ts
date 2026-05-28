@@ -59,7 +59,7 @@ export default defineConfig({
     target: 'esnext',
     minify: 'esbuild',
     cssCodeSplit: true,
-    chunkSizeWarningLimit: 1000, // رفع حد التحذير
+    chunkSizeWarningLimit: 500, // 500KB - aligns with bundle initial < 350KB target
     rollupOptions: {
       output: {
         manualChunks(id) {

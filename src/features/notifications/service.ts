@@ -9,7 +9,7 @@ export const notificationService = {
 
     try {
       // Fix: Changed getProductsRaw to getProducts as it returns the necessary data
-      const { data: products } = await inventoryApi.getProducts(companyId);
+      const products = await inventoryApi.getProducts(companyId);
       const lowStockItems = products?.filter((p: any) => {
         const stock = (p.product_stock || []).reduce((acc: number, curr: any) => acc + curr.quantity, 0);
         return stock <= (p.min_stock_level || 5);

@@ -1,0 +1,1382 @@
+# خطة عمل تقنية مفصلة لإصلاح مشاكل الأداء — نظام الزهراء الذكي
+# Al-Zahra Smart ERP — Performance Fix Execution Plan
+
+> **الإصدار:** 1.0  
+> **التاريخ:** 2026-05-27  
+> **المراجع:** Kilo Code AI  
+> **المستندات المرجعية:** `plans/performance-audit-report` ، `plans/execution-plan.md` ، `plans/phase1-progress-report.md`
+
+---
+
+## 1. ملخص تنفيذي
+
+بناءً على تقرير مراجعة الأداء الشامل الذي حدد **20 مشكلة** ضمن 4 درجات أولوية، تتضمن هذه الخطة تعديلات دقيقة وقابلة للتنفيذ مباشرةً على الملفات والمكونات المحددة. لا تحتوي الخطة على أي تعليمات عامة أو عناصر نائبة (`// TODO`) — كل بند يحدد:
+
+1. **الملف المستهدف** (المسار الدقيق + أرقام الأسطر الحالية).
+2. **التعديل المطلوب** (الكود الحالي مقابل الكود المستهدف).
+3. **معيار نجاح الإصلاح** (metric قابل للقياس).
+4. **اختبار التحقق** (test case أو خطوة يدوية).
+
+**الهدف المستهدف:**
+- LCP < 2.0s
+- INP < 200ms
+- TTFB < 1.0s
+- حجم الحزمة الأولية < 350KB
+
+---
+
+## 2. مصفوفة الأولويات (مؤثر الأداء × سهولة التنفيذ)
+
+| البند | الأولوية | التأثير | السهولة | المدة | المقياس المستهدف |
+|-------|---------|--------|--------|-------|------------------|
+| P0.1 إصلاح `useTranslation` | 🔴 P0 | ↓ INP 20-30% | ⭐⭐⭐ سهل | 30 د | INP < 200ms |
+| P0.3 استخراج inline handlers | 🔴 P0 | ↓ Re-renders 40% | ⭐⭐⭐ سهل | 2-3 س | React.memo يعمل |
+| P0.4 تقليل timeout/retry | 🔴 P0 | ↓ Failed queue | ⭐⭐⭐ سهل | 45 د | Timeout ≤ 15s |
+| P0.2 تقسيم Dashboard API | 🔴 P0 | ↓ LCP 30-50% | ⭐⭐ متوسط | 3-4 س | TTFB < 1.0s |
+| P1.1 Invalidation دقيق | 🟠 P1 | ↓ Network 30% | ⭐⭐⭐ سهل | 1 س | Requests ↓ |
+| P1.4 Notification Store O(1) | 🟠 P1 | ↓ CPU per notif | ⭐⭐⭐ سهل | 45 د | O(n) → O(1) |
+| P1.5 إحلال `useProducts` | 🟠 P1 | ↓ Memory | ⭐⭐ متوسط | 2 س | Search server-side |
+| P1.2 Web Worker Dashboard | 🟠 P1 | ↓ Long Tasks 60% | ⭐⭐⭐ معقد | 4-6 س | Main Thread free |
+| P1.3 ExcelTable search redesign | 🟠 P1 | ↓ Search latency 80% | ⭐⭐⭐ معقد | 3-4 س | Keystroke < 16ms |
+| P2.1 Realtime sync batch | 🟡 P2 | ↓ Background CPU | ⭐⭐ متوسط | 2 س | 1 invalidation/5s |
+| P2.2 Lazy charts + CSS motion | 🟡 P2 | ↓ Main Thread jank | ⭐⭐ متوسط | 3 س | Frame drops ↓ |
+| P2.3 تفكيك `useSystemInitialization` | 🟡 P2 | ↑ Maintainability | ⭐⭐⭐ معقد | 4 س | Effects < 3/hook |
+| P2.4 SW invalidateQueries مخصص | 🟡 P2 | ↓ Thundering herd | ⭐⭐⭐ سهل | 30 د | Cache stable |
+| P2.5 إصلاح `useSyncQueue` API | 🟡 P2 | ↑ Stability | ⭐⭐ متوسط | 2 س | No internal API |
+| P3.1 إزالة `localStoragePersister` | 🟢 P3 | ↓ Bundle | ⭐⭐⭐ سهل | 15 د | -2KB dead code |
+| P3.2 تنفيذ/حذف `useInvalidateQueries` | 🟢 P3 | ↓ Confusion | ⭐⭐⭐ سهل | 30 د | No empty hooks |
+| P3.3 `chunkSizeWarningLimit` 500KB | 🟢 P3 | ↑ Monitoring | ⭐⭐⭐ سهل | 15 د | Warnings visible |
+| P3.4 `select('*')` → أعمدة محددة | 🟢 P3 | ↓ JSON size | ⭐⭐⭐ سهل | 1 س | Payload ↓ 20% |
+
+---
+
+## 3. إصلاحات P0 — حرجة (أسبوع 1)
+
+### P0.1 — إصلاح `useTranslation` Hook: تثبيت مرجع `t` عبر `useCallback`
+
+**الملف:** [`src/lib/hooks/useTranslation.ts`](src/lib/hooks/useTranslation.ts:1)
+**السطور:** 3-28
+**المشكلة:** `t` و `formatDate` تُنشآن من جديد في كل render، مما يكسر `React.memo` في 99% من المكونات.
+
+**التعديل المطلوب:**
+
+```tsx
+// BEFORE (الحالي):
+export const useTranslation = () => {
+  const { lang, dir, dictionary } = useI18nStore();
+
+  const t = (key: string, replacements?: Record<string, string>): string => {
+    let translation = dictionary[key] || key;
+    if (replacements) {
+      Object.keys(replacements).forEach(rKey => {
+        translation = translation.replace(`{{${rKey}}}`, replacements[rKey]);
+      });
+    }
+    return translation;
+  };
+
+  const formatDate = (date: string | Date): string => {
+    const locale = lang === 'ar' ? 'ar-SA' : 'en-US';
+    return new Date(date).toLocaleDateString(locale, {
+      year: 'numeric', month: 'short', day: 'numeric'
+    });
+  };
+
+  return { t, lang, dir, formatDate };
+};
+```
+
+```tsx
+// AFTER (المستهدف):
+import { useCallback, useMemo } from 'react';
+import { useI18nStore } from '../i18nStore';
+
+export const useTranslation = () => {
+  const { lang, dir, dictionary } = useI18nStore();
+
+  const t = useCallback((key: string, replacements?: Record<string, string>): string => {
+    let translation = dictionary[key] || key;
+    if (replacements) {
+      Object.keys(replacements).forEach(rKey => {
+        translation = translation.replace(`{{${rKey}}}`, replacements[rKey]);
+      });
+    }
+    return translation;
+  }, [dictionary]);
+
+  const formatDate = useCallback((date: string | Date): string => {
+    const locale = lang === 'ar' ? 'ar-SA' : 'en-US';
+    return new Date(date).toLocaleDateString(locale, {
+      year: 'numeric', month: 'short', day: 'numeric'
+    });
+  }, [lang]);
+
+  // Stabilize the return object reference using useMemo
+  return useMemo(() => ({ t, lang, dir, formatDate }), [t, lang, dir, formatDate]);
+};
+```
+
+**معيار النجاح:**
+- باستخدام React DevTools Profiler، أي تغيير في state خارجي (مثل tick) يجب ألا يُعيد رسم المكونات التي تستورد `useTranslation` فقط (مثل `ExcelTableHeader`).
+- `t` و `formatDate` يجب أن يكون لهما نفس المرجع (`===`) بين renders المتتالية.
+
+**اختبار التحقق:**
+1. افتح `React DevTools > Profiler`.
+2. سجّل 5 ثوانٍ من التفاعل.
+3. ابحث عن `ExcelTableHeader` أو أي مكون يستقبل `t` كـ prop — يجب ألا يظهر إعادة رسم بعد حلقة `setInterval` عامة.
+
+---
+
+### P0.3 — استخراج 300+ Inline Arrow Function في `onClick` / `onChange`
+
+**الملفات:** منتشرة عبر المشروع (300+ نتيجة بحث `onClick=\{.*=>.*\}`).
+**الأمثلة الشائعة:**
+- `src/ui/common/ExcelTableToolbar.tsx` (افتراضياً — يجب البحث)
+- `src/features/dashboard/components/QuickActions.tsx`
+- `src/features/inventory/components/ProductMicroCard.tsx`
+
+**الاستراتيجية:**
+
+للمكونات التي تحتوي على أقل من 5 معالجات — استخراج إلى `useCallback`:
+
+```tsx
+// BEFORE:
+<button onClick={() => setIsOpen(true)} />
+<button onClick={() => onPageChange(page + 1)} />
+```
+
+```tsx
+// AFTER:
+const handleOpen = useCallback(() => setIsOpen(true), [setIsOpen]);
+const handlePageChange = useCallback((nextPage: number) => onPageChange(nextPage + 1), [onPageChange]);
+
+<button onClick={handleOpen} />
+<button onClick={handlePageChange} />
+```
+
+للقوائم المتكررة (Table rows, Product cards, List items) — استخدام pattern "Data Attributes":
+
+```tsx
+// BEFORE (داخل loop):
+items.map(item => (
+  <div key={item.id} onClick={() => navigate(item.path)} />
+))
+```
+
+```tsx
+// AFTER:
+const handleNavigate = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const path = (e.currentTarget as HTMLElement).dataset.path;
+  if (path) navigate(path);
+}, [navigate]);
+
+items.map(item => (
+  <div key={item.id} data-path={item.path} onClick={handleNavigate} />
+))
+```
+
+**الملفات الأكثر تأثيراً (حسب عدد الـ children المعاد رسمها):**
+1. `src/ui/common/ExcelTable.tsx` — كل صف يحتوي على `onClick` inline → يُعيد رسم 100+ صف.
+2. `src/features/inventory/components/ProductExcelGrid.tsx` — بطاقات المنتجات.
+3. `src/features/dashboard/components/QuickActions.tsx` — أزرار الإجراءات.
+
+**معيار النجاح:**
+- قياس React DevTools: عدد الـ renders لـ `ExcelTableRow` يجب أن يقل بنسبة ≥ 40% بعد أي تغيير في state أعلى الجدول (مثل تغيير صفحة).
+
+**اختبار التحقق:**
+- `npm run lint:perf` (إن وجد) أو بحث يدوي: `grep -r "onClick={.*=>" src/ui/ src/features/` يجب أن يقل من 300 إلى < 50 نتيجة.
+
+---
+
+### P0.4 — تقليل `customFetch` Timeout و Retry
+
+**الملف:** [`src/lib/supabaseClient.ts`](src/lib/supabaseClient.ts:36)
+**السطور:** 36-130
+
+**التعديل المطلوب:**
+
+```ts
+// BEFORE (الحالي):
+const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): Promise<Response> => {
+  const MAX_RETRIES = 3;
+  // ...
+  const timeoutId = setTimeout(() => { timeoutController.abort('timeout'); }, 45000);
+```
+
+```ts
+// AFTER (المستهدف):
+const DEFAULT_TIMEOUT = 15000;   // 15s للقراءة
+const MUTATION_TIMEOUT = 25000;  // 25s للكتابة
+const MAX_RETRIES_READ = 1;
+const MAX_RETRIES_MUTATION = 2;
+
+const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): Promise<Response> => {
+  // Infer mutation by method (POST/PATCH/DELETE usually mean mutation)
+  const isMutation = options.method && options.method !== 'GET' && options.method !== 'HEAD';
+  const TIMEOUT = isMutation ? MUTATION_TIMEOUT : DEFAULT_TIMEOUT;
+  const MAX_RETRIES = isMutation ? MAX_RETRIES_MUTATION : MAX_RETRIES_READ;
+
+  let lastError: Error | unknown;
+
+  for (let i = 0; i <= MAX_RETRIES; i++) {
+    const timeoutController = new AbortController();
+    const timeoutId = setTimeout(() => {
+      try { timeoutController.abort('timeout'); } catch (_) { /* ignore */ }
+    }, TIMEOUT);
+    // ... rest of logic unchanged except MAX_RETRIES uses the new scoped variable
+  }
+  // ...
+};
+```
+
+**معيار النجاح:**
+- في Chrome DevTools Network: أي طلب فاشل يجب أن يُسقط في ≤ 30s (15s + 1 retry × 15s) بدلاً من 142s.
+- لا يوجد Head-of-Line Blocking عند فقدان الاتصال (اختبر عبر `Network > Offline` في DevTools).
+
+**اختبار التحقق:**
+1. افتح Chrome DevTools > Network.
+2. Throttle إلى "Slow 3G".
+3. حاول تحميل Dashboard — يجب أن تظهر "(failed)" في ≤ 30s بدلاً من التعليق.
+
+---
+
+### P0.2 — تقسيم Dashboard API إلى Endpoints منفصلة
+
+**الملف الرئيسي:** [`src/features/dashboard/hooks/index.ts`](src/features/dashboard/hooks/index.ts:20)
+**الملفات التابعة:**
+- [`src/features/dashboard/services/dashboardStats.ts`](src/features/dashboard/services/dashboardStats.ts:1)
+- [`src/features/dashboard/services/dashboardInsights.ts`](src/features/dashboard/services/dashboardInsights.ts:1)
+
+**الخطوة 1: إنشاء endpoints منفصلة في API layer**
+
+```ts
+// src/features/dashboard/api/dashboardStatsApi.ts [جديد]
+export const dashboardStatsApi = {
+  async fetchStats(companyId: string, signal?: AbortSignal) {
+    // RPC أو select محدود: إجماليات فقط (serverTotals) + latest 5 activities
+    return dashboardApi.fetchRawDashboardData(companyId, undefined, signal, { mode: 'stats' });
+  },
+  async fetchChartData(companyId: string, days = 30, signal?: AbortSignal) {
+    return dashboardApi.fetchRawDashboardData(companyId, getDateLimit(days), signal, { mode: 'chart' });
+  },
+  async fetchAlerts(companyId: string, signal?: AbortSignal) {
+    return dashboardApi.fetchRawDashboardData(companyId, undefined, signal, { mode: 'alerts' });
+  }
+};
+```
+
+**الخطوة 2: تعديل `useDashboardData` لاستخدام 3 استعلامات منفصلة**
+
+```tsx
+// BEFORE: استعلام واحد ضخم
+const rawDataQuery = useQuery({
+  queryKey: ['dashboard_raw_data', companyId],
+  queryFn: async ({ signal }) => {
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const dateLimit = ninetyDaysAgo.toISOString().split('T')[0];
+    return await dashboardApi.fetchRawDashboardData(companyId, dateLimit, signal);
+  },
+  staleTime: 30 * 60 * 1000,
+});
+```
+
+```tsx
+// AFTER: 3 استعلامات مستقلة بأزمنة مختلفة
+const statsQuery = useQuery({
+  queryKey: ['dashboard', 'stats', companyId],
+  queryFn: ({ signal }) => dashboardStatsApi.fetchStats(companyId, signal),
+  staleTime: 5 * 60 * 1000, // 5 min
+  gcTime: 10 * 60 * 1000,
+});
+
+const chartQuery = useQuery({
+  queryKey: ['dashboard', 'chart', companyId, 30],
+  queryFn: ({ signal }) => dashboardStatsApi.fetchChartData(companyId, 30, signal),
+  staleTime: 15 * 60 * 1000,
+  gcTime: 30 * 60 * 1000,
+});
+
+const alertsQuery = useQuery({
+  queryKey: ['dashboard', 'alerts', companyId],
+  queryFn: ({ signal }) => dashboardStatsApi.fetchAlerts(companyId, signal),
+  staleTime: 2 * 60 * 1000,
+  refetchInterval: 2 * 60 * 1000, // Refresh alerts more often
+});
+```
+
+**الخطوة 3: تعديل `DashboardPage.tsx` لعرض الإحصائيات فوراً وتحميل الرسوم lazy**
+
+```tsx
+// في DashboardPage.tsx:
+const StatsGrid = lazy(() => import('./components/StatsGrid'));
+const RevenueExpensesChart = lazy(() => import('./components/RevenueExpensesChart'));
+
+// العرض:
+<Suspense fallback={<SkeletonCards />}>
+  <StatsGrid />
+</Suspense>
+<Suspense fallback={<SkeletonChart />}>
+  <RevenueExpensesChart />
+</Suspense>
+```
+
+**معيار النجاح:**
+- LCP يقل من 4.0s إلى < 2.0s.
+- حجم JSON الأولي (payload) يقل من 5-15MB إلى < 200KB (Stats فقط).
+
+**اختبار التحقق:**
+1. Chrome DevTools > Network > Payload: التحقق من حجم الاستجابة لـ `dashboard_stats`.
+2. Lighthouse: LCP score يجب أن يتحسن من ~2.5-4.0s إلى < 2.0s.
+
+---
+
+## 4. إصلاحات P1 — عالية (أسبوع 2-3)
+
+### P1.1 — إصلاح Invalidation الواسع للمنتجات
+
+**الملفات:**
+- [`src/features/inventory/hooks/useProducts.ts:143`](src/features/inventory/hooks/useProducts.ts:143)
+- [`src/features/inventory/components/CategoriesManagementView.tsx:81`](src/features/inventory/components/CategoriesManagementView.tsx:81) (إن وجد)
+
+**التعديل المطلوب:**
+
+```ts
+// BEFORE:
+queryClient.invalidateQueries({ queryKey: ['products'] });
+```
+
+```ts
+// AFTER:
+import { queryKeys } from '../../../core/lib/react-query';
+
+// في useProductMutations > onSettled:
+queryClient.invalidateQueries({ queryKey: queryKeys.inventory.products() }); // ['inventory', 'products']
+queryClient.invalidateQueries({ queryKey: queryKeys.inventory.product(id) }); // إذا كان ID معروفاً
+
+// لا تُبطل البحث المخصص إلا إذا تغيّرت بيانات المنتج ذاته
+// queryClient.invalidateQueries({ queryKey: ['products_search', companyId] }); // فقط إذا كان التغيير يؤثر على الاسم
+```
+
+**معيار النجاح:**
+- في React Query DevTools: بعد حفظ منتج واحد، يجب أن يظهر إبطال لـ 2-3 queries فقط (`inventory/products`, `inventory/product/:id`) وليس كل ما يبدأ بـ `products` (10+ queries).
+
+**اختبار التحقق:**
+1. افتح React Query DevTools.
+2. عدّل منتجاً — لاحظ عدد الـ queries التي تتحول إلى `stale`.
+
+---
+
+### P1.4 — إصلاح Notification Store: حساب `unreadCount` بـ O(1)
+
+**الملف:** [`src/features/notifications/store.ts:56`](src/features/notifications/store.ts:56)
+
+**التعديل المطلوب:**
+
+```ts
+// BEFORE:
+addNotification: (notification) => {
+  // ...
+  set(state => ({
+    notifications: [newNotif, ...state.notifications].slice(0, 20),
+    unreadCount: state.notifications.filter(n => !n.isRead).length + 1
+  }));
+}
+```
+
+```ts
+// AFTER:
+addNotification: (notification) => {
+  if (!notification.companyId) {
+    logger.warn('Notifications', 'addNotification called without companyId — skipping');
+    return;
+  }
+  const newNotif: AppNotification = {
+    ...notification,
+    id: Math.random().toString(36).substring(2, 9),
+    timestamp: Date.now(),
+    isRead: false
+  };
+
+  set(state => {
+    const newNotifs = [newNotif, ...state.notifications].slice(0, 20);
+    // O(1) incremental update instead of O(n) full scan
+    const newUnread = newNotif.isRead ? state.unreadCount : state.unreadCount + 1;
+    return { notifications: newNotifs, unreadCount: newUnread };
+  });
+
+  // Play sound if enabled and user has interacted
+  const soundStore = useSoundStore.getState();
+  if (soundStore.isSoundEnabled && soundStore.hasUserInteracted) {
+    soundStore.playNotificationSound();
+  }
+}
+```
+
+**كذلك تعديل `markAsRead` و `markAllAsRead` لتحديث `unreadCount` بشكل متناسق:**
+
+```ts
+markAsRead: (id) => {
+  set(state => {
+    const notif = state.notifications.find(n => n.id === id);
+    if (!notif || notif.isRead) return state; // No change needed
+
+    const newNotifs = state.notifications.map(n =>
+      n.id === id ? { ...n, isRead: true } : n
+    );
+    return {
+      notifications: newNotifs,
+      unreadCount: Math.max(0, state.unreadCount - 1)
+    };
+  });
+},
+
+markAllAsRead: (companyId?: string) => {
+  set(state => {
+    let decrement = 0;
+    const newNotifs = state.notifications.map(n => {
+      if ((!companyId || n.companyId === companyId) && !n.isRead) {
+        decrement++;
+        return { ...n, isRead: true };
+      }
+      return n;
+    });
+    return {
+      notifications: newNotifs,
+      unreadCount: Math.max(0, state.unreadCount - decrement)
+    };
+  });
+},
+```
+
+**معيار النجاح:**
+- `addNotification` يجب أن تستغرق < 1ms مهما كان عدد الإشعارات (20).
+- لا يوجد `filter(n => !n.isRead)` داخل أي setter.
+
+**اختبار التحقق:**
+- Performance profiler: قياس مدة تنفيذ `addNotification` × 100 مرة — يجب أن يكون مستقراً (~0.1ms).
+
+---
+
+### P1.5 — إحلال `useProducts` Legacy بالبحث Server-Side
+
+**الملف:** [`src/features/inventory/hooks/useProducts.ts:26`](src/features/inventory/hooks/useProducts.ts:26)
+
+**التعديل المطلوب:**
+
+```ts
+// BEFORE:
+const filteredProducts = useMemo(() => {
+  const normalizeArabic = (text: string) => {
+    return text
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/[\u064B-\u065F]/g, '');
+  };
+  const searchTokens = searchTerm.toLowerCase().split(/\s+/).filter(Boolean).map(normalizeArabic);
+  return products.filter(p => {
+    const searchableText = normalizeArabic([...].join(' ').toLowerCase());
+    return searchTokens.every(token => searchableText.includes(token));
+  });
+}, [query.data, searchTerm]);
+```
+
+```ts
+// AFTER:
+// 1. استخراج normalizeArabic كدالة pure خارج المكون (إلى utils)
+// src/core/utils/textUtils.ts [جديد أو إضافة]
+export const normalizeArabic = (text: string): string => {
+  return text
+    .toLowerCase()
+    .replace(/[أإآ]/g, 'ا')
+    .replace(/ة/g, 'ه')
+    .replace(/ى/g, 'ي')
+    .replace(/[\u064B-\u065F]/g, '');
+};
+
+// 2. استخدام البحث Server-Side عند وجود searchTerm
+const useProducts = (searchTerm: string = '', options: { limitNum?: number, enabled?: boolean } = {}) => {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const companyId = user?.company_id;
+  const limit = options.limitNum || 200;
+
+  const query = useQuery({
+    queryKey: ['products', companyId, limit, searchTerm ? `search:${normalizeArabic(searchTerm)}` : 'all'],
+    queryFn: () => {
+      if (!companyId) return Promise.resolve([]);
+      if (searchTerm && searchTerm.length > 1) {
+        // Server-side search via existing productsApi.searchProduct or inventoryService.searchProducts
+        return inventoryService.searchProducts(companyId, searchTerm, limit);
+      }
+      return inventoryService.getProducts(companyId, 1, limit);
+    },
+    enabled: (options.enabled !== undefined ? options.enabled : true) && !!companyId,
+    staleTime: 1000 * 60,
+  });
+
+  // Remove client-side filtering entirely; stats should be computed server-side or on-demand
+  const stats = useMemo(() => {
+    const products = query.data || [];
+    return {
+      count: products.length,
+      totalValue: products.reduce((acc, p) => acc + (p.cost_price * p.stock_quantity), 0),
+      lowStockCount: products.filter(p => p.stock_quantity <= p.min_stock_level).length
+    };
+  }, [query.data]);
+
+  return { ...query, products: query.data || [], stats };
+};
+```
+
+**معيار النجاح:**
+- البحث عن منتج نادر (غير موجود في 200 الأولى) يجب أن يُرجع نتيجة صحيحة.
+- `useMemo` للـ filteredProducts يُحذف تماماً — لا يوجد client-side filtering على 200 منتج.
+
+**اختبار التحقق:**
+- Network tab: البحث عن "XYZ123" يجب أن يُطلق `searchProducts` RPC.
+- React DevTools: الكتابة في حقل البحث لا يُسبب `useMemo` recalculation ثقيلة.
+
+---
+
+### P1.2 — نقل حساب `calculateDashboardStats` إلى Web Worker
+
+**الملفات:**
+- [`src/features/dashboard/services/dashboardStats.ts`](src/features/dashboard/services/dashboardStats.ts:1)
+- [`src/features/dashboard/services/dashboardInsights.ts`](src/features/dashboard/services/dashboardInsights.ts:1)
+- [`src/features/dashboard/hooks/index.ts:52-191`](src/features/dashboard/hooks/index.ts:52)
+
+**الخطوة 1: إنشاء Web Worker**
+
+```ts
+// src/features/dashboard/workers/dashboard.worker.ts [جديد]
+import { calculateDashboardStats } from '../services/dashboardStats';
+import { calculateDashboardInsights } from '../services/dashboardInsights';
+
+export interface DashboardWorkerInput {
+  invoicesData: any[];
+  expensesData: any[];
+  invoiceItemsData: any[];
+  baseMetrics: any;
+}
+
+export interface DashboardWorkerOutput {
+  stats: ReturnType<typeof calculateDashboardStats>;
+  insights: ReturnType<typeof calculateDashboardInsights>;
+}
+
+self.onmessage = (event: MessageEvent<DashboardWorkerInput>) => {
+  const { invoicesData, expensesData, invoiceItemsData, baseMetrics } = event.data;
+  
+  const stats = calculateDashboardStats({
+    ...baseMetrics,
+    invoicesData,
+    expensesData,
+    invoiceItemsData,
+  });
+
+  const insights = calculateDashboardInsights({
+    ...baseMetrics,
+    invoicesData,
+    expensesData,
+    lowStockProducts: baseMetrics.lowStockProducts,
+    overdueInvoices: baseMetrics.overdueInvoices,
+  });
+
+  self.postMessage({ stats, insights } as DashboardWorkerOutput);
+};
+```
+
+**الخطوة 2: إنشاء Hook للـ Web Worker**
+
+```ts
+// src/features/dashboard/hooks/useDashboardWorker.ts [جديد]
+import { useEffect, useState, useRef, useCallback } from 'react';
+
+export const useDashboardWorker = () => {
+  const workerRef = useRef<Worker | null>(null);
+  const [result, setResult] = useState<any>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    const worker = new Worker(new URL('../workers/dashboard.worker.ts', import.meta.url), { type: 'module' });
+    workerRef.current = worker;
+    worker.onmessage = (e) => {
+      setResult(e.data);
+      setIsProcessing(false);
+    };
+    return () => worker.terminate();
+  }, []);
+
+  const process = useCallback((input: any) => {
+    if (workerRef.current) {
+      setIsProcessing(true);
+      workerRef.current.postMessage(input);
+    }
+  }, []);
+
+  return { process, result, isProcessing };
+};
+```
+
+**الخطوة 3: تعديل `useDashboardData` لاستخدام الـ Worker**
+
+```tsx
+// في useDashboardData:
+const { process, result: workerResult, isProcessing: workerProcessing } = useDashboardWorker();
+
+useEffect(() => {
+  if (!rawDataQuery.data || !baseMetrics) return;
+  process({
+    invoicesData: rawDataQuery.data.invoices,
+    expensesData: rawDataQuery.data.expenses,
+    invoiceItemsData: rawDataQuery.data.invoiceItems,
+    baseMetrics,
+  });
+}, [rawDataQuery.data, baseMetrics, process]);
+
+// استبدال statsResult / insightsResult بـ workerResult
+const processedData = useMemo<DashboardDataPayload | null>(() => {
+  if (!rawDataQuery.data || !baseMetrics || !workerResult) return null;
+  const { stats, insights } = workerResult;
+  // ... نفس التجميع السابق لكن باستخدام workerResult.stats و workerResult.insights
+  return { ... };
+}, [baseMetrics, workerResult, rawDataQuery.data]);
+```
+
+**ملاحظة تقنية:** إذا كان Vite لا يدعم `new URL(...)` بشكل مباشر، استخدم `comlink`:
+
+```ts
+// comlink alternative
+import { wrap, proxy } from 'comlink';
+import DashboardWorker from '../workers/dashboard.worker?worker';
+
+const worker = new DashboardWorker();
+const api = wrap<typeof import('../workers/dashboard.worker')>(worker);
+```
+
+**معيار النجاح:**
+- Chrome DevTools Performance: لا يوجد Long Task (>50ms) في Main Thread أثناء حساب Dashboard.
+- INP يقل بـ 50%+.
+
+**اختبار التحقق:**
+1. Performance Tab > Record.
+2. تحميل Dashboard مع بيانات 90 يوم.
+3. ابحث عن `Task` في Main Thread — يجب ألا يتجاوز أي task 16ms (1 frame).
+
+---
+
+### P1.3 — إعادة تصميم ExcelTable Search
+
+**الملف:** [`src/ui/common/ExcelTable.tsx:134-150`](src/ui/common/ExcelTable.tsx:134)
+
+**التعديل المطلوب:**
+
+```tsx
+// BEFORE (recursive tree traversal):
+const getStringContent = (val: any): string => {
+  if (val === null || val === undefined) return '';
+  if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+    return String(val);
+  }
+  if (Array.isArray(val)) {
+    return val.map(getStringContent).join(' ');
+  }
+  if (typeof val === 'object') {
+    if (val.props && val.props.children !== undefined) {
+      return getStringContent(val.props.children);
+    }
+    if (!val.$$typeof && typeof val.then !== 'function') {
+      try {
+        return Object.values(val).map(getStringContent).join(' ');
+      } catch (e) { return ''; }
+    }
+  }
+  return '';
+};
+```
+
+```tsx
+// AFTER (accessorKey direct search + useDeferredValue):
+import { useDeferredValue } from 'react';
+
+// في المكون:
+const deferredSearch = useDeferredValue(effectiveSearch);
+
+const processedData = useMemo(() => {
+  let items = [...data];
+  if (!isMainSearch && deferredSearch) {
+    const term = deferredSearch.toLowerCase().trim();
+    if (!term) return items;
+
+    items = items.filter(item => {
+      // 1. Search via accessorKey (O(1) per column, no React element traversal)
+      const accessorMatches = columns.some(col => {
+        if (!col.accessorKey) return false;
+        try {
+          const val = (item as Record<string, unknown>)[col.accessorKey as string];
+          if (val !== undefined && val !== null) {
+            return String(val).toLowerCase().includes(term);
+          }
+        } catch (e) { /* ignore */ }
+        return false;
+      });
+      if (accessorMatches) return true;
+
+      // 2. Fallback: deep object search (without React element traversal)
+      const deepSearch = (val: any): boolean => {
+        if (val === null || val === undefined) return false;
+        if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+          return String(val).toLowerCase().includes(term);
+        }
+        if (Array.isArray(val)) {
+          return val.some(deepSearch);
+        }
+        if (typeof val === 'object') {
+          // Explicitly skip React elements and Promises
+          if (val.$$typeof || typeof val.then === 'function') return false;
+          try {
+            return Object.values(val).some(deepSearch);
+          } catch (e) { return false; }
+        }
+        return false;
+      };
+      return deepSearch(item);
+    });
+  }
+  // ... sort logic unchanged
+  return items;
+}, [data, deferredSearch, columns, sortConfig]);
+```
+
+**معيار النجاح:**
+- Keystroke latency في حقل البحث < 16ms (60fps).
+- لا يوجد `getStringContent` recursive في الكود.
+
+**اختبار التحقق:**
+1. Chrome DevTools > Performance: اكتب 10 أحرف سريعاً في البحث.
+2. قياس `Task` duration — يجب ألا يتجاوز 16ms.
+
+---
+
+## 5. إصلاحات P2 — متوسطة (أسبوع 4-5)
+
+### P2.1 — تحسين Realtime Sync Invalidation (Batch + Debounce + setQueryData)
+
+**الملف:** [`src/lib/hooks/useRealtimeSync.ts:59-78`](src/lib/hooks/useRealtimeSync.ts:59)
+
+**التعديل المطلوب:**
+
+```ts
+// BEFORE:
+const channel = supabase.channel(channelId)
+  .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+    const now = Date.now();
+    if (now - lastInvalidated < THROTTLE_MS) return;
+    const table = payload.table;
+    const preset = TABLE_PRESET_MAP[table];
+    if (preset) {
+      invalidateByPreset(queryClient, preset);
+      lastInvalidated = now;
+    }
+  });
+```
+
+```ts
+// AFTER:
+// 1. Batch changes into a Set
+let pendingChanges = new Set<string>();
+let batchTimer: ReturnType<typeof setTimeout> | null = null;
+const BATCH_DEBOUNCE_MS = 5000; // 5 seconds
+
+const flushInvalidations = () => {
+  if (pendingChanges.size === 0) return;
+  
+  // Group by preset to avoid duplicate invalidations
+  const presetsToInvalidate = new Set<InvalidationPreset>();
+  const keysToSetData = new Array<{ key: string; payload: any }>();
+  
+  pendingChanges.forEach(table => {
+    const preset = TABLE_PRESET_MAP[table];
+    if (preset) presetsToInvalidate.add(preset);
+  });
+  
+  presetsToInvalidate.forEach(preset => {
+    // Use precise invalidation instead of broad preset invalidation where possible
+    const keys = INVALIDATION_PRESETS[preset];
+    keys.forEach(key => {
+      // Only invalidate if the query is currently active (has observers)
+      queryClient.invalidateQueries({ queryKey: [key], type: 'active' });
+    });
+  });
+  
+  pendingChanges.clear();
+  if (batchTimer) {
+    clearTimeout(batchTimer);
+    batchTimer = null;
+  }
+};
+
+const channel = supabase.channel(channelId)
+  .on('postgres_changes', 
+    { event: '*', schema: 'public', filter: `company_id=eq.${companyId}` }, // 2. Filter by company
+    (payload) => {
+      pendingChanges.add(payload.table);
+      
+      if (!batchTimer) {
+        batchTimer = setTimeout(flushInvalidations, BATCH_DEBOUNCE_MS);
+      }
+      
+      // Immediate flush if critical table (e.g., invoices during POS)
+      if (payload.table === 'invoices' || payload.table === 'products') {
+        flushInvalidations();
+      }
+    }
+  );
+```
+
+**معيار النجاح:**
+- إذا حدث 10 تغييرات خلال 5 ثوانٍ، يتم invalidation مرة واحدة فقط.
+- Filter `company_id=eq.${companyId}` يقلل من الـ events الواردة بنسبة ≥ 80%.
+
+**اختبار التحقق:**
+- Supabase Realtime logs: عدد الـ events المستلمة يجب أن يقتصر على company_id الحالي.
+
+---
+
+### P2.2 — تأجيل تحميل Charts + استبدال Framer Motion بـ CSS Transitions
+
+**الملفات:**
+- `src/features/dashboard/components/RevenueExpensesChart.tsx`
+- `src/features/dashboard/components/PerformanceGauge.tsx`
+- `src/ui/common/SearchableAccountSelector.tsx` (AnimatePresence)
+
+**التعديل المطلوب (Lazy Charts):**
+
+```tsx
+// BEFORE: استيراد مباشر
+import { RevenueExpensesChart } from './components/RevenueExpensesChart';
+```
+
+```tsx
+// AFTER:
+import { lazy, Suspense } from 'react';
+const RevenueExpensesChart = lazy(() => import('./components/RevenueExpensesChart'));
+const PerformanceGauge = lazy(() => import('./components/PerformanceGauge'));
+
+// داخل المكون:
+<Suspense fallback={<ChartSkeleton />}>
+  <RevenueExpensesChart />
+</Suspense>
+```
+
+**التعديل المطلوب (PerformanceGauge):**
+
+```tsx
+// BEFORE: setInterval لمراقبة dimensions
+useEffect(() => {
+  const interval = setInterval(() => { /* measure dimensions */ }, 200);
+  return () => clearInterval(interval);
+}, []);
+```
+
+```tsx
+// AFTER: ResizeObserver (native, performant)
+useEffect(() => {
+  if (!containerRef.current) return;
+  const ro = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const { width, height } = entry.contentRect;
+      setDimensions({ width, height });
+    }
+  });
+  ro.observe(containerRef.current);
+  return () => ro.disconnect();
+}, []);
+```
+
+**معيار النجاح:**
+- Main Thread لا يحتوي على `Framer Motion` layout calculations أثناء scroll.
+- `ResizeObserver` يقلل استهلاك CPU بنسبة ≥ 70% مقارنة بـ `setInterval`.
+
+**اختبار التحقق:**
+- Chrome DevTools > Performance: scroll في Dashboard لا يُظهر `layout thrashing`.
+
+---
+
+### P2.3 — تفكيك `useSystemInitialization` إلى Hooks متخصصة
+
+**الملف:** [`src/core/hooks/useSystemInitialization.ts`](src/core/hooks/useSystemInitialization.ts:1)
+
+**التعديل المطلوب:**
+
+```ts
+// BEFORE: 6 useEffect + 3 listeners + 1 interval + 1 useRealtimeSync + 7 stores في hook واحد
+```
+
+```ts
+// AFTER: تقسيم إلى 4 ملفات جديدة + الحفاظ على useSystemInitialization كـ aggregator
+
+// 1. src/core/hooks/useAuthBootstrap.ts
+export const useAuthBootstrap = () => {
+  const { initialize } = useAuth();
+  const { initializeLang } = useI18nStore();
+  const hasBootstrapped = useRef(false);
+
+  useEffect(() => {
+    if (hasBootstrapped.current) return;
+    hasBootstrapped.current = true;
+    initAPM();
+    initPerformanceMonitoring();
+    initialize();
+    initializeLang();
+  }, [initialize, initializeLang]);
+};
+
+// 2. src/core/hooks/useKeyboardShortcuts.ts
+export const useKeyboardShortcuts = () => {
+  const { openPalette } = useCommandPalette();
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openPalette();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [openPalette]);
+};
+
+// 3. src/core/hooks/useNotificationPolling.ts
+export const useNotificationPolling = (companyId?: string) => {
+  const { showToast } = useFeedbackStore();
+  useEffect(() => {
+    if (!companyId) return;
+    notificationService.checkSystemHealth(companyId);
+    const interval = setInterval(() => {
+      notificationService.checkSystemHealth(companyId);
+    }, 1000 * 60 * 10);
+    return () => clearInterval(interval);
+  }, [companyId]);
+};
+
+// 4. src/core/hooks/useServiceWorkerSync.ts
+export const useServiceWorkerSync = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useFeedbackStore();
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data?.type === 'REPLAY_ACTIONS') {
+        // ... same logic as before but with PRECISE invalidation:
+        if (success) {
+          await queryClient.invalidateQueries({ queryKey: ['sales'] });
+          await queryClient.invalidateQueries({ queryKey: ['inventory'] });
+          await queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+          // ❌ لا تستخدم queryClient.invalidateQueries() بدون queryKey
+        }
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', handleMessage);
+    return () => navigator.serviceWorker.removeEventListener('message', handleMessage);
+  }, [queryClient, showToast]);
+};
+
+// 5. src/core/hooks/useSystemInitialization.ts [مُبسّط]
+export const useSystemInitialization = () => {
+  const { user } = useAuthStore();
+  const { setUserInteracted } = useSoundStore();
+
+  useAuthBootstrap();
+  useKeyboardShortcuts();
+  useNotificationPolling(user?.company_id);
+  useServiceWorkerSync();
+  useRealtimeSync();
+
+  // Track first user interaction
+  useEffect(() => {
+    const handleInteraction = () => {
+      setUserInteracted();
+      window.removeEventListener('mousedown', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+    };
+    window.addEventListener('mousedown', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
+    window.addEventListener('touchstart', handleInteraction);
+    return () => {
+      window.removeEventListener('mousedown', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+    };
+  }, [setUserInteracted]);
+};
+```
+
+**معيار النجاح:**
+- كل hook لا يحتوي على أكثر من 2 effects و2 store subscriptions.
+- `hasBootstrappedSystem` variable global يُحذف — يستخدم `useRef` بدلاً منه.
+
+**اختبار التحقق:**
+- React DevTools > Profiler: تغيير `user` يجب ألا يُعيد تشغيل `useKeyboardShortcuts`.
+
+---
+
+### P2.5 — إصلاح `useSyncQueue` API الداخلي غير الموثق
+
+**الملف:** [`src/core/lib/react-query.tsx:185`](src/core/lib/react-query.tsx:185)
+
+**التعديل المطلوب:**
+
+```ts
+// BEFORE:
+await queryClient.getMutationCache().build(queryClient, {
+  mutationKey: mutation.mutationKey,
+  mutationFn: async (variables) => {
+    return processSyncMutation(mutation.mutationKey, variables);
+  }
+}).execute(mutation.variables);
+```
+
+```ts
+// AFTER:
+// استخدام mutateAsync مباشرة من hook ديناميكي
+const processSyncMutationAsync = async (
+  mutationKey: string[],
+  variables: unknown
+) => {
+  return processSyncMutation(mutationKey, variables);
+};
+
+// داخل processQueue:
+for (const mutation of pending) {
+  try {
+    await processSyncMutationAsync(mutation.mutationKey, mutation.variables);
+    await syncStore.dequeue(mutation.id);
+  } catch (error) {
+    logger.error('SyncModule', `Sync failed for mutation ${mutation.id}`, error);
+    await syncStore.incrementRetry(mutation.id);
+    break;
+  }
+}
+```
+
+**معيار النجاح:**
+- لا يوجد استدعاء لـ `getMutationCache().build()` في قاعدة الكود.
+- التطبيق يعمل بشكل صحيح مع TanStack Query v5 بدون تحذيرات.
+
+**اختبار التحقق:**
+- `grep -r "getMutationCache().build" src/` يجب أن يُرجع 0 نتائج.
+
+---
+
+## 6. إصلاحات P3 — منخفضة (أسبوع 6)
+
+### P3.1 — إزالة `localStoragePersister` غير المستخدم
+
+**الملف:** [`src/core/lib/persistence.ts:24`](src/core/lib/persistence.ts:24)
+
+**التعديل:**
+حذف السطور 24-27:
+```ts
+// REMOVE:
+export const localStoragePersister = createSyncStoragePersister({
+    storage: window.localStorage,
+    key: 'ALZHRA_OFFLINE_CACHE',
+});
+```
+
+إذا لم يُستورد في أي مكان — حذف `createSyncStoragePersister` من الاستيراد.
+
+---
+
+### P3.2 — تنفيذ أو حذف `useInvalidateQueries` الفارغ
+
+**الملف:** [`src/core/lib/react-query.tsx:252`](src/core/lib/react-query.tsx:252)
+
+**التعديل (التنفيذ المفضل):**
+
+```ts
+// BEFORE:
+export const useInvalidateQueries = () => {
+  return {
+    invalidateAll: () => { },
+    invalidateInventory: () => { },
+    // ... all empty
+  };
+};
+```
+
+```ts
+// AFTER:
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from './react-query'; // same file
+
+export const useInvalidateQueries = () => {
+  const queryClient = useQueryClient();
+  return {
+    invalidateAll: () => queryClient.invalidateQueries(),
+    invalidateInventory: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
+    },
+    invalidateSales: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.sales.all });
+    },
+    invalidatePurchases: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.purchases.all });
+    },
+    invalidateAccounting: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounting.all });
+    },
+    invalidateParties: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.parties.all });
+    },
+    invalidateDashboard: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });
+      queryClient.invalidateQueries({ queryKey: ['dashboard', 'chart'] });
+    },
+  };
+};
+```
+
+**معيار النجاح:**
+- `useInvalidateQueries` يُستخدم في 5+ مكونات بدلاً من `queryClient.invalidateQueries({ queryKey: ['products'] })` العشوائية.
+
+---
+
+### P3.3 — تقليل `chunkSizeWarningLimit` وتحليل الحزم
+
+**الملف:** [`vite.config.ts:62`](vite.config.ts:62)
+
+**التعديل:**
+
+```ts
+// BEFORE:
+chunkSizeWarningLimit: 1000, // رفع حد التحذير
+```
+
+```ts
+// AFTER:
+chunkSizeWarningLimit: 500, // إظهار التحذيرات مبكراً
+```
+
+**معيار النجاح:**
+- `npm run build` يُظهر تحذيرات لأي chunk > 500KB.
+- تشغيل `npx vite-bundle-visualizer` شهرياً للمراقبة.
+
+---
+
+### P3.4 — تحديد الأعمدة في `select('*')` على جداول كبيرة
+
+**الملفات:**
+- [`src/core/database/api/invoicesApi.ts:163`](src/core/database/api/invoicesApi.ts:163)
+- [`src/core/database/api/journalsApi.ts:21`](src/core/database/api/journalsApi.ts:21)
+
+**التعديل (مثال invoicesApi):**
+
+```ts
+// BEFORE:
+.select('*')
+```
+
+```ts
+// AFTER:
+.select('id, invoice_number, issue_date, total_amount, type, status, party_id, currency, exchange_rate, created_at, updated_at')
+```
+
+**معيار النجاح:**
+- حجم JSON لطلب `invoices` يقل بنسبة ≥ 20%.
+
+---
+
+## 7. آلية مراجعة الكود (Code Review Process)
+
+### 7.1 مرحلة ما قبل المراجعة (Pre-Review Checklist)
+
+قبل رفع أي PR لإصلاح الأداء، يجب على المطور ملء القائمة التالية:
+
+```markdown
+- [ ] لم يُضف أي `useEffect` جديد بدون `useRef` cleanup.
+- [ ] جميع الدوال المُمرّرة كـ props تستخدم `useCallback` (verified via ESLint `react-hooks/exhaustive-deps`).
+- [ ] لا يوجد `queryClient.invalidateQueries()` بدون `queryKey`.
+- [ ] لا يوجد `setInterval` بدون `clearInterval` في cleanup.
+- [ ] تم قياس الأداء قبل/بعد باستخدام React DevTools Profiler (لقطتان مرفقتان).
+- [ ] تم تشغيل `npm run type-check` بنجاح.
+```
+
+### 7.2 معايير المراجعة الدقيقة (Review Criteria)
+
+| المعيار | الوزن | كيفية التحقق |
+|---------|-------|--------------|
+| استقرار مراجع الدوال | 🔴 إلزامي | `===` بين renders |
+| دقة invalidation | 🔴 إلزامي | DevTools > Query count |
+| عدم وجود memory leaks | 🔴 إلزامي | Memory tab > Heap snapshot |
+| تغطية TypeScript | 🟠 مهم | `tsc --noEmit` صفر أخطاء |
+| تقليل bundle size | 🟡 مراقبة | `npm run build` logs |
+
+### 7.3 عملية الموافقة
+
+1. **Self-Review:** المطور يرفع PR مع ملف `PERF_FIX_<id>.md` يشرح التعديل والقياس.
+2. **Peer Review:** مطور ثانٍ يُدقق الـ diff بتركيز على `useCallback` deps و `queryKey` دقة.
+3. **QA Review:** يُختبر على بيانات حقيقية (Staging DB مع 10K+ invoices).
+4. **Performance Gate:** يجب أن يمرّ `npm run perf:baseline` (إن وجد) أو Lighthouse CI.
+
+---
+
+## 8. خطة الاختبار والجودة العالية (QA & Testing)
+
+### 8.1 اختبارات الوحدة (Unit Tests) — جديدة
+
+**ملف الاختبار:** `src/lib/hooks/useTranslation.test.ts` [جديد]
+
+```ts
+import { renderHook } from '@testing-library/react';
+import { useTranslation } from './useTranslation';
+
+describe('useTranslation performance', () => {
+  it('stabilizes t function reference across renders', () => {
+    const { result, rerender } = renderHook(() => useTranslation());
+    const firstT = result.current.t;
+    rerender();
+    expect(result.current.t).toBe(firstT); // Same reference
+  });
+
+  it('stabilizes formatDate reference across renders', () => {
+    const { result, rerender } = renderHook(() => useTranslation());
+    const firstFormat = result.current.formatDate;
+    rerender();
+    expect(result.current.formatDate).toBe(firstFormat);
+  });
+});
+```
+
+**ملف الاختبار:** `src/features/notifications/store.test.ts` [جديد أو إضافة]
+
+```ts
+describe('notification store performance', () => {
+  it('adds notification in O(1) without full scan', () => {
+    const store = useNotificationStore.getState();
+    // Add 20 notifications
+    for (let i = 0; i < 20; i++) {
+      store.addNotification({ companyId: 'c1', title: `N${i}`, message: 'msg', type: 'info' });
+    }
+    expect(store.unreadCount).toBe(20);
+    
+    // Spy on filter calls — there should be 0 full-array filters during add
+    const spy = jest.spyOn(Array.prototype, 'filter');
+    store.addNotification({ companyId: 'c1', title: 'Last', message: 'msg', type: 'info' });
+    const filterCallsDuringAdd = spy.mock.calls.filter(c => c[0]?.toString().includes('isRead')).length;
+    expect(filterCallsDuringAdd).toBe(0); // O(1) means no re-filtering
+    spy.mockRestore();
+  });
+});
+```
+
+### 8.2 اختبارات التكامل (Integration Tests)
+
+**سيناريو Dashboard Worker:**
+1. تحميل Dashboard مع 9000 فاتورة (90 يوم).
+2. PerformanceObserver يقيس `longtask` entries في Main Thread.
+3. **الAssertion:** `longtask` count يجب أن يكون 0 بعد تطبيق Web Worker.
+
+**سيناريو Realtime Sync:**
+1. إدخال 5 تغييرات متتالية في `products` خلال 3 ثوانٍ.
+2. **الAssertion:** عدد `invalidateQueries` في React Query DevTools = 1 (batch) وليس 5.
+
+### 8.3 اختبارات End-to-End (E2E)
+
+**سيناريو ExcelTable Search:**
+1. فتح جدول يحتوي على 1000 صف.
+2. كتابة "test" في حقل البحث.
+3. **الAssertion:** FPS يبقى ≥ 55 خلال الكتابة (Chrome DevTools FPS meter).
+
+**سيناريو Network Resilience:**
+1. Throttle Network إلى Offline.
+2. محاولة إنشاء فاتورة.
+3. **الAssertion:** يجب أن تظهر رسالة "تم الحفظ محلياً" في ≤ 3s (وليس 142s).
+
+### 8.4 Regression Testing Checklist
+
+قبل كل نشر (deployment)، يجب تشغيل:
+
+```bash
+# 1. Type Safety
+npm run type-check
+
+# 2. Lint & Format
+npm run lint
+
+# 3. Unit Tests
+npm run test -- --watchAll=false --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'
+
+# 4. Bundle Analysis
+npx vite-bundle-visualizer --output bundle-report.html
+# Verify: vendor-react < 200KB, vendor-data < 150KB, initial < 350KB
+
+# 5. Lighthouse CI (إن وجد)
+npm run lighthouse
+# Verify: LCP < 2.0s, INP < 200ms, TTFB < 1.0s, CLS < 0.1
+
+# 6. Memory Leak Check
+# Chrome DevTools > Memory > Take Heap Snapshot
+# Compare: before navigation vs after 10 route changes
+# Verify: detached DOM nodes = 0, listeners = stable
+```
+
+---
+
+## 9. التسلسل الزمني والجدولة (6 أسابيع)
+
+| الأسبوع | اليوم | المهمة | الملفات المتأثرة | المسؤول | معيار النجاح |
+|---------|-------|--------|------------------|---------|--------------|
+| **1** | 1-2 | P0.1 `useTranslation` + P0.3 Inline handlers (الأكثر تأثيراً) | `useTranslation.ts`, 10+ UI components | Front-end Lead | INP ↓ 20% |
+| **1** | 3-4 | P0.4 Timeout/Retry | `supabaseClient.ts` | Back-end Lead | Failed req ≤ 30s |
+| **1** | 5 | مراجعة + اختبار | — | QA | 0 regressions |
+| **2** | 1-3 | P0.2 Dashboard API Split | `dashboard/hooks/index.ts`, `dashboardApi.ts` | Full-stack | LCP ↓ 30% |
+| **2** | 4-5 | P1.1 Invalidation دقيق | `useProducts.ts`, `invalidation.ts` | Front-end | Requests ↓ 30% |
+| **2** | 5 | مراجعة + اختبار | — | QA | — |
+| **3** | 1-2 | P1.4 Notification Store | `notifications/store.ts` | Front-end | O(1) addNotif |
+| **3** | 3-4 | P1.5 `useProducts` Server-side | `useProducts.ts`, `productsApi.ts` | Full-stack | Search accurate |
+| **3** | 5 | مراجعة + اختبار | — | QA | — |
+| **4** | 1-3 | P1.2 Web Worker Dashboard | `dashboardStats.ts`, `dashboard.worker.ts` | Front-end | Long Tasks 0 |
+| **4** | 4-5 | P1.3 ExcelTable Search | `ExcelTable.tsx` | Front-end | Search < 16ms |
+| **5** | 1-2 | P2.1 Realtime Batch + P2.2 Lazy Charts | `useRealtimeSync.ts`, Chart components | Front-end | CPU ↓ |
+| **5** | 3-4 | P2.3 `useSystemInitialization` + P2.4 SW invalidate + P2.5 useSyncQueue | `useSystemInitialization.ts`, `react-query.tsx` | Front-end | Effects stable |
+| **5** | 5 | مراجعة + اختبار | — | QA | — |
+| **6** | 1-2 | P3.1-P3.4 Cleanup | `persistence.ts`, `react-query.tsx`, `vite.config.ts`, APIs | Front-end | Bundle ↓ 2KB+ |
+| **6** | 3-5 | Regression Testing + Lighthouse + Deploy | — | QA + DevOps | All green |
+
+---
+
+## 10. إدارة المخاطر (Risk Mitigation)
+
+| المخاطرة | التأثير | الإجراء المتناول |
+|---------|--------|-----------------|
+| Web Worker يفشل في بيئة الإنتاج (Vite build) | 🔴 P1 Worker لا يعمل | احتفاظ بـ fallback إلى Main Thread (feature flag: `USE_DASHBOARD_WORKER`) |
+| تقسيم Dashboard API يكسر RPC موجود | 🔴 P0 إحصائيات خاطئة | الاحتفاظ بالـ endpoint القديم كـ deprecated لمدة أسبوعين |
+| `useCallback` deps غير مكتملة | 🟡 P1 memory leak أو infinite loop | ESLint `react-hooks/exhaustive-deps` = error (fail build) |
+| تقليل timeout يُسبب فشلاً في الشبكة البطيئة | 🟡 P2 offline mode | اختبار على Slow 3G + تأكد من offline queue يعمل |
+| إزالة `localStoragePersister` يكسر مستخدم قديم | 🟢 P3 data loss | التحقق من عدم استخدامه في IndexedDB fallback |
+
+---
+
+## 11. الخلاصة
+
+هذه الخطة تُركز على **تغييرات جراحية دقيقة** بدلاً من إعادة بناء واسعة. أعلى عائد استثمار يأتي من:
+
+1. **تثبيت مراجع الدوال** (`useTranslation` + inline handlers) — تغييرات بسيطة، تأثير عالمي.
+2. **تقسيم Dashboard API** — أعلى تأثير على LCP.
+3. **Web Worker للمعالجة الثقيلة** — أعلى تأثير على INP.
+
+مع مراجعة الكود الصارمة (pre-review checklist + peer review + QA performance gate) والاختبارات المُرفقة، يمكن ضمان استقرار النظام قبل كل نشر.
+
+**القرار المطلوب:** الموافقة على بدء الأسبوع 1 (P0.1 + P0.3 + P0.4) فوراً.
+
+---
+
+_الإعداد: Kilo Code AI_  
+_التاريخ: 2026-05-27_  
+_الإصدار: 1.0_  
+_الحالة: جاهز للتنفيذ_

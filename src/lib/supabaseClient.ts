@@ -33,8 +33,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const isSupabasePlaceholder = !supabaseUrl || !supabaseAnonKey || !isValidSupabaseUrl(supabaseUrl);
 
 // Custom fetch with timeout and retry logic
+const DEFAULT_TIMEOUT = 15000;   // 15s for reads
+const MUTATION_TIMEOUT = 25000;  // 25s for writes
+const MAX_RETRIES_READ = 1;
+const MAX_RETRIES_MUTATION = 2;
+
 const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): Promise<Response> => {
-  const MAX_RETRIES = 3;
+  // Infer mutation by method (POST/PATCH/DELETE usually mean mutation)
+  const isMutation = options.method && options.method !== 'GET' && options.method !== 'HEAD';
+  const TIMEOUT = isMutation ? MUTATION_TIMEOUT : DEFAULT_TIMEOUT;
+  const MAX_RETRIES = isMutation ? MAX_RETRIES_MUTATION : MAX_RETRIES_READ;
+
   let lastError: Error | unknown;
 
   for (let i = 0; i <= MAX_RETRIES; i++) {
@@ -43,7 +52,7 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
       try {
         timeoutController.abort('timeout');
       } catch (_) { /* ignore */ }
-    }, 45000);
+    }, TIMEOUT);
 
     // Merge signals if options.signal exists
     let signal = timeoutController.signal;
@@ -143,16 +152,23 @@ const createMockClient = () => {
       getSession: () => Promise.resolve({ data: { session: null }, error: null }),
       signInWithPassword: () => Promise.resolve({ data: null, error: null }),
       signOut: () => Promise.resolve({ error: null }),
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
     },
-    // Add a mock realtime channel to prevent "supabase.channel is not a function" errors
-    channel: () => ({
-      subscribe: (callback: any) => {
-        // No-op subscription; immediately invoke the callback with empty payload
-        if (callback?.on) callback.on('postgres_changes', () => {});
-        return { unsubscribe: () => {} };
-      },
-    }),
+    // Add a mock realtime channel to support .on(...).subscribe() chaining
+    channel: (_channelId?: string) => {
+      const channelMock = {
+        // Chainable .on() — returns self so .on(...).subscribe(...) works
+        on: (_event: string, _filter: any, _callback?: any) => channelMock,
+        // Terminal .subscribe() — no-op in offline/demo mode
+        subscribe: (_callback?: (status: string) => void) => {
+          _callback?.('CLOSED');
+          return { unsubscribe: () => { } };
+        },
+        unsubscribe: () => { },
+      };
+      return channelMock;
+    },
+    removeChannel: (_channel: any) => Promise.resolve({ data: 'ok', error: null }),
   };
 };
 

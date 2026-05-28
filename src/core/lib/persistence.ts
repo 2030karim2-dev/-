@@ -1,10 +1,12 @@
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { del, get, set } from 'idb-keyval';
 import { Persister } from '@tanstack/react-query-persist-client';
 
 /**
  * Creates an IndexedDB persister for TanStack Query
- * This allows the app to load data from the local database when offline
+ * This allows the app to load data from the local database when offline.
+ *
+ * Note: localStoragePersister was removed because IndexedDB is universally
+ * supported in our target environments and avoids the 5MB limit + sync IO of localStorage.
  */
 export function createIndexedDBPersister(idbKey: string = 'alzhra-query-cache'): Persister {
     return {
@@ -19,9 +21,3 @@ export function createIndexedDBPersister(idbKey: string = 'alzhra-query-cache'):
         },
     };
 }
-
-// Fallback to localStorage if IndexedDB is not available or for simpler data
-export const localStoragePersister = createSyncStoragePersister({
-    storage: window.localStorage,
-    key: 'ALZHRA_OFFLINE_CACHE',
-});

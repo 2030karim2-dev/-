@@ -23,21 +23,18 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        const checkDimensions = () => {
-            if (containerRef.current && containerRef.current.offsetWidth > 0) {
-                setIsMounted(true);
-                return true;
+        if (!containerRef.current) return;
+
+        const ro = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width } = entry.contentRect;
+                if (width > 0) {
+                    setIsMounted(true);
+                }
             }
-            return false;
-        };
-
-        if (checkDimensions()) return;
-
-        const interval = setInterval(() => {
-            if (checkDimensions()) clearInterval(interval);
-        }, 500);
-
-        return () => clearInterval(interval);
+        });
+        ro.observe(containerRef.current);
+        return () => ro.disconnect();
     }, []);
 
     const percentage = target > 0 ? Math.min(100, (value / target) * 100) : 0;
@@ -104,9 +101,9 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
             </div>
 
             {/* Gauge Chart */}
-            <div 
-              ref={containerRef}
-              className="relative h-40 min-h-[160px] group overflow-hidden"
+            <div
+                ref={containerRef}
+                className="relative h-40 min-h-[160px] group overflow-hidden"
             >
                 {/* Subtle outer glow */}
                 <div className="absolute inset-x-0 bottom-4 h-24 bg-[length:100%_100%] bg-no-repeat opacity-20 transition-opacity duration-700 group-hover:opacity-40 pointer-events-none"

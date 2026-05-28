@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../auth/store';
-import { dashboardApi } from '../api/index';
+import { dashboardStatsApi } from '../api/dashboardStatsApi';
 import { calculateDashboardStats } from '../services/dashboardStats';
 import { calculateDashboardInsights } from '../services/dashboardInsights';
 import { useMemo } from 'react';
@@ -21,33 +21,58 @@ export const useDashboardData = () => {
   const { user } = useAuthStore();
   const companyId = user?.company_id;
 
-  // 1. Fetch Raw Data using React Query
-  const rawDataQuery = useQuery({
-    queryKey: ['dashboard_raw_data', companyId],
-    queryFn: async ({ signal }) => {
-      try {
-        if (!companyId) return Promise.reject('No company ID');
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const dateLimit = thirtyDaysAgo.toISOString().split('T')[0];
-        return await dashboardApi.fetchRawDashboardData(companyId, dateLimit, signal);
-      } catch (error: any) {
-        // Gracefully handle aborted requests to avoid console error spam
-        if (error.name === 'AbortError' || error.message?.includes('aborted') || signal.aborted) {
-          console.debug('Dashboard data fetch aborted');
-          return null;
-        }
-        throw error;
-      }
+  // 1. Stats query — lightweight, refreshes every 5 min
+  const statsQuery = useQuery({
+    queryKey: ['dashboard', 'stats', companyId],
+    queryFn: ({ signal }) => {
+      if (!companyId) return Promise.reject('No company ID');
+      return dashboardStatsApi.fetchStats(companyId, signal);
     },
     enabled: !!companyId,
-    staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
-  // 2. Compute Base Metrics using useMemo
+  // 2. Chart query — heavier, refreshes every 15 min
+  const chartQuery = useQuery({
+    queryKey: ['dashboard', 'chart', companyId, 30],
+    queryFn: ({ signal }) => {
+      if (!companyId) return Promise.reject('No company ID');
+      return dashboardStatsApi.fetchChartData(companyId, 30, signal);
+    },
+    enabled: !!companyId,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
+
+  // 3. Alerts query — light, refreshes every 2 min
+  const alertsQuery = useQuery({
+    queryKey: ['dashboard', 'alerts', companyId],
+    queryFn: ({ signal }) => {
+      if (!companyId) return Promise.reject('No company ID');
+      return dashboardStatsApi.fetchAlerts(companyId, signal);
+    },
+    enabled: !!companyId,
+    staleTime: 2 * 60 * 1000,
+    refetchInterval: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+
+  // Merge raw data: use whichever query has freshest data (stats is primary)
+  const rawData = statsQuery.data || chartQuery.data || alertsQuery.data;
+  const isLoading = statsQuery.isLoading;
+  const isError = statsQuery.isError;
+  const isFetching = statsQuery.isFetching || chartQuery.isFetching || alertsQuery.isFetching;
+  const refetch = () => {
+    statsQuery.refetch();
+    chartQuery.refetch();
+    alertsQuery.refetch();
+  };
+
+  // Compute Base Metrics using useMemo
   const baseMetrics = useMemo(() => {
-    if (!rawDataQuery.data) return null;
-    const { invoices, expenses, bondEntries } = rawDataQuery.data;
+    if (!rawData) return null;
+    const { invoices, expenses, bondEntries } = rawData;
 
     // Process Bonds
     const bonds = bondEntries.map((entry: any) => {
@@ -76,7 +101,7 @@ export const useDashboardData = () => {
     const clientTotalExpenses = expenses.reduce((sum: number, e: any) => sum + toBaseCurrency(e), 0);
 
     // Server-side totals (RPC) used for debts/suppliers as they are not subject to the 30-day limit
-    const serverTotals = (rawDataQuery.data.serverTotals || {}) as any;
+    const serverTotals = (rawData.serverTotals || {}) as any;
     const serverTotalSales = Number(serverTotals.total_sales) || 0;
     const serverTotalPurchases = Number(serverTotals.total_purchases) || 0;
     const serverTotalExpenses = Number(serverTotals.total_expenses) || 0;
@@ -90,22 +115,11 @@ export const useDashboardData = () => {
     const totalExpenses = clientTotalExpenses > 0 ? clientTotalExpenses : serverTotalExpenses;
     const totalDebts = Math.max(serverTotalDebts, 0);
 
-    // Process Trial Balance for accurate Net Profit/Loss
-    let trialBalanceRows = [];
-    if (Array.isArray(rawDataQuery.data.trialBalanceRows)) {
-      trialBalanceRows = rawDataQuery.data.trialBalanceRows;
-    } else if (rawDataQuery.data.trialBalanceRows && Array.isArray(rawDataQuery.data.trialBalanceRows.rows)) {
-      trialBalanceRows = rawDataQuery.data.trialBalanceRows.rows;
-    }
+    // Net Profit: use server-side totals from get_dashboard_totals RPC
+    // (report_trial_balance is heavy and is loaded separately on-demand only)
+    const serverNetProfit = serverTotalSales - serverTotalPurchases - serverTotalExpenses;
+    const netProfit = serverNetProfit;
 
-    const revenues = trialBalanceRows.filter((a: any) => (a.code || a.account_code || '').startsWith('4'));
-    const expensesAcc = trialBalanceRows.filter((a: any) => (a.code || a.account_code || '').startsWith('5'));
-
-    const totalRevenues = revenues.reduce((s: number, a: any) => s + Math.abs(a.netBalance ?? a.balance ?? 0), 0);
-    const totalExpensesAcc = expensesAcc.reduce((s: number, a: any) => s + Math.abs(a.netBalance ?? a.balance ?? 0), 0);
-
-    // Net Profit based on accounting accounts (Revenues - Expenses)
-    const netProfit = totalRevenues - totalExpensesAcc;
     const netCashPosition = isFinite(receiptBonds - paymentBonds) ? (receiptBonds - paymentBonds) : 0;
 
     const overdueInvoices = invoices.filter((i: any) => {
@@ -114,7 +128,7 @@ export const useDashboardData = () => {
       return i.status === 'posted' && daysDiff > 7;
     });
 
-    const lowStockProducts = rawDataQuery.data.productsWithStock.filter((p: any) => {
+    const lowStockProducts = rawData.productsWithStock.filter((p: any) => {
       const totalStock = (p.product_stock || []).reduce((sum: number, s: any) => sum + Number(s.quantity || 0), 0);
       return totalStock <= (p.min_stock_level || 5);
     }).map((p: any) => ({
@@ -132,30 +146,36 @@ export const useDashboardData = () => {
       netProfit, netCashPosition,
       overdueInvoices, lowStockProducts,
     };
-  }, [rawDataQuery.data]);
+  }, [rawData]);
 
 
   // 3. Compute Complex Classifications and Insights using useMemo
+  // OPTIMIZED: Memoize statsResult and insightsResult separately to avoid
+  // recalculating both when only one dependency changes
+  const statsResult = useMemo(() => {
+    if (!rawData || !baseMetrics) return null;
+    return calculateDashboardStats({
+      ...baseMetrics,
+      invoicesData: rawData.invoices,
+      expensesData: rawData.expenses,
+      invoiceItemsData: rawData.invoiceItems
+    });
+  }, [rawData, baseMetrics]);
+
+  const insightsResult = useMemo(() => {
+    if (!rawData || !baseMetrics) return null;
+    return calculateDashboardInsights({
+      ...baseMetrics,
+      invoicesData: rawData.invoices,
+      expensesData: rawData.expenses,
+    });
+  }, [rawData, baseMetrics]);
+
   const processedData = useMemo<DashboardDataPayload | null>(() => {
-    if (!rawDataQuery.data || !baseMetrics) return null;
+    if (!rawData || !baseMetrics || !statsResult || !insightsResult) return null;
 
-    const { invoices, expenses, invoiceItems } = rawDataQuery.data;
+    const { invoices } = rawData;
 
-    // Call external service transformers
-    const statsResult = calculateDashboardStats({
-      ...baseMetrics,
-      invoicesData: invoices,
-      expensesData: expenses,
-      invoiceItemsData: invoiceItems
-    });
-
-    const insightsResult = calculateDashboardInsights({
-      ...baseMetrics,
-      invoicesData: invoices,
-      expensesData: expenses,
-    });
-
-    // Assemble final payload
     return {
       stats: {
         sales: formatCurrency(baseMetrics.totalSales),
@@ -168,7 +188,11 @@ export const useDashboardData = () => {
         salesTrend: Math.round(insightsResult.salesTrend * 10) / 10,
         purchasesTrend: Math.round(insightsResult.purchasesTrend * 10) / 10,
         expensesTrend: Math.round(insightsResult.expensesTrend * 10) / 10,
-        profitTrend: Math.round(((insightsResult.newerSales - insightsResult.newerPurchases - insightsResult.newerExpenses) - (insightsResult.olderSales - insightsResult.olderPurchases - insightsResult.olderExpenses)) / Math.max(Math.abs(insightsResult.olderSales - insightsResult.olderPurchases - insightsResult.olderExpenses), 1) * 1000) / 10
+        profitTrend: Math.round(
+          ((insightsResult.newerSales - insightsResult.newerPurchases - insightsResult.newerExpenses) -
+            (insightsResult.olderSales - insightsResult.olderPurchases - insightsResult.olderExpenses)) /
+          Math.max(Math.abs(insightsResult.olderSales - insightsResult.olderPurchases - insightsResult.olderExpenses), 1) * 1000
+        ) / 10
       },
       salesData: statsResult.salesData.length ? statsResult.salesData : [{ name: 'اليوم', value: 0 }],
       categoryData: statsResult.categoryData.length ? statsResult.categoryData : [{ name: 'لا توجد بيانات', value: 0, color: '#94a3b8' }],
@@ -186,8 +210,7 @@ export const useDashboardData = () => {
       insights: insightsResult.insights as any,
       lowStockProducts: baseMetrics.lowStockProducts as any
     };
-
-  }, [rawDataQuery.data, baseMetrics]);
+  }, [baseMetrics, statsResult, insightsResult, rawData]);
 
   // Provide fallback empty data if still loading or errored
   const fallbackData: DashboardDataPayload = {
@@ -198,14 +221,17 @@ export const useDashboardData = () => {
   };
 
   return {
-    ...rawDataQuery,
-    data: processedData, // Replace raw data with processed data in return
-    ... (processedData || fallbackData) // Spread attributes for ease of access
+    isLoading,
+    isError,
+    isFetching,
+    refetch,
+    data: processedData,
+    ... (processedData || fallbackData)
   };
 };
 
 export const useDashboardStats = () => {
-  const { stats, isLoading, error } = useDashboardData();
-  return { stats, isLoading, error };
+  const { stats, isLoading, isError } = useDashboardData();
+  return { stats, isLoading, error: isError };
 };
 export default useDashboardData;

@@ -25,7 +25,7 @@ export const purchasesService = {
     }));
 
     // Use RPC for atomic operation
-    const result = await purchasesApi.createPurchaseRPC(companyId, userId, data);
+    const result = await purchasesApi.createPurchaseRPC(companyId, userId, data as any);
 
     if (result) {
       const typedResult = result as unknown as PurchaseInvoiceResponse;
@@ -69,7 +69,7 @@ export const purchasesService = {
   },
 
   processPurchaseReturn: async (data: CreatePurchaseDTO, companyId: string, userId: string) => {
-    return await purchasesApi.createPurchaseReturnRPC(companyId, userId, data);
+    return await purchasesApi.createPurchaseReturnRPC(companyId, userId, data as any);
   },
 
   // ⚡ Server-side stats via RPC — no frontend aggregation

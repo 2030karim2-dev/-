@@ -46,21 +46,18 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
     const [isMounted, setIsMounted] = useState(false);
 
     React.useEffect(() => {
-        const checkDimensions = () => {
-            if (containerRef.current && containerRef.current.offsetWidth > 0) {
-                setIsMounted(true);
-                return true;
+        if (!containerRef.current) return;
+
+        const ro = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width } = entry.contentRect;
+                if (width > 0) {
+                    setIsMounted(true);
+                }
             }
-            return false;
-        };
-
-        if (checkDimensions()) return;
-
-        const interval = setInterval(() => {
-            if (checkDimensions()) clearInterval(interval);
-        }, 500);
-
-        return () => clearInterval(interval);
+        });
+        ro.observe(containerRef.current);
+        return () => ro.disconnect();
     }, []);
 
     const commonProps = {
@@ -194,9 +191,9 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
                     </button>
                 </div>
             </div>
-            <div 
+            <div
                 ref={containerRef}
-                className="h-72 w-full mt-6" 
+                className="h-72 w-full mt-6"
                 dir="ltr"
             >
                 {isMounted ? (

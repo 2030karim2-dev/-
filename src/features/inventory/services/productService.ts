@@ -41,8 +41,7 @@ export const productService = {
      * Get all products for a company
      */
     getProducts: async (companyId: string, page: number = 1, limitNum: number = 10000): Promise<Product[]> => {
-        const { data, error } = await inventoryApi.getProducts(companyId, page, limitNum);
-        if (error) throw error;
+        const data = await inventoryApi.getProducts(companyId, page, limitNum);
         return productService.mapRawProducts(data || []);
     },
 
@@ -121,21 +120,25 @@ export const productService = {
      * Get a single product by ID
      */
     getProductById: async (id: string) => {
-        const { data, error } = await inventoryApi.getProductById(id);
-        if (error) throw error;
+        const data = await inventoryApi.getProductById(id);
         return { data };
     },
 
     /**
-     * Search products using advanced database search
+     * Search products using advanced database search.
+     * Returns Product[] (mapped through the same shape as getProducts) so consumers
+     * can use a single type for both list and search results.
+     *
+     * @param limit Optional limit (default: 200) — applied client-side if RPC ignores it
      */
-    searchProducts: async (companyId: string, term: string): Promise<Record<string, unknown>[]> => {
+    searchProducts: async (companyId: string, term: string, limit: number = 200): Promise<Product[]> => {
         const { data, error } = await supabase.rpc('search_inventory', {
             p_term: term,
             p_company_id: companyId
         });
         if (error) throw error;
-        return data || [];
+        const rows = (data || []).slice(0, limit);
+        return productService.mapRawProducts(rows as unknown[]);
     },
 
     /**
@@ -173,8 +176,7 @@ export const productService = {
             category_id: (data.category && data.category.length === 36) ? data.category : null
         } as any;
 
-        const { data: product, error } = await inventoryApi.createProduct(payload);
-        if (error) throw error;
+        const product = await inventoryApi.createProduct(payload) as any;
 
         // Save UOMs
         if (product && data.uoms && data.uoms.length > 0) {
@@ -228,12 +230,7 @@ export const productService = {
             if (data.category) payload.category_id = data.category.length === 36 ? data.category : null;
 
             logger.debug('ProductService', `Sending update payload to API`, payload);
-            const { data: product, error } = await inventoryApi.updateProduct(id, payload as any);
-
-            if (error) {
-                logger.error('ProductService', `API update failed`, error);
-                throw error;
-            }
+            const product = await inventoryApi.updateProduct(id, payload as any);
 
             // Update UOMs
             if (data.uoms) {
@@ -280,16 +277,14 @@ export const productService = {
      * Delete a product
      */
     deleteProduct: async (id: string) => {
-        const { error } = await inventoryApi.deleteProduct(id);
-        if (error) throw error;
+        await inventoryApi.deleteProduct(id);
     },
 
     /**
      * Bulk delete products
      */
     bulkDeleteProducts: async (ids: string[]) => {
-        const { error } = await inventoryApi.bulkDeleteProducts(ids);
-        if (error) throw error;
+        await inventoryApi.bulkDeleteProducts(ids);
     },
 
     /**

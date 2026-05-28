@@ -1,0 +1,488 @@
+# 📊 تقرير مراجعة الأداء الشاملة — نظام الزهراء الذكي (Al-Zahra Smart ERP)
+
+> **تاريخ التقرير:** 2026-05-27
+> **المُراجع:** Kilo Code Performance Audit
+> **الهدف:** تحديد الأسباب الجذرية لبطء تحميل المكونات، استجابة واجهة المستخدم، واستهلاك الموارد، مع تقديم حلول عملية مرتبة حسب الأولوية.
+
+---
+
+## 1. ملخص تنفيذي
+
+التطبيق يعتمد بنية **Feature-Based Architecture** متطورة باستخدام **React 19 + Vite + TanStack Query v5 + Zustand + Supabase**. البنية العامة سليمة وتتبع أفضل الممارسات في تقسيم الرoutes lazy loading وتقسيم الحزم (manual chunks). ومع ذلك، توجد **6 مشاكل حرجة (P0-P1)** تُسبب بطءاً ملحوظاً في:
+
+1. **إعادة الرسم المتواصلة (Rendering Cycles)** بسبب إنشاء دوال جديدة في كل render.
+2. **استعلامات ضخمة غير محدودة** في لوحة التحكم تحمل بيانات 90 يوماً كاملة مع جميع العلاقات.
+3. **معالجة بيانات client-side مكلفة** دون استخدام Web Workers أو التجزئة.
+4. **طلبات شبكة ذات timeout طويل جداً** مع retry عدواني يسبب تراكم الطلبات.
+
+**التأثير التقديري:** إصلاح المشاكل من فئة P0 و P1 يمكن أن يُحسِّن أداء التحميل الأولي (LCP) بـ **40-60%** ويُقلِّل إعادة الرسم (INP) بـ **50%** على الأقل.
+
+---
+
+## 2. نظرة عامة على البنية والتقنيات
+
+| الطبقة | التقنية | الأنماط المستخدمة | تقييم البنية |
+|--------|---------|-------------------|--------------|
+| **Build Tool** | Vite 5 + ESBuild | Manual Chunks, PWA, Node Polyfills | ✅ جيد — يوجد تقسيم للحزم |
+| **Framework** | React 19.2.4 + TypeScript | Functional Components, Hooks | ⚠️ يحتاج Memoization |
+| **Routing** | React Router v7 | Lazy Loading, FeatureBoundary (Suspense+ErrorBoundary) | ✅ ممتاز |
+| **Data Fetching** | TanStack Query v5 | Persist Query Client (IndexedDB), Optimistic Updates | ✅ جيد — gcTime محسّن |
+| **State Mgmt** | Zustand 5 + persist middleware | Feature-based stores (auth, inventory, notifications, settings) | ⚠️ بعض المتاجر تحتوي على منطق مكلف |
+| **Backend** | Supabase (PostgREST + Realtime) | RPC, select with joins, custom fetch | ⚠️ استعلامات تحتاج تحسين |
+| **UI/Styling** | Tailwind CSS 3.4 + Framer Motion + Recharts | Utility-first, dark mode, animations | ⚠️ Motion يُسبب jank |
+| **Export** | jspdf + html2canvas + xlsx-js-style | Lazy chunks (vendor-export, vendor-xlsx) | ✅ مفصول عن الحزمة الرئيسية |
+| **Virtualization** | @tanstack/react-virtual | ExcelTableBody, SearchableAccountSelector | ⚠️ لم يُطبّق في كل القوائم الكبيرة |
+
+---
+
+## 3. المشاكل المُكتشفة مرتبة حسب الأولوية
+
+### 🔴 P0 — حرجة (تأثير مباشر على LCP / INP / TTFB)
+
+#### P0.1 — `useTranslation` ينشئ دالة `t` جديدة في كل render
+**الموقع:** `src/lib/hooks/useTranslation.ts:3-16`
+
+**الوصف:**
+الـ Hook لا يُغلِّف الدالة `t` داخل [`useCallback`](src/lib/hooks/useTranslation.ts:6). هذا يعني أن **كل مكون يستخدم الترجمة** يحصل على مرجع دالة مختلف في كل render. النتيجة:
+- كسر [`React.memo`](src/ui/common/ExcelTableHeader.tsx:87) في المكونات الأبناء.
+- إعادة رسم لا ضرورة لها في **99% من شجرة المكونات** عند أي تغيير في state.
+- الأطفال التي تتلقّى `t` كـ prop أو تستخدمها داخل `useEffect` / `useMemo` deps تُعيد حساب كل شيء.
+
+**الدليل:**
+```tsx
+const t = (key: string, replacements?: Record<string, string>): string => {
+  // ... تُنشأ في كل render
+};
+return { t, lang, dir, formatDate };
+```
+
+**الحل:**
+```tsx
+const t = useCallback((key: string, replacements?: Record<string, string>): string => {
+  let translation = dictionary[key] || key;
+  if (replacements) {
+    Object.keys(replacements).forEach(rKey => {
+      translation = translation.replace(`{{${rKey}}}`, replacements[rKey]);
+    });
+  }
+  return translation;
+}, [dictionary]);
+```
+**تأثير متوقع:** تقليل INP بنسبة 20-30% وتحسين استجابة الكتابة في الحقول.
+
+---
+
+#### P0.2 — لوحة التحكم تحمل "payload" ضخمًا غير محدود (90 يوماً)
+**الموقع:** `src/features/dashboard/hooks/index.ts:28-49`
+
+**الوصف:**
+[`useDashboardData`](src/features/dashboard/hooks/index.ts:20) تستدعي `dashboardApi.fetchRawDashboardData(companyId, dateLimit, signal)` حيث `dateLimit` = 90 يوم ماضي. هذه الدالة RPC (أو select مُدمج) تُعيد:
+- جميع الفواتير (`invoices`) مع relations
+- جميع المصروفات (`expenses`) مع relations
+- جميع قيود اليومية (`bondEntries`) مع `journal_entry_lines`
+- جميع المنتجات مع مخزونها (`productsWithStock`)
+- جميع بنود الفواتير (`invoiceItems`)
+- إجماليات من الخادم (`serverTotals`)
+
+**الجذر:**
+لا يوجد **server-side pagination** أو **limit** على هذه البيانات. إذا كانت الشركة تُصدر 100 فاتورة/يوم، فالم payload = 9000 فاتورة + بنودها + مصروفات + مخزون. هذا يمكن أن يصل إلى **5-15 ميجابايت** JSON.
+
+**الحل المُقترح:**
+1. **تقسيم البيانات إلى endpoints منفصلة:**
+   - `/api/dashboard/stats` — إجماليات فقط (LCP critical).
+   - `/api/dashboard/chart` — بيانات الرسم البياني (آخر 30 يوماً).
+   - `/api/dashboard/alerts` — التنبيهات.
+2. **استخدام TanStack Query `staleTime` و `gcTime` مختلفة لكل endpoint.**
+3. **DashboardPage:** عرض الإجماليات فوراً وتحميل الرسوم البيانية lazy داخل [`Suspense`](src/features/dashboard/DashboardPage.tsx:117).
+
+---
+
+#### P0.3 — أكثر من 300 دالة سهمية inline في `onClick` / `onChange`
+**المواقع:** منتشرة عبر المشروع (300+ نتيجة بحث).
+
+**الوصف:**
+الأنماط التالية شائعة جداً:
+```tsx
+<button onClick={() => setIsOpen(true)} />
+<button onClick={() => onPageChange(page + 1)} />
+<div onClick={() => navigate(item.path)} />
+```
+في React، إنشاء دالة سهمية inline داخل render يعني **مرجع جديد في كل render**. إذا كان الابن:
+- مُغلّف بـ `React.memo` → ينكسر Memoization.
+- يستخدم `useEffect` مع هذه الدالة في deps → يُعيد التشغيل.
+- يُمرِّرها لأحفاده → تنتشر إعادة الرسم.
+
+**الحل:**
+1. **استخراج المعالجات إلى `useCallback`** للمكونات الكبيرة أو المعقدة.
+2. **استخدام pattern "Data Attributes"** للقوائم المتكررة:
+   ```tsx
+   <button data-action="open" onClick={handleAction} />
+   ```
+3. **تطبيق React.memo على المكونات المتكررة** (MicroCard, ListItem, TableRow) مع ضمان استقرار props.
+
+---
+
+#### P0.4 — `customFetch` timeout مفرط (45 ثانية) + Retry عدواني ×3
+**الموقع:** `src/lib/supabaseClient.ts:36-130`
+
+**الوصف:**
+الـ timeout مضبوط على **45,000ms** (`const timeoutId = setTimeout(..., 45000)`). مع وجود **3 retries** و exponential backoff (`Math.pow(2, i) * 1000 + random * 500`)، يمكن لطلب واحد فاشل أن يستنزف:
+- **45s × 3 = 135 ثانية** كحد أقصى.
+- **+ 1s + 2s + 4s** backoff ≈ **142 ثانية** إجمالاً.
+
+**الجذر:**
+- في حالة ضعف الشبكة أو بطء الاستجابة من Supabase، يتراكم الطلبات في المتصفح ( browsers limit concurrent connections per domain ≈ 6 ).
+- هذا يحجز الـ connections للطلبات الأخرى (images, API calls) ويُسبب **Head-of-Line Blocking**.
+
+**الحل:**
+```ts
+// تقليل timeout بناءً على نوع العملية
+const DEFAULT_TIMEOUT = 15000; // 15s للقراءة
+const MUTATION_TIMEOUT = 25000; // 25s للكتابة
+const MAX_RETRIES = 1; // للقراءات
+const MUTATION_MAX_RETRIES = 2; // للكتابات (idempotent فقط)
+```
+
+---
+
+### 🟠 P1 — عالية (تأثير على استجابة التفاعل واستهلاك الذاكرة)
+
+#### P1.1 — Invalidation واسع جداً للمنتجات
+**الموقع:** `src/features/inventory/hooks/useProducts.ts:143` و `src/features/inventory/components/CategoriesManagementView.tsx:81`
+
+**الوصف:**
+```tsx
+queryClient.invalidateQueries({ queryKey: ['products'] });
+```
+هذا يُبطل **جميع** الـ queries التي تبدأ بـ `['products']`، بما في ذلك:
+- `['products', companyId, limit]` — قائمة المنتجات.
+- `['products_search', companyId, term]` — نتائج البحث.
+- `['products_minimal', companyId]` — المنتجات المختصرة.
+- أي query مفتاحها يبدأ بـ `'products'` في أي جزء من التطبيق.
+
+**الحل:**
+```tsx
+// استخدام invalidation دقيق
+queryClient.invalidateQueries({ queryKey: ['products', companyId, limitNum] });
+queryClient.invalidateQueries({ queryKey: ['products_minimal', companyId] });
+// أو استخدام الدالة المساعدة invalidateByPreset إذا كانت محدثة
+```
+
+---
+
+#### P1.2 — `calculateDashboardStats` & `calculateDashboardInsights` — معالجة client-side مكلفة
+**المواقع:**
+- `src/features/dashboard/services/dashboardStats.ts`
+- `src/features/dashboard/services/dashboardInsights.ts`
+- `src/features/dashboard/hooks/index.ts:52-191`
+
+**الوصف:**
+هاتان الدالتان تنفِّذان **7-10 حلقات `forEach` + `filter` + `reduce`** على بيانات ضخمة في الخيط الرئيسي (Main Thread). العمليات:
+- `toBaseCurrency(inv)` على كل فاتورة (حسابات Decimal.js).
+- `new Date(i.issue_date).toLocaleDateString('en-CA')` × آلاف المرات.
+- تجميعات `Object.entries` + `sort` + `slice`.
+
+**الجذر:**
+كل هذه العمليات تتم في **Main Thread** وتُسبب **Long Task** (>50ms) يمنع التفاعل.
+
+**الحل:**
+1. **نقل المعالجة إلى Web Worker** عبر `comlink`:
+   ```ts
+   // dashboard.worker.ts
+   export function calculateStatsWorker(data: RawData): DashboardStats {
+     // ... كل المنطق هنا
+   }
+   ```
+2. **أو استخدام `scheduler.yield()` / `requestIdleCallback`** لتقطيع العمل.
+3. **Memoization على مستوى أعمق:** تخزين `chartDataMap` و `productSales` كـ `useMemo` منفصلة مع `deep-equal` للبيانات الخام.
+
+---
+
+#### P1.3 — `ExcelTable` يُجري بحثاً client-side باستخدام递归 على React elements
+**الموقع:** `src/ui/common/ExcelTable.tsx:134-150`
+
+**الوصف:**
+```tsx
+const getStringContent = (val: any): string => {
+  if (typeof val === 'object') {
+    if (val.props && val.props.children !== undefined) {
+      return getStringContent(val.props.children);
+    }
+  }
+  // ...
+};
+```
+هذه الدالة تتجاوز **React Element tree** بشكل recursive لاستخراج النص. إذا كان الجدول يحتوي على 1000 صف و10 أعمدة، وكل خلية تحتوي على مكونات معقدة (أزرار، أيقونات، dropdowns)، فإن البحث يُجري **10,000 traversal** على شجرة React في كل keystroke.
+
+**الحل:**
+1. **تعطيل البحث الداخلي إذا كان البحث server-side** (`isMainSearch = true` → لا حاجة لـ `processedData` filtering).
+2. **إضافة `accessorKey` لكل عمود** والبحث في `row[accessorKey]` مباشرة بدلاً من render output.
+3. **استخدام `useDeferredValue`** للبحث لتقليل الأولوية.
+
+---
+
+#### P1.4 — Notification Store: حساب `unreadCount` في كل تحديث
+**الموقع:** `src/features/notifications/store.ts:56-59`
+
+**الوصف:**
+```tsx
+set(state => ({
+  notifications: [newNotif, ...state.notifications].slice(0, 20),
+  unreadCount: state.notifications.filter(n => !n.isRead).length + 1
+}));
+```
+- `unreadCount` يُحسب بـ `O(n)` في كل `addNotification`.
+- `getCompanyUnreadCount` يُجري `filter` في كل render عند استدعائه من `HeaderActions`.
+
+**الحل:**
+```tsx
+// تخزين unreadCount كـ derived state محسوب مرة واحدة
+set(state => {
+  const newNotifs = [newNotif, ...state.notifications].slice(0, 20);
+  const newUnread = newNotif.isRead ? state.unreadCount : state.unreadCount + 1;
+  return { notifications: newNotifs, unreadCount: newUnread };
+});
+```
+
+---
+
+#### P1.5 — `useProducts` legacy hook: بحث client-side على 200 منتج مع normalizing عربي
+**الموقع:** `src/features/inventory/hooks/useProducts.ts:26-55`
+
+**الوصف:**
+```tsx
+const filteredProducts = useMemo(() => {
+  const normalizeArabic = (text: string) => {
+    return text
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/[\u064B-\u065F]/g, '');
+  };
+  // ... filter على 200 منتج
+}, [query.data, searchTerm]);
+```
+- `normalizeArabic` تُعرف داخل `useMemo` (لا تأثير سلبي لكنه غير ضروري).
+- البحث يتم على **client-side** فقط بعد تحميل 200 منتج. إذا كان المستخدم يبحث عن منتج نادر، يجب أن يذهب للخادم.
+- `stats` يُعيد حساب `reduce` و `filter` في كل تغيير.
+
+**الحل:**
+1. **استخدام `useProductsPaginated`** (الموجود أصلاً) بدلاً من `useProducts` للقوائم الكبيرة.
+2. **تخزين `normalizeArabic` خارج المكون** كدالة pure.
+3. **إرسال `searchTerm` إلى الخادم** عبر `ilike` (موجود في `productsApi.searchProduct`) بدلاً من client-side filtering.
+
+---
+
+### 🟡 P2 — متوسطة (تحسينات بنيوية وتقنية)
+
+#### P2.1 — `useRealtimeSync`: invalidation واسع بسبب `postgres_changes` على كل الجداول
+**الموقع:** `src/lib/hooks/useRealtimeSync.ts:59-78`
+
+**الوصف:**
+```tsx
+channel.on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+  const preset = TABLE_PRESET_MAP[payload.table];
+  if (preset) invalidateByPreset(queryClient, preset);
+});
+```
+- يستمع لـ **كل** التغييرات في **كل** الجداول (`public.*`).
+- الـ throttle = 2000ms. هذا يعني أنه إذا حدث 10 تغييرات خلال 2 ثانية، يتم تجاهل 9 منها.
+- لكن `invalidateByPreset` قد يُبطل **عشرات الـ queries** مرة واحدة (مثلاً preset `'sale'` يُبطل invoices, stats, analytics, returns, dashboard).
+
+**الحل:**
+1. **تقليل نطاق الاستماع:** استخدام `filter` على `company_id` في الـ channel بدلاً من `schema: 'public'` فقط.
+2. **تطبيق debounce + batch invalidation:** تجميع التغييرات لـ 5 ثوانٍ ثم invalidation مرة واحدة.
+3. **استخدام `queryClient.setQueryData` للتحديث المُحسَّن** بدلاً من `invalidateQueries` عندما يكون التغيير معروفاً (مثلاً: إضافة منتج → `setQueryData` للقائمة).
+
+---
+
+#### P2.2 — Framer Motion + Recharts: حجب الخيط الرئيسي
+**المواقع:**
+- `src/ui/common/SearchableAccountSelector.tsx:3` (AnimatePresence)
+- `src/ui/dashboard/SalesChart.tsx` (Recharts)
+- `src/features/dashboard/components/PerformanceGauge.tsx` (setInterval + animation)
+
+**الوصف:**
+- **Framer Motion** يُجري حسابات layout و animations على Main Thread. استخدام `AnimatePresence` في القوائم المنسدحة (dropdowns) يُسبب **layout thrashing**.
+- **Recharts** يُعيد رسم SVG بالكامل عند أي تغيير في data. في DashboardPage، كل widget chart يُعيد الرسم بشكل منفصل.
+- **PerformanceGauge** يستخدم `setInterval` لمراقبة dimensions.
+
+**الحل:**
+1. **تأجيل تحميل Charts:**
+   ```tsx
+   const SalesChart = lazy(() => import('./SalesChart'));
+   ```
+2. **استخدام `requestAnimationFrame` + `IntersectionObserver`** لتفعيل الرسم البياني فقط عندما يكون مرئياً.
+3. **تقليل `framer-motion` usage** في المكونات المتكررة (table rows, list items). استخدم CSS transitions (`transform`, `opacity`) بدلاً من JS animation.
+
+---
+
+#### P2.3 — `useSystemInitialization` يُجمِّع 10+ effects داخل hook واحد
+**الموقع:** `src/core/hooks/useSystemInitialization.ts`
+
+**الوصف:**
+الـ Hook يحتوي على:
+- 6 `useEffect`.
+- 3 `addEventListener` (mousedown, keydown, touchstart).
+- 1 `setInterval` (10 دقائق).
+- 1 `useRealtimeSync()` (WebSocket subscription).
+- اشتراكات في 7+ stores مختلفة.
+
+**الجذر:**
+- كل تغيير في أي store من الـ 7 يُعيد تشغيل الـ Hook وربما يُسبب re-run للـ effects.
+- `hasBootstrappedSystem` variable global لا يُحمِّل في StrictMode (يُعاد mount مرتين).
+
+**الحل:**
+1. **تقسيم الـ Hook إلى hooks متخصصة:**
+   - `useKeyboardShortcuts`
+   - `useNetworkSync`
+   - `useAuthBootstrap`
+   - `useNotificationPolling`
+2. **استخدام `useRef` لـ bootstrap flag** بدلاً من variable global:
+   ```tsx
+   const hasBootstrapped = useRef(false);
+   ```
+
+---
+
+#### P2.4 — `queryClient.invalidateQueries()` بدون `queryKey` في Service Worker sync
+**الموقع:** `src/core/hooks/useSystemInitialization.ts:138`
+
+**الوصف:**
+```tsx
+await queryClient.invalidateQueries(); // ❌ invalidates EVERYTHING
+```
+بعد مزامنة Service Worker، يتم إبطال **كل** الـ cache في التطبيق. هذا يُسبب ** thundering herd** من الطلبات.
+
+**الحل:**
+```tsx
+await queryClient.invalidateQueries({ queryKey: ['sales'] });
+await queryClient.invalidateQueries({ queryKey: ['inventory'] });
+// أو استخدام invalidateByPreset
+```
+
+---
+
+#### P2.5 — `useSyncQueue` يستخدم API داخلية غير موثقة
+**الموقع:** `src/core/lib/react-query.tsx:185-190`
+
+**الوصف:**
+```tsx
+await queryClient.getMutationCache().build(queryClient, {
+  mutationKey: mutation.mutationKey,
+  mutationFn: async (variables) => { ... }
+}).execute(mutation.variables);
+```
+`mutationCache.build()` هو **API داخلي** غير موثق في TanStack Query وقد يتغير أو يُحذف. إذا فشل، قد يُسبب memory leak لأن الـ mutation observer لا يُزال.
+
+**الحل:**
+استخدام `queryClient.fetchMutation` (إذا كان متاحاً) أو إنشاء `useMutation` hook ديناميكي بشكل آمن:
+```tsx
+const mutation = useMutation({ mutationFn: processSyncMutation });
+// في sync loop:
+for (const pending of pendingMutations) {
+  await mutation.mutateAsync(pending.variables);
+}
+```
+
+---
+
+### 🟢 P3 — منخفضة (تحسينات طويلة الأمد)
+
+#### P3.1 — `localStoragePersister` غير مستخدم ويُضيف حجماً
+**الموقع:** `src/core/lib/persistence.ts:24-27`
+
+**الوصف:**
+يُعرِّف fallback persister لكن التطبيق يستخدم فقط IndexedDB Persister.
+
+**الحل:** إزالة إذا لم يُستخدم، أو تفعيله كـ fallback فعلي عند فشل IndexedDB.
+
+---
+
+#### P3.2 — `useInvalidateQueries` hook فارغ (stub)
+**الموقع:** `src/core/lib/react-query.tsx:252-262`
+
+**الوصف:**
+```tsx
+export const useInvalidateQueries = () => {
+  return {
+    invalidateAll: () => { },
+    invalidateInventory: () => { },
+    // ... كلها فارغة
+  };
+};
+```
+موجود في قاعدة الكود لكنه لا يُفعل شيئاً. يُسبب confusion ويجعل المطورين يُعيدون كتابة invalidation logic.
+
+**الحل:** إما تنفيذه أو حذفه.
+
+---
+
+#### P3.3 — `chunkSizeWarningLimit: 1000` يُخفي التحذيرات
+**الموقع:** `vite.config.ts:62`
+
+**الوصف:**
+رفع الحد إلى 1MB يُخفي التحذيرات عن chunks ضخمة. `vendor-react` قد يصل إلى 500KB+ و `vendor-data` أيضاً.
+
+**الحل:**
+1. **تقليل الحد إلى 500KB** ومراقبة التحذيرات.
+2. **استخدام `vite-bundle-visualizer`** بشكل دوري.
+3. **تقسيم `lucide-react`** إلى dynamic imports حسب الأيقونات المستخدمة في كل feature.
+
+---
+
+#### P3.4 — بعض الاستعلامات تستخدم `select('*')` على جداول كبيرة
+**المواقع:**
+- `src/core/database/api/invoicesApi.ts:163` (`select('*')` على `invoices`)
+- `src/core/database/api/journalsApi.ts:21` (`select('*')` على `journal_entries`)
+
+**الحل:** تحديد الأعمدة المطلوبة صراحةً لتقليل حجم JSON والذاكرة.
+
+---
+
+## 4. خطة العمل المُقترحة (Roadmap)
+
+| الأسبوع | الأولوية | المهمة | التأثير المتوقع |
+|---------|----------|--------|-----------------|
+| **1** | P0.1 | إصلاح `useTranslation` بـ `useCallback` | ↓ INP 20-30% |
+| **1** | P0.3 | استخراج 50+ inline handler شائع إلى `useCallback` | ↓ Re-renders 40% |
+| **2** | P0.2 | تقسيم Dashboard API إلى 3 endpoints | ↓ LCP 30-50%, ↓ TTFB |
+| **2** | P0.4 | تقليل timeout إلى 15s وتفعيل abort signal | ↓ Failed request queue |
+| **3** | P1.1 | إصلاح invalidation keys الدقيقة | ↓ Network requests 30% |
+| **3** | P1.2 | Web Worker لـ Dashboard Stats | ↓ Long Tasks 60% |
+| **4** | P1.3 | إعادة تصميم ExcelTable search | ↓ Search latency 80% |
+| **4** | P1.5 | إحلال `useProducts` بـ `useProductsPaginated` | ↓ Memory usage |
+| **5** | P2.1 | تحسين Realtime invalidation (filter + batch) | ↓ Background CPU |
+| **5** | P2.2 | Lazy load Charts + CSS transitions بدل Motion | ↓ Main Thread jank |
+| **6** | P2.3 | تقسيم `useSystemInitialization` | ↑ Maintainability |
+
+---
+
+## 5. مقاييس الأداء المُستهدفة
+
+| المقياس | الحالي (تقديري) | الهدف | كيفية القياس |
+|---------|-----------------|-------|--------------|
+| **LCP** | 2.5-4.0s | < 2.0s | Lighthouse / `web-vitals` |
+| **INP** | 300-500ms | < 200ms | Chrome DevTools > Performance |
+| **TTFB** | 1.5-3.0s | < 1.0s | Supabase Dashboard + `initAPM` |
+| **CLS** | 0.1-0.25 | < 0.1 | Lighthouse |
+| **JS Bundle (initial)** | ~450KB | < 350KB | `vite-bundle-visualizer` |
+| **Memory (heap)** | يتصاعد مع الاستخدام | مستقر | Chrome DevTools > Memory |
+
+---
+
+## 6. الخلاصة
+
+نظام الزهراء الذكي يتمتع ببنية **Feature-Based Architecture** قوية وأساس تقني حديث (React 19, Vite, TanStack Query v5). المشاكل الحرجة لا تكمن في البنية العالية، بل في:
+
+1. **إعادة الرسم المتواصلة** بسبب دوال inline و `useTranslation`.
+2. **استعلامات ضخمة monolithic** في لوحة التحكم.
+3. **معالجة بيانات client-side ثقيلة** دون تقطيع أو Web Workers.
+4. **Retry/Timeout عدواني** يسبب تراكم الطلبات.
+
+بإصلاح المشاكل من فئة **P0** خلال أسبوعين، يمكن تحقيق تحسن ملحوظ في الأداء المُحسوس (INP, LCP). المشاكل من فئة **P1** تُحسِّن استقرار التطبيق على المدى المتوسط. المشاكل من فئة **P2** و **P3** تُعزز قابلية الصيانة وتُقلِّل الديون التقنية.
+
+**التوصية الفورية:**
+- البدء بـ **P0.1** (`useTranslation` fix) — تغيير سطر واحد، تأثير عالمي.
+- إعادة تصميم **Dashboard Data Fetching** — أعلى عائد استثمار.
+- تفعيل **React DevTools Profiler** في بيئة التطوير لقياس الفرق قبل/بعد.

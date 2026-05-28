@@ -72,8 +72,7 @@ export const useVINLookup = () => {
                     min_stock_level: 0,
                     unit: 'قطعة'
                 };
-                const { data: newProduct, error } = await inventoryApi.createProduct(productData);
-                if (error) throw error;
+                const newProduct = await inventoryApi.createProduct(productData) as any;
 
                 if (savedVehicleId && newProduct?.id) {
                     await inventoryApi.addFitment({ company_id: companyId, product_id: newProduct.id, vehicle_id: savedVehicleId });
@@ -92,8 +91,7 @@ export const useVINLookup = () => {
                     min_stock_level: 0,
                     unit: 'قطعة'
                 };
-                const { data: altProduct, error: altErr } = await inventoryApi.createProduct(newProductData);
-                if (altErr) throw altErr;
+                const altProduct = await inventoryApi.createProduct(newProductData) as any;
 
                 await inventoryApi.addCrossReference({
                     company_id: companyId,

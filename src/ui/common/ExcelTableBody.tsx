@@ -39,7 +39,7 @@ interface ExcelTableBodyProps<T> {
     rowHeight?: number;
 }
 
-export function ExcelTableBody<T>({
+function ExcelTableBodyInner<T>({
     isLoading,
     orderedData,
     columns,
@@ -243,3 +243,5 @@ export function ExcelTableBody<T>({
         </tbody>
     );
 }
+
+export const ExcelTableBody = React.memo(ExcelTableBodyInner) as typeof ExcelTableBodyInner;

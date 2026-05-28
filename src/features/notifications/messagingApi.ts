@@ -16,7 +16,7 @@ export interface MessagingConfig {
     whatsapp_phone: string;
     notify_on_sale: boolean;
     notify_on_purchase: boolean;
-    notify_on_bond: boolean;
+    notify_on_payment_bond: boolean;
     notify_on_expense: boolean;
     notify_on_stock_transfer: boolean;
     notify_on_low_stock: boolean;
@@ -44,7 +44,7 @@ export const DEFAULT_MESSAGING_CONFIG: Omit<MessagingConfig, 'company_id'> = {
     whatsapp_phone: '',
     notify_on_sale: true,
     notify_on_purchase: true,
-    notify_on_bond: true,
+    notify_on_payment_bond: true,
     notify_on_expense: true,
     notify_on_stock_transfer: true,
     notify_on_low_stock: true,

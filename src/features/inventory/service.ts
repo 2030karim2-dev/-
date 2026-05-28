@@ -36,8 +36,8 @@ export const inventoryService = {
     return productService.getProducts(companyId, page, limitNum);
   },
 
-  searchProducts: async (companyId: string, term: string) => {
-    return productService.searchProducts(companyId, term);
+  searchProducts: async (companyId: string, term: string, limit?: number) => {
+    return productService.searchProducts(companyId, term, limit);
   },
 
   getProductById: async (id: string) => {
@@ -155,20 +155,20 @@ export const inventoryService = {
   // ==========================================
   // Quick Adjustments
   // ==========================================
-  
+
   quickAdjustStock: async (companyId: string, items: { product_id: string; warehouse_id: string; quantity: number }[], userId: string) => {
     const { warehouseApi } = await import('./api/warehouseApi');
-    
+
     // Process in batches of 20 to prevent rate limiting and connection drops
     const BATCH_SIZE = 20;
     for (let i = 0; i < items.length; i += BATCH_SIZE) {
       const batch = items.slice(i, i + BATCH_SIZE);
-      const promises = batch.map(item => 
-         warehouseApi.updateStock(companyId, item.product_id, item.warehouse_id, item.quantity, userId)
+      const promises = batch.map(item =>
+        warehouseApi.updateStock(companyId, item.product_id, item.warehouse_id, item.quantity, userId)
       );
       await Promise.all(promises);
     }
-    
+
     return true;
   }
 };

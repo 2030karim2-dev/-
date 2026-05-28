@@ -91,6 +91,9 @@ export const journalLineSchema = z.object({
     }
 );
 
+import Decimal from 'decimal.js';
+import { SOX_BALANCE_TOLERANCE } from '../utils/decimalUtils';
+
 // Journal entry schema with balance validation
 export const journalEntrySchema = z.object({
     date: dateSchema,
@@ -100,12 +103,12 @@ export const journalEntrySchema = z.object({
     lines: z.array(journalLineSchema).min(2, 'قيد يومية يتطلب سطرين على الأقل'),
 }).refine(
     data => {
-        const totalDebit = data.lines.reduce((sum, line) => sum + (line.debit_amount || 0), 0);
-        const totalCredit = data.lines.reduce((sum, line) => sum + (line.credit_amount || 0), 0);
-        return Math.abs(totalDebit - totalCredit) < 0.01;
+        const totalDebit = data.lines.reduce((sum, line) => sum.plus(new Decimal(line.debit_amount || 0)), new Decimal(0));
+        const totalCredit = data.lines.reduce((sum, line) => sum.plus(new Decimal(line.credit_amount || 0)), new Decimal(0));
+        return totalDebit.minus(totalCredit).absoluteValue().lessThanOrEqualTo(SOX_BALANCE_TOLERANCE);
     },
     {
-        message: 'القيد المحاسبي غير متوازن: إجمالي المدين يجب أن يساوي إجمالي الدائن',
+        message: 'القيد المحاسبي غير متوازن: إجمالي المدين يجب أن يساوي إجمالي الدائن بدقة متناهية متوافقة مع معايير SOX',
     }
 );
 

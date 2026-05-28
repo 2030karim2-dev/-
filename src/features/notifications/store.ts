@@ -53,10 +53,13 @@ export const useNotificationStore = create<NotificationState>()(
           timestamp: Date.now(),
           isRead: false
         };
-        set(state => ({
-          notifications: [newNotif, ...state.notifications].slice(0, 100), // Keep last 100
-          unreadCount: state.notifications.filter(n => !n.isRead).length + 1
-        }));
+
+        set(state => {
+          const newNotifs = [newNotif, ...state.notifications].slice(0, 20);
+          // O(1) incremental update instead of O(n) full scan
+          const newUnread = newNotif.isRead ? state.unreadCount : state.unreadCount + 1;
+          return { notifications: newNotifs, unreadCount: newUnread };
+        });
 
         // Play sound if enabled and user has interacted
         const soundStore = useSoundStore.getState();
@@ -75,45 +78,64 @@ export const useNotificationStore = create<NotificationState>()(
 
       markAsRead: (id) => {
         set(state => {
+          const notif = state.notifications.find(n => n.id === id);
+          if (!notif || notif.isRead) return state; // No change needed
+
           const newNotifs = state.notifications.map(n =>
             n.id === id ? { ...n, isRead: true } : n
           );
           return {
             notifications: newNotifs,
-            unreadCount: newNotifs.filter(n => !n.isRead).length
+            unreadCount: Math.max(0, state.unreadCount - 1)
           };
         });
       },
 
       markAllAsRead: (companyId?: string) => {
-        set(state => ({
-          notifications: state.notifications.map(n =>
-            (!companyId || n.companyId === companyId) ? { ...n, isRead: true } : n
-          ),
-          unreadCount: companyId
-            ? state.notifications.filter(n => n.companyId !== companyId && !n.isRead).length
-            : 0
-        }));
-      },
-
-      deleteNotification: (id) => {
         set(state => {
-          const newNotifs = state.notifications.filter(n => n.id !== id);
+          let decrement = 0;
+          const newNotifs = state.notifications.map(n => {
+            if ((!companyId || n.companyId === companyId) && !n.isRead) {
+              decrement++;
+              return { ...n, isRead: true };
+            }
+            return n;
+          });
           return {
             notifications: newNotifs,
-            unreadCount: newNotifs.filter(n => !n.isRead).length
+            unreadCount: Math.max(0, state.unreadCount - decrement)
           };
         });
       },
 
-      clearAll: (companyId?: string) => set(state => ({
-        notifications: companyId
-          ? state.notifications.filter(n => n.companyId !== companyId)
-          : [],
-        unreadCount: companyId
-          ? state.notifications.filter(n => n.companyId !== companyId && !n.isRead).length
-          : 0
-      })),
+      deleteNotification: (id) => {
+        set(state => {
+          const notif = state.notifications.find(n => n.id === id);
+          const newNotifs = state.notifications.filter(n => n.id !== id);
+          return {
+            notifications: newNotifs,
+            unreadCount: Math.max(0, state.unreadCount - (notif && !notif.isRead ? 1 : 0))
+          };
+        });
+      },
+
+      clearAll: (companyId?: string) => set(state => {
+        let removedUnread = 0;
+        const remaining = companyId
+          ? state.notifications.filter(n => {
+            const keep = n.companyId !== companyId;
+            if (!keep && !n.isRead) removedUnread++;
+            return keep;
+          })
+          : [];
+        if (!companyId) {
+          removedUnread = state.unreadCount;
+        }
+        return {
+          notifications: remaining,
+          unreadCount: Math.max(0, state.unreadCount - removedUnread)
+        };
+      }),
     }),
     { name: 'al-zahra-notifications' }
   )

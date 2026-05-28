@@ -92,17 +92,14 @@ export const partiesService = {
   saveParty: async (companyId: string, data: PartyFormData, id?: string) => {
     if (!data.name) throw new Error("الاسم مطلوب");
     if (id) {
-      const { error } = await partiesApi.updateParty(id, data);
-      if (error) throw error;
+      await partiesApi.updateParty(id, data as any);
     } else {
-      const { error } = await partiesApi.createParty(data, companyId);
-      if (error) throw error;
+      await partiesApi.createParty(data as any, companyId);
     }
   },
 
   deleteParty: async (id: string) => {
-    const { error } = await partiesApi.deleteParty(id);
-    if (error) throw error;
+    await partiesApi.deleteParty(id);
   },
 
   saveCategory: async (companyId: string, data: { name: string, type: PartyType }, id?: string) => {
@@ -160,13 +157,12 @@ export const partiesService = {
     const existing = (searchResults || []).find((p: Record<string, unknown>) => p.name === name);
     if (existing) return existing as unknown as Party;
 
-    const { data: created, error: createError } = await partiesApi.createParty({
+    const created = await partiesApi.createParty({
       name,
       type,
       status: 'active'
     } as any, companyId);
 
-    if (createError) throw createError;
     return (created as unknown) as Party;
   }
 };

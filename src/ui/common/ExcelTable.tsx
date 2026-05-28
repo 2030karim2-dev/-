@@ -1,9 +1,12 @@
-import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useDeferredValue } from 'react';
 import { GripVertical } from 'lucide-react';
 import { cn } from '../../core/utils';
 import { useTableKeyboardNavigation } from './useTableKeyboardNavigation';
 import { useTableDragDrop } from './hooks/useTableDragDrop';
-import { useTableSelection } from './hooks/useTableSelection';
+import { useTableResize } from './ExcelTable/hooks/useTableResize';
+import { useTableSelection } from './ExcelTable/hooks/useTableSelection';
+import { useTableDrag } from './hooks/useTableDrag';
+import { useTablePagination } from './hooks/useTablePagination';
 import { ExcelTableHeader } from './ExcelTableHeader';
 import { ExcelTableBody } from './ExcelTableBody';
 import { ExcelTablePagination } from './ExcelTablePagination';
@@ -65,34 +68,28 @@ function ExcelTable<T>({
   const [internalSearch, setInternalSearch] = useState('');
   const isMainSearch = !!onSearchChange;
   const effectiveSearch = isMainSearch ? (searchValue ?? '') : internalSearch;
+  const deferredSearch = useDeferredValue(effectiveSearch);
   const [isZoomed, setIsZoomed] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(showShortcutsPanel);
   const tableRef = useRef<HTMLDivElement>(null);
   const tableWrapperRef = useRef<HTMLDivElement>(null);
-  const [isMouseDown, setIsMouseDown] = useState(false);
 
-  // Resize state
-  const [_isResizing, _setIsResizing] = useState(false);
-  const [_resizeDirection, _setResizeDirection] = useState<string | null>(null);
-  const [customSize, setCustomSize] = useState<{ width?: string; height?: string }>({});
-  const [originalSize, setOriginalSize] = useState<{ width?: string; height?: string }>({});
+  // ── Table Resize & Drag ─────────────────────────────────────
+  const {
+    columnWidths,
+    customSize,
+    zoomLevel,
+    setZoomLevel,
+    handleMouseDown: handleColumnResizeStart,
+    handleWrapperResizeStart,
+    handleResetSize: handleResetTableSize
+  } = useTableResize({ enableResize, tableWrapperRef: tableWrapperRef as React.RefObject<HTMLDivElement> });
 
-  // Drag state
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(pageSize);
-
-  useEffect(() => {
-    setItemsPerPage(pageSize);
-  }, [pageSize]);
-
-  const [columnWidths, setColumnWidths] = useState<Record<number, number>>({});
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const resizingRef = useRef<{ colIndex: number; startX: number; startWidth: number } | null>(null);
+  const {
+    isDragging,
+    position,
+    handleTableDragStart
+  } = useTableDrag({ enableDrag, isZoomed, tableWrapperRef: tableWrapperRef as React.RefObject<HTMLDivElement> });
 
   const themes = {
     blue: {
@@ -137,62 +134,39 @@ function ExcelTable<T>({
 
   const processedData = useMemo(() => {
     let items = [...data];
-    if (!isMainSearch && effectiveSearch) {
-      const term = effectiveSearch.toLowerCase();
-
-      // Helper to recursively extract text from any React element or primitive
-      const getStringContent = (val: any): string => {
-        if (val === null || val === undefined) return '';
-        if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
-          return String(val);
-        }
-        if (Array.isArray(val)) {
-          return val.map(getStringContent).join(' ');
-        }
-        if (typeof val === 'object') {
-          if (val.props && val.props.children !== undefined) {
-            return getStringContent(val.props.children);
-          }
-          if (!val.$$typeof && typeof val.then !== 'function') {
-            try {
-              return Object.values(val).map(getStringContent).join(' ');
-            } catch (e) {
-              return '';
-            }
-          }
-        }
-        return '';
-      };
+    if (!isMainSearch && deferredSearch) {
+      const term = deferredSearch.toLowerCase().trim();
+      if (!term) return items;
 
       items = items.filter(item => {
-        // 1. Try to evaluate column accessors to catch custom displayed values/elements
+        // 1. Search via accessorKey (O(1) per column, no React element traversal)
         const accessorMatches = columns.some(col => {
+          if (!col.accessorKey) return false;
           try {
-            const val = col.accessor(item);
-            const content = getStringContent(val);
-            if (content) {
-              return content.toLowerCase().includes(term);
+            const val = (item as Record<string, unknown>)[col.accessorKey as string];
+            if (val !== undefined && val !== null) {
+              return String(val).toLowerCase().includes(term);
             }
-          } catch (e) {
-            // Ignore errors in custom accessors
-          }
+          } catch (e) { /* ignore */ }
           return false;
         });
         if (accessorMatches) return true;
 
-        // 2. Fallback to recursive deep search of the item object's values
+        // 2. Fallback: deep object search (without React element traversal)
         const deepSearch = (val: any): boolean => {
           if (val === null || val === undefined) return false;
           if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
             return String(val).toLowerCase().includes(term);
           }
+          if (Array.isArray(val)) {
+            return val.some(deepSearch);
+          }
           if (typeof val === 'object') {
+            // Explicitly skip React elements and Promises
             if (val.$$typeof || typeof val.then === 'function') return false;
             try {
               return Object.values(val).some(deepSearch);
-            } catch (e) {
-              return false;
-            }
+            } catch (e) { return false; }
           }
           return false;
         };
@@ -222,17 +196,27 @@ function ExcelTable<T>({
     setCurrentPage(1);
   }, [effectiveSearch, data.length]);
 
-  const paginatedData = useMemo(() => {
-    if (!enablePagination) return processedData;
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return processedData.slice(startIndex, startIndex + itemsPerPage);
-  }, [processedData, currentPage, itemsPerPage, enablePagination]);
+  // ── Pagination & Selection (after processedData) ───────────
+  const {
+    currentPage,
+    itemsPerPage,
+    totalPages,
+    paginatedData: paginatedResult,
+    setCurrentPage,
+    setItemsPerPage
+  } = useTablePagination({ enablePagination, pageSize, data: processedData });
 
-  const totalPages = Math.ceil(processedData.length / itemsPerPage);
+  const { orderedData, handlers: { handleDragStart, handleDragEnter, handleDragEnd, handleDrop } } = useTableDragDrop(paginatedResult as T[], onOrderChange);
 
-  // Custom Hooks
-  const { orderedData, handlers: { handleDragStart, handleDragEnter, handleDragEnd, handleDrop } } = useTableDragDrop(paginatedData, onOrderChange);
-  const { toggleAllSelection, toggleRowSelection } = useTableSelection(orderedData, selectedRowIds, onSelectionChange, getRowId);
+  const {
+    toggleAllSelection: toggleAllSelectionHk,
+    toggleRowSelection: toggleRowSelectionHk,
+    handleMouseDownOnTable,
+    handleMouseUpOnTable,
+    handleMouseLeaveOnTable,
+    handleMouseDownCell,
+    handleMouseEnterCell
+  } = useTableSelection({ orderedData, selectedRowIds, onSelectionChange, getRowId });
 
   const {
     focusedCell,
@@ -273,138 +257,6 @@ function ExcelTable<T>({
     setSortConfig({ key, direction });
   };
 
-  const handleMouseDown = useCallback((e: React.MouseEvent, colIndex: number) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const th = (e.target as HTMLElement).parentElement as HTMLTableCellElement;
-    resizingRef.current = {
-      colIndex,
-      startX: e.clientX,
-      startWidth: th.offsetWidth,
-    };
-    document.body.style.cursor = 'col-resize';
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, []);
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!resizingRef.current) return;
-    const { colIndex, startX, startWidth } = resizingRef.current;
-    const newWidth = startWidth + (e.clientX - startX);
-    if (newWidth > 40) {
-      setColumnWidths(prev => ({ ...prev, [colIndex]: newWidth }));
-    }
-  }, []);
-
-  const handleMouseUp = useCallback(() => {
-    resizingRef.current = null;
-    document.body.style.cursor = '';
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  }, []);
-
-  // Reset size to original
-  const handleResetSize = () => {
-    setCustomSize({});
-    setIsZoomed(false);
-    setPosition({ x: 0, y: 0 });
-  };
-
-  // Save original size before resize
-  const saveOriginalSize = useCallback(() => {
-    if (tableWrapperRef.current && Object.keys(originalSize).length === 0) {
-      setOriginalSize({
-        width: tableWrapperRef.current.style.width || '',
-        height: tableWrapperRef.current.style.height || ''
-      });
-    }
-  }, [originalSize]);
-
-  // Handle wrapper resize start (for full table resize)
-  const handleWrapperResizeStart = (direction: string, e: React.MouseEvent) => {
-    if (!enableResize) return;
-    e.stopPropagation();
-    _setIsResizing(true);
-    _setResizeDirection(direction);
-    saveOriginalSize();
-
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startWidth = tableWrapperRef.current?.offsetWidth || 0;
-    const startHeight = tableWrapperRef.current?.offsetHeight || 0;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (!tableWrapperRef.current) return;
-
-      const deltaX = moveEvent.clientX - startX;
-      const deltaY = moveEvent.clientY - startY;
-
-      let newWidth = startWidth;
-      let newHeight = startHeight;
-
-      if (direction.includes('e')) {
-        newWidth = Math.max(400, startWidth + deltaX);
-      }
-      if (direction.includes('w')) {
-        newWidth = Math.max(400, startWidth - deltaX);
-      }
-      if (direction.includes('s')) {
-        newHeight = Math.max(200, startHeight + deltaY);
-      }
-      if (direction.includes('n')) {
-        newHeight = Math.max(200, startHeight - deltaY);
-      }
-
-      setCustomSize({ width: `${newWidth}px`, height: `${newHeight}px` });
-    };
-
-    const handleMouseUp = () => {
-      _setIsResizing(false);
-      _setResizeDirection(null);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    document.body.style.cursor = `${direction}-resize`;
-    document.body.style.userSelect = 'none';
-  };
-
-  // Handle drag start
-  const handleTableDragStart = (e: React.MouseEvent) => {
-    if (!enableDrag || isZoomed) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-
-    const rect = tableWrapperRef.current?.getBoundingClientRect();
-    if (rect) {
-      setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    }
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const newX = moveEvent.clientX - dragOffset.x;
-      const newY = moveEvent.clientY - dragOffset.y;
-      setPosition({ x: newX, y: newY });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    document.body.style.cursor = 'grabbing';
-    document.body.style.userSelect = 'none';
-  };
-
   const handleEditInputKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -431,21 +283,6 @@ function ExcelTable<T>({
     }
   };
 
-  // Handle mouse selection
-  const handleMouseDownCell = (e: React.MouseEvent, rowIdx: number, colIdx: number) => {
-    if (e.shiftKey) {
-      handleCellClick(rowIdx, colIdx, true);
-    } else {
-      startSelection(rowIdx, colIdx);
-    }
-  };
-
-  const handleMouseEnterCell = () => {
-    if (isMouseDown) {
-      // Selection is being made - handled by startSelection/updateSelection
-    }
-  };
-
 
 
   return (
@@ -463,11 +300,11 @@ function ExcelTable<T>({
           isRTL={isRTL}
           onExport={onExport}
           enableResize={enableResize}
-          handleResetSize={handleResetSize}
+          handleResetSize={handleResetTableSize}
           isZoomed={isZoomed}
           setIsZoomed={setIsZoomed}
           zoomLevel={zoomLevel}
-          setZoomLevel={setZoomLevel}
+          setZoomLevel={setZoomLevel as React.Dispatch<React.SetStateAction<number>>}
           showShortcuts={showShortcuts}
           setShowShortcuts={setShowShortcuts}
         />
@@ -524,9 +361,9 @@ function ExcelTable<T>({
             ref={tableRef}
             tabIndex={-1}
             className="flex-1 overflow-auto custom-scrollbar outline-none"
-            onMouseDown={() => setIsMouseDown(true)}
-            onMouseUp={() => { setIsMouseDown(false); endSelection(); }}
-            onMouseLeave={() => { setIsMouseDown(false); endSelection(); }}
+            onMouseDown={handleMouseDownOnTable}
+            onMouseUp={() => handleMouseUpOnTable(endSelection)}
+            onMouseLeave={() => handleMouseLeaveOnTable(endSelection)}
           >
             <table
               style={{ fontSize: `${zoomLevel * 11}px` }}
@@ -540,12 +377,12 @@ function ExcelTable<T>({
                 enableSelection={enableSelection}
                 orderedDataLength={orderedData.length}
                 selectedRowIdsSize={selectedRowIds.size}
-                toggleAllSelection={toggleAllSelection}
+                toggleAllSelection={toggleAllSelectionHk}
                 columnWidths={columnWidths}
                 handleSort={handleSort}
                 sortConfig={sortConfig}
                 isRTL={isRTL}
-                handleMouseDown={handleMouseDown}
+                handleMouseDown={handleColumnResizeStart}
                 isLoading={isLoading}
               />
               <ExcelTableBody
@@ -564,13 +401,13 @@ function ExcelTable<T>({
                 onRowClick={onRowClick}
                 onOrderChange={onOrderChange}
                 currentTheme={currentTheme}
-                toggleRowSelection={toggleRowSelection}
+                toggleRowSelection={toggleRowSelectionHk}
                 currentPage={currentPage}
                 itemsPerPage={itemsPerPage}
                 focusedCell={focusedCell}
                 editingCell={editingCell}
                 handleCellClick={handleCellClick}
-                handleMouseDownCell={handleMouseDownCell}
+                handleMouseDownCell={(e: React.MouseEvent, row: number, col: number) => handleMouseDownCell(e, row, col, handleCellClick, startSelection)}
                 handleMouseEnterCell={handleMouseEnterCell}
                 onRowDoubleClick={onRowDoubleClick as any}
                 startEditing={startEditing}

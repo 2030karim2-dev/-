@@ -3,86 +3,45 @@ import { inventoryService } from '../service';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
 import { ProductFormData } from '../types';
-import { useMemo, useEffect } from 'react';
-import { supabase } from '../../../lib/supabaseClient';
-import { logger } from '../../../core/utils/logger';
+import { useMemo } from 'react';
 import { syncStore } from '../../../core/lib/sync-store';
+import { queryKeys } from '../../../core/lib/react-query';
+import { normalizeArabic } from '../../../core/utils/textUtils.ts';
 
 export const useProducts = (searchTerm: string = '', options: { limitNum?: number, enabled?: boolean } = {}) => {
-    const queryClient = useQueryClient();
     const { user } = useAuthStore();
     const companyId = user?.company_id;
+    const limit = options.limitNum || 200;
 
     const query = useQuery({
-        queryKey: ['products', companyId, options.limitNum],
-        queryFn: () => companyId ? inventoryService.getProducts(companyId, 1, options.limitNum || 10000) : Promise.resolve([]),
+        queryKey: ['products', companyId, limit, searchTerm ? `search:${normalizeArabic(searchTerm)}` : 'all'],
+        queryFn: () => {
+            if (!companyId) return Promise.resolve([]);
+            if (searchTerm && searchTerm.length > 1) {
+                return inventoryService.searchProducts(companyId, searchTerm, limit);
+            }
+            return inventoryService.getProducts(companyId, 1, limit);
+        },
         enabled: (options.enabled !== undefined ? options.enabled : true) && !!companyId,
+        staleTime: 1000 * 60,
     });
 
-    // Realtime channel for product and stock updates
-    useEffect(() => {
-        if (!companyId) return;
+    // NOTE: Realtime invalidation for products is now handled centrally by
+    // useRealtimeSync() (global-sync channel). This avoids duplicate WebSocket
+    // connections and redundant query invalidations.
+    // See: src/lib/hooks/useRealtimeSync.ts
 
-        const channel = supabase
-            .channel(`products_realtime_${companyId}`)
-            .on(
-                'postgres_changes',
-                {
-                    event: '*',
-                    schema: 'public',
-                    table: 'products',
-                    filter: `company_id=eq.${companyId}`
-                },
-                (payload: any) => {
-                    logger.debug('Products', 'Inventory updated via realtime', JSON.stringify(payload));
-                    queryClient.invalidateQueries({ queryKey: ['products', companyId] });
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [companyId, queryClient]);
-
-    const filteredProducts = useMemo(() => {
+    // Stats computed directly from server data (no client-side filtering)
+    const stats = useMemo(() => {
         const products = query.data || [];
-        if (!searchTerm) return products;
-
-        // Normalize Arabic characters for more flexible matching
-        const normalizeArabic = (text: string) => {
-            return text
-                .replace(/[أإآ]/g, 'ا')
-                .replace(/ة/g, 'ه')
-                .replace(/ى/g, 'ي')
-                .replace(/[\u064B-\u065F]/g, ''); // Remove Harakat
+        return {
+            count: products.length,
+            totalValue: products.reduce((acc, p) => acc + ((p.cost_price || 0) * (p.stock_quantity || 0)), 0),
+            lowStockCount: products.filter(p => (p.stock_quantity || 0) <= (p.min_stock_level || 0)).length
         };
+    }, [query.data]);
 
-        const searchTokens = searchTerm.toLowerCase().split(/\s+/).filter(Boolean).map(normalizeArabic);
-
-        return products.filter(p => {
-            const searchableText = normalizeArabic([
-                p.name,
-                p.name_ar,
-                p.sku,
-                p.brand,
-                p.part_number,
-                p.alternative_numbers,
-                p.size,
-                p.specifications
-            ].filter(Boolean).join(' ').toLowerCase());
-
-            return searchTokens.every(token => searchableText.includes(token));
-        });
-    }, [query.data, searchTerm]);
-
-    const stats = useMemo(() => ({
-        count: filteredProducts.length,
-        totalValue: filteredProducts.reduce((acc, p) => acc + (p.cost_price * p.stock_quantity), 0),
-        lowStockCount: filteredProducts.filter(p => p.stock_quantity <= p.min_stock_level).length
-    }), [filteredProducts]);
-
-    return { ...query, products: filteredProducts, stats };
+    return { ...query, products: query.data || [], stats };
 };
 
 export const useMinimalProducts = () => {
@@ -160,9 +119,12 @@ export const useProductMutations = () => {
         onSuccess: () => {
             showToast("تم حفظ بيانات المنتج بنجاح", 'success');
         },
-        onSettled: () => {
+        onSettled: (_data, _error, variables) => {
             // Always refetch after mutation to ensure consistency
-            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.inventory.products() });
+            if (variables.id) {
+                queryClient.invalidateQueries({ queryKey: queryKeys.inventory.product(variables.id) });
+            }
         },
     });
 
@@ -170,7 +132,7 @@ export const useProductMutations = () => {
         // Fix: Call deleteProduct which will be added to inventoryService
         mutationFn: (id: string) => inventoryService.deleteProduct(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.inventory.products() });
             showToast("تم حذف المنتج من المستودع", 'info');
         }
     });
@@ -178,7 +140,7 @@ export const useProductMutations = () => {
     const bulkDeleteProducts = useMutation({
         mutationFn: (ids: string[]) => inventoryService.bulkDeleteProducts(ids),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.inventory.products() });
             showToast("تم حذف المنتجات المحددة بنجاح", 'info');
         }
     });

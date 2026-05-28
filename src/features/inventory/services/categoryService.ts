@@ -48,17 +48,14 @@ export const categoryService = {
      * Create a new category
      */
     createCategory: async (companyId: string, name: string) => {
-        const { data, error } = await inventoryApi.createCategory(companyId, name);
-        if (error) throw error;
-        return data;
+        return await inventoryApi.createCategory(companyId, name);
     },
 
     /**
      * Delete a category
      */
     deleteCategory: async (id: string) => {
-        const { error } = await inventoryApi.deleteCategory(id);
-        if (error) throw error;
+        await inventoryApi.deleteCategory(id);
     }
 };
 

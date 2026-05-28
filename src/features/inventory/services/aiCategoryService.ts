@@ -156,13 +156,12 @@ export const aiCategoryService = {
         for (const catName of newNamesRequested) {
             // Only create if it doesn't exist in the database yet
             if (!categoryMap[catName]) {
-                const { data, error } = await inventoryApi.createCategory(companyId, catName);
-                if (error) {
+                try {
+                    const data = await inventoryApi.createCategory(companyId, catName);
+                    categoryMap[catName] = (data as { id: string }).id;
+                } catch (error) {
                     console.error(`Failed to create category ${catName}:`, error);
                     throw new Error(`فشل إنشاء القسم الجديد "${catName}". قد يكون القسم موجوداً بالفعل باسم مشابه.`);
-                }
-                if (data) {
-                    categoryMap[catName] = (data as { id: string }).id;
                 }
             }
         }

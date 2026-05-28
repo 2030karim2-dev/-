@@ -7,8 +7,7 @@ import { supabase } from '../../../lib/supabaseClient';
 // Verification point
 export const accountsService = {
   getAccounts: async (companyId: string): Promise<Account[]> => {
-    const { data, error } = await accountsApi.getAccounts(companyId);
-    if (error) throw error;
+    const data = await accountsApi.getAccounts(companyId);
 
     // تحويل البيانات من السكيما (snake_case) إلى النموذج المطلوب في الواجهة
     return (data || []).map((acc: any) => ({
@@ -25,7 +24,7 @@ export const accountsService = {
   },
 
   createAccount: async (data: AccountFormData, companyId: string): Promise<Account> => {
-    const { data: account, error } = await accountsApi.createAccount({
+    const account = await accountsApi.createAccount({
       company_id: companyId,
       code: data.code,
       name_ar: data.name,
@@ -33,9 +32,7 @@ export const accountsService = {
       parent_id: data.parent_id || null,
       currency_code: 'SAR',
       is_system: false
-    });
-
-    if (error) throw error;
+    }) as any;
 
     return {
       id: account.id,
@@ -53,8 +50,7 @@ export const accountsService = {
   // Fix: Added missing deleteAccount method
   deleteAccount: async (id: string, isSystem: boolean) => {
     if (isSystem) throw new Error("لا يمكن حذف حساب نظام");
-    const { error } = await accountsApi.deleteAccount(id);
-    if (error) throw error;
+    await accountsApi.deleteAccount(id);
   },
 
   // Fix: Added missing seedDefaultAccounts method
@@ -107,8 +103,7 @@ export const accountsService = {
       }));
 
     if (toInsert.length > 0) {
-      const { error } = await accountsApi.insertAccounts(toInsert);
-      if (error) throw error;
+      await accountsApi.insertAccounts(toInsert);
     }
 
     return true;
@@ -168,8 +163,7 @@ export const accountsService = {
       }));
 
     if (toInsert.length > 0) {
-      const { error } = await accountsApi.insertAccounts(toInsert);
-      if (error) throw error;
+      await accountsApi.insertAccounts(toInsert);
     }
 
     return true;

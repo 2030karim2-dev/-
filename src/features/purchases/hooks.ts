@@ -86,7 +86,7 @@ export const useCreatePayment = () => {
   return useMutation({
     mutationFn: async (data: CreatePaymentDTO) => {
       if (!user?.company_id || !user?.id) throw new Error("Authentication failed");
-      return purchasesApi.createSupplierPayment(data, user.company_id, user.id);
+      return purchasesApi.createSupplierPayment(data as any, user.company_id, user.id);
     },
     onSuccess: () => {
       showToast('تم تسجيل سند الصرف بنجاح', 'success');

@@ -34,21 +34,18 @@ export const PaymentMethodsChart: React.FC<PaymentMethodsChartProps> = ({
     const [isMounted, setIsMounted] = React.useState(false);
 
     React.useEffect(() => {
-        const checkDimensions = () => {
-            if (containerRef.current && containerRef.current.offsetWidth > 0) {
-                setIsMounted(true);
-                return true;
+        if (!containerRef.current) return;
+
+        const ro = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width } = entry.contentRect;
+                if (width > 0) {
+                    setIsMounted(true);
+                }
             }
-            return false;
-        };
-
-        if (checkDimensions()) return;
-
-        const interval = setInterval(() => {
-            if (checkDimensions()) clearInterval(interval);
-        }, 500);
-
-        return () => clearInterval(interval);
+        });
+        ro.observe(containerRef.current);
+        return () => ro.disconnect();
     }, []);
 
     const getMethodInfo = (method: string) => {

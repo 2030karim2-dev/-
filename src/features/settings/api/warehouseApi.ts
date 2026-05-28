@@ -1,5 +1,4 @@
-
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '@/core/database/api';
 
 export const warehouseApi = {
   fetchWarehouses: async (companyId: string) => {

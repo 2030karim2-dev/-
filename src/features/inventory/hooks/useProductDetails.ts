@@ -40,7 +40,7 @@ export const useProductDetails = (product: Product | null) => {
         enabled: !!product?.supplier_id
     });
 
-    const supplierName = (supplierData?.data as any)?.name || product?.supplier_name || 'غير محدد';
+    const supplierName = (supplierData as any)?.name || product?.supplier_name || 'غير محدد';
 
     return {
         analytics,

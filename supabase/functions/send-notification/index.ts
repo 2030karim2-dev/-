@@ -252,7 +252,7 @@ Deno.serve(async (req: Request) => {
         const eventToggleMap: Record<string, string> = {
             sale: 'notify_on_sale',
             purchase: 'notify_on_purchase',
-            bond: 'notify_on_bond',
+            bond: 'notify_on_payment_bond',
             expense: 'notify_on_expense',
             stock_transfer: 'notify_on_stock_transfer',
             low_stock: 'notify_on_low_stock',

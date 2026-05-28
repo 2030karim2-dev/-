@@ -19,7 +19,7 @@ export const processSyncMutation = async (mutationKey: any[], variables: any, me
 
         if (id) {
             // Conflict Detection: Fetch current state
-            const { data: current } = await inventoryApi.getProductById(id);
+            const current = await inventoryApi.getProductById(id).catch(() => null) as any;
             if (current && metadata?.last_updated_at) {
                 const serverTime = new Date(current.updated_at).getTime();
                 const clientTime = new Date(metadata.last_updated_at).getTime();

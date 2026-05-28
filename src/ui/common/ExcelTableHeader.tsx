@@ -17,7 +17,7 @@ interface ExcelTableHeaderProps<T> {
     isLoading: boolean;
 }
 
-export function ExcelTableHeader<T>({
+function ExcelTableHeaderInner<T>({
     columns,
     enableSelection,
     orderedDataLength,
@@ -83,3 +83,5 @@ export function ExcelTableHeader<T>({
         </thead>
     );
 }
+
+export const ExcelTableHeader = React.memo(ExcelTableHeaderInner) as typeof ExcelTableHeaderInner;

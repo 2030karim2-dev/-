@@ -17,10 +17,10 @@ import { processSyncMutation } from './sync-registry';
 // ------------------------------------------
 export const QUERY_CONFIG = {
     // Default stale time (15 minutes) - Increased for better offline experience
-    DEFAULT_STALE_TIME: 15 * 60 * 1000,
+    DEFAULT_STALE_TIME: 15 * 60 * 1000, // 15 min
 
     // Cache time (24 hours) - Store in IndexedDB for much longer
-    DEFAULT_CACHE_TIME: 24 * 60 * 60 * 1000,
+    DEFAULT_CACHE_TIME: 1 * 60 * 60 * 1000, // 1 hour (was 24h — reduced to limit IndexedDB bloat)
 
     // Retry configuration
     DEFAULT_RETRY: 3,
@@ -133,7 +133,7 @@ export const createQueryClient = (options?: Partial<typeof QUERY_CONFIG>) => {
         defaultOptions: {
             queries: {
                 staleTime: options?.DEFAULT_STALE_TIME ?? QUERY_CONFIG.DEFAULT_STALE_TIME,
-                gcTime: options?.DEFAULT_CACHE_TIME ?? QUERY_CONFIG.DEFAULT_CACHE_TIME,
+                gcTime: options?.DEFAULT_CACHE_TIME ?? QUERY_CONFIG.DEFAULT_CACHE_TIME, // Reduced from 24h to limit IndexedDB bloat
                 retry: options?.DEFAULT_RETRY ?? QUERY_CONFIG.DEFAULT_RETRY,
                 refetchOnWindowFocus: options?.REFETCH_ON_WINDOW_FOCUS ?? QUERY_CONFIG.REFETCH_ON_WINDOW_FOCUS,
                 refetchOnReconnect: options?.REFETCH_ON_RECONNECT ?? QUERY_CONFIG.REFETCH_ON_RECONNECT,
@@ -158,7 +158,7 @@ interface ReactQueryProviderProps {
 /**
  * Hook to manage background synchronization of pending mutations
  */
-const useSyncQueue = (queryClient: QueryClient) => {
+const useSyncQueue = (_queryClient: QueryClient) => {
     const { isOnline } = useNetworkStatus();
     const isProcessingRef = useRef(false);
 
@@ -181,13 +181,9 @@ const useSyncQueue = (queryClient: QueryClient) => {
         try {
             for (const mutation of pending) {
                 try {
-                    // We use mutationCache directly to avoid creating new observers
-                    await queryClient.getMutationCache().build(queryClient, {
-                        mutationKey: mutation.mutationKey,
-                        mutationFn: async (variables) => {
-                            return processSyncMutation(mutation.mutationKey, variables);
-                        }
-                    }).execute(mutation.variables);
+                    // Call processSyncMutation directly instead of undocumented mutationCache.build() API.
+                    // This avoids creating internal observers and provides clean execution semantics.
+                    await processSyncMutation(mutation.mutationKey, mutation.variables);
 
                     await syncStore.dequeue(mutation.id);
                 } catch (error) {
@@ -249,15 +245,23 @@ export interface UseMutationOptions<TData, TError, TVariables, TContext> {
 // ------------------------------------------
 // Utility Hooks
 // ------------------------------------------
+import { useQueryClient } from '@tanstack/react-query';
+
+/**
+ * Provides scoped query invalidation utilities.
+ * Each method invalidates only the related query keys (active queries only).
+ */
 export const useInvalidateQueries = () => {
+    const queryClient = useQueryClient();
+
     return {
-        invalidateAll: () => { },
-        invalidateInventory: () => { },
-        invalidateSales: () => { },
-        invalidatePurchases: () => { },
-        invalidateAccounting: () => { },
-        invalidateParties: () => { },
-        invalidateDashboard: () => { },
+        invalidateAll: () => queryClient.invalidateQueries({ type: 'active' }),
+        invalidateInventory: () => queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all, type: 'active' }),
+        invalidateSales: () => queryClient.invalidateQueries({ queryKey: queryKeys.sales.all, type: 'active' }),
+        invalidatePurchases: () => queryClient.invalidateQueries({ queryKey: queryKeys.purchases.all, type: 'active' }),
+        invalidateAccounting: () => queryClient.invalidateQueries({ queryKey: queryKeys.accounting.all, type: 'active' }),
+        invalidateParties: () => queryClient.invalidateQueries({ queryKey: queryKeys.parties.all, type: 'active' }),
+        invalidateDashboard: () => queryClient.invalidateQueries({ queryKey: ['dashboard'], type: 'active' }),
     };
 };
 

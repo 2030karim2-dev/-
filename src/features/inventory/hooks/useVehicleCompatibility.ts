@@ -26,8 +26,7 @@ export function useLocalProductSearch(partNumber: string) {
     queryKey: ['local_products_by_part', companyId, partNumber],
     queryFn: async () => {
       if (!companyId || !partNumber) return [];
-      const { data, error } = await productsApi.searchProduct(companyId, partNumber);
-      if (error) throw error;
+      const data = await productsApi.searchProduct(companyId, partNumber);
       return data || [];
     },
     enabled: !!companyId && !!partNumber,

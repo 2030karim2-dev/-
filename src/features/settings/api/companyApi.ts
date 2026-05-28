@@ -1,5 +1,4 @@
-
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '@/core/database/api';
 import { CompanyFormData } from '../types';
 
 export const companyApi = {

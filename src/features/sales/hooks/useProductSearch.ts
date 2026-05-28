@@ -3,9 +3,10 @@
 // Hook for searching products
 // ============================================
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { inventoryApi } from '../../inventory/api';
+import { useDebounce } from '../../../lib/hooks/useDebounce';
 
 interface UseProductSearchOptions {
     companyId: string;
@@ -28,20 +29,12 @@ export interface ProductSearchResult {
 export const useProductSearch = (searchTerm: string, options?: UseProductSearchOptions) => {
     const { companyId, debounceMs = 300, enabled = true } = options ?? {};
 
-    const [debouncedTerm, setDebouncedTerm] = useState(searchTerm);
-
-    // Debounce the search term using useEffect
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedTerm(searchTerm);
-        }, debounceMs);
-
-        return () => clearTimeout(timer);
-    }, [searchTerm, debounceMs]);
+    // Use centralized useDebounce hook instead of custom debounce logic
+    const debouncedTerm = useDebounce(searchTerm, debounceMs);
 
     // Normalize the term for consistent caching (strip extra spaces)
-    const normalizedTerm = useMemo(() => 
-        debouncedTerm.replace(/\s+/g, ' ').trim(), 
+    const normalizedTerm = useMemo(() =>
+        debouncedTerm.replace(/\s+/g, ' ').trim(),
         [debouncedTerm]
     );
 
@@ -62,22 +55,18 @@ export const useProductSearch = (searchTerm: string, options?: UseProductSearchO
                 return [];
             }
 
-            const { data, error } = await inventoryApi.searchProduct(companyId, normalizedTerm);
+            const results = await inventoryApi.searchProduct(companyId, normalizedTerm);
 
-            if (data === null) return [];
-            
-            if (error !== null) {
-                throw new Error(error.message || 'Failed to search products');
-            }
+            if (!results || results.length === 0) return [];
 
             // Map results to sum quantities from the nested stock array
-            return data.map((item: Record<string, unknown>) => {
+            return results.map((item: any) => {
                 const stockArray = Array.isArray(item.quantity) ? item.quantity : [];
                 const totalQty = (stockArray as { quantity: string | number }[]).reduce(
-                    (sum: number, s: { quantity: string | number }) => sum + (Number(s.quantity) || 0), 
+                    (sum: number, s: { quantity: string | number }) => sum + (Number(s.quantity) || 0),
                     0
                 );
-                
+
                 return {
                     id: String(item.id || ''),
                     name_ar: String(item.name_ar || ''),
@@ -93,16 +82,11 @@ export const useProductSearch = (searchTerm: string, options?: UseProductSearchO
         enabled: enabled && !!companyId && normalizedTerm.length >= 2,
     });
 
-    const search = useCallback((term: string) => {
-        setDebouncedTerm(term);
-    }, []);
-
     return {
         products,
         isLoading,
         isError,
         error,
-        search,
         hasResults: products.length > 0,
         resultsCount: products.length,
     };

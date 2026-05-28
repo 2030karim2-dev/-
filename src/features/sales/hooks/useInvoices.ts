@@ -3,7 +3,7 @@ import { salesService } from '../service';
 import { useAuthStore } from '@/features/auth/store';
 import { useFeedbackStore } from '@/features/feedback/store';
 import { invalidateByPreset } from '@/lib/invalidation';
-import { useOfflineQueueStore } from '@/core/services/offlineQueueStore';
+import { syncStore } from '@/core/lib/sync-store';
 import { CreateInvoiceDTO } from '../types';
 
 export const useInvoices = () => {
@@ -30,7 +30,6 @@ export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const { showToast } = useFeedbackStore();
-  const { enqueue } = useOfflineQueueStore();
 
   return useMutation({
     mutationFn: async (data: CreateInvoiceDTO) => {
@@ -43,7 +42,10 @@ export const useCreateInvoice = () => {
     },
     onError: (error: any, variables) => {
       if (!navigator.onLine || error.message?.includes('Failed to fetch') || error.status === 0) {
-        enqueue('CREATE_INVOICE', { ...variables, company_id: user?.company_id, user_id: user?.id });
+        syncStore.enqueue({
+          mutationKey: ['sales', 'create'],
+          variables: { ...variables, company_id: user?.company_id, user_id: user?.id },
+        });
         showToast("تم حفظ الفاتورة محلياً. سيتم مزامنتها عند عودة الاتصال.", 'info');
         return;
       }

@@ -113,6 +113,7 @@ const DashboardPage: React.FC = () => {
             <div className="flex-1 overflow-y-auto px-1.5 md:px-3 py-3 custom-scrollbar pb-24 relative z-10">
                 <ContentContainer>
 
+                    {/* Section 1: Top cards — Financial Health + Quick Actions */}
                     <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <FinancialHealthScore
@@ -124,18 +125,17 @@ const DashboardPage: React.FC = () => {
                         </div>
                     </Suspense>
 
+                    {/* Section 2: Stats + Notifications */}
                     <Suspense fallback={<div className="h-32 mt-3 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
                         <div className="mt-3">
                             <StatsGrid stats={stats || { sales: '0', purchases: '0', expenses: '0', debts: '0' }} />
                         </div>
-                    </Suspense>
-
-                    <Suspense fallback={null}>
                         <div className="mt-3">
                             <AISmartNotifications stats={stats} lowStockProducts={lowStockProducts} alerts={alerts} />
                         </div>
                     </Suspense>
 
+                    {/* Section 3: Main grid — Chart widgets + info cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 4xl:grid-cols-5 gap-3 mt-3">
                         <Suspense fallback={<ChartSkeleton />}>
                             <div className="bg-[var(--app-surface)]/80 backdrop-blur-xl border border-[var(--app-border)] p-4 rounded-2xl relative overflow-hidden group hover:border-[var(--accent)]/30 transition-all duration-500">
@@ -170,12 +170,9 @@ const DashboardPage: React.FC = () => {
                             </Suspense>
                         </GlobalErrorBoundary>
 
+                        {/* Widget group: Performance + CashFlow + Inventory + Quotation + Categories + TopPerformers */}
                         <Suspense fallback={<div className="h-40 min-h-[160px] animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                            <PerformanceGauge
-                                value={salesValue}
-                                target={100000}
-                                title="هدف المبيعات الشهري"
-                            />
+                            <PerformanceGauge value={salesValue} target={100000} title="هدف المبيعات الشهري" />
                         </Suspense>
 
                         <Suspense fallback={<div className="h-40 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
@@ -200,30 +197,19 @@ const DashboardPage: React.FC = () => {
                         </Suspense>
 
                         <Suspense fallback={<div className="h-60 animate-pulse bg-[var(--app-surface)] rounded-2xl" />}>
-                            <TopPerformers
-                                products={topProducts as any}
-                                customers={topCustomers as any}
-                            />
+                            <TopPerformers products={topProducts as any} customers={topCustomers as any} />
                         </Suspense>
 
-                        <Suspense fallback={null}>
-                            <WarehouseTransferSuggestions />
-                        </Suspense>
-
-                        <Suspense fallback={null}>
-                            <CustomerSegmentation companyId={user?.company_id || ''} />
-                        </Suspense>
-
+                        {/* Alert widgets — same fallback, loads together */}
                         <Suspense fallback={null}>
                             <AlertsPanel alerts={alerts as any} />
                         </Suspense>
 
                         <Suspense fallback={null}>
+                            <WarehouseTransferSuggestions />
                             <SmartPurchaseAlert lowStockItems={lowStockProducts as any} />
-                        </Suspense>
-
-                        <Suspense fallback={null}>
                             <SmartTargets targets={targets} />
+                            <CustomerSegmentation companyId={user?.company_id || ''} />
                         </Suspense>
                     </div>
 

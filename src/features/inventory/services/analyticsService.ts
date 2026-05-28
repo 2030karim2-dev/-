@@ -131,8 +131,7 @@ export const analyticsService = {
         const sales = salesData || [];
 
         // 2. Fetch All Products with Stock for accurate forecasting & stagnant analysis
-        const { data: productsData, error: productError } = await inventoryApi.getProducts(companyId);
-        if (productError) throw productError;
+        const productsData = await inventoryApi.getProducts(companyId);
 
         const allProducts = ((productsData as Record<string, unknown>[]) || []).map((p) => {
             const stockList = Array.isArray(p.stock) ? p.stock : [];

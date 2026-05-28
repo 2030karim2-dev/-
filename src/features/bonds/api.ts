@@ -1,5 +1,11 @@
+/**
+ * Bonds API - Backward compatibility re-export
+ * 
+ * This file now re-exports from the centralized core API layer.
+ * All new code should import directly from '@/core/database/api'.
+ */
 
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '@/core/database/api';
 import { BondFormData, BondType } from './types';
 
 export const bondsApi = {
@@ -33,7 +39,7 @@ export const bondsApi = {
     if (!data.cash_account_id || !data.counterparty_id) {
       throw new Error("يجب اختيار الحسابات المطلوبة");
     }
-    
+
     // Explicit bounds check preventing logical crashes
     if (Number(data.amount) <= 0) {
       throw new Error("لا يمكن إنشاء سند بقيمة صفر أو قيمة سالبة");

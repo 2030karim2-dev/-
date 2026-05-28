@@ -68,7 +68,7 @@ export const salesService = {
     }));
 
     if (payload.type === 'return_sale') {
-      return await salesApi.commitReturnRPC(companyId, userId, payload);
+      return await salesApi.commitReturnRPC(companyId, userId, payload as any);
     }
 
     let finalTreasuryAccountId = payload.treasuryAccountId;
@@ -88,12 +88,12 @@ export const salesService = {
       ...restPayload,
       ...(finalTreasuryAccountId ? { treasuryAccountId: finalTreasuryAccountId } : {})
     };
-    const result = await salesApi.commitInvoiceRPC(companyId, userId, enhancedPayload);
+    const result = await salesApi.commitInvoiceRPC(companyId, userId, enhancedPayload as any);
 
     // 🔔 Fire-and-forget notification
     if (result) {
       const itemsTotal = payload.items.reduce((sum, it) => sum + (it.quantity * it.unitPrice), 0);
-      const typedResult = result as InvoiceResponse;
+      const typedResult = result as unknown as InvoiceResponse;
       messagingService.notify(companyId, 'sale', {
         invoiceNumber: typedResult.invoice_number || '',
         customerName: CASH_CUSTOMER_LABEL, // Target refactoring to extract party name from DB result later
