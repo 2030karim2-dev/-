@@ -84,31 +84,36 @@ export const useRealtimeSync = () => {
 
         logger.debug('Realtime', `🔌 Initializing persistent channel for company [${companyId}]`);
 
-        const channel = supabase.channel(channelId)
-            .on(
+        let channel = supabase.channel(channelId);
+
+        // Chain postgres_changes listeners for each watched table to multiplex over a single channel
+        Object.keys(TABLE_PRESET_MAP).forEach((table) => {
+            channel = channel.on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
+                    table: table,
                     filter: `company_id=eq.${companyId}`,
                 },
                 (payload: any) => {
-                    pendingChangesRef.current.add(payload.table);
+                    pendingChangesRef.current.add(payload.table || table);
 
                     if (!batchTimerRef.current) {
                         batchTimerRef.current = setTimeout(flushInvalidations, BATCH_DEBOUNCE_MS);
                     }
 
                     // Immediate flush if critical table (e.g., invoices during POS)
-                    if (payload.table === 'invoices' || payload.table === 'products') {
+                    if (table === 'invoices' || table === 'products') {
                         flushInvalidations();
                     }
                 }
             );
+        });
 
         channel.subscribe((status: any) => {
             if (status === 'SUBSCRIBED') {
-                logger.debug('Realtime', '✅ Realtime Connection Active');
+                logger.debug('Realtime', `✅ Realtime Connection Active (Listening to ${Object.keys(TABLE_PRESET_MAP).length} tables)`);
             }
         });
 

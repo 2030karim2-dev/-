@@ -135,15 +135,18 @@ const MainLayout: React.FC = () => {
           </div>
         )}
 
-        <main className={cn(
-          "flex-1 overflow-y-auto custom-scrollbar relative scroll-smooth",
-          mainPaddingBottom
-        )}>
-          <ErrorBoundary>
-            <Suspense fallback={<PageLoader />}>
-              <Outlet />
-            </Suspense>
-          </ErrorBoundary>
+        <main className="flex-1 overflow-hidden flex flex-col relative">
+          <div className={cn(
+            "flex-1 overflow-hidden flex flex-col min-h-0",
+            "p-2 md:p-3 2xl:p-4",
+            mainPaddingBottom
+          )}>
+            <ErrorBoundary>
+              <Suspense fallback={<PageLoader />}>
+                <Outlet />
+              </Suspense>
+            </ErrorBoundary>
+          </div>
         </main>
 
         {/* Tactical Mobile Navigation */}

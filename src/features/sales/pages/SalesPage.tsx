@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 // Trigger rebuild to resolve stale hooks.ts link
 import { ShoppingBag, Plus, History, RefreshCw, BarChart3, FileText } from 'lucide-react';
 import MicroHeader from '@/ui/base/MicroHeader';
-import CreateInvoiceView from '@/features/sales/components/create/CreateInvoiceView';
-import InvoiceListView from '@/features/sales/components/list/InvoiceListView';
-import SalesReturnsView from '@/features/sales/components/Returns/SalesReturnsView';
-import SalesAnalyticsView from '@/features/sales/components/Analytics/SalesAnalyticsView';
-import QuotationsTab from '@/features/sales/components/quotations/QuotationsTab';
+import PageLoader from '@/ui/base/PageLoader';
+
+const CreateInvoiceView = lazy(() => import('@/features/sales/components/create/CreateInvoiceView'));
+const InvoiceListView = lazy(() => import('@/features/sales/components/list/InvoiceListView'));
+const SalesReturnsView = lazy(() => import('@/features/sales/components/Returns/SalesReturnsView'));
+const SalesAnalyticsView = lazy(() => import('@/features/sales/components/Analytics/SalesAnalyticsView'));
+const QuotationsTab = lazy(() => import('@/features/sales/components/quotations/QuotationsTab'));
 import InvoiceDetailsModal from '@/features/sales/components/details/InvoiceDetailsModal';
 import { useCreateInvoice, useInvoices } from '@/features/sales/hooks/index';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -140,9 +142,19 @@ const SalesPage: React.FC = () => {
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
       />
-      <div className="flex-1 overflow-y-auto px-2 pt-2 pb-16 custom-scrollbar">
-        <div className="max-w-none mx-auto">
-          {renderContent()}
+      <div className={`flex-1 min-h-0 ${
+        ['list', 'returns', 'quotations'].includes(activeTab)
+          ? "overflow-hidden flex flex-col px-2 pt-2"
+          : "overflow-y-auto custom-scrollbar px-2 pt-2 pb-16"
+      }`}>
+        <div className={`max-w-none mx-auto w-full ${
+          ['list', 'returns', 'quotations'].includes(activeTab)
+            ? "flex-1 flex flex-col min-h-0 h-full"
+            : ""
+        }`}>
+          <Suspense fallback={<PageLoader />}>
+            {renderContent()}
+          </Suspense>
         </div>
       </div>
       <InvoiceDetailsModal

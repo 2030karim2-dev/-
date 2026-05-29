@@ -199,10 +199,21 @@ const ResultCard: React.FC<{
             </div>
 
             {/* Price & Stock Column */}
-            <div className="flex-shrink-0 text-left flex flex-col items-end gap-1.5 min-w-[100px]">
-                <span className="font-black text-blue-600 dark:text-blue-400 text-xs md:text-base font-mono" dir="ltr">
-                    {formatCurrency(result.selling_price)}
-                </span>
+            <div className="flex-shrink-0 text-left flex flex-col items-end gap-1.5 min-w-[120px]">
+                <div className="flex flex-col items-end">
+                    <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-gray-400 dark:text-slate-500 font-bold">بيع:</span>
+                        <span className="font-black text-blue-600 dark:text-blue-400 text-xs md:text-base font-mono" dir="ltr">
+                            {formatCurrency(result.selling_price)}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-1 mt-0.5">
+                        <span className="text-[10px] text-gray-400 dark:text-slate-500 font-medium">شراء:</span>
+                        <span className="text-xs text-gray-500 dark:text-slate-400 font-mono" dir="ltr">
+                            {formatCurrency(result.cost_price)}
+                        </span>
+                    </div>
+                </div>
                 <span
                     className={cn(
                         'text-[10px] md:text-xs font-bold px-2.5 py-0.5 rounded-full',

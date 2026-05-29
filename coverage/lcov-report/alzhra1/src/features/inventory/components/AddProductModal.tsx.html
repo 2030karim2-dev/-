@@ -1,0 +1,628 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for alzhra1/src/features/inventory/components/AddProductModal.tsx</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../index.html">All files</a> / <a href="index.html">alzhra1/src/features/inventory/components</a> AddProductModal.tsx</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/181</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/181</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import React, { useEffect } from 'react';</span></span></span>
+<span class="cstat-no" title="statement not covered" >import { useForm } from 'react-hook-form';</span>
+<span class="cstat-no" title="statement not covered" >import { zodResolver } from '@hookform/resolvers/zod';</span>
+<span class="cstat-no" title="statement not covered" >import { Save, Zap, ShieldCheck, Package, DollarSign, Box } from 'lucide-react';</span>
+<span class="cstat-no" title="statement not covered" >import { ProductFormData, Product } from '../types';</span>
+<span class="cstat-no" title="statement not covered" >import { productFormSchema } from '../schema';</span>
+<span class="cstat-no" title="statement not covered" >import Modal from '../../../ui/base/Modal';</span>
+<span class="cstat-no" title="statement not covered" >import Button from '../../../ui/base/Button';</span>
+<span class="cstat-no" title="statement not covered" >import { useTranslation } from '../../../lib/hooks/useTranslation';</span>
+<span class="cstat-no" title="statement not covered" >import { useAuthStore } from '../../auth/store';</span>
+<span class="cstat-no" title="statement not covered" >import SimilarityAdvisor from './SimilarityAdvisor';</span>
+<span class="cstat-no" title="statement not covered" >import { useSimilarityCheck } from '../hooks/useSimilarityCheck';</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >// Modular Form Components</span>
+<span class="cstat-no" title="statement not covered" >import ProductImageUploader from './product_form/ProductImageUploader';</span>
+<span class="cstat-no" title="statement not covered" >import ProductCoreInfo from './product_form/ProductCoreInfo';</span>
+<span class="cstat-no" title="statement not covered" >import ProductCategory from './product_form/ProductCategory';</span>
+<span class="cstat-no" title="statement not covered" >import ProductFinancials from './product_form/ProductFinancials';</span>
+<span class="cstat-no" title="statement not covered" >import ProductStockInfo from './product_form/ProductStockInfo';</span>
+<span class="cstat-no" title="statement not covered" >import ProductDetails from './product_form/ProductDetails';</span>
+<span class="cstat-no" title="statement not covered" >import ProductFitment from './product_form/ProductFitment';</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >interface Props {</span>
+<span class="cstat-no" title="statement not covered" >  isOpen: boolean;</span>
+<span class="cstat-no" title="statement not covered" >  onClose: () =&gt; void;</span>
+<span class="cstat-no" title="statement not covered" >  onSubmit: (data: ProductFormData) =&gt; void | Promise&lt;void&gt;;</span>
+<span class="cstat-no" title="statement not covered" >  isSubmitting: boolean;</span>
+<span class="cstat-no" title="statement not covered" >  initialData?: Product | null;</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >const AddProductModal: React.FC&lt;Props&gt; = ({ isOpen, onClose, onSubmit, isSubmitting, initialData }) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  const { t } = useTranslation();</span>
+<span class="cstat-no" title="statement not covered" >  const { user } = useAuthStore();</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm&lt;ProductFormData&gt;({</span>
+<span class="cstat-no" title="statement not covered" >    resolver: zodResolver(productFormSchema) as any,</span>
+<span class="cstat-no" title="statement not covered" >    defaultValues: {</span>
+<span class="cstat-no" title="statement not covered" >      unit: 'piece',</span>
+<span class="cstat-no" title="statement not covered" >      category: 'عام',</span>
+<span class="cstat-no" title="statement not covered" >      min_stock_level: 5</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  });</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >  const productName = watch('name');</span>
+<span class="cstat-no" title="statement not covered" >  const { similarProducts, setSimilarProducts } = useSimilarityCheck(productName, user?.company_id, !!initialData);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >  useEffect(() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (isOpen) {</span>
+<span class="cstat-no" title="statement not covered" >      if (initialData) {</span>
+<span class="cstat-no" title="statement not covered" >        reset({</span>
+<span class="cstat-no" title="statement not covered" >          name: initialData.name,</span>
+<span class="cstat-no" title="statement not covered" >          sku: initialData.sku,</span>
+<span class="cstat-no" title="statement not covered" >          part_number: initialData.part_number,</span>
+<span class="cstat-no" title="statement not covered" >          brand: initialData.brand,</span>
+<span class="cstat-no" title="statement not covered" >          size: initialData.size,</span>
+<span class="cstat-no" title="statement not covered" >          specifications: initialData.specifications,</span>
+<span class="cstat-no" title="statement not covered" >          alternative_numbers: initialData.alternatives?.join(', '),</span>
+<span class="cstat-no" title="statement not covered" >          image_url: initialData.image_url,</span>
+<span class="cstat-no" title="statement not covered" >          cost_price: initialData.cost_price,</span>
+<span class="cstat-no" title="statement not covered" >          selling_price: initialData.selling_price,</span>
+<span class="cstat-no" title="statement not covered" >          min_stock_level: initialData.min_stock_level,</span>
+<span class="cstat-no" title="statement not covered" >          stock_quantity: initialData.stock_quantity,</span>
+<span class="cstat-no" title="statement not covered" >          unit: (initialData.unit as ProductFormData['unit']) || 'piece',</span>
+<span class="cstat-no" title="statement not covered" >          category: initialData.category_id || '',</span>
+<span class="cstat-no" title="statement not covered" >          location: initialData.location</span>
+<span class="cstat-no" title="statement not covered" >        });</span>
+<span class="cstat-no" title="statement not covered" >      } else {</span>
+<span class="cstat-no" title="statement not covered" >        const autoSku = `AZ-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;</span>
+<span class="cstat-no" title="statement not covered" >        reset({</span>
+<span class="cstat-no" title="statement not covered" >          name: '',</span>
+<span class="cstat-no" title="statement not covered" >          sku: autoSku,</span>
+<span class="cstat-no" title="statement not covered" >          part_number: '',</span>
+<span class="cstat-no" title="statement not covered" >          brand: '',</span>
+<span class="cstat-no" title="statement not covered" >          size: '',</span>
+<span class="cstat-no" title="statement not covered" >          specifications: '',</span>
+<span class="cstat-no" title="statement not covered" >          alternative_numbers: '',</span>
+<span class="cstat-no" title="statement not covered" >          image_url: null,</span>
+<span class="cstat-no" title="statement not covered" >          cost_price: '',</span>
+<span class="cstat-no" title="statement not covered" >          selling_price: '',</span>
+<span class="cstat-no" title="statement not covered" >          min_stock_level: 5,</span>
+<span class="cstat-no" title="statement not covered" >          stock_quantity: 0,</span>
+<span class="cstat-no" title="statement not covered" >          unit: 'piece',</span>
+<span class="cstat-no" title="statement not covered" >          category: ''</span>
+<span class="cstat-no" title="statement not covered" >        });</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }, [isOpen, initialData, reset]);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >  const footer = (</span>
+<span class="cstat-no" title="statement not covered" >    &lt;div className="flex w-full gap-2 p-1"&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;button</span>
+<span class="cstat-no" title="statement not covered" >        type="button"</span>
+<span class="cstat-no" title="statement not covered" >        onClick={onClose}</span>
+<span class="cstat-no" title="statement not covered" >        className="flex-1 py-3 text-[11px] font-bold text-gray-500 bg-gray-50 dark:bg-slate-800 border dark:border-slate-700 uppercase tracking-widest hover:bg-gray-100 transition-colors"</span>
+<span class="cstat-no" title="statement not covered" >      &gt;</span>
+<span class="cstat-no" title="statement not covered" >        {t('cancel')}</span>
+<span class="cstat-no" title="statement not covered" >      &lt;/button&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;Button</span>
+<span class="cstat-no" title="statement not covered" >        onClick={handleSubmit(onSubmit as any)}</span>
+<span class="cstat-no" title="statement not covered" >        isLoading={isSubmitting}</span>
+<span class="cstat-no" title="statement not covered" >        className="flex-[2] rounded-none text-[11px] font-bold bg-blue-600 border-blue-700 shadow-xl uppercase tracking-widest"</span>
+<span class="cstat-no" title="statement not covered" >        leftIcon={&lt;Save size={16} /&gt;}</span>
+<span class="cstat-no" title="statement not covered" >      &gt;</span>
+<span class="cstat-no" title="statement not covered" >        {initialData ? t('update_data') : t('confirm_product')}</span>
+<span class="cstat-no" title="statement not covered" >      &lt;/Button&gt;</span>
+<span class="cstat-no" title="statement not covered" >    &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >  );</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >  return (</span>
+<span class="cstat-no" title="statement not covered" >    &lt;Modal</span>
+<span class="cstat-no" title="statement not covered" >      isOpen={isOpen}</span>
+<span class="cstat-no" title="statement not covered" >      onClose={onClose}</span>
+<span class="cstat-no" title="statement not covered" >      icon={initialData ? ShieldCheck : Package}</span>
+<span class="cstat-no" title="statement not covered" >      title={initialData ? t('edit_product_title') : t('new_product_title')}</span>
+<span class="cstat-no" title="statement not covered" >      description={t('product_card_desc')}</span>
+<span class="cstat-no" title="statement not covered" >      footer={footer}</span>
+<span class="cstat-no" title="statement not covered" >    &gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;div className="flex flex-col"&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;div className="p-5 bg-white dark:bg-slate-900 border-b dark:border-slate-800 flex flex-row gap-6"&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;div className="flex flex-col gap-2 w-32 shrink-0"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;ProductImageUploader setValue={setValue} watch={watch} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;div className="space-y-1"&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;label className="text-[9px] font-bold text-blue-500 uppercase tracking-tighter text-center block"&gt;{t('product_code')}&lt;/label&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;input</span>
+<span class="cstat-no" title="statement not covered" >                {...register('sku')}</span>
+<span class="cstat-no" title="statement not covered" >                readOnly</span>
+<span class="cstat-no" title="statement not covered" >                className="w-full text-center font-mono text-[10px] font-bold py-1.5 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800 text-blue-700 dark:text-blue-400 outline-none rounded-lg"</span>
+<span class="cstat-no" title="statement not covered" >              /&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;div className="flex-1 flex flex-col justify-center"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;ProductCategory register={register} watch={watch} setValue={setValue} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >        &lt;div className="p-5 border-b dark:border-slate-800 bg-gray-50/30 dark:bg-slate-950/30"&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5 px-1 mb-4"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;Zap size={14} className="text-blue-500" /&gt;</span>
+<span class="cstat-no" title="statement not covered" >            {t('identity_data')}</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/h4&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;ProductCoreInfo register={register} errors={errors} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;SimilarityAdvisor</span>
+<span class="cstat-no" title="statement not covered" >            isVisible={similarProducts.length &gt; 0}</span>
+<span class="cstat-no" title="statement not covered" >            similarProducts={similarProducts}</span>
+<span class="cstat-no" title="statement not covered" >            onApplyName={(name) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >              setValue('name', name);</span>
+<span class="cstat-no" title="statement not covered" >              setSimilarProducts([]);</span>
+<span class="cstat-no" title="statement not covered" >            }}</span>
+<span class="cstat-no" title="statement not covered" >          /&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >        &lt;div className="p-5 space-y-6 bg-white dark:bg-slate-900"&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;div className="grid grid-cols-2 gap-x-6"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;div className="space-y-3"&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;h4 className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 px-1"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;DollarSign size={12} /&gt; {t('pricing')}</span>
+<span class="cstat-no" title="statement not covered" >              &lt;/h4&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;div className="grid grid-cols-2 gap-2"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;ProductFinancials register={register} errors={errors} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;div className="space-y-3"&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;h4 className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest flex items-center gap-1.5 px-1"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;Box size={12} /&gt; {t('stock')}</span>
+<span class="cstat-no" title="statement not covered" >              &lt;/h4&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;div className="grid grid-cols-2 gap-2"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;ProductStockInfo register={register} errors={errors} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;ProductDetails register={register} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;div className="pt-4 border-t dark:border-slate-800"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;ProductFitment productId={initialData?.id} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >    &lt;/Modal&gt;</span>
+<span class="cstat-no" title="statement not covered" >  );</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export default AddProductModal;</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-05-28T19:17:13.661Z
+            </div>
+        <script src="../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../sorter.js"></script>
+        <script src="../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

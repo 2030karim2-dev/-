@@ -15,6 +15,8 @@ export class PostTransactionUsecase {
         {
             date: validatedData.date,
             description: validatedData.description,
+            ...(validatedData.currency_code !== undefined ? { currency_code: validatedData.currency_code } : {}),
+            ...(validatedData.exchange_rate !== undefined ? { exchange_rate: validatedData.exchange_rate } : {}),
             lines: validatedData.lines.map((line: any) => ({
                 account_id: line.account_id,
                 debit: line.debit_amount,

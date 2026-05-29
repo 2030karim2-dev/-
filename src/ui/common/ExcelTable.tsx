@@ -54,6 +54,8 @@ interface ExcelTableProps<T> {
   enableResize?: boolean;
   enableDrag?: boolean;
   isLoading?: boolean;
+  zoomLevel?: number;
+  setZoomLevel?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 function ExcelTable<T>({
@@ -62,7 +64,7 @@ function ExcelTable<T>({
   onCellUpdate, enablePagination = true, pageSize = 20,
   enableSelection = false, selectedRowIds = new Set(), onSelectionChange, getRowId,
   isRTL = false, showShortcutsPanel = false, enableResize = true, enableDrag = false,
-  isLoading = false
+  isLoading = false, zoomLevel: propZoomLevel, setZoomLevel: propSetZoomLevel
 }: ExcelTableProps<T>) {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [internalSearch, setInternalSearch] = useState('');
@@ -83,7 +85,12 @@ function ExcelTable<T>({
     handleMouseDown: handleColumnResizeStart,
     handleWrapperResizeStart,
     handleResetSize: handleResetTableSize
-  } = useTableResize({ enableResize, tableWrapperRef: tableWrapperRef as React.RefObject<HTMLDivElement> });
+  } = useTableResize({ 
+    enableResize, 
+    tableWrapperRef: tableWrapperRef as React.RefObject<HTMLDivElement>,
+    zoomLevel: propZoomLevel,
+    setZoomLevel: propSetZoomLevel
+  });
 
   const {
     isDragging,
@@ -360,7 +367,7 @@ function ExcelTable<T>({
           <div
             ref={tableRef}
             tabIndex={-1}
-            className="flex-1 overflow-auto custom-scrollbar outline-none"
+            className="flex-1 overflow-auto data-table-scroll custom-scrollbar smooth-scroll outline-none"
             onMouseDown={handleMouseDownOnTable}
             onMouseUp={() => handleMouseUpOnTable(endSelection)}
             onMouseLeave={() => handleMouseLeaveOnTable(endSelection)}

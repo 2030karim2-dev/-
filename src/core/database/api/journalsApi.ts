@@ -5,6 +5,8 @@
  * Migrated from: src/features/accounting/api/journalsApi.ts
  */
 
+import Decimal from 'decimal.js';
+import { safeDecimal, SOX_BALANCE_TOLERANCE } from '../../utils/decimalUtils';
 import { supabase, parseError } from './baseApi';
 
 export const journalsApi = {
@@ -76,11 +78,12 @@ export const journalsApi = {
             }>;
         }
     ) => {
-        // 1. Calculate and validate balance
-        const totalDebit = data.lines.reduce((sum: number, l) => sum + (Number(l.debit) || 0), 0);
-        const totalCredit = data.lines.reduce((sum: number, l) => sum + (Number(l.credit) || 0), 0);
+        // 1. Calculate and validate balance using precise Decimal math
+        const totalDebit = data.lines.reduce((sum, l) => sum.plus(safeDecimal(l.debit)), new Decimal(0));
+        const totalCredit = data.lines.reduce((sum, l) => sum.plus(safeDecimal(l.credit)), new Decimal(0));
 
-        if (Math.abs(totalDebit - totalCredit) > 0.01) {
+        const imbalance = totalDebit.minus(totalCredit).absoluteValue();
+        if (imbalance.greaterThan(SOX_BALANCE_TOLERANCE)) {
             throw parseError(`القيد غير متوازن: مدين ${totalDebit.toFixed(2)} ≠ دائن ${totalCredit.toFixed(2)}`);
         }
 

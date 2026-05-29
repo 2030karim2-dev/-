@@ -7,7 +7,7 @@ import ProductDetailModal from './components/ProductDetailModal';
 import ProductDetailPane from './components/ProductDetailPane';
 import AddProductModal from './components/AddProductModal';
 import MicroHeader from '../../ui/base/MicroHeader';
-import { Database, Plus, List, LayoutGrid, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Database, Plus, List, LayoutGrid, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useBreakpoint, useCurrentBreakpoint } from '../../lib/hooks/useBreakpoint';
 import ContentContainer from '../../ui/layout/ContentContainer';
 import { useTranslation } from '../../lib/hooks/useTranslation';
@@ -95,6 +95,9 @@ const InventoryPage: React.FC = () => {
                         <div className="flex items-center gap-3">
                             {activeView === 'products' && (
                                 <div className="hidden md:flex items-center gap-3 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-[10px] sm:text-xs font-bold shadow-sm" title="إحصائيات المنتجات">
+                                    {isFetching && (
+                                        <RefreshCw size={12} className="animate-spin text-blue-500 shrink-0" />
+                                    )}
                                     <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400" title="إجمالي المنتجات">
                                         <Database size={12} /> {totalCount.toLocaleString('ar-SA')}
                                     </span>
@@ -136,7 +139,7 @@ const InventoryPage: React.FC = () => {
                     "flex-1 overflow-hidden flex flex-col relative z-20 transition-all duration-500",
                     isZenMode ? "bg-white dark:bg-slate-900" : ""
                 )}>
-                    <ContentContainer>
+                    <ContentContainer className="flex-1 flex flex-col min-h-0 overflow-hidden h-full" fluid>
                         {/* Wide Desktop: Split View — detail pane + table side by side */}
                         {showSplitDetail ? (
                             <div className="flex-1 flex overflow-hidden gap-0">

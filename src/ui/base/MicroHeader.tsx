@@ -81,99 +81,99 @@ const MicroHeader: React.FC<MicroHeaderProps> = ({
   if (isMaximized) return null;
 
   return (
-    <div className="flex-none bg-[var(--app-surface)] border-b border-[var(--app-border)] shadow-sm transition-all no-print z-40">
-      <div className="max-w-none mx-auto">
-        {/* Main Row */}
-        <div className="flex h-8 md:h-9 items-center justify-between px-2 md:px-4">
-          <div className="flex items-center gap-1.5 overflow-hidden">
-            {!isRoot && (
-              <button
-                onClick={() => navigate(-1)}
-                className="p-1 hover:bg-[var(--app-surface-hover)] rounded-md transition-transform active:scale-90"
-                aria-label="Go back"
-              >
-                <BackIcon size={14} className="text-[var(--app-text-secondary)]" />
-              </button>
-            )}
-            <div className="flex items-center gap-1.5 bg-[var(--app-bg)]/50 px-2 py-0.5 rounded-full border border-[var(--app-border)]">
-              <Icon className={iconColor} size={12} />
-              <h1 className="text-[9px] md:text-[10px] font-black text-[var(--app-text)] whitespace-nowrap uppercase tracking-widest">{title}</h1>
-            </div>
-          </div>
+        <div className="flex-none bg-[var(--app-surface)] border-b border-[var(--app-border)] shadow-sm transition-all no-print z-40">
+          <div className="max-w-none mx-auto">
+            {/* Main Row - Compact spacing */}
+            <div className="flex h-7 md:h-8 items-center justify-between px-2 md:px-3">
+              <div className="flex items-center gap-1.5 overflow-hidden">
+                {!isRoot && (
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="p-0.5 hover:bg-[var(--app-surface-hover)] rounded transition-transform active:scale-90"
+                    aria-label="Go back"
+                  >
+                    <BackIcon size={12} className="text-[var(--app-text-secondary)]" />
+                  </button>
+                )}
+                <div className="flex items-center gap-1.5 bg-[var(--app-bg)]/50 px-1.5 py-0.5 rounded-full border border-[var(--app-border)]">
+                  <Icon className={iconColor} size={11} />
+                  <h1 className="text-[10px] md:text-[11px] font-black text-[var(--app-text)] whitespace-nowrap uppercase tracking-widest">{title}</h1>
+                </div>
+              </div>
 
-          <div className="flex items-center gap-1 md:gap-1.5">
-            {isMaximized && onToggleZen && (
-              <button
-                onClick={onToggleZen}
-                className={cn(
-                  "p-1 rounded-md border transition-all active:scale-95 shadow-sm",
-                  "bg-white dark:bg-slate-800 text-gray-500 hover:text-indigo-500 border-[var(--app-border)]"
+              <div className="flex items-center gap-1">
+                {isMaximized && onToggleZen && (
+                  <button
+                    onClick={onToggleZen}
+                    className={cn(
+                      "p-0.5 rounded border transition-all active:scale-95 shadow-sm",
+                      "bg-white dark:bg-slate-800 text-gray-500 hover:text-indigo-500 border-[var(--app-border)]"
+                    )}
+                    title={isZenMode ? "Show Header" : "Zen Mode (Hide Header)"}
+                  >
+                    {isZenMode ? <EyeOff size={12} /> : <Eye size={12} />}
+                  </button>
                 )}
-                title={isZenMode ? "Show Header" : "Zen Mode (Hide Header)"}
-              >
-                {isZenMode ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
-            )}
-            {onToggleMaximize && (
-              <button
-                onClick={onToggleMaximize}
-                className={cn(
-                  "p-1 rounded-md border transition-all active:scale-95 shadow-sm",
-                  isMaximized 
-                    ? "bg-rose-500 text-white border-rose-400 hover:bg-rose-600 shadow-rose-500/20" 
-                    : "bg-white dark:bg-slate-800 text-gray-500 hover:text-blue-500 border-[var(--app-border)]"
+                {onToggleMaximize && (
+                  <button
+                    onClick={onToggleMaximize}
+                    className={cn(
+                      "p-0.5 rounded border transition-all active:scale-95 shadow-sm",
+                      isMaximized 
+                        ? "bg-rose-500 text-white border-rose-400" 
+                        : "bg-white dark:bg-slate-800 text-gray-500 hover:text-blue-500 border-[var(--app-border)]"
+                    )}
+                    title={isMaximized ? "Minimize" : "Maximize"}
+                  >
+                    {isMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+                  </button>
                 )}
-                title={isMaximized ? "Minimize" : "Maximize"}
-              >
-                {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-              </button>
+                {actions}
+              </div>
+            </div>
+
+            {/* Unified Search & Tab Row - MERGED TO SAVE SPACE - Compact */}
+            {(tabs || onSearchChange || extraRow) && (
+              <div className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-0.5 md:px-2 bg-[var(--app-surface)] border-t border-[var(--app-border)]">
+                {/* Tabs Section */}
+                {tabs && onTabChange && activeTab && (
+                  <div className="flex-1 w-full overflow-x-auto no-scrollbar min-w-0">
+                    <AdvancedTabBar
+                      tabs={tabs}
+                      activeTab={activeTab}
+                      onTabChange={onTabChange}
+                      onTabsReorder={onTabsReorder}
+                      enableDragDrop={enableDragDrop}
+                      enableKeyboardNav={enableKeyboardNav}
+                      size="sm"
+                      theme="auto"
+                      animation={{
+                        transitionDuration: 400,
+                        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                        enable3D: enable3D,
+                        enableGlassmorphism: true,
+                        enablePulsing: true,
+                        enableMultiLayerShadows: true,
+                      }}
+                      a11y={{
+                        ariaLabel: `${title} navigation tabs`,
+                        announceChanges: true,
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Search/Filter Section - HIDDEN because it's moved to Top Header */}
+                {extraRow && (
+                  <div className={`flex items-center gap-2 w-full ${searchWidth} shrink-0`}>
+                    {extraRow}
+                  </div>
+                )}
+              </div>
             )}
-            {actions}
           </div>
         </div>
-
-        {/* Unified Search & Tab Row - MERGED TO SAVE SPACE */}
-        {(tabs || onSearchChange || extraRow) && (
-          <div className="flex flex-col md:flex-row items-center gap-1.5 md:gap-3 p-1 md:px-3 bg-[var(--app-surface)] border-t border-[var(--app-border)]">
-            {/* Tabs Section */}
-            {tabs && onTabChange && activeTab && (
-              <div className="flex-1 w-full overflow-x-auto no-scrollbar min-w-0">
-                <AdvancedTabBar
-                  tabs={tabs}
-                  activeTab={activeTab}
-                  onTabChange={onTabChange}
-                  onTabsReorder={onTabsReorder}
-                  enableDragDrop={enableDragDrop}
-                  enableKeyboardNav={enableKeyboardNav}
-                  size="sm"
-                  theme="auto"
-                  animation={{
-                    transitionDuration: 400,
-                    easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-                    enable3D: enable3D,
-                    enableGlassmorphism: true,
-                    enablePulsing: true,
-                    enableMultiLayerShadows: true,
-                  }}
-                  a11y={{
-                    ariaLabel: `${title} navigation tabs`,
-                    announceChanges: true,
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Search/Filter Section - HIDDEN because it's moved to Top Header */}
-            {extraRow && (
-              <div className={`flex items-center gap-2 w-full ${searchWidth} shrink-0`}>
-                {extraRow}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    );
 };
 
 export default MicroHeader;

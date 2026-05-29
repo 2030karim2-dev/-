@@ -6,6 +6,8 @@ import { formatCurrency } from '@/core/utils';
 import type { QuotationStatus } from '@/features/sales/types/quotation';
 import CreateQuotationModal from '@/features/sales/components/quotations/CreateQuotationModal';
 import QuotationDetailsModal from '@/features/sales/components/quotations/QuotationDetailsModal';
+import DraggableTable from '@/ui/components/DraggableTable';
+import TablePagination from '@/ui/components/TablePagination';
 
 const STATUS_CONFIG: Record<QuotationStatus, { label: string; color: string; icon: React.ReactNode }> = {
   draft: { label: 'مسودة', color: 'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300', icon: <Clock size={12} /> },
@@ -37,6 +39,9 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedQuotationId, setSelectedQuotationId] = useState<string | null>(null);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
 
   const fetchQuotations = async () => {
     if (!user?.company_id) return;
@@ -67,7 +72,7 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 flex flex-col min-h-0 h-full space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -129,65 +134,68 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">ابدأ بإنشاء عرض سعر جديد</p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-gray-400">الرقم</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-gray-400">العميل</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-gray-400">التاريخ</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-gray-400">الصلاحية</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-gray-400">المبلغ</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-gray-400">الحالة</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-500 dark:text-gray-400">البنود</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
-                {filtered.map((q) => {
-                  const statusConf = STATUS_CONFIG[q.status as QuotationStatus] || STATUS_CONFIG.draft;
-                  const daysLeft = getDaysRemaining(q.valid_until);
-                  return (
-                    <tr
-                      key={q.id}
-                      onClick={() => setSelectedQuotationId(q.id)}
-                      className="hover:bg-gray-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
-                    >
-                      <td className="py-3 px-4 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400">
-                        {q.quotation_number}
-                      </td>
-                      <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">
-                        {q.party?.name || 'عميل نقدي'}
-                      </td>
-                      <td className="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs">
-                        {new Date(q.issue_date).toLocaleDateString('ar-SA')}
-                      </td>
-                      <td className="py-3 px-4">
-                        {daysLeft !== null ? (
-                          <span className={`text-xs font-medium ${daysLeft <= 0 ? 'text-rose-500' : daysLeft <= 3 ? 'text-amber-500' : 'text-gray-500 dark:text-gray-400'}`}>
-                            {daysLeft <= 0 ? 'منتهي' : `${daysLeft} يوم`}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-gray-400">—</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 font-mono font-bold text-gray-900 dark:text-white" dir="ltr">
-                        {formatCurrency(q.total_amount, q.currency_code || 'SAR')}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConf.color}`}>
-                          {statusConf.icon}
-                          {statusConf.label}
+        <div className="flex-1 min-h-0 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+          <div className="overflow-x-auto overflow-y-auto custom-scrollbar flex-1 min-h-0">
+            <DraggableTable
+              data={filtered.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)}
+              renderRow={(q) => (
+                <>
+                  <td
+                    className="py-3 px-4 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer"
+                    onClick={() => setSelectedQuotationId(q.id)}
+                  >
+                    {q.quotation_number}
+                  </td>
+                  <td
+                    className="py-3 px-4 font-medium text-gray-900 dark:text-white cursor-pointer"
+                    onClick={() => setSelectedQuotationId(q.id)}
+                  >
+                    {q.party?.name || 'عميل نقدي'}
+                  </td>
+                  <td className="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs">
+                    {new Date(q.issue_date).toLocaleDateString('ar-SA')}
+                  </td>
+                  <td className="py-3 px-4">
+                    {(() => {
+                      const daysLeft = getDaysRemaining(q.valid_until);
+                      if (daysLeft === null) return <span className="text-xs text-gray-400">—</span>;
+                      return (
+                        <span className={`text-xs font-medium ${daysLeft <= 0 ? 'text-rose-500' : daysLeft <= 3 ? 'text-amber-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                          {daysLeft <= 0 ? 'منتهي' : `${daysLeft} يوم`}
                         </span>
-                      </td>
-                      <td className="py-3 px-4 text-xs text-gray-500 dark:text-gray-400">
-                        {q.quotation_items?.length || 0}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                      );
+                    })()}
+                  </td>
+                  <td className="py-3 px-4 font-mono font-bold text-gray-900 dark:text-white" dir="ltr">
+                    {formatCurrency(q.total_amount, q.currency_code || 'SAR')}
+                  </td>
+                  <td className="py-3 px-4">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_CONFIG[q.status as QuotationStatus]?.color}`}>
+                      {STATUS_CONFIG[q.status as QuotationStatus]?.icon}
+                      {STATUS_CONFIG[q.status as QuotationStatus]?.label}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-xs text-gray-500 dark:text-gray-400">
+                    {q.quotation_items?.length || 0}
+                  </td>
+                </>
+              )}
+              onOrderChange={(newData) => {
+                const startIdx = (currentPage - 1) * rowsPerPage;
+                const updated = [...filtered];
+                updated.splice(startIdx, rowsPerPage, ...newData);
+                setQuotations(updated);
+              }}
+              className="w-full text-sm"
+            />
+          </div>
+          {/* Pinned pagination footer */}
+          <div className="shrink-0 border-t border-gray-100 dark:border-slate-800">
+            <TablePagination
+              currentPage={currentPage}
+              totalPages={Math.max(1, Math.ceil(filtered.length / rowsPerPage))}
+              onPageChange={setCurrentPage}
+            />
           </div>
         </div>
       )}

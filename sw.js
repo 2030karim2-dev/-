@@ -44,7 +44,31 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Assets: Stale While Revalidate
+  // JS, CSS and dynamic chunk files: Network First -> Cache Fallback
+  // This guarantees fresh code bundles when online, eliminating MIME/ChunkLoad errors after redeployments.
+  const url = new URL(request.url);
+  if (
+    url.pathname.endsWith('.js') || 
+    url.pathname.endsWith('.css') || 
+    url.pathname.includes('/assets/')
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Other static assets (images, icons, fonts): Stale While Revalidate
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request).then((networkResponse) => {

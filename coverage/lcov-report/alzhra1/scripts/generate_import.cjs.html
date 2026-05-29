@@ -1,0 +1,613 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for alzhra1/scripts/generate_import.cjs</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">alzhra1/scripts</a> generate_import.cjs</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/176</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/176</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >const fs = require('fs');<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >const crypto = require('crypto');</span>
+<span class="cstat-no" title="statement not covered" >const uuidv4 = () =&gt; crypto.randomUUID();</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >const companyId = 'c83421a2-a8d7-46ff-886c-a219e75ae1e6';</span>
+<span class="cstat-no" title="statement not covered" >const warehouseId = 'f7435eb7-3f74-4d10-aa6b-edcf47b2508e';</span>
+<span class="cstat-no" title="statement not covered" >// Fixed conversion rate based on user prompt (e.g., 1 RMB = 0.52 SAR)</span>
+<span class="cstat-no" title="statement not covered" >const RMB_TO_SAR = 0.53;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >const rawData = [</span>
+<span class="cstat-no" title="statement not covered" >    { no: 3, oem: "16572-31170", part: "16572-31170", brand: "Nuetral", desc: "Radiator Coolant Hose", model: "Toyota Tacoma FJ Cruiser 4Runner", price_rmb: 15.00, qty: 100 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 4, oem: "16571-54490", part: "16571-54490", brand: "Nuetral", desc: "Radiator Coolant Hose", model: "Toyota Hilux 2002-2005", price_rmb: 15.00, qty: 100 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 5, oem: "16572-54270", part: "16572-54270", brand: "Nuetral", desc: "Radiator Coolant Hose", model: "Toyota Hilux 1994-2006", price_rmb: 26.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 6, oem: "25472-26001", part: "25472-26001", brand: "Nuetral", desc: "Radiator Coolant Hose", model: "Hyundai Accent 1994-2011", price_rmb: 13.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 7, oem: "16571-2B120", part: "16571-2B120", brand: "Nuetral", desc: "Radiator Coolant Hose", model: "Toyota", price_rmb: 26.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 9, oem: "04111-31B40", part: "04111-31B40", brand: "RAM", desc: "Overhaul Gasket Kit", model: "Toyota LEXUS IS250 4GR-FSE", price_rmb: 175.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 10, oem: "04111-31B40", part: "04111-31B40", brand: "RAM", desc: "Overhaul Gasket Kit", model: "Toyota LEXUS IS250 4GR-FSE", price_rmb: 168.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 11, oem: "46420-60090", part: "46420-60090", brand: "Nuetral", desc: "Parking Brake Cable", model: "Toyota Land Cruiser", price_rmb: 68.00, qty: 20 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 12, oem: "46430-60030", part: "46430-60030", brand: "Nuetral", desc: "Parking Brake Cable", model: "Toyota Land Cruiser", price_rmb: 68.00, qty: 20 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 13, oem: "30304AJR", part: "30304AJR", brand: "EEP", desc: "Bearing", model: "Toyota Land Cruiser 1995", price_rmb: 17.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 14, oem: "LM104948", part: "LM104948", brand: "EEP", desc: "Bearing", model: "Land Cruiser FZJ100/UZJ100", price_rmb: 21.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 15, oem: "LM102949", part: "LM102949", brand: "EEP", desc: "Bearing", model: "Land Cruiser FJ80 HDJ80 HZJ80", price_rmb: 19.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 16, oem: "48702-60050", part: "48702-60050", brand: "EEP", desc: "Arm Bushing", model: "Land Cruiser/FZJ80 1990-1996", price_rmb: 13.00, qty: 20 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 17, oem: "48061-60050", part: "48061-60050", brand: "EEP", desc: "Arm Bushing", model: "Land Cruiser", price_rmb: 12.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 18, oem: "48706-60070", part: "48706-60070", brand: "EEP", desc: "Arm Bushing", model: "Toyota Land Cruiser 4700 FZJ100", price_rmb: 12.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 19, oem: "48632-0K010", part: "48632-0K010", brand: "EEP", desc: "Arm Bushing", model: "Hilux/KUN15/GGN15/2WD 2004-2011", price_rmb: 12.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 20, oem: "48702-60060", part: "48702-60060", brand: "EEP", desc: "Arm Bushing/Small", model: "Land Cruiser/FZJ80 1990-1998", price_rmb: 13.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 21, oem: "48702-60090", part: "48702-60090", brand: "EEP", desc: "Bushing", model: "Land Cruiser/UZJ100 1998-2007", price_rmb: 13.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 22, oem: "48702-35070", part: "48702-35070", brand: "EEP", desc: "Bushing", model: "Land Cruiser/VZJ95/4Runner", price_rmb: 11.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 23, oem: "48655-52010", part: "48655-0D060", brand: "EEP", desc: "Arm Bushing/Big", model: "Vios/NCP10 2004-2006", price_rmb: 13.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 24, oem: "48655-0K040", part: "48655-0K040", brand: "EEP", desc: "Arm Bushing/Big", model: "Hilux 2005-2015", price_rmb: 21.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 25, "oem": "48654-0K040", part: "48654-0K040", brand: "EEP", desc: "Arm Bushing/Small", model: "Hilux 2005-2015", price_rmb: 21.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 26, oem: "48632-0K020", part: "48632-0K020", brand: "EEP", desc: "Bushing", model: "Toyota Innova/Kijang", price_rmb: 12.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 27, oem: "45047-09026", part: "45047-09026", brand: "EEP", desc: "Tie Rod End/L", model: "Vios 02-05", price_rmb: 28.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 28, oem: "45046-09026", part: "45046-09026", brand: "EEP", desc: "Tie Rod End/R", model: "Vios 02-05", price_rmb: 28.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 29, oem: "45503-19255", part: "45503-19255", brand: "EEP", desc: "Rack End/L=R", model: "Corolla/YARIS", price_rmb: 23.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 30, oem: "45503-09031", part: "45503-09331", brand: "EEP", desc: "Rack End/L=R", model: "HILUX VIGO/KUN", price_rmb: 25.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 31, oem: "48655-12170", part: "48655-05070", brand: "EEP", desc: "Arm Bushing", model: "ACM21/PRIUS", price_rmb: 15.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 32, oem: "TO-55-A", part: "TO-1-064A", brand: "EEP", desc: "CV Joint", model: "Toyota Corolla 2001-", price_rmb: 55.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 33, oem: "TO-54-A", part: "TO-1-057A", brand: "EEP", desc: "CV Joint", model: "Toyota Corolla NZE124", price_rmb: 55.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 34, oem: "TO-57", part: "TO-1-045", brand: "EEP", desc: "CV Joint", model: "Land Cruiser HZJ80", price_rmb: 88.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 35, oem: "TO-58", part: "TO-1-073", brand: "EEP", desc: "CV Joint", model: "Land Cruiser FZJ105", price_rmb: 90.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 36, oem: "TO-60", part: "TO-1-071", brand: "EEP", desc: "CV Joint", model: "Hilux Vigo KUN25", price_rmb: 90.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 37, oem: "04465-60190", part: "04465-60340", brand: "EEP", desc: "Brake Pads/Front", model: "LX470 98-07", price_rmb: 48.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 38, oem: "04465-35290", part: "D976-7877-GC", brand: "EEP", desc: "Brake Pads/Front", model: "Prado 2003-2010", price_rmb: 48.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 39, oem: "04465-02220", part: "04465-02220", brand: "EEP", desc: "Brake Pads/Front", model: "COROLLA ZRE150", price_rmb: 42.00, qty: 10 },</span>
+<span class="cstat-no" title="statement not covered" >    { no: 40, oem: "04465-0K420", part: "D2006-9236-GC", brand: "EEP", desc: "Brake Pads/Front", model: "Innova 2015-", price_rmb: 43.00, qty: 10 }</span>
+<span class="cstat-no" title="statement not covered" >];</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >function translateName(desc, model, partNumber) {</span>
+<span class="cstat-no" title="statement not covered" >    let name_ar = '';</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    // 1. Translate Description</span>
+<span class="cstat-no" title="statement not covered" >    if (desc.includes('Radiator Coolant Hose')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'هوس بيب تبريد ';</span>
+<span class="cstat-no" title="statement not covered" >        if (partNumber.startsWith('16572')) name_ar += 'فوق ';</span>
+<span class="cstat-no" title="statement not covered" >        if (partNumber.startsWith('16571')) name_ar += 'تحت ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('Overhaul Gasket Kit')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'طقم وجيه كامل ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('Parking Brake Cable')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'واير جلنط ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc === 'Bearing') {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'رمان بلي ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('Arm Bushing/Small')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'جلبة مقص صغير ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('Arm Bushing/Big')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'جلبة مقص كبير ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('Arm Bushing')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'جلبة مقص ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc === 'Bushing') {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'جلبة ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('Tie Rod End/L')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'ذراع دركسون خارجي يسار ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('Tie Rod End/R')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'ذراع دركسون خارجي يمين ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('Rack End/L=R')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'ذراع دركسون داخلي جهتين ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('CV Joint')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'رأس عكس خارجي ';</span>
+<span class="cstat-no" title="statement not covered" >    } else if (desc.includes('Brake Pads/Front')) {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += 'قماش فرامل أمامي ';</span>
+<span class="cstat-no" title="statement not covered" >    } else {</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += desc + ' ';</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    // 2. Translate Car Model</span>
+<span class="cstat-no" title="statement not covered" >    let mod = model.toLowerCase();</span>
+<span class="cstat-no" title="statement not covered" >    let modAr = [];</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('toyota')) modAr.push('تويوتا');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('hyundai')) modAr.push('هيونداي');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('lexus')) modAr.push('لكزس');</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('tacoma')) modAr.push('تاكوما');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('fj cruiser')) modAr.push('اف جي');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('4runner')) modAr.push('فورشنار');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('hilux')) modAr.push('هايلوكس');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('accent')) modAr.push('اكسنت');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('land cruiser')) modAr.push('لاندكروزر');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('vios')) modAr.push('فيوس');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('innova')) modAr.push('انوفا');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('corolla')) modAr.push('كورولا');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('yaris')) modAr.push('يارس');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('prado')) modAr.push('برادو');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('prius')) modAr.push('بريوس');</span>
+<span class="cstat-no" title="statement not covered" >    if (mod.includes('camry')) modAr.push('كامري');</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    // Remove duplicates</span>
+<span class="cstat-no" title="statement not covered" >    modAr = [...new Set(modAr)];</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    name_ar += modAr.join(' ');</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    // Fallback if no specific model translated and string doesn't exist</span>
+<span class="cstat-no" title="statement not covered" >    if (modAr.length === 0) {</span>
+<span class="cstat-no" title="statement not covered" >        // Just append the raw model info stripped of weird chars</span>
+<span class="cstat-no" title="statement not covered" >        name_ar += model.replace(/[^a-zA-Z0-9- /]/g, ' ');</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    return name_ar.trim().replace(/\s+/g, ' ');</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >let sql = `-- INSERT SCRIPT FOR CHINESE SUPPLIER INVOICE IMPORT\n\n`;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >const supplierId = uuidv4();</span>
+<span class="cstat-no" title="statement not covered" >sql += `INSERT INTO parties (id, company_id, type, name, status, balance, created_at) VALUES ('${supplierId}', '${companyId}', 'supplier', 'المورد الصيني (China Supplier)', 'active', 0, NOW());\n\n`;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >const invoiceId = uuidv4();</span>
+<span class="cstat-no" title="statement not covered" >let invoiceTotalSAR = 0;</span>
+<span class="cstat-no" title="statement not covered" >let invoiceItemSql = ``;</span>
+<span class="cstat-no" title="statement not covered" >let productMap = {}; // Deduplicate SKUs</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >for (const item of rawData) {</span>
+<span class="cstat-no" title="statement not covered" >    const costSAR = (item.price_rmb * RMB_TO_SAR).toFixed(2);</span>
+<span class="cstat-no" title="statement not covered" >    const saleSAR = (costSAR * 1.3).toFixed(2);</span>
+<span class="cstat-no" title="statement not covered" >    invoiceTotalSAR += (costSAR * item.qty);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    let productId;</span>
+<span class="cstat-no" title="statement not covered" >    if (productMap[item.oem]) {</span>
+<span class="cstat-no" title="statement not covered" >        productId = productMap[item.oem];</span>
+<span class="cstat-no" title="statement not covered" >        // Only update stock for duplicates</span>
+<span class="cstat-no" title="statement not covered" >        sql += `INSERT INTO product_stock (product_id, warehouse_id, quantity) VALUES ('${productId}', '${warehouseId}', ${item.qty}) ON CONFLICT (product_id, warehouse_id) DO UPDATE SET quantity = product_stock.quantity + EXCLUDED.quantity;\n`;</span>
+<span class="cstat-no" title="statement not covered" >    } else {</span>
+<span class="cstat-no" title="statement not covered" >        productId = uuidv4();</span>
+<span class="cstat-no" title="statement not covered" >        productMap[item.oem] = productId;</span>
+<span class="cstat-no" title="statement not covered" >        const productName = translateName(item.desc, item.model, item.oem);</span>
+<span class="cstat-no" title="statement not covered" >        const safeName = productName.replace(/'/g, "''");</span>
+<span class="cstat-no" title="statement not covered" >        sql += `INSERT INTO products (id, company_id, name_ar, brand, part_number, alternative_numbers, sku, cost_price, sale_price, min_stock_level, status, created_at) VALUES ('${productId}', '${companyId}', '${safeName}', '${item.brand}', '${item.part}', '${item.oem}', '${item.part}', ${costSAR}, ${saleSAR}, 5, 'active', NOW());\n`;</span>
+<span class="cstat-no" title="statement not covered" >        sql += `INSERT INTO product_stock (product_id, warehouse_id, quantity) VALUES ('${productId}', '${warehouseId}', ${item.qty}) ON CONFLICT (product_id, warehouse_id) DO UPDATE SET quantity = product_stock.quantity + EXCLUDED.quantity;\n`;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    // Add Invoice item (Every line in the invoice gets its own row)</span>
+<span class="cstat-no" title="statement not covered" >    const iitemId = uuidv4();</span>
+<span class="cstat-no" title="statement not covered" >    invoiceItemSql += `INSERT INTO invoice_items (id, invoice_id, product_id, quantity, unit_price, total) VALUES ('${iitemId}', '${invoiceId}', '${productId}', ${item.qty}, ${costSAR}, ${(costSAR * item.qty).toFixed(2)});\n`;</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >// Generate Invoice</span>
+<span class="cstat-no" title="statement not covered" >const invoiceNumber = `INV-CH-${Date.now()}`;</span>
+<span class="cstat-no" title="statement not covered" >sql += `\nINSERT INTO invoices (id, company_id, type, invoice_number, party_id, total_amount, status, created_at, date) VALUES ('${invoiceId}', '${companyId}', 'purchase', '${invoiceNumber}', '${supplierId}', ${invoiceTotalSAR.toFixed(2)}, 'paid', NOW(), NOW());\n\n`;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >sql += invoiceItemSql;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >// Write original script</span>
+<span class="cstat-no" title="statement not covered" >fs.writeFileSync('import_script.sql', sql);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >// Write cleanup script</span>
+<span class="cstat-no" title="statement not covered" >let cleanupSkus = Object.keys(productMap).map(k =&gt; `'${k}'`).join(',');</span>
+<span class="cstat-no" title="statement not covered" >let cleanupSql = `</span>
+<span class="cstat-no" title="statement not covered" >DELETE FROM invoice_items WHERE invoice_id IN (SELECT id FROM invoices WHERE invoice_number LIKE 'INV-CH-%');</span>
+<span class="cstat-no" title="statement not covered" >DELETE FROM invoices WHERE invoice_number LIKE 'INV-CH-%';</span>
+<span class="cstat-no" title="statement not covered" >DELETE FROM product_stock WHERE product_id IN (SELECT id FROM products WHERE sku IN (${cleanupSkus}));</span>
+<span class="cstat-no" title="statement not covered" >DELETE FROM products WHERE sku IN (${cleanupSkus});</span>
+<span class="cstat-no" title="statement not covered" >DELETE FROM parties WHERE name = 'المورد الصيني (China Supplier)';</span>
+<span class="cstat-no" title="statement not covered" >`;</span>
+<span class="cstat-no" title="statement not covered" >fs.writeFileSync('cleanup_script.sql', cleanupSql);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >console.log('SQL Script generated successfully: import_script.sql and cleanup_script.sql');</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-05-28T19:17:13.661Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

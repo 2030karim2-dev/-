@@ -27,6 +27,7 @@ const CurrencyManager: React.FC = () => {
         isAddModalOpen, setIsAddModalOpen,
         newCurrency, setNewCurrency,
         handleUpdateRate, handleAddCurrency,
+        toMarketRate,
         deleteCurrency, refreshRates, isSaving
     } = useCurrencyManager();
 
@@ -96,6 +97,7 @@ const CurrencyManager: React.FC = () => {
                 otherCurrencies={otherCurrencies}
                 baseCurrency={baseCurrency}
                 getLatestRate={getLatestRate}
+                toMarketRate={toMarketRate}
                 activeRateEdit={activeRateEdit}
                 setActiveRateEdit={setActiveRateEdit}
                 setNewRateValue={setNewRateValue}
@@ -105,18 +107,18 @@ const CurrencyManager: React.FC = () => {
                 isSaving={isSaving}
             />
 
-            {/* Info Alert */}
             <div className="bg-gradient-to-r from-blue-50/50 to-transparent dark:from-blue-900/10 dark:to-transparent p-5 rounded-[2rem] border border-blue-100 dark:border-blue-900/30 flex gap-4 items-start shadow-sm mt-2">
                 <div className="p-2.5 bg-blue-100 dark:bg-blue-900/40 rounded-2xl text-blue-600 dark:text-blue-400 shrink-0 shadow-inner">
                     <AlertCircle size={20} />
                 </div>
                 <div>
-                    <h4 className="text-xs font-bold text-blue-800 dark:text-blue-300 mb-1">معلومة هامة</h4>
+                    <h4 className="text-xs font-bold text-blue-800 dark:text-blue-300 mb-1">طريقة إدخال أسعار الصرف</h4>
                     <p className="text-[10px] font-bold text-blue-600/70 dark:text-blue-400/70 leading-relaxed md:w-3/4">
-                        نقوم بتسجيل وتثبيت (Snapshots) أسعار الصرف لكل عملية مالية بشكل دائم. تعديل سعر الصرف هنا سيؤثر حصرياً على العمليات المستقبلية والجديدة ولن يقوم بتغيير أي أرصدة تخص فواتير وسندات سابقة للحفاظ على التدقيق المالي المحاسبي.
+                        أدخل <strong>سعر السوق</strong> مباشرةً — مثال: إذا كان 1 ريال سعودي يساوي 410 ريال يمني، أدخل <strong>410</strong>. سيقوم النظام تلقائياً بحساب وحفظ معدل التحويل الصحيح (1 ÷ 410 = 0.00243902) لضمان دقة جميع العمليات المالية. تعديل السعر يؤثر على العمليات المستقبلية فقط ولا يُغيّر أرصدة الفواتير السابقة.
                     </p>
                 </div>
             </div>
+
 
             <AddCurrencyModal
                 isOpen={isAddModalOpen}

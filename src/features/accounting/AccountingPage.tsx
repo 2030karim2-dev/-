@@ -156,7 +156,12 @@ const AccountingPage: React.FC = () => {
         isZenMode ? "bg-white dark:bg-slate-900" : ""
       )}>
         <Suspense fallback={<PageLoader />}>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-2 md:p-4 pt-5 md:pt-6 print-area animate-in slide-in-from-bottom-4 duration-500">
+          <div className={cn(
+            "flex-1 p-2 md:p-4 pt-5 md:pt-6 print-area animate-in slide-in-from-bottom-4 duration-500 min-h-0",
+            ['journal', 'accounts', 'treasury', 'ledger'].includes(activeView)
+              ? "overflow-hidden flex flex-col h-full"
+              : "overflow-y-auto custom-scrollbar"
+          )}>
              {renderContent()}
           </div>
         </Suspense>

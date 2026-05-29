@@ -21,9 +21,9 @@ const PurchasesTable: React.FC<PurchasesTableProps> = ({ data, isLoading, onView
     }
 
     return (
-        <div className="space-y-4">
+        <div className="flex-1 flex flex-col min-h-0 h-full space-y-4">
             {/* Mobile View: Micro UI Cards */}
-            <div className="grid grid-cols-1 md:hidden gap-2">
+            <div className="grid grid-cols-1 md:hidden gap-2 overflow-y-auto custom-scrollbar flex-1 min-h-0">
                 {data.map(item => (
                     <MicroListItem
                         key={item.id}
@@ -49,7 +49,7 @@ const PurchasesTable: React.FC<PurchasesTableProps> = ({ data, isLoading, onView
             </div>
 
             {/* Desktop View: Full Excel Table */}
-            <div className="hidden md:block bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+            <div className="hidden md:flex flex-col flex-1 min-h-0 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
                 <ExcelTable
                     columns={[
                         {

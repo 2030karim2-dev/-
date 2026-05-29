@@ -23,6 +23,7 @@ interface RawProduct {
     description?: string;
     purchase_price?: number | string;
     sale_price?: number | string;
+    cost_price?: number | string;
     min_stock_level?: number | string;
     unit?: string;
     image_url?: string | null;
@@ -74,7 +75,7 @@ export const productService = {
                 category_id: prod.category_id || null,
                 size: prod.size || '',
                 specifications: prod.description || '',
-                cost_price: Number(prod.purchase_price) || 0,
+                cost_price: Number(prod.purchase_price) || Number(prod.cost_price) || 0,
                 sale_price: Number(prod.sale_price) || 0,
                 selling_price: Number(prod.sale_price) || 0,
                 stock_quantity: totalStock,

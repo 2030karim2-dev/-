@@ -3,12 +3,8 @@
 // Use Dashboard Hook
 // ============================================
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../../../core/lib/react-query';
-import { useEffect } from 'react';
-import { supabase } from '../../../lib/supabaseClient';
-import { useAuthStore } from '../../auth/store';
-import { useFeedbackStore } from '../../feedback/store';
 
 // ------------------------------------------
 // Types
@@ -116,40 +112,11 @@ const fetchDashboardData = async (_period: string): Promise<DashboardData> => {
 export const useDashboard = (options?: UseDashboardOptions) => {
     const { period = 'week', refetchInterval } = options ?? {};
 
-    const queryClient = useQueryClient();
-    const { user } = useAuthStore();
-    const { showToast } = useFeedbackStore();
+
 
     const queryKey = [...queryKeys.dashboard.stats, period];
 
-    // Realtime channel for new sales notifications
-    useEffect(() => {
-        if (!user?.company_id) return;
 
-        const channel = supabase
-            .channel(`dashboard_sales_${user.company_id}`)
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'invoices',
-                    filter: `company_id=eq.${user.company_id}`
-                },
-                (payload: any) => {
-                    // Only notify for actual sales, ignoring returns and purchases
-                    if (payload.new.type === 'sale') {
-                        showToast(`مبيعات جديدة بقيمة ${payload.new.total_amount} ر.س`, 'success');
-                        queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });
-                    }
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [user?.company_id, queryClient, showToast]);
 
     const {
         data,

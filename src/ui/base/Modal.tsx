@@ -12,6 +12,7 @@ interface ModalProps {
   children: React.ReactNode;
   footer: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'full' | 'resizable';
+  headerActions?: React.ReactNode;
 }
 
 type Position = { x: number; y: number };
@@ -25,7 +26,8 @@ const Modal: React.FC<ModalProps> = ({
   description,
   children,
   footer,
-  size = 'lg'
+  size = 'lg',
+  headerActions
 }) => {
   const [isMaximized, setIsMaximized] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
@@ -46,6 +48,13 @@ const Modal: React.FC<ModalProps> = ({
 
   const handleDragStart = (e: React.MouseEvent) => {
     if (isMaximized) return;
+    
+    // Ignore drag if clicking on buttons, inputs, labels or dropdowns
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('input') || target.closest('label') || target.closest('select')) {
+      return;
+    }
+
     const rect = modalRef.current?.getBoundingClientRect();
     if (!rect) return;
 
@@ -229,43 +238,46 @@ const Modal: React.FC<ModalProps> = ({
         <div 
           onMouseDown={handleDragStart}
           className={cn(
-            "flex justify-between items-center p-3 md:p-5 border-b border-[var(--app-border)] bg-[var(--app-surface)] shrink-0",
+            "flex justify-between items-center py-2 px-3 md:py-2 md:px-4 border-b border-[var(--app-border)] bg-[var(--app-surface)] shrink-0",
             !isMaximized && "cursor-move active:cursor-grabbing"
           )}
         >
           <div className="flex items-center gap-2 select-none">
-            <div className="p-1.5 md:p-2 bg-blue-600 text-white shadow-sm rounded-md md:rounded-lg">
-              <Icon size={16} className="md:hidden" />
-              <Icon size={20} className="hidden md:block" />
+            <div className="p-1 md:p-1.5 bg-blue-600 text-white shadow-sm rounded-md md:rounded-lg">
+              <Icon size={14} className="md:hidden" />
+              <Icon size={18} className="hidden md:block" />
             </div>
             <div>
-              <h2 className="text-[11px] md:text-sm font-bold text-[var(--app-text)] leading-none">{title}</h2>
-              <p className="text-[10px] md:text-xs font-medium text-[var(--app-text-secondary)] mt-1 opacity-70">{description}</p>
+              <h2 className="text-[10px] md:text-xs font-bold text-[var(--app-text)] leading-none">{title}</h2>
+              <p className="text-[9px] md:text-[10px] font-medium text-[var(--app-text-secondary)] mt-0.5 opacity-70">{description}</p>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={toggleFullscreen}
-              className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 active:scale-90 transition-all rounded-lg"
-              title={isMaximized ? 'خروج من ملء الشاشة' : 'ملء الشاشة'}
-            >
-              {isMaximized ? <Shrink size={18} /> : <Expand size={18} />}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-2 text-[var(--app-text-secondary)] hover:text-red-500 active:scale-90 transition-all rounded-full"
-            >
-              <X size={20} />
-            </button>
+          <div className="flex items-center gap-2.5">
+            {headerActions && <div className="flex items-center gap-2">{headerActions}</div>}
+            <div className="flex items-center gap-1 border-r dark:border-slate-800 pr-1.5">
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                className="p-1 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 active:scale-90 transition-all rounded-lg"
+                title={isMaximized ? 'خروج من ملء الشاشة' : 'ملء الشاشة'}
+              >
+                {isMaximized ? <Shrink size={16} /> : <Expand size={16} />}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1 text-[var(--app-text-secondary)] hover:text-red-500 active:scale-90 transition-all rounded-full"
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Content Segment */}
         <div className={cn(
-          "flex-1 overflow-y-auto custom-scrollbar bg-[var(--app-bg)]",
-          (isMaximized || size === 'full') ? "p-1 md:p-2 lg:p-3" : "p-4 md:p-8 lg:p-10"
+          "flex-1 custom-scrollbar bg-[var(--app-bg)]",
+          (isMaximized || size === 'full') ? "p-1 md:p-2 lg:p-3 flex flex-col min-h-0 overflow-hidden" : "p-4 md:p-8 lg:p-10 overflow-y-auto"
         )}>
           {children}
         </div>

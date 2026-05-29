@@ -100,6 +100,8 @@ export const journalEntrySchema = z.object({
     description: z.string().min(1, 'الوصف مطلوب'),
     reference: z.string().optional(),
     reference_type: z.string().optional(),
+    currency_code: z.string().optional(),
+    exchange_rate: z.number().optional(),
     lines: z.array(journalLineSchema).min(2, 'قيد يومية يتطلب سطرين على الأقل'),
 }).refine(
     data => {

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { UseFormRegister } from 'react-hook-form';
 import { Trash2, CheckCircle2, AlertTriangle, Clock } from 'lucide-react';
 import { formatNumberDisplay } from '../../../../core/utils';
 import { cn } from '../../../../core/utils';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 interface Props {
     items: any[];
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const AuditItemsTable: React.FC<Props> = ({ items, register, filter, category, isCompleted, onRemoveItem }) => {
+    const parentRef = useRef<HTMLDivElement>(null);
 
     const filteredFields = items.map((item, index) => ({ ...item, index })).filter(field => {
         const product = field.products;
@@ -28,6 +30,18 @@ const AuditItemsTable: React.FC<Props> = ({ items, register, filter, category, i
     });
 
     const showActions = !isCompleted && !!onRemoveItem;
+    const columnCount = showActions ? 9 : 8;
+
+    const rowVirtualizer = useVirtualizer({
+        count: filteredFields.length,
+        getScrollElement: () => parentRef.current,
+        estimateSize: () => 64, // estimated height of counting row
+        overscan: 10,
+    });
+
+    const virtualItems = rowVirtualizer.getVirtualItems();
+    const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
+    const paddingBottom = virtualItems.length > 0 ? rowVirtualizer.getTotalSize() - virtualItems[virtualItems.length - 1].end : 0;
 
     // Footer stats
     const totalExpected = filteredFields.reduce((sum, f) => sum + (Number(f.expected_quantity) || 0), 0);
@@ -57,7 +71,7 @@ const AuditItemsTable: React.FC<Props> = ({ items, register, filter, category, i
 
     return (
         <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden rounded-xl">
-            <div className="overflow-x-auto custom-scrollbar">
+            <div ref={parentRef} className="overflow-auto max-h-[600px] custom-scrollbar">
                 <table className="w-full text-right text-xs border-collapse">
                     <thead className="bg-slate-800 dark:bg-slate-900 text-white font-bold border-b-2 border-slate-700 uppercase tracking-wider sticky top-0 z-10">
                         <tr>
@@ -73,7 +87,14 @@ const AuditItemsTable: React.FC<Props> = ({ items, register, filter, category, i
                         </tr>
                     </thead>
                     <tbody className="divide-y dark:divide-slate-800">
-                        {filteredFields.map((field, index) => {
+                        {paddingTop > 0 && (
+                            <tr>
+                                <td colSpan={columnCount} style={{ height: `${paddingTop}px` }} />
+                            </tr>
+                        )}
+                        {virtualItems.map((virtualRow) => {
+                            const field = filteredFields[virtualRow.index];
+                            const index = field.index;
                             const product = field.products;
                             const isCounted = field.counted_quantity !== null && field.counted_quantity !== undefined && field.counted_quantity !== '';
                             const diff = isCounted
@@ -151,6 +172,11 @@ const AuditItemsTable: React.FC<Props> = ({ items, register, filter, category, i
                                 </tr>
                             );
                         })}
+                        {paddingBottom > 0 && (
+                            <tr>
+                                <td colSpan={columnCount} style={{ height: `${paddingBottom}px` }} />
+                            </tr>
+                        )}
                     </tbody>
 
                     {/* ── Footer Row ── */}

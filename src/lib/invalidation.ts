@@ -24,7 +24,7 @@ const DOMAIN_KEYS = {
     // Purchases related
     purchases: ['purchases', 'purchase_stats', 'purchase_details', 'purchases_analytics'],
     // Inventory related
-    inventory: ['products', 'product_search', 'warehouses', 'inventory_categories', 'transfers', 'audit_sessions'],
+    inventory: ['products', 'products_paginated', 'product_search', 'warehouses', 'inventory_categories', 'transfers', 'audit_sessions'],
     // Expenses related
     expenses: ['expenses', 'expense_categories', 'next_expense_number'],
     // Accounting related

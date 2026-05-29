@@ -57,16 +57,23 @@ export class ErrorBoundary extends Component<Props, State> {
             error.name === 'ChunkLoadError';
 
         if (isChunkError) {
-            logger.warn('ErrorBoundary', 'Detected chunk load error. Attempting to recover by reloading...');
+            logger.warn('ErrorBoundary', 'Detected chunk load error. Attempting cache-busting reload...');
 
-            // Try to auto-reload once per session to fix the version mismatch
             const lastReload = sessionStorage.getItem('last_chunk_error_reload');
             const now = Date.now();
 
-            // If we haven't reloaded for a chunk error in the last 10 seconds, do it once
-            if (!lastReload || now - parseInt(lastReload) > 10000) {
+            // Prevent infinite reload loops (limit to once per 15 seconds)
+            if (!lastReload || now - parseInt(lastReload) > 15000) {
                 sessionStorage.setItem('last_chunk_error_reload', now.toString());
-                window.location.reload();
+                
+                try {
+                    const currentUrl = new URL(window.location.href);
+                    // Append cache buster to search params (before hash) so HashRouter path remains unchanged
+                    currentUrl.searchParams.set('cb', now.toString());
+                    window.location.replace(currentUrl.toString());
+                } catch {
+                    window.location.reload();
+                }
                 return;
             }
         }

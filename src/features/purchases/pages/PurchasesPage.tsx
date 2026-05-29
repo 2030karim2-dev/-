@@ -1,25 +1,28 @@
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, Suspense, lazy } from 'react';
 import { ShoppingCart, Plus, RefreshCw, Wallet, History, BarChart3, Sparkles, ShieldCheck, Wrench, FileText } from 'lucide-react';
 import PurchaseStats from '../components/PurchaseStats';
-import PurchasesTable from '../components/PurchasesTable';
-import CreatePurchaseModal from '../components/CreatePurchaseModal';
-import PurchaseDetailsModal from '../components/PurchaseDetailsModal';
-import CreatePaymentModal from '../components/CreatePaymentModal';
-import { AuditModal } from '../../accounting/components/AuditModal';
-import PurchasesAnalytics from '../components/Analytics/PurchasesAnalytics';
 import { usePurchases } from '../hooks';
 import MicroHeader from '../../../ui/base/MicroHeader';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
-import SmartImportView from '../../smart-import/components/SmartImportView';
 import { usePurchaseStore } from '../store';
 // import { purchaseAccountingService } from '../services/purchaseAccounting';
 import { purchaseFixesService } from '../services/maintenance/purchaseFixes';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
-import PurchaseReturnsView from '../components/Returns/PurchaseReturnsView';
-import PurchaseQuotationsTab from '../components/quotations/PurchaseQuotationsTab';
 import { useAIPrefillStore } from '../../ai/store';
+import PageLoader from '../../../ui/base/PageLoader';
+
+// Lazy load heavy components
+const PurchasesTable = lazy(() => import('../components/PurchasesTable'));
+const CreatePurchaseModal = lazy(() => import('../components/CreatePurchaseModal'));
+const PurchaseDetailsModal = lazy(() => import('../components/PurchaseDetailsModal'));
+const CreatePaymentModal = lazy(() => import('../components/CreatePaymentModal'));
+const AuditModal = lazy(() => import('../../accounting/components/AuditModal').then(module => ({ default: module.AuditModal })));
+const PurchasesAnalytics = lazy(() => import('../components/Analytics/PurchasesAnalytics'));
+const SmartImportView = lazy(() => import('../../smart-import/components/SmartImportView'));
+const PurchaseReturnsView = lazy(() => import('../components/Returns/PurchaseReturnsView'));
+const PurchaseQuotationsTab = lazy(() => import('../components/quotations/PurchaseQuotationsTab'));
 
 const PurchasesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'create' | 'list' | 'returns' | 'analytics' | 'smart_import' | 'quotations'>('list');
@@ -208,21 +211,37 @@ const PurchasesPage: React.FC = () => {
         onSearchChange={setSearchTerm}
       />
 
-      <div className="flex-1 overflow-y-auto px-2 pt-0 pb-16 custom-scrollbar">
-        <div className="space-y-3 pt-2 h-full">
+      <div className={`flex-1 pt-0 pb-0 min-h-0 ${
+        ['list', 'returns', 'quotations'].includes(activeTab)
+          ? "overflow-hidden flex flex-col"
+          : "overflow-y-auto custom-scrollbar pb-16 px-2"
+      }`}>
+        <div className={`space-y-3 pt-2 w-full ${
+          ['list', 'returns', 'quotations'].includes(activeTab)
+            ? "flex-1 flex flex-col min-h-0 h-full px-2"
+            : "h-full"
+        }`}>
           {activeTab !== 'analytics' && activeTab !== 'create' && activeTab !== 'smart_import' && <PurchaseStats />}
-          <div className="animate-in fade-in slide-in-from-bottom-1 h-full">
-            {renderContent()}
+          <div className={`animate-in fade-in slide-in-from-bottom-1 ${
+            ['list', 'returns', 'quotations'].includes(activeTab)
+              ? "flex-1 flex flex-col min-h-0 h-full"
+              : "h-full"
+          }`}>
+            <Suspense fallback={<PageLoader />}>
+              {renderContent()}
+            </Suspense>
           </div>
         </div>
       </div>
 
-      <PurchaseDetailsModal
-        invoiceId={viewInvoiceId}
-        onClose={() => setViewInvoiceId(null)}
-      />
-      <CreatePaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} />
-      {isAuditOpen && <AuditModal onClose={() => setIsAuditOpen(false)} />}
+      <Suspense fallback={null}>
+        <PurchaseDetailsModal
+          invoiceId={viewInvoiceId}
+          onClose={() => setViewInvoiceId(null)}
+        />
+        <CreatePaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} />
+        {isAuditOpen && <AuditModal onClose={() => setIsAuditOpen(false)} />}
+      </Suspense>
     </div>
   );
 };

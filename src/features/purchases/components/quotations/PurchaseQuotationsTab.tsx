@@ -64,7 +64,7 @@ export const PurchaseQuotationsTab: React.FC<Props> = ({ onConvertToPurchase }) 
   }, [grouped, searchTerm]);
 
   return (
-    <div className="space-y-4">
+    <div className="flex-1 flex flex-col min-h-0 h-full gap-3">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -86,7 +86,7 @@ export const PurchaseQuotationsTab: React.FC<Props> = ({ onConvertToPurchase }) 
       </div>
 
       {/* Search */}
-      <div className="relative max-w-xs">
+      <div className="relative max-w-xs shrink-0">
         <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
@@ -106,19 +106,21 @@ export const PurchaseQuotationsTab: React.FC<Props> = ({ onConvertToPurchase }) 
         />
       )}
 
-      {/* Content */}
+      {/* Content — fills remaining height */}
       {loading ? (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex-1 flex items-center justify-center">
           <Loader2 className="w-6 h-6 animate-spin text-violet-500" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-700">
-          <FileText size={40} className="mx-auto text-gray-300 dark:text-slate-600 mb-3" />
-          <p className="text-gray-500 dark:text-gray-400 font-medium">لا توجد عروض أسعار من الموردين</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">سجّل عروض الموردين للمقارنة بينها</p>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center py-12 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-700 w-full max-w-sm">
+            <FileText size={40} className="mx-auto text-gray-300 dark:text-slate-600 mb-3" />
+            <p className="text-gray-500 dark:text-gray-400 font-medium">لا توجد عروض أسعار من الموردين</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">سجّل عروض الموردين للمقارنة بينها</p>
+          </div>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-3 pb-2">
           {filtered.map(([groupId, quots]) => (
             <div
               key={groupId}

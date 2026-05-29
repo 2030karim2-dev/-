@@ -1,0 +1,511 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for alzhra1/src/features/accounting/components/journals/JournalTable.tsx</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../../../../index.html">All files</a> / <a href="index.html">alzhra1/src/features/accounting/components/journals</a> JournalTable.tsx</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/142</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/142</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import React, { useState, useMemo } from 'react';</span></span></span>
+<span class="cstat-no" title="statement not covered" >import { Filter, Search,  ArrowUpDown } from 'lucide-react';</span>
+<span class="cstat-no" title="statement not covered" >import { useJournals } from '../../hooks/useJournals';</span>
+<span class="cstat-no" title="statement not covered" >// import TableSkeleton from '../../../../ui/base/TableSkeleton';</span>
+<span class="cstat-no" title="statement not covered" >// import EmptyState from '../../../../ui/base/EmptyState';</span>
+<span class="cstat-no" title="statement not covered" >import JournalEntryRow from './JournalEntryRow';</span>
+<span class="cstat-no" title="statement not covered" >// import Input from '../../../../ui/base/Input';</span>
+<span class="cstat-no" title="statement not covered" >import { UIJournalEntry, UIJournalLine } from '../../types/models';</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >const JournalTable: React.FC = () =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    const {</span>
+<span class="cstat-no" title="statement not covered" >        data,</span>
+<span class="cstat-no" title="statement not covered" >        isLoading,</span>
+<span class="cstat-no" title="statement not covered" >        fetchNextPage,</span>
+<span class="cstat-no" title="statement not covered" >        hasNextPage,</span>
+<span class="cstat-no" title="statement not covered" >        isFetchingNextPage</span>
+<span class="cstat-no" title="statement not covered" >    } = useJournals();</span>
+<span class="cstat-no" title="statement not covered" >    const [searchTerm, setSearchTerm] = useState('');</span>
+<span class="cstat-no" title="statement not covered" >    const [sortOrder, setSortOrder] = useState&lt;'asc' | 'desc'&gt;('desc');</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    const journals: UIJournalEntry[] = useMemo(() =&gt; data?.pages?.flat() || [], [data]);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    // Filter &amp; Sort Logic</span>
+<span class="cstat-no" title="statement not covered" >    const filteredJournals = useMemo(() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        if (!journals.length) return [];</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >        let result = [...journals];</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >        // 1. Search</span>
+<span class="cstat-no" title="statement not covered" >        if (searchTerm) {</span>
+<span class="cstat-no" title="statement not covered" >            const lowerTerm = searchTerm.toLowerCase();</span>
+<span class="cstat-no" title="statement not covered" >            result = result.filter(j =&gt;</span>
+<span class="cstat-no" title="statement not covered" >                j.description?.toLowerCase().includes(lowerTerm) ||</span>
+<span class="cstat-no" title="statement not covered" >                j.entry_number?.toString().includes(lowerTerm) ||</span>
+<span class="cstat-no" title="statement not covered" >                // Search in lines</span>
+<span class="cstat-no" title="statement not covered" >                j.journal_entry_lines?.some((l: UIJournalLine) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >                    l.description?.toLowerCase().includes(lowerTerm) ||</span>
+<span class="cstat-no" title="statement not covered" >                    l.account?.name?.toLowerCase().includes(lowerTerm) ||</span>
+<span class="cstat-no" title="statement not covered" >                    l.account?.name_ar?.toLowerCase().includes(lowerTerm) ||</span>
+<span class="cstat-no" title="statement not covered" >                    l.account?.code?.toLowerCase().includes(lowerTerm)</span>
+<span class="cstat-no" title="statement not covered" >                )</span>
+<span class="cstat-no" title="statement not covered" >            );</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >        // 2. Sort</span>
+<span class="cstat-no" title="statement not covered" >        result.sort((a, b) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >            const dateA = new Date(a.entry_date).getTime();</span>
+<span class="cstat-no" title="statement not covered" >            const dateB = new Date(b.entry_date).getTime();</span>
+<span class="cstat-no" title="statement not covered" >            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;</span>
+<span class="cstat-no" title="statement not covered" >        });</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >        return result;</span>
+<span class="cstat-no" title="statement not covered" >    }, [journals, searchTerm, sortOrder]);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    if (isLoading) return (</span>
+<span class="cstat-no" title="statement not covered" >        &lt;div className="space-y-4"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            {[1, 2, 3].map(i =&gt; &lt;div key={i} className="h-24 bg-gray-100 dark:bg-slate-800 rounded-lg animate-pulse" /&gt;)}</span>
+<span class="cstat-no" title="statement not covered" >        &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >    );</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >    return (</span>
+<span class="cstat-no" title="statement not covered" >        &lt;div className="space-y-6 animate-in fade-in duration-500 pb-20"&gt;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >            {/* Controls Bar */}</span>
+<span class="cstat-no" title="statement not covered" >            &lt;div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-lg border border-gray-100 dark:border-slate-800 shadow-sm sticky top-0 z-10"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;div className="relative w-full md:w-96"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;input</span>
+<span class="cstat-no" title="statement not covered" >                        type="text"</span>
+<span class="cstat-no" title="statement not covered" >                        placeholder="بحث برقم القيد، الوصف، أو اسم الحساب..."</span>
+<span class="cstat-no" title="statement not covered" >                        className="w-full pl-4 pr-10 py-2 bg-gray-50 dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"</span>
+<span class="cstat-no" title="statement not covered" >                        value={searchTerm}</span>
+<span class="cstat-no" title="statement not covered" >                        onChange={(e) =&gt; setSearchTerm(e.target.value)}</span>
+<span class="cstat-no" title="statement not covered" >                    /&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >                &lt;div className="flex items-center gap-2 w-full md:w-auto"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;button</span>
+<span class="cstat-no" title="statement not covered" >                        onClick={() =&gt; setSortOrder(prev =&gt; prev === 'asc' ? 'desc' : 'asc')}</span>
+<span class="cstat-no" title="statement not covered" >                        className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-sm font-bold"</span>
+<span class="cstat-no" title="statement not covered" >                    &gt;</span>
+<span class="cstat-no" title="statement not covered" >                        &lt;ArrowUpDown size={16} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >                        &lt;span&gt;{sortOrder === 'asc' ? 'الأقدم أولاً' : 'الأحدث أولاً'}&lt;/span&gt;</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;/button&gt;</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;div className="px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-bold font-mono"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                        {filteredJournals.length} قيود</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >            {/* Journals Table */}</span>
+<span class="cstat-no" title="statement not covered" >            &lt;div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-300 dark:border-slate-700 shadow-sm overflow-hidden"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;div className="overflow-x-auto"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;table className="w-full text-sm border-collapse"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                        &lt;thead className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 font-bold sticky top-0 z-10 shadow-sm"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                            &lt;tr&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;th className="px-2 py-3 border border-gray-300 dark:border-slate-700 w-10 text-center"&gt;#&lt;/th&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;th className="px-3 py-3 border border-gray-300 dark:border-slate-700 w-24 text-center"&gt;رقم القيد&lt;/th&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;th className="px-3 py-3 border border-gray-300 dark:border-slate-700 w-32 text-center"&gt;التاريخ&lt;/th&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;th className="px-3 py-3 border border-gray-300 dark:border-slate-700 w-24 text-center"&gt;نوع المعاملة&lt;/th&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;th className="px-3 py-3 border border-gray-300 dark:border-slate-700 w-32 text-center"&gt;المستخدم&lt;/th&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;th className="px-3 py-3 border border-gray-300 dark:border-slate-700 text-right min-w-[200px]"&gt;البيان / الشرح&lt;/th&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;th className="px-3 py-3 border border-gray-300 dark:border-slate-700 w-32 text-center"&gt;إجمالي مدين&lt;/th&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;th className="px-3 py-3 border border-gray-300 dark:border-slate-700 w-32 text-center"&gt;إجمالي دائن&lt;/th&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;th className="px-3 py-3 border border-gray-300 dark:border-slate-700 w-24 text-center"&gt;الحالة&lt;/th&gt;</span>
+<span class="cstat-no" title="statement not covered" >                            &lt;/tr&gt;</span>
+<span class="cstat-no" title="statement not covered" >                        &lt;/thead&gt;</span>
+<span class="cstat-no" title="statement not covered" >                        &lt;tbody className="divide-y divide-gray-200 dark:divide-slate-700"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                            {filteredJournals.length &gt; 0 ? (</span>
+<span class="cstat-no" title="statement not covered" >                                filteredJournals.map((journal: UIJournalEntry) =&gt; (</span>
+<span class="cstat-no" title="statement not covered" >                                    &lt;JournalEntryRow key={journal.id} entry={journal} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                ))</span>
+<span class="cstat-no" title="statement not covered" >                            ) : (</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;tr&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                    &lt;td colSpan={9} className="p-8 text-center text-gray-500"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                        &lt;Filter className="mx-auto mb-2 text-gray-300" size={32} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                        &lt;p&gt;لا توجد قيود تطابق البحث&lt;/p&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                    &lt;/td&gt;</span>
+<span class="cstat-no" title="statement not covered" >                                &lt;/tr&gt;</span>
+<span class="cstat-no" title="statement not covered" >                            )}</span>
+<span class="cstat-no" title="statement not covered" >                        &lt;/tbody&gt;</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;/table&gt;</span>
+<span class="cstat-no" title="statement not covered" >                &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >                {hasNextPage &amp;&amp; (</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;div className="p-4 text-center border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50"&gt;</span>
+<span class="cstat-no" title="statement not covered" >                        &lt;button</span>
+<span class="cstat-no" title="statement not covered" >                            onClick={() =&gt; fetchNextPage()}</span>
+<span class="cstat-no" title="statement not covered" >                            disabled={isFetchingNextPage}</span>
+<span class="cstat-no" title="statement not covered" >                            className="px-6 py-2 bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/60 rounded-lg text-sm font-bold transition-colors disabled:opacity-50"</span>
+<span class="cstat-no" title="statement not covered" >                        &gt;</span>
+<span class="cstat-no" title="statement not covered" >                            {isFetchingNextPage ? 'جاري التحميل...' : 'تحميل المزيد'}</span>
+<span class="cstat-no" title="statement not covered" >                        &lt;/button&gt;</span>
+<span class="cstat-no" title="statement not covered" >                    &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >                )}</span>
+<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >        &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >    );</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >export default JournalTable;</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-05-28T19:17:13.661Z
+            </div>
+        <script src="../../../../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../../../../sorter.js"></script>
+        <script src="../../../../../../block-navigation.js"></script>
+    </body>
+</html>
+    

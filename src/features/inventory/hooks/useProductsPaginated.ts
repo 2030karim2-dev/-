@@ -17,11 +17,12 @@
  */
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { useAuthStore } from '../../auth/store';
 import { productService } from '../services/productService';
 import { Product } from '../types';
+import { useDebounce } from '../../../lib/hooks/useDebounce';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -69,23 +70,22 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
 
   const [page, setPage] = useState(initialPage);
   const [search, setSearch] = useState(initialSearch);
-  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const debouncedSearch = useDebounce(search, 300);
 
-  // Debounce search: 300 ms delay before sending to server
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Reset to first page when search query changes
   useEffect(() => {
-    return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    };
-  }, []);
+    setPage(1);
+  }, [debouncedSearch]);
+
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => {
-      setDebouncedSearch(value);
-      setPage(1); // reset to first page on new search
-    }, 300);
   }, []);
+
+  // Sync internal search state if initialSearch prop changes externally
+  useEffect(() => {
+    setSearch(initialSearch);
+    setPage(1);
+  }, [initialSearch]);
 
   // ── Main paginated query ─────────────────────────────────────────────────
 
@@ -148,21 +148,7 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
   }, [page, query.data, companyId, pageSize, debouncedSearch, sortKey, sortDir, queryClient]);
 
   // ── Real-time invalidation ───────────────────────────────────────────────
-
-  useEffect(() => {
-    if (!companyId) return;
-    const channel = supabase
-      .channel(`products_paginated_rt_${companyId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'products', filter: `company_id=eq.${companyId}` },
-        () => {
-          // Invalidate all paginated product queries so all pages refresh
-          void queryClient.invalidateQueries({ queryKey: ['products_paginated', companyId] });
-        }
-      )
-      .subscribe();
-
-    return () => { void supabase.removeChannel(channel); };
-  }, [companyId, queryClient]);
+  // Handled globally by useRealtimeSync hook in src/lib/hooks/useRealtimeSync.ts
 
   // ── Navigation helpers ───────────────────────────────────────────────────
 

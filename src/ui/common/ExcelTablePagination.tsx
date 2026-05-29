@@ -28,7 +28,7 @@ export function ExcelTablePagination({
     if (!enablePagination || totalPages <= 1) return null;
 
     return (
-        <div className="p-2 border-t border-[var(--app-border)] bg-[var(--app-bg)] flex flex-col sm:flex-row justify-between items-center gap-2 select-none">
+        <div className="p-2 border-t border-[var(--app-border)] bg-[var(--app-bg)] flex flex-col sm:flex-row justify-between items-center gap-2 select-none smooth-scroll">
             <div className="flex items-center gap-2 text-[10px] text-[var(--app-text-secondary)]">
                 <span>عرض</span>
                 <select
@@ -53,12 +53,10 @@ export function ExcelTablePagination({
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                     className={cn(
-                        "flex items-center gap-1 p-1 px-3 rounded hover:bg-[var(--app-surface)] disabled:opacity-50 disabled:hover:bg-transparent transition-colors text-[10px] font-bold text-[var(--app-text-secondary)]",
-                        isRTL ? "flex-row-reverse" : ""
+                        "flex items-center justify-center w-7 h-7 rounded hover:bg-[var(--app-surface-hover)] disabled:opacity-50 disabled:hover:bg-transparent transition-colors text-[10px] font-bold text-[var(--app-text-secondary)]",
                     )}
                 >
                     {isRTL ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
-                    <span>السابق</span>
                 </button>
 
                 <div className="flex items-center gap-1 mx-2">
@@ -82,7 +80,7 @@ export function ExcelTablePagination({
                                     "w-7 h-7 flex items-center justify-center rounded-lg text-[10px] font-bold transition-all",
                                     currentPage === pageNum
                                         ? cn("text-white shadow-md", currentTheme.accent)
-                                        : "text-[var(--app-text-secondary)] hover:bg-[var(--app-surface)]"
+                                        : "text-[var(--app-text-secondary)] hover:bg-[var(--app-surface-hover)]"
                                 )}
                             >
                                 {pageNum}
@@ -95,11 +93,9 @@ export function ExcelTablePagination({
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
                     className={cn(
-                        "flex items-center gap-1 p-1 px-3 rounded hover:bg-[var(--app-surface)] disabled:opacity-50 disabled:hover:bg-transparent transition-colors text-[10px] font-bold text-[var(--app-text-secondary)]",
-                        isRTL ? "flex-row-reverse" : ""
+                        "flex items-center justify-center w-7 h-7 rounded hover:bg-[var(--app-surface-hover)] disabled:opacity-50 disabled:hover:bg-transparent transition-colors text-[10px] font-bold text-[var(--app-text-secondary)]",
                     )}
                 >
-                    <span>التالي</span>
                     {isRTL ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
                 </button>
             </div>

@@ -14,6 +14,7 @@ interface CurrencyTableProps {
     otherCurrencies: any[];
     baseCurrency: any | undefined;
     getLatestRate: (code: string) => number;
+    toMarketRate: (rateToBase: number) => number;
     activeRateEdit: string | null;
     setActiveRateEdit: (code: string | null) => void;
     setNewRateValue: (val: number) => void;
@@ -27,6 +28,7 @@ export const CurrencyTable: React.FC<CurrencyTableProps> = ({
     otherCurrencies,
     baseCurrency,
     getLatestRate,
+    toMarketRate,
     activeRateEdit,
     setActiveRateEdit,
     setNewRateValue,
@@ -77,15 +79,23 @@ export const CurrencyTable: React.FC<CurrencyTableProps> = ({
                     <thead>
                         <tr className="border-b border-gray-100 dark:border-slate-800/60">
                             <th className="p-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest w-20 text-center">الرمز</th>
-                            <th className="p-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">اسم العملة</th>
+                    <th className="p-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">اسم العملة</th>
                             <th className="p-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">الكود المرجعي</th>
-                            <th className="p-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest w-72">سعر الصرف (مقابل {baseCurrency?.code})</th>
-                            <th className="p-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest w-24 text-center">إجراءات</th>
+                            <th className="p-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest w-72">
+                                سعر الصرف
+                                <span className="block text-[8px] normal-case tracking-normal text-blue-400 font-normal mt-0.5">
+                                    أدخل كم وحدة تساوي 1 {baseCurrency?.code}
+                                </span>
+                            </th>
+                    <th className="p-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest w-24 text-center">إجراءات</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-slate-800/80">
                         {otherCurrencies.map((curr: any) => {
+                            // currentRate = rate_to_base (المخزون في DB)
                             const currentRate = getLatestRate(curr.code);
+                            // marketRate = ما يراه المستخدم (مثال: 410 ريال يمني لكل ريال سعودي)
+                            const marketRate = toMarketRate(currentRate);
                             const isEditing = activeRateEdit === curr.code;
 
                             return (
@@ -119,18 +129,19 @@ export const CurrencyTable: React.FC<CurrencyTableProps> = ({
                                     </td>
                                     <td className="p-4 align-middle relative">
                                         {isEditing ? (
-                                            <div className="flex gap-2 items-center animate-in slide-in-from-right-3 zoom-in-[0.98] duration-200">
-                                                <div className="relative w-full">
-                                                    <input
-                                                        autoFocus
-                                                        type="number"
-                                                        defaultValue={currentRate}
-                                                        onChange={(e) => setNewRateValue(parseFloat(e.target.value))}
-                                                        className="w-full bg-white dark:bg-slate-950 border-2 border-blue-500 p-2.5 rounded-2xl text-sm font-bold font-mono outline-none shadow-[0_0_15px_rgba(59,130,246,0.15)] focus:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-shadow pr-8"
-                                                        placeholder="أدخل السعر الجديد..."
-                                                    />
-                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-blue-300 select-none">{curr.code}</span>
-                                                </div>
+                                            <div className="flex flex-col gap-1.5 animate-in slide-in-from-right-3 zoom-in-[0.98] duration-200">
+                                                <div className="flex gap-2 items-center">
+                                                    <div className="relative w-full">
+                                                        <input
+                                                            autoFocus
+                                                            type="number"
+                                                            defaultValue={marketRate}
+                                                            onChange={(e) => setNewRateValue(parseFloat(e.target.value))}
+                                                            className="w-full bg-white dark:bg-slate-950 border-2 border-blue-500 p-2.5 rounded-2xl text-sm font-bold font-mono outline-none shadow-[0_0_15px_rgba(59,130,246,0.15)] focus:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-shadow pr-8"
+                                                            placeholder="مثال: 410"
+                                                        />
+                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-blue-300 select-none">{curr.code}</span>
+                                                    </div>
                                                 <button
                                                     onClick={() => handleUpdateRate(curr.code)}
                                                     className="shrink-0 p-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 active:scale-95 transition-all outline-none"
@@ -145,22 +156,26 @@ export const CurrencyTable: React.FC<CurrencyTableProps> = ({
                                                 >
                                                     <XIcon size={18} />
                                                 </button>
+                                                </div>
+                                                <p className="text-[9px] text-blue-500/80 font-bold pr-1">
+                                                    سيُحفظ تلقائياً: 1 ÷ {marketRate || '...'} = {marketRate ? (1/marketRate).toFixed(8) : '...'}
+                                                </p>
                                             </div>
                                         ) : (
                                             <div
-                                                onClick={() => { setActiveRateEdit(curr.code); setNewRateValue(currentRate); }}
+                                                onClick={() => { setActiveRateEdit(curr.code); setNewRateValue(marketRate); }}
                                                 className="group/edit flex items-center justify-between p-3 rounded-2xl hover:bg-white dark:hover:bg-slate-950 border-2 border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 cursor-pointer transition-all hover:shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:hover:shadow-black/20"
                                                 title="انقر لتعديل السعر المباشر"
                                             >
                                                 <div className="flex items-baseline gap-1.5 flex-col">
                                                     <div className="flex items-baseline gap-1.5">
                                                         <h3 className="text-lg font-bold font-mono text-gray-800 dark:text-slate-200 leading-none group-hover/edit:text-blue-600 dark:group-hover/edit:text-blue-400 transition-colors">
-                                                            {formatNumberDisplay(currentRate)}
+                                                            {formatNumberDisplay(marketRate)}
                                                         </h3>
-                                                        <span className="text-[9px] font-bold text-gray-400 group-hover/edit:text-blue-300">{baseCurrency?.code}</span>
+                                                        <span className="text-[9px] font-bold text-gray-400 group-hover/edit:text-blue-300">{curr.code} / 1 {baseCurrency?.code}</span>
                                                     </div>
                                                     <span className="text-[8px] font-bold text-gray-400">
-                                                        المعادل = المبلغ {curr.exchange_operator === 'multiply' ? '×' : '÷'} {currentRate}
+                                                        معدل التحويل المخزون = {currentRate.toFixed(8)}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5 opacity-0 group-hover/edit:opacity-100 transition-all translate-x-4 group-hover/edit:translate-x-0">

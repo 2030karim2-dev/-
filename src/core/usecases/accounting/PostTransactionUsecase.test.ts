@@ -24,6 +24,8 @@ describe('PostTransactionUsecase', () => {
         const mockInputData = {
             date: '2023-10-01',
             description: 'Test entry description',
+            currency_code: 'USD',
+            exchange_rate: 3.75,
             lines: [
                 { account_id: validUUID1, debit_amount: 100, credit_amount: 0, description: 'Line 1' },
                 { account_id: validUUID2, debit_amount: 0, credit_amount: 100, description: 'Line 2' }
@@ -43,6 +45,8 @@ describe('PostTransactionUsecase', () => {
             {
                 date: mockInputData.date,
                 description: mockInputData.description,
+                currency_code: 'USD',
+                exchange_rate: 3.75,
                 lines: [
                     { account_id: validUUID1, debit: 100, credit: 0, description: 'Line 1' },
                     { account_id: validUUID2, debit: 0, credit: 100, description: 'Line 2' }

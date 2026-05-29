@@ -3,6 +3,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 export interface UseTableResizeOptions {
     enableResize?: boolean;
     tableWrapperRef: React.RefObject<HTMLDivElement>;
+    zoomLevel?: number;
+    setZoomLevel?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export interface UseTableResizeReturn {
@@ -20,14 +22,19 @@ export interface UseTableResizeReturn {
 
 export const useTableResize = ({
     enableResize = true,
-    tableWrapperRef
+    tableWrapperRef,
+    zoomLevel: externalZoomLevel,
+    setZoomLevel: externalSetZoomLevel
 }: UseTableResizeOptions): UseTableResizeReturn => {
     const [columnWidths, setColumnWidths] = useState<Record<number, number>>({});
     const [customSize, setCustomSize] = useState<{ width?: string; height?: string }>({});
     const [originalSize, setOriginalSize] = useState<{ width?: string; height?: string }>({});
     const [isResizing, setIsResizing] = useState(false);
     const [resizeDirection, setResizeDirection] = useState<string | null>(null);
-    const [zoomLevel, setZoomLevel] = useState(1);
+    const [internalZoomLevel, setInternalZoomLevel] = useState(1);
+
+    const zoomLevel = externalZoomLevel !== undefined ? externalZoomLevel : internalZoomLevel;
+    const setZoomLevel = externalSetZoomLevel !== undefined ? externalSetZoomLevel : setInternalZoomLevel;
 
     const resizingRef = useRef<{ colIndex: number; startX: number; startWidth: number } | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);

@@ -115,7 +115,11 @@ const ExpensesPage: React.FC = () => {
         onSearchChange={setSearchTerm}
       />
 
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28 custom-scrollbar">
+      <div className={`flex-1 px-4 pt-4 pb-28 min-h-0 ${
+        viewType === 'list'
+          ? "overflow-hidden flex flex-col"
+          : "overflow-y-auto custom-scrollbar"
+      }`}>
         <ExpensesListView 
           expenses={expenses || []} 
           isLoading={isLoading} 

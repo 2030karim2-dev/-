@@ -21,9 +21,10 @@ export const useDashboardData = () => {
   const { user } = useAuthStore();
   const companyId = user?.company_id;
 
-  // 1. Stats query — lightweight, refreshes every 5 min
-  const statsQuery = useQuery({
-    queryKey: ['dashboard', 'stats', companyId],
+  // 1. Consolidated primary query - Fetches all dashboard raw data in a single consolidated network call.
+  // Refreshes every 5 minutes to maintain freshness, saving 66% database load.
+  const dashboardQuery = useQuery({
+    queryKey: ['dashboard', 'raw_data', companyId],
     queryFn: ({ signal }) => {
       if (!companyId) return Promise.reject('No company ID');
       return dashboardStatsApi.fetchStats(companyId, signal);
@@ -33,40 +34,12 @@ export const useDashboardData = () => {
     gcTime: 10 * 60 * 1000,
   });
 
-  // 2. Chart query — heavier, refreshes every 15 min
-  const chartQuery = useQuery({
-    queryKey: ['dashboard', 'chart', companyId, 30],
-    queryFn: ({ signal }) => {
-      if (!companyId) return Promise.reject('No company ID');
-      return dashboardStatsApi.fetchChartData(companyId, 30, signal);
-    },
-    enabled: !!companyId,
-    staleTime: 15 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-  });
-
-  // 3. Alerts query — light, refreshes every 2 min
-  const alertsQuery = useQuery({
-    queryKey: ['dashboard', 'alerts', companyId],
-    queryFn: ({ signal }) => {
-      if (!companyId) return Promise.reject('No company ID');
-      return dashboardStatsApi.fetchAlerts(companyId, signal);
-    },
-    enabled: !!companyId,
-    staleTime: 2 * 60 * 1000,
-    refetchInterval: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
-  });
-
-  // Merge raw data: use whichever query has freshest data (stats is primary)
-  const rawData = statsQuery.data || chartQuery.data || alertsQuery.data;
-  const isLoading = statsQuery.isLoading;
-  const isError = statsQuery.isError;
-  const isFetching = statsQuery.isFetching || chartQuery.isFetching || alertsQuery.isFetching;
+  const rawData = dashboardQuery.data;
+  const isLoading = dashboardQuery.isLoading;
+  const isError = dashboardQuery.isError;
+  const isFetching = dashboardQuery.isFetching;
   const refetch = () => {
-    statsQuery.refetch();
-    chartQuery.refetch();
-    alertsQuery.refetch();
+    dashboardQuery.refetch();
   };
 
   // Compute Base Metrics using useMemo

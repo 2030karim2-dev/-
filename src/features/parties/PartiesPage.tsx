@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, Suspense, lazy } from 'react';
 import { Users, UserPlus, FileText, LayoutGrid, Edit, Trash2, History, LucideIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useParties, usePartyMutations, usePartiesView } from './hooks';
@@ -7,15 +7,18 @@ import { useAIPrefillStore } from '../ai/store';
 import MicroHeader from '../../ui/base/MicroHeader';
 import PartiesStats from './components/PartiesStats';
 import ExcelTable, { Column } from '../../ui/common/ExcelTable';
-import PartyModal from './components/PartyModal';
-import StatementView from './components/StatementView';
-import CategoriesView from './components/CategoriesView';
-import CustomerTimelineModal from './components/customers/CustomerTimelineModal';
 import Button from '../../ui/base/Button';
 import Avatar from '../../ui/base/Avatar';
 import { formatCurrency, cn } from '../../core/utils';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import FullscreenContainer from '../../ui/base/FullscreenContainer';
+import PageLoader from '../../ui/base/PageLoader';
+
+// Lazy load heavy components
+const PartyModal = lazy(() => import('./components/PartyModal'));
+const StatementView = lazy(() => import('./components/StatementView'));
+const CategoriesView = lazy(() => import('./components/CategoriesView'));
+const CustomerTimelineModal = lazy(() => import('./components/customers/CustomerTimelineModal'));
 
 interface PartiesPageProps {
     partyType: PartyType;
@@ -197,10 +200,10 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
         switch (activeView) {
             case 'list':
                 return (
-                    <div className="space-y-4 animate-in fade-in duration-500">
+                    <div className="flex-1 flex flex-col min-h-0 h-full space-y-4 animate-in fade-in duration-500">
                         <PartiesStats stats={stats} type={partyType} />
 
-                        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                        <div className="flex-1 min-h-0 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm flex flex-col">
                             <ExcelTable
                                 columns={columns}
                                 data={parties || []}
@@ -249,39 +252,48 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                 "flex-1 overflow-hidden flex flex-col relative z-20",
                 isZenMode ? "bg-white dark:bg-slate-900" : ""
             )}>
-                <div className="flex-1 overflow-y-auto px-2 md:px-4 pt-5 md:pt-6 pb-24 custom-scrollbar">
-                    {renderContent()}
+                <div className={cn(
+                    "flex-1 px-2 md:px-4 pt-5 md:pt-6 pb-24 min-h-0",
+                    activeView === 'list'
+                        ? "overflow-hidden flex flex-col"
+                        : "overflow-y-auto custom-scrollbar"
+                )}>
+                    <Suspense fallback={<PageLoader />}>
+                        {renderContent()}
+                    </Suspense>
                 </div>
             </div>
 
-            <PartyModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                onSubmit={(data) => {
-                    const payload = { data: data as PartyFormData };
-                    if (editingParty?.id) {
-                        (payload as any).id = editingParty.id;
-                    }
-                    saveParty(payload as any, { onSuccess: () => {
-                        handleCloseModal();
-                        setPrefillData(null);
-                    }});
-                }}
-                isSubmitting={isSaving}
-                initialData={editingParty}
-                prefillData={prefillData}
-                partyType={partyType}
-            />
+            <Suspense fallback={null}>
+                <PartyModal
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    onSubmit={(data) => {
+                        const payload = { data: data as PartyFormData };
+                        if (editingParty?.id) {
+                            (payload as any).id = editingParty.id;
+                        }
+                        saveParty(payload as any, { onSuccess: () => {
+                            handleCloseModal();
+                            setPrefillData(null);
+                        }});
+                    }}
+                    isSubmitting={isSaving}
+                    initialData={editingParty}
+                    prefillData={prefillData}
+                    partyType={partyType}
+                />
 
-            {/* Customer Timeline Modal */}
-            <CustomerTimelineModal
-                isOpen={isTimelineOpen}
-                onClose={() => {
-                    setIsTimelineOpen(false);
-                    setSelectedCustomer(null);
-                }}
-                customer={selectedCustomer}
-            />
+                {/* Customer Timeline Modal */}
+                <CustomerTimelineModal
+                    isOpen={isTimelineOpen}
+                    onClose={() => {
+                        setIsTimelineOpen(false);
+                        setSelectedCustomer(null);
+                    }}
+                    customer={selectedCustomer}
+                />
+            </Suspense>
         </div>
         </FullscreenContainer>
     );

@@ -94,12 +94,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, onAddToCart, inSt
                                 playNotificationSound();
                                 onAddToCart(product);
                             }}
-                            disabled={!hasStock}
                             className={`
                         relative bg-white dark:bg-slate-900 p-2 rounded-2xl border transition-all active:scale-95 text-right flex flex-col h-48 md:h-52 group
                         ${hasStock
                                     ? 'border-gray-100 dark:border-slate-800 hover:border-blue-500 shadow-sm hover:shadow-md'
-                                    : 'bg-gray-50 dark:bg-slate-900/50 opacity-60 cursor-not-allowed'
+                                    : 'border-gray-100 dark:border-slate-800 hover:border-red-500 shadow-sm hover:shadow-md opacity-75'
                                 }
                     `}
                         >
@@ -148,9 +147,20 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, onAddToCart, inSt
 
                                 {/* Price + Stock Row */}
                                 <div className="mt-2.5 flex justify-between items-end w-full">
-                                    <span dir="ltr" className="font-black text-blue-600 dark:text-blue-400 text-xs md:text-base tracking-tighter">
-                                        {formatCurrency(product.sale_price ?? product.selling_price ?? 0)}
-                                    </span>
+                                    <div className="flex flex-col text-right">
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-[10px] text-gray-500 dark:text-slate-400 font-black">بيع:</span>
+                                            <span dir="ltr" className="font-black text-blue-600 dark:text-blue-400 text-xs md:text-base tracking-tighter">
+                                                {formatCurrency(product.sale_price ?? product.selling_price ?? 0)}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1 mt-0.5">
+                                            <span className="text-[10px] text-gray-400 dark:text-slate-500 font-bold">شراء:</span>
+                                            <span dir="ltr" className="text-[10px] text-gray-500 dark:text-slate-400 font-mono">
+                                                {formatCurrency(product.cost_price ?? 0)}
+                                            </span>
+                                        </div>
+                                    </div>
                                     <span dir="ltr" className={`text-[10px] md:text-xs font-bold uppercase px-2 py-0.5 rounded-lg flex items-center gap-1 ${hasStock
                                         ? isLowStock
                                             ? 'text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400'
@@ -162,12 +172,6 @@ const ProductGrid: React.FC<ProductGridProps> = ({ searchTerm, onAddToCart, inSt
                                     </span>
                                 </div>
                             </div>
-
-                            {!hasStock && (
-                                <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-[1.5px] rounded-2xl flex items-center justify-center z-10">
-                                    <span className="bg-rose-500 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg">نفذت الكمية</span>
-                                </div>
-                            )}
                         </button>
                     );
                 })}

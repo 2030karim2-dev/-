@@ -59,7 +59,7 @@ const JournalTable: React.FC = () => {
     );
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500 pb-20">
+        <div className="flex-1 flex flex-col min-h-0 h-full space-y-6 animate-in fade-in duration-500 pb-20">
 
             {/* Controls Bar */}
             <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-lg border border-gray-100 dark:border-slate-800 shadow-sm sticky top-0 z-10">
@@ -89,8 +89,8 @@ const JournalTable: React.FC = () => {
             </div>
 
             {/* Journals Table */}
-            <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-300 dark:border-slate-700 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-300 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col flex-1 min-h-0">
+                <div className="overflow-x-auto overflow-y-auto custom-scrollbar flex-1 min-h-0">
                     <table className="w-full text-sm border-collapse">
                         <thead className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 font-bold sticky top-0 z-10 shadow-sm">
                             <tr>

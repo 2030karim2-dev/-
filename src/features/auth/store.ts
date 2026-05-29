@@ -148,20 +148,14 @@ export const useAuthStore = create<AuthState>()(
               });
               // Invalidate all queries to refresh data with the valid session
               queryClient.invalidateQueries();
-            } else if (!persistedUser) {
-              // Fallback if no profile exists yet and no persisted user
-              set({
-                user: {
-                  id: session.user.id,
-                  email: session.user.email || '',
-                  full_name: session.user.user_metadata?.full_name || '',
-                  role: 'viewer',
-                },
-                isAuthenticated: true,
-                isLoading: false,
-                isReady: true,
-              });
-              queryClient.invalidateQueries();
+            } else {
+              // ⚡ STALE OR DELETED USER: If profile fetch fails or returns incomplete data,
+              // we must clear the session to prevent being stuck in a broken state.
+              logger.warn('Auth', 'Profile fetch failed for active session, clearing session');
+              await supabase.auth.signOut({ scope: 'local' });
+              queryClient.clear();
+              Promise.resolve(persister.removeClient()).catch(() => { });
+              set({ user: null, isAuthenticated: false, isLoading: false, isReady: true });
             }
           } else if (!persistedUser) {
             set({ user: null, isAuthenticated: false, isLoading: false, isReady: true });
