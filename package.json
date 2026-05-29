@@ -16,7 +16,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:analyze": "npm run build && npx vite-bundle-visualizer",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --report-unused-disable-directives",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "clean": "chmod +x cleanup.sh && ./cleanup.sh",

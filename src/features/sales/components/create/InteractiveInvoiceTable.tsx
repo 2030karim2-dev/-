@@ -7,30 +7,38 @@ import { cn } from '../../../../core/utils';
 import ProductSelectionModal from './ProductSelectionModal';
 import InvoiceRow from './InvoiceRow';
 
-
 const InteractiveInvoiceTable: React.FC = () => {
-  const {
-    items, setProductForRow, addItem, updateItem, removeItem, showDiscount, toggleColumn
-  } = useSalesStore();
+  const { items, setProductForRow, addItem, updateItem, removeItem, showDiscount, toggleColumn } =
+    useSalesStore();
 
   const tableRef = useRef<HTMLTableElement>(null);
-  const [modalState, setModalState] = useState<{ isOpen: boolean; rowIndex: number; query: string }>({
-    isOpen: false, rowIndex: 0, query: ''
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    rowIndex: number;
+    query: string;
+  }>({
+    isOpen: false,
+    rowIndex: 0,
+    query: '',
   });
 
   // Column Resizing Logic
   const initialWidths = (() => {
     try {
       const saved = localStorage.getItem('invoice_col_widths');
-      return saved ? JSON.parse(saved) : {
-        index: 40,
-        description: 350,
-        quantity: 100,
-        price: 120,
-        discount: 100,
-        total: 140,
-      };
-    } catch { return { index: 40, description: 350, quantity: 100, price: 120, discount: 100, total: 140 }; }
+      return saved
+        ? JSON.parse(saved)
+        : {
+            index: 40,
+            description: 350,
+            quantity: 100,
+            price: 120,
+            discount: 100,
+            total: 140,
+          };
+    } catch {
+      return { index: 40, description: 350, quantity: 100, price: 120, discount: 100, total: 140 };
+    }
   })();
 
   const [colWidths, setColWidths] = useState<Record<string, number>>(initialWidths);
@@ -45,7 +53,7 @@ const InteractiveInvoiceTable: React.FC = () => {
     resizingRef.current = {
       field,
       startX: e.pageX,
-      startWidth: colWidths[field]
+      startWidth: colWidths[field],
     };
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
@@ -59,7 +67,7 @@ const InteractiveInvoiceTable: React.FC = () => {
     const delta = e.pageX - startX;
     setColWidths(prev => ({
       ...prev,
-      [field]: Math.max(50, startWidth + delta)
+      [field]: Math.max(50, startWidth + delta),
     }));
   }, []);
 
@@ -81,16 +89,25 @@ const InteractiveInvoiceTable: React.FC = () => {
 
     // Auto-focus quantity after selection
     setTimeout(() => {
-      const nextCell = tableRef.current?.querySelector(`[data-row-index="${modalState.rowIndex}"][data-col-field="quantity"]`)!;
+      const nextCell = tableRef.current?.querySelector(
+        `[data-row-index="${modalState.rowIndex}"][data-col-field="quantity"]`
+      ) as HTMLInputElement | null;
       nextCell?.focus();
       nextCell?.select();
     }, 50);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, rowIndex: number, field: keyof SalesCartItem) => {
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    rowIndex: number,
+    field: keyof SalesCartItem
+  ) => {
     if (!tableRef.current) return;
 
-    if (field === 'name' && (e.key === 'Enter' || (e.key.length === 1 && !e.ctrlKey && !e.metaKey))) {
+    if (
+      field === 'name' &&
+      (e.key === 'Enter' || (e.key.length === 1 && !e.ctrlKey && !e.metaKey))
+    ) {
       e.preventDefault();
       handleOpenSearch(rowIndex, e.key.length === 1 ? e.key : '');
       return;
@@ -102,19 +119,32 @@ const InteractiveInvoiceTable: React.FC = () => {
     const colIndex = navigationFields.indexOf(field);
 
     const moveFocus = (row: number, colField: keyof SalesCartItem) => {
-      const nextCell = tableRef.current?.querySelector(`[data-row-index="${row}"][data-col-field="${colField}"]`)!;
+      const nextCell = tableRef.current?.querySelector(
+        `[data-row-index="${row}"][data-col-field="${colField}"]`
+      ) as HTMLInputElement | null;
       nextCell?.focus();
       if (nextCell) nextCell.select();
     };
 
     switch (e.key) {
-      case 'ArrowUp': e.preventDefault(); moveFocus(Math.max(0, rowIndex - 1), field); break;
-      case 'ArrowDown': e.preventDefault(); moveFocus(Math.min(items.length - 1, rowIndex + 1), field); break;
+      case 'ArrowUp':
+        e.preventDefault();
+        moveFocus(Math.max(0, rowIndex - 1), field);
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        moveFocus(Math.min(items.length - 1, rowIndex + 1), field);
+        break;
       case 'Enter':
         e.preventDefault();
-        if (rowIndex === items.length - 1 && field === navigationFields[navigationFields.length - 1]) {
+        if (
+          rowIndex === items.length - 1 &&
+          field === navigationFields[navigationFields.length - 1]
+        ) {
           addItem();
-          setTimeout(() => { moveFocus(rowIndex + 1, 'name'); }, 50);
+          setTimeout(() => {
+            moveFocus(rowIndex + 1, 'name');
+          }, 50);
         } else {
           moveFocus(rowIndex + 1, field);
         }
@@ -126,66 +156,129 @@ const InteractiveInvoiceTable: React.FC = () => {
           moveFocus(rowIndex, navigationFields[nextColIndex]);
         } else if (!e.shiftKey && rowIndex === items.length - 1) {
           addItem();
-          setTimeout(() => { moveFocus(rowIndex + 1, 'name'); }, 50);
+          setTimeout(() => {
+            moveFocus(rowIndex + 1, 'name');
+          }, 50);
         } else if (!e.shiftKey) {
           moveFocus(rowIndex + 1, navigationFields[0]);
         } else if (e.shiftKey && rowIndex > 0) {
           moveFocus(rowIndex - 1, navigationFields[navigationFields.length - 1]);
         }
         break;
-      default: return;
+      default:
+        return;
     }
   };
 
   return (
-    <div className="flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
+    <div className="flex flex-col overflow-hidden bg-white dark:bg-slate-900">
       {/* Table Toolbar */}
-      <div className="p-1 flex justify-between items-center bg-gray-50 dark:bg-slate-950 border-y dark:border-slate-800">
+      <div className="flex items-center justify-between border-y bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-950">
         <div className="flex items-center gap-2 px-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
-          <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">محتويات الفاتورة</span>
+          <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400"></div>
+          <span className="text-[9px] font-bold uppercase tracking-widest text-gray-500">
+            محتويات الفاتورة
+          </span>
         </div>
         <div className="flex gap-1.5">
-          <div className="flex bg-gray-100 dark:bg-slate-800 p-0.5 rounded-lg border dark:border-slate-800">
+          <div className="flex rounded-lg border bg-gray-100 p-0.5 dark:border-slate-800 dark:bg-slate-800">
             {useDiscountStore.getState().discountEnabled && (
-              <button onClick={() => { toggleColumn('showDiscount'); }} className={cn("px-4 py-1 text-[9px] font-bold uppercase transition-all rounded-md", showDiscount ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-gray-400")}>خصم</button>
+              <button
+                onClick={() => {
+                  toggleColumn('showDiscount');
+                }}
+                className={cn(
+                  'rounded-md px-4 py-1 text-[9px] font-bold uppercase transition-all',
+                  showDiscount
+                    ? 'bg-white text-blue-600 shadow-sm dark:bg-slate-700'
+                    : 'text-gray-400'
+                )}
+              >
+                خصم
+              </button>
             )}
-
           </div>
-          <button className="p-2 text-gray-400 hover:text-blue-500 transition-colors"><Settings size={14} /></button>
+          <button className="p-2 text-gray-400 transition-colors hover:text-blue-500">
+            <Settings size={14} />
+          </button>
         </div>
       </div>
 
       {/* Main Grid */}
-      <div className="overflow-x-auto custom-scrollbar">
-        <table ref={tableRef} className="w-full border-collapse table-fixed min-w-max">
+      <div className="custom-scrollbar overflow-x-auto">
+        <table ref={tableRef} className="w-full min-w-max table-fixed border-collapse">
           <thead>
-            <tr className="bg-gray-50/50 dark:bg-slate-800/20 text-[9px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest text-right">
-              <th style={{ width: colWidths.index }} className="relative p-2 border-b border-l dark:border-slate-800 text-center">#</th>
-              <th style={{ width: colWidths.description }} className="relative p-2 border-b border-l dark:border-slate-800 group">
+            <tr className="bg-gray-50/50 text-right text-[9px] font-bold uppercase tracking-widest text-gray-500 dark:bg-slate-800/20 dark:text-slate-400">
+              <th
+                style={{ width: colWidths.index }}
+                className="relative border-b border-l p-2 text-center dark:border-slate-800"
+              >
+                #
+              </th>
+              <th
+                style={{ width: colWidths.description }}
+                className="group relative border-b border-l p-2 dark:border-slate-800"
+              >
                 وصف الصنف
-                <div onMouseDown={(e) => { onMouseDown(e, 'description'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                <div
+                  onMouseDown={e => {
+                    onMouseDown(e, 'description');
+                  }}
+                  className="absolute left-0 top-0 z-20 h-full w-1 cursor-col-resize transition-colors hover:w-1.5 hover:bg-blue-500/50 active:bg-blue-600"
+                ></div>
               </th>
-              <th style={{ width: colWidths.quantity }} className="relative p-2 border-b border-l dark:border-slate-800 text-center group">
+              <th
+                style={{ width: colWidths.quantity }}
+                className="group relative border-b border-l p-2 text-center dark:border-slate-800"
+              >
                 الكمية
-                <div onMouseDown={(e) => { onMouseDown(e, 'quantity'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                <div
+                  onMouseDown={e => {
+                    onMouseDown(e, 'quantity');
+                  }}
+                  className="absolute left-0 top-0 z-20 h-full w-1 cursor-col-resize transition-colors hover:w-1.5 hover:bg-blue-500/50 active:bg-blue-600"
+                ></div>
               </th>
-              <th style={{ width: colWidths.price }} className="relative p-2 border-b border-l dark:border-slate-800 text-center group">
+              <th
+                style={{ width: colWidths.price }}
+                className="group relative border-b border-l p-2 text-center dark:border-slate-800"
+              >
                 سعر الوحدة
-                <div onMouseDown={(e) => { onMouseDown(e, 'price'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                <div
+                  onMouseDown={e => {
+                    onMouseDown(e, 'price');
+                  }}
+                  className="absolute left-0 top-0 z-20 h-full w-1 cursor-col-resize transition-colors hover:w-1.5 hover:bg-blue-500/50 active:bg-blue-600"
+                ></div>
               </th>
               {showDiscount && (
-                <th style={{ width: colWidths.discount }} className="relative p-2 border-b border-l dark:border-slate-800 text-center group">
+                <th
+                  style={{ width: colWidths.discount }}
+                  className="group relative border-b border-l p-2 text-center dark:border-slate-800"
+                >
                   الخصم
-                  <div onMouseDown={(e) => { onMouseDown(e, 'discount'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                  <div
+                    onMouseDown={e => {
+                      onMouseDown(e, 'discount');
+                    }}
+                    className="absolute left-0 top-0 z-20 h-full w-1 cursor-col-resize transition-colors hover:w-1.5 hover:bg-blue-500/50 active:bg-blue-600"
+                  ></div>
                 </th>
               )}
 
-              <th style={{ width: colWidths.total }} className="relative p-2 border-b dark:border-slate-800 text-left group">
+              <th
+                style={{ width: colWidths.total }}
+                className="group relative border-b p-2 text-left dark:border-slate-800"
+              >
                 الإجمالي
-                <div onMouseDown={(e) => { onMouseDown(e, 'total'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                <div
+                  onMouseDown={e => {
+                    onMouseDown(e, 'total');
+                  }}
+                  className="absolute left-0 top-0 z-20 h-full w-1 cursor-col-resize transition-colors hover:w-1.5 hover:bg-blue-500/50 active:bg-blue-600"
+                ></div>
               </th>
-              <th className="p-2 w-10 text-center border-b dark:border-slate-800"></th>
+              <th className="w-10 border-b p-2 text-center dark:border-slate-800"></th>
             </tr>
           </thead>
           <tbody className="divide-y dark:divide-slate-800">
@@ -205,13 +298,18 @@ const InteractiveInvoiceTable: React.FC = () => {
         </table>
       </div>
 
-      <button onClick={addItem} className="w-full py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 text-gray-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-t dark:border-slate-800">
+      <button
+        onClick={addItem}
+        className="flex w-full items-center justify-center gap-2 border-t bg-gray-50 py-2.5 text-[10px] font-bold uppercase tracking-widest text-gray-500 transition-all hover:bg-gray-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800"
+      >
         <Plus size={14} strokeWidth={3} /> إضافة سطر
       </button>
 
       <ProductSelectionModal
         isOpen={modalState.isOpen}
-        onClose={() => { setModalState(prev => ({ ...prev, isOpen: false })); }}
+        onClose={() => {
+          setModalState(prev => ({ ...prev, isOpen: false }));
+        }}
         onSelect={handleProductSelect}
         initialQuery={modalState.query}
       />
