@@ -3,7 +3,7 @@
  * Handles CRUD + RFQ comparison for purchase quotations
  */
 import { supabase } from '../../../lib/supabaseClient';
-import { CreatePurchaseQuotationDTO } from '../types/quotation';
+import type { CreatePurchaseQuotationDTO } from '../types/quotation';
 
 export const purchaseQuotationsApi = {
   /**

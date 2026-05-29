@@ -93,7 +93,7 @@ const SecuritySettings: React.FC = () => {
               {t.two_factor_auth_desc || 'إضافة طبقة حماية إضافية لحسابك باستخدام تطبيق المصادقة.'}
             </p>
             <button
-              onClick={() => showToast(t.feature_coming_soon || 'ستتوفر قريباً', 'info')}
+              onClick={() => { showToast(t.feature_coming_soon || 'ستتوفر قريباً', 'info'); }}
               className="text-[9px] font-bold text-blue-600 border-2 border-blue-500/20 px-3 py-1.5 rounded-xl hover:bg-blue-50 transition-all uppercase"
             >
               {t.enable_protection || 'تفعيل الحماية'}
@@ -111,7 +111,7 @@ const SecuritySettings: React.FC = () => {
               {t.terminate_sessions_desc || 'تسجيل الخروج من كافة الأجهزة والمتصفحات الأخرى النشطة.'}
             </p>
             <button
-              onClick={() => showToast(t.feature_coming_soon || 'ستتوفر قريباً', 'info')}
+              onClick={() => { showToast(t.feature_coming_soon || 'ستتوفر قريباً', 'info'); }}
               className="w-full bg-rose-600 text-white py-2.5 rounded-xl text-[9px] font-bold shadow-lg shadow-rose-500/20 active:scale-95 transition-all"
             >
               {t.logout_all_devices || 'تسجيل الخروج من كل الأجهزة'}

@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type Database = {
+export interface Database {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
@@ -4179,7 +4179,7 @@ export type Database = {
       }
       get_all_parties: {
         Args: { p_company_id: string; p_status?: string; p_type?: string }
-        Returns: {
+        Returns: Array<{
           address: string
           avg_rating: number
           balance: number
@@ -4212,7 +4212,7 @@ export type Database = {
           total_purchases_amount: number
           type: string
           updated_at: string
-        }[]
+        }>
       }
       get_all_products: {
         Args: {
@@ -4220,7 +4220,7 @@ export type Database = {
           p_status?: string
           p_warehouse_id?: string
         }
-        Returns: {
+        Returns: Array<{
           alternative_numbers: string
           barcode: string
           brand: string
@@ -4250,7 +4250,7 @@ export type Database = {
           unit: string
           updated_at: string
           warehouse_quantities: Json
-        }[]
+        }>
       }
       get_auth_companies: { Args: never; Returns: string[] }
       get_auth_company_id: { Args: never; Returns: string }
@@ -4270,7 +4270,7 @@ export type Database = {
           p_limit?: number
           p_offset?: number
         }
-        Returns: {
+        Returns: Array<{
           cost_price: number
           days_since_last_sale: number
           id: string
@@ -4280,14 +4280,14 @@ export type Database = {
           sku: string
           stock_quantity: number
           total_value: number
-        }[]
+        }>
       }
       get_expense_stats: { Args: { p_company_id: string }; Returns: Json }
       get_inventory_valuation: { Args: { p_company_id: string }; Returns: Json }
       get_invoice_with_items: { Args: { p_invoice_id: string }; Returns: Json }
       get_item_movements_with_balance: {
         Args: { p_company_id: string; p_product_id: string }
-        Returns: {
+        Returns: Array<{
           balance_after: number
           date: string
           document_number: string
@@ -4300,11 +4300,11 @@ export type Database = {
           source_name: string
           source_user: string
           transaction_type: string
-        }[]
+        }>
       }
       get_low_stock_products: {
         Args: { p_company_id?: string }
-        Returns: {
+        Returns: Array<{
           category_name: string
           cost_price: number
           id: string
@@ -4314,7 +4314,7 @@ export type Database = {
           sale_price: number
           sku: string
           total_stock: number
-        }[]
+        }>
       }
       get_next_invoice_number: {
         Args: { p_company_id: string; p_prefix?: string }
@@ -4330,7 +4330,7 @@ export type Database = {
       }
       get_overdue_invoices: {
         Args: { p_company_id: string; p_type?: string }
-        Returns: {
+        Returns: Array<{
           aging_bucket: string
           currency_code: string
           days_overdue: number
@@ -4344,7 +4344,7 @@ export type Database = {
           party_phone: string
           remaining: number
           total_amount: number
-        }[]
+        }>
       }
       get_paginated_invoices: {
         Args: {
@@ -4369,7 +4369,7 @@ export type Database = {
       get_party_summary: { Args: { p_party_id: string }; Returns: Json }
       get_potential_duplicates: {
         Args: { p_company_id: string; p_type?: string }
-        Returns: {
+        Returns: Array<{
           id1: string
           id2: string
           name1: string
@@ -4377,11 +4377,11 @@ export type Database = {
           phone1: string
           phone2: string
           similarity: number
-        }[]
+        }>
       }
       get_product_analytics: {
         Args: { p_company_id: string; p_days?: number; p_product_id: string }
-        Returns: {
+        Returns: Array<{
           avg_sale_price: number
           current_stock: number
           gross_profit: number
@@ -4390,11 +4390,11 @@ export type Database = {
           total_revenue: number
           total_sold: number
           transaction_count: number
-        }[]
+        }>
       }
       get_product_fitment: {
         Args: { p_id: string }
-        Returns: {
+        Returns: Array<{
           fitment_id: string
           make: string
           model: string
@@ -4403,7 +4403,7 @@ export type Database = {
           vehicle_id: string
           year_end: number
           year_start: number
-        }[]
+        }>
       }
       get_product_stock_history: {
         Args: {
@@ -4414,7 +4414,7 @@ export type Database = {
           p_to_date?: string
           p_warehouse_id?: string
         }
-        Returns: {
+        Returns: Array<{
           created_by: string
           id: string
           invoice_number: string
@@ -4426,7 +4426,7 @@ export type Database = {
           transaction_type: string
           warehouse_id: string
           warehouse_name: string
-        }[]
+        }>
       }
       get_products_page: {
         Args: {
@@ -4453,25 +4453,25 @@ export type Database = {
       get_sales_stats: { Args: { p_company_id: string }; Returns: Json }
       get_similar_products: {
         Args: { p_company_id: string; p_name: string }
-        Returns: {
+        Returns: Array<{
           id: string
           name_ar: string
           similarity_score: number
-        }[]
+        }>
       }
       get_stock_valuation: { Args: { p_company_id: string }; Returns: Json }
       get_top_customers_by_revenue: {
         Args: { p_company_id: string; p_limit?: number }
-        Returns: {
+        Returns: Array<{
           id: string
           invoice_count: number
           name: string
           total_revenue: number
-        }[]
+        }>
       }
       get_top_selling_products: {
         Args: { p_company_id: string; p_days?: number; p_limit?: number }
-        Returns: {
+        Returns: Array<{
           category_id: string
           gross_profit: number
           id: string
@@ -4480,12 +4480,12 @@ export type Database = {
           total_cost: number
           total_revenue: number
           total_sold: number
-        }[]
+        }>
       }
       get_user_profile: { Args: { p_user_id?: string }; Returns: Json }
       get_vehicle_products: {
         Args: { v_id: string }
-        Returns: {
+        Returns: Array<{
           fitment_id: string
           name: string
           notes: string
@@ -4494,18 +4494,18 @@ export type Database = {
           product_id: string
           sku: string
           total_stock: number
-        }[]
+        }>
       }
       get_warehouses_with_stats: {
         Args: { p_company_id: string }
-        Returns: {
+        Returns: Array<{
           id: string
           itemCount: number
           location: string
           name_ar: string
           stockValue: number
           totalStock: number
-        }[]
+        }>
       }
       log_cron_backup_event: { Args: never; Returns: undefined }
       normalize_arabic: { Args: { p_text: string }; Returns: string }
@@ -4566,12 +4566,12 @@ export type Database = {
       }
       report_cash_flow: {
         Args: { p_company_id: string; p_from?: string; p_to?: string }
-        Returns: {
+        Returns: Array<{
           inflow: number
           month: string
           net: number
           outflow: number
-        }[]
+        }>
       }
       report_debt_aging: {
         Args: { p_company_id: string; p_type?: string }
@@ -4587,7 +4587,7 @@ export type Database = {
       }
       search_inventory: {
         Args: { p_company_id: string; p_term: string }
-        Returns: {
+        Returns: Array<{
           alternative_numbers: string
           barcode: string
           brand: string
@@ -4603,7 +4603,7 @@ export type Database = {
           sku: string
           status: string
           stock_quantity: number
-        }[]
+        }>
       }
       search_inventory_paginated: {
         Args: {
@@ -4614,7 +4614,7 @@ export type Database = {
           p_sort_key: string
           p_term: string
         }
-        Returns: {
+        Returns: Array<{
           alternative_numbers: string
           barcode: string
           brand: string
@@ -4637,7 +4637,7 @@ export type Database = {
           total_count: number
           unit: string
           updated_at: string
-        }[]
+        }>
       }
       search_parties: {
         Args: {
@@ -4646,7 +4646,7 @@ export type Database = {
           p_query: string
           p_type?: string
         }
-        Returns: {
+        Returns: Array<{
           balance: number
           category_id: string
           category_name: string
@@ -4657,7 +4657,7 @@ export type Database = {
           status: string
           tax_number: string
           type: string
-        }[]
+        }>
       }
       user_has_company_access: {
         Args: { p_company_id: string }
@@ -4665,11 +4665,11 @@ export type Database = {
       }
       validate_data_integrity: {
         Args: { p_company_id: string }
-        Returns: {
+        Returns: Array<{
           check_name: string
           details: string
           status: string
-        }[]
+        }>
       }
       validate_journal_entry_balance: {
         Args: { p_journal_entry_id: string }
@@ -4691,9 +4691,7 @@ export type Database = {
       payment_status_enum: "draft" | "posted" | "void"
       product_status_enum: "active" | "inactive" | "discontinued"
     }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+    CompositeTypes: Record<never, never>
   }
 }
 

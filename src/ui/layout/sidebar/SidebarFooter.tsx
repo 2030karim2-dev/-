@@ -34,7 +34,7 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({ isCollapsed }) => {
               <span className="text-[10px] text-[var(--app-text-secondary)] capitalize">{role}</span>
             </div>
             <button
-              onClick={() => setIsLogoutModalOpen(true)}
+              onClick={() => { setIsLogoutModalOpen(true); }}
               className="mr-auto p-2 text-[var(--app-text-secondary)] hover:text-red-500 transition-colors"
               title={t('logout')}
               aria-label={t('logout')}
@@ -44,7 +44,7 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({ isCollapsed }) => {
           </>
         ) : (
           <button
-            onClick={() => setIsLogoutModalOpen(true)}
+            onClick={() => { setIsLogoutModalOpen(true); }}
             className="p-2 text-[var(--app-text-secondary)] hover:text-red-500 transition-colors mt-2"
             title={t('logout')}
             aria-label={t('logout')}
@@ -56,7 +56,7 @@ const SidebarFooter: React.FC<SidebarFooterProps> = ({ isCollapsed }) => {
 
       <LogoutConfirmModal
         isOpen={isLogoutModalOpen}
-        onClose={() => setIsLogoutModalOpen(false)}
+        onClose={() => { setIsLogoutModalOpen(false); }}
         onConfirm={performLogout}
         isLoading={isLoggingOut}
       />

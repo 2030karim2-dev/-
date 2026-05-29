@@ -57,7 +57,7 @@ const SalesReturnsView: React.FC<SalesReturnsViewProps> = ({ searchTerm: propSea
       handleExportExcel,
       clearFilters,
       hasActiveFilters
-  } = useReturnsListView(returns, 'sales', (filteredReturns) => sumInBaseCurrency(filteredReturns as any[]));
+  } = useReturnsListView(returns, 'sales', (filteredReturns) => sumInBaseCurrency(filteredReturns));
 
   // Sync initial search term
   React.useEffect(() => {
@@ -121,7 +121,7 @@ const SalesReturnsView: React.FC<SalesReturnsViewProps> = ({ searchTerm: propSea
       {/* Add Return Button */}
       <div className="flex justify-end">
         <Button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => { setIsModalOpen(true); }}
           variant="danger"
           size="sm"
           leftIcon={<Plus size={14} />}
@@ -261,7 +261,7 @@ const SalesReturnsView: React.FC<SalesReturnsViewProps> = ({ searchTerm: propSea
                 data={processedReturns}
                 colorTheme="indigo"
                 isRTL={true}
-                onRowDoubleClick={(row) => onViewDetails(row.id)}
+                onRowDoubleClick={(row) => { onViewDetails(row.id); }}
                 showSearch={false}
                 pageSize={10}
               />
@@ -284,7 +284,7 @@ const SalesReturnsView: React.FC<SalesReturnsViewProps> = ({ searchTerm: propSea
       {/* Advanced Return Modal */}
       <AdvancedReturnModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => { setIsModalOpen(false); }}
         returnType="sale"
         partyName="عميل"
         onSuccess={() => {

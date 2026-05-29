@@ -47,7 +47,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
       setShowAlert({ type: 'error', message: 'فشل في تصدير الفاتورة' });
     } finally {
       setIsExporting(false);
-      setTimeout(() => setShowAlert(null), 3000);
+      setTimeout(() => { setShowAlert(null); }, 3000);
     }
   };
 
@@ -60,7 +60,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
       taxNumber: (comp?.tax_number || '') as string,
       invoiceNumber: invoice.invoice_number || '',
       issueDate: invoice.issue_date,
-      customerName: (invoice.parties as any)?.name || 'عميل نقدي',
+      customerName: (invoice.parties)?.name || 'عميل نقدي',
       issuedBy: issuedByName,
       items: (invoice.invoice_items || []).map((i: any) => ({
         name: i.description || i.name || '---',
@@ -72,13 +72,13 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
       totalAmount: invoice.total_amount,
     });
     setShowAlert({ type: 'success', message: 'تم تصدير ملف Excel بنجاح' });
-    setTimeout(() => setShowAlert(null), 3000);
+    setTimeout(() => { setShowAlert(null); }, 3000);
   };
 
   const handleReturnSubmit = (invoiceData: any, items: any[]) => {
     if (onReturn) {
       onReturn(invoiceData, items);
-      setTimeout(() => setShowAlert(null), 3000);
+      setTimeout(() => { setShowAlert(null); }, 3000);
       setShowReturnSection(false);
     }
   };
@@ -86,7 +86,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
   const handleAlert = (alertOptions: { type: 'success' | 'warning' | 'error'; message: string }) => {
     setShowAlert(alertOptions);
     if (alertOptions.type !== 'success') {
-       setTimeout(() => setShowAlert(null), 3000);
+       setTimeout(() => { setShowAlert(null); }, 3000);
     }
   };
 
@@ -117,7 +117,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
           onClose={onClose}
           onExportPDF={handleExportPDF}
           onExportExcel={handleExportExcel}
-          onToggleReturn={() => setShowReturnSection(!showReturnSection)}
+          onToggleReturn={() => { setShowReturnSection(!showReturnSection); }}
           isExporting={isExporting}
           issuedByName={issuedByName}
           printRef={printRef as any}
@@ -140,7 +140,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
         {invoice && invoice.type !== 'return_sale' && onReturn && (
           <div className="flex justify-end px-4 mt-2">
             <button
-              onClick={() => setShowReturnSection(true)}
+              onClick={() => { setShowReturnSection(true); }}
               className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
               title="بدء عملية المرتجع لهذه الفاتورة"
             >
@@ -186,7 +186,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
               number: invoice.invoice_number || '',
               total: invoice.total_amount || 0,
               itemCount: invoice.invoice_items?.length || 0,
-              customerName: (invoice.parties as any)?.name || 'غير محدد',
+              customerName: (invoice.parties)?.name || 'غير محدد',
               customerDebt: 0,
               avgInvoiceTotal: 0
             }} />
@@ -195,7 +195,7 @@ const InvoiceDetailsModal: React.FC<Props> = ({ invoiceId, onClose, onReturn }) 
               <ReturnWizard 
                 invoice={invoice} 
                 onReturn={handleReturnSubmit} 
-                onCancel={() => setShowReturnSection(false)}
+                onCancel={() => { setShowReturnSection(false); }}
                 onAlert={handleAlert}
               />
             ) : (

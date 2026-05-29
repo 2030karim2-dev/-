@@ -34,7 +34,7 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
             }
         });
         ro.observe(containerRef.current);
-        return () => ro.disconnect();
+        return () => { ro.disconnect(); };
     }, []);
 
     const percentage = target > 0 ? Math.min(100, (value / target) * 100) : 0;

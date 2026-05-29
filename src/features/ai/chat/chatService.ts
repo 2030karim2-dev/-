@@ -4,15 +4,15 @@
  */
 import { generateAIContent } from '../core/provider';
 import { buildRealDataContext } from '../core/prompts';
-import { ChatMessage } from '../core/types';
+import type { ChatMessage } from '../core/types';
 
 export type { ChatMessage };
 
 export async function sendChatMessage(
     userMessage: string,
-    context: string = '',
+    context = '',
     _history: ChatMessage[] = [],
-    _memoryContext: string = ''
+    _memoryContext = ''
 ): Promise<string> {
     try {
         const dataContext = buildRealDataContext();
@@ -32,7 +32,7 @@ ${userMessage}
 }
 
 export function speakText(_text: string): Promise<void> {
-    return new Promise((resolve) => resolve());
+    return new Promise((resolve) => { resolve(); });
 }
 
 export function stopSpeaking(): void {

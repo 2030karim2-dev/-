@@ -17,24 +17,24 @@ export const useConnectionStore = create<ConnectionState>((set) => ({
   lastTimeoutAt: null,
   consecutiveFailures: 0,
 
-  reportTimeout: () => set((state) => {
+  reportTimeout: () => { set((state) => {
     const now = Date.now();
     return {
       isUnstable: true,
       lastTimeoutAt: now,
       consecutiveFailures: state.consecutiveFailures + 1,
     };
-  }),
+  }); },
 
-  reportSuccess: () => set({
+  reportSuccess: () => { set({
     isUnstable: false,
     consecutiveFailures: 0,
-  }),
+  }); },
 
-  reportFailure: () => set((state) => ({
+  reportFailure: () => { set((state) => ({
     consecutiveFailures: state.consecutiveFailures + 1,
     isUnstable: state.consecutiveFailures + 1 >= 3,
-  })),
+  })); },
 
-  setUnstable: (isUnstable) => set({ isUnstable }),
+  setUnstable: (isUnstable) => { set({ isUnstable }); },
 }));

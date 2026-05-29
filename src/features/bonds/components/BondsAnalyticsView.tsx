@@ -22,8 +22,8 @@ interface Analytics {
     totalAmount: number;
     count: number;
     avgAmount: number;
-    chartData: { date: string; amount: number; count: number }[];
-    accountData: { name: string; amount: number; count: number }[];
+    chartData: Array<{ date: string; amount: number; count: number }>;
+    accountData: Array<{ name: string; amount: number; count: number }>;
 }
 
 interface Totals {
@@ -57,7 +57,7 @@ const BondsAnalyticsView: React.FC<Props> = ({ analytics, totals, onSwitchToList
                             {(['today', 'week', 'month', 'quarter', 'year'] as PeriodType[]).map(p => (
                                 <button
                                     key={p}
-                                    onClick={() => setPeriod(p)}
+                                    onClick={() => { setPeriod(p); }}
                                     className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${period === p
                                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
                                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'

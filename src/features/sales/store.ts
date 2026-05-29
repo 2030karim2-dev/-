@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { Product } from '../inventory/types';
+import type { Product } from '../inventory/types';
 import { useDiscountStore } from '../settings/taxDiscountStore';
 
 /**
@@ -82,7 +82,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   showDiscount: false,
   notes: '',
 
-  initializeItems: (count) => set({ items: Array.from({ length: count }, createNewItem) }),
+  initializeItems: (count) => { set({ items: Array.from({ length: count }, createNewItem) }); },
 
   updateItem: (index, field, value) => {
     set(state => {
@@ -129,7 +129,7 @@ export const useSalesStore = create<SalesState>((set, get) => ({
     get().calculateTotals();
   },
 
-  addItem: () => set(state => ({ items: [...state.items, createNewItem()] })),
+  addItem: () => { set(state => ({ items: [...state.items, createNewItem()] })); },
 
   addProductToCart: (product) => {
     set(state => {
@@ -199,13 +199,13 @@ export const useSalesStore = create<SalesState>((set, get) => ({
     });
   },
 
-  setCustomer: (selectedCustomer) => set({ selectedCustomer }),
+  setCustomer: (selectedCustomer) => { set({ selectedCustomer }); },
 
   setMetadata: (field, value) => {
     set((state) => {
       const newState = { ...state, [field]: value };
 
-      if (['currency', 'exchangeRate', 'exchangeOperator'].includes(field as string)) {
+      if (['currency', 'exchangeRate', 'exchangeOperator'].includes(field)) {
         const rate = (newState.currency === 'SAR') ? 1 : newState.exchangeRate;
 
         newState.items = newState.items.map(item => {
@@ -227,11 +227,11 @@ export const useSalesStore = create<SalesState>((set, get) => ({
     get().calculateTotals();
   },
 
-  resetCart: () => set(() => ({
+  resetCart: () => { set(() => ({
     items: [],
     selectedCustomer: null,
     summary: { subtotal: 0, discountAmount: 0, totalAmount: 0 },
     invoiceType: 'cash',
     notes: ''
-  }))
+  })); }
 }));

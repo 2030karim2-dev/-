@@ -16,8 +16,8 @@ import {
 } from 'lucide-react';
 import { cn } from '../../../core/utils';
 import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
-import { POSSearchResult } from '../hooks/usePOSSearch';
-import { SortMode } from '../hooks/usePOSSearch';
+import type { POSSearchResult } from '../hooks/usePOSSearch';
+import type { SortMode } from '../hooks/usePOSSearch';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ export interface POSSearchDropdownProps {
 
 // ── Sort Options ───────────────────────────────────────────────────
 
-const SORT_OPTIONS: { mode: SortMode; label: string; icon: React.ReactNode }[] = [
+const SORT_OPTIONS: Array<{ mode: SortMode; label: string; icon: React.ReactNode }> = [
     { mode: 'relevance', label: 'الأكثر تطابقاً', icon: <Sparkles size={12} /> },
     { mode: 'price_asc', label: 'السعر: منخفض', icon: <ArrowUpDown size={12} /> },
     { mode: 'price_desc', label: 'السعر: مرتفع', icon: <ArrowUpDown size={12} /> },
@@ -113,7 +113,7 @@ const ResultCard: React.FC<{
     return (
         <button
             type="button"
-            onClick={() => onSelect(result)}
+            onClick={() => { onSelect(result); }}
             onMouseEnter={onMouseEnter}
             className={cn(
                 'w-full text-right p-3.5 md:p-4 flex items-start gap-4 transition-all duration-150 border-b border-slate-100 dark:border-slate-800 last:border-b-0',

@@ -20,7 +20,7 @@ interface StorageOptions {
 // Storage Adapter
 // ------------------------------------------
 class StorageAdapter {
-    private prefix: string = 'alzhra_';
+    private prefix = 'alzhra_';
 
     setPrefix(prefix: string): void {
         this.prefix = prefix;
@@ -106,7 +106,7 @@ class StorageAdapter {
                     keysToRemove.push(key);
                 }
             }
-            keysToRemove.forEach(key => localStorage.removeItem(key));
+            keysToRemove.forEach(key => { localStorage.removeItem(key); });
         } catch (error) {
             logger.error('Persister', 'Storage clear error', error);
         }
@@ -152,7 +152,7 @@ class StorageAdapter {
 // Session Storage Adapter
 // ------------------------------------------
 class SessionStorageAdapter {
-    private prefix: string = 'alzhra_';
+    private prefix = 'alzhra_';
 
     setPrefix(prefix: string): void {
         this.prefix = prefix;
@@ -212,7 +212,7 @@ class SessionStorageAdapter {
                     keysToRemove.push(key);
                 }
             }
-            keysToRemove.forEach(key => sessionStorage.removeItem(key));
+            keysToRemove.forEach(key => { sessionStorage.removeItem(key); });
         } catch (error) {
             logger.error('Persister', 'Session storage clear error', error);
         }
@@ -229,10 +229,10 @@ export const sessionStorage$ = new SessionStorageAdapter();
 // Base Persister Functions
 // ------------------------------------------
 export const persisterBase = {
-    set: (key: string, value: StorageValue, options?: StorageOptions) => localStorage$.set(key, value, options),
+    set: (key: string, value: StorageValue, options?: StorageOptions) => { localStorage$.set(key, value, options); },
     get: <T = StorageValue>(key: string, defaultValue?: T) => localStorage$.get<T>(key, defaultValue),
-    remove: (key: string) => localStorage$.remove(key),
-    clear: () => localStorage$.clear(),
+    remove: (key: string) => { localStorage$.remove(key); },
+    clear: () => { localStorage$.clear(); },
     has: (key: string) => localStorage$.has(key),
     keys: () => localStorage$.keys(),
 };

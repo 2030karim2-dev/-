@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../core/utils';
-import { IconColor } from '../../core/types';
+import type { IconColor } from '../../core/types';
 
 interface IconProps {
   icon: LucideIcon;

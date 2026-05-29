@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import PageLoader from '../../../ui/base/PageLoader';
 import ProductMicroCard from './ProductMicroCard';
 import { Activity } from 'lucide-react';
-import { Product } from '../types';
+import type { Product } from '../types';
 
 // Lazy load heavy inventory views
 const SmartImportView = lazy(() => import('../../smart-import/components/SmartImportView'));
@@ -109,7 +109,7 @@ const InventoryViewRenderer: React.FC<InventoryViewRendererProps> = ({
                                         product={selectedProduct}
                                         onEdit={handleEdit}
                                         onDelete={deleteProduct}
-                                        onClose={() => setSelectedProduct(null)}
+                                        onClose={() => { setSelectedProduct(null); }}
                                         onMaximize={onMaximizeProduct}
                                     />
                                 </div>
@@ -131,7 +131,7 @@ const InventoryViewRenderer: React.FC<InventoryViewRendererProps> = ({
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
                         {products.map(p => (
-                            <ProductMicroCard key={p.id} product={p} onClick={() => setSelectedProduct(p)} />
+                            <ProductMicroCard key={p.id} product={p} onClick={() => { setSelectedProduct(p); }} />
                         ))}
                     </div>
                 );

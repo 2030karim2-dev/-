@@ -127,7 +127,7 @@ const CreatePurchaseModal: React.FC<Props> = ({ onSuccess }) => {
                 className="w-full h-full mt-2 bg-transparent text-xs font-bold outline-none resize-none min-h-[60px]"
                 placeholder="أضف أي ملاحظات أو شروط خاصة بفاتورة المشتريات هنا..."
                 value={notes}
-                onChange={(e) => setMetadata('notes', e.target.value)}
+                onChange={(e) => { setMetadata('notes', e.target.value); }}
               />
             </div>
 

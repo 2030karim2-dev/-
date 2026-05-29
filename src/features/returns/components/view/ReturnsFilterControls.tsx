@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, Filter, Download, Printer, RefreshCw, X } from 'lucide-react';
 import Button from '../../../../ui/base/Button';
-import { SortField, SortDirection } from '../../hooks/useReturnsListView';
+import type { SortField, SortDirection } from '../../hooks/useReturnsListView';
 
 interface Props {
     localSearchTerm: string;
@@ -44,13 +44,13 @@ export const ReturnsFilterControls: React.FC<Props> = ({
                     <input
                         type="text"
                         value={localSearchTerm}
-                        onChange={(e) => setLocalSearchTerm(e.target.value)}
+                        onChange={(e) => { setLocalSearchTerm(e.target.value); }}
                         placeholder={`بحث ب${type === 'sales' ? 'العميل' : 'المورد'}، رقم الفاتورة، سبب الإرجاع...`}
                         className="w-full pr-10 pl-3 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400"
                     />
                     {localSearchTerm && (
                         <button
-                            onClick={() => setLocalSearchTerm('')}
+                            onClick={() => { setLocalSearchTerm(''); }}
                             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                             <X size={14} />
@@ -63,7 +63,7 @@ export const ReturnsFilterControls: React.FC<Props> = ({
                     <Button
                         variant={showFilters ? 'primary' : 'outline'}
                         size="sm"
-                        onClick={() => setShowFilters(!showFilters)}
+                        onClick={() => { setShowFilters(!showFilters); }}
                         leftIcon={<Filter size={14} />}
                     >
                         فلترة
@@ -111,7 +111,7 @@ export const ReturnsFilterControls: React.FC<Props> = ({
                             <label className="block text-xs font-bold text-gray-500 mb-1">الحالة</label>
                             <select
                                 value={filters.status}
-                                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                                onChange={(e) => { setFilters({ ...filters, status: e.target.value }); }}
                                 className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm outline-none focus:border-blue-500"
                             >
                                 <option value="">الكل</option>
@@ -126,7 +126,7 @@ export const ReturnsFilterControls: React.FC<Props> = ({
                             <label className="block text-xs font-bold text-gray-500 mb-1">سبب الإرجاع</label>
                             <select
                                 value={filters.returnReason}
-                                onChange={(e) => setFilters({ ...filters, returnReason: e.target.value })}
+                                onChange={(e) => { setFilters({ ...filters, returnReason: e.target.value }); }}
                                 className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm outline-none focus:border-blue-500"
                             >
                                 <option value="">الكل</option>
@@ -146,7 +146,7 @@ export const ReturnsFilterControls: React.FC<Props> = ({
                             <input
                                 type="date"
                                 value={filters.startDate}
-                                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+                                onChange={(e) => { setFilters({ ...filters, startDate: e.target.value }); }}
                                 className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm outline-none focus:border-blue-500"
                             />
                         </div>
@@ -157,7 +157,7 @@ export const ReturnsFilterControls: React.FC<Props> = ({
                             <input
                                 type="date"
                                 value={filters.endDate}
-                                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+                                onChange={(e) => { setFilters({ ...filters, endDate: e.target.value }); }}
                                 className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm outline-none focus:border-blue-500"
                             />
                         </div>
@@ -168,7 +168,7 @@ export const ReturnsFilterControls: React.FC<Props> = ({
                             <input
                                 type="number"
                                 value={filters.minAmount}
-                                onChange={(e) => setFilters({ ...filters, minAmount: e.target.value })}
+                                onChange={(e) => { setFilters({ ...filters, minAmount: e.target.value }); }}
                                 placeholder="الحد الأدنى"
                                 className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm outline-none focus:border-blue-500"
                             />
@@ -180,7 +180,7 @@ export const ReturnsFilterControls: React.FC<Props> = ({
                             <input
                                 type="number"
                                 value={filters.maxAmount}
-                                onChange={(e) => setFilters({ ...filters, maxAmount: e.target.value })}
+                                onChange={(e) => { setFilters({ ...filters, maxAmount: e.target.value }); }}
                                 placeholder="الحد الأعلى"
                                 className="w-full p-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded text-sm outline-none focus:border-blue-500"
                             />

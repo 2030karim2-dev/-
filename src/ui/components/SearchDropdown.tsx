@@ -38,7 +38,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
             if (
                 dropdownEl &&
                 !dropdownEl.contains(target) &&
-                (!triggerEl || !triggerEl.contains(target))
+                (!triggerEl?.contains(target))
             ) {
                 onClose();
             }

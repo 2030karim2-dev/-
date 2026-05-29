@@ -14,7 +14,7 @@ export const SettingField: React.FC<{
         <input
             type={type}
             value={value}
-            onChange={(e) => onChange(type === 'number' ? parseInt(e.target.value) || 0 : e.target.value)}
+            onChange={(e) => { onChange(type === 'number' ? parseInt(e.target.value) || 0 : e.target.value); }}
             placeholder={placeholder}
             dir={dir}
             className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs font-bold text-gray-800 dark:text-slate-200 outline-none transition-colors"

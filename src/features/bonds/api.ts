@@ -6,7 +6,7 @@
  */
 
 import { supabase } from '@/core/database/api';
-import { BondFormData, BondType } from './types';
+import type { BondFormData, BondType } from './types';
 
 export const bondsApi = {
   getBonds: async (companyId: string, type?: BondType) => {

@@ -69,12 +69,12 @@ class AIMetricsTracker {
             successRate: (successful.length / this.metrics.length) * 100,
             averageLatencyMs: avgLatency,
             totalErrors: failed.length,
-            errorTypes: failed.reduce((acc, m) => {
+            errorTypes: failed.reduce<Record<string, number>>((acc, m) => {
                 if (m.errorType) {
                     acc[m.errorType] = (acc[m.errorType] || 0) + 1;
                 }
                 return acc;
-            }, {} as Record<string, number>)
+            }, {})
         };
     }
 

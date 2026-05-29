@@ -75,7 +75,7 @@ const QuickAuditItemsTable: React.FC<Props> = ({ items, onUpdateQuantity, onRemo
                                         <input
                                             type="number"
                                             value={item.quantity === 0 ? '' : item.quantity}
-                                            onChange={(e) => onUpdateQuantity(item.product_id, e.target.value)}
+                                            onChange={(e) => { onUpdateQuantity(item.product_id, e.target.value); }}
                                             onFocus={(e) => { if (item.quantity === 0) e.target.select(); }}
                                             className="w-20 bg-white dark:bg-slate-950 border-2 border-blue-100 dark:border-blue-900/50 rounded-md py-1.5 px-1 text-center font-bold font-mono text-blue-600 dark:text-blue-400 focus:border-blue-500 focus:ring-0 transition-colors outline-none"
                                             placeholder="0"
@@ -86,7 +86,7 @@ const QuickAuditItemsTable: React.FC<Props> = ({ items, onUpdateQuantity, onRemo
                                     </td>
                                     <td className="py-2 px-3 text-center">
                                         <button
-                                            onClick={() => onRemoveItem(item.product_id)}
+                                            onClick={() => { onRemoveItem(item.product_id); }}
                                             className="text-gray-400 hover:text-red-500 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-all opacity-0 group-hover:opacity-100"
                                         >
                                             <X size={14} strokeWidth={3} />

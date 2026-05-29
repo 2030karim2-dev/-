@@ -28,9 +28,9 @@ export const processSyncMutation = async (mutationKey: any[], variables: any, me
                     throw new Error(`CONFLICT: تم تعديل هذا المنتج في المتجر من جهاز آخر. (خادم: ${current.updated_at}, محلي: ${metadata.last_updated_at})`);
                 }
             }
-            return inventoryService.updateProduct(id, data as any, company_id);
+            return inventoryService.updateProduct(id, data, company_id);
         }
-        return inventoryService.createProduct(data as any, company_id, user_id);
+        return inventoryService.createProduct(data, company_id, user_id);
     }
 
     if (feature === 'inventory' && action === 'transfer') {

@@ -2,8 +2,8 @@ import React from 'react';
 import { X, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import { AppNotification } from '../store';
-import { typeConfig, NotificationType } from './notificationConfig';
+import type { AppNotification } from '../store';
+import { typeConfig, type NotificationType } from './notificationConfig';
 
 interface NotificationItemProps {
     notif: AppNotification;

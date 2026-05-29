@@ -116,7 +116,7 @@ const BackupPage: React.FC = () => {
                                 <input
                                     type="checkbox"
                                     checked={autoConfig.enabled}
-                                    onChange={(e) => setAutoConfig({ ...autoConfig, enabled: e.target.checked })}
+                                    onChange={(e) => { setAutoConfig({ ...autoConfig, enabled: e.target.checked }); }}
                                     className="sr-only peer"
                                 />
                                 <div className="w-14 h-7 bg-gray-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-700 peer-checked:bg-blue-600 shadow-inner"></div>
@@ -132,7 +132,7 @@ const BackupPage: React.FC = () => {
                                     {(['daily', 'weekly', 'monthly'] as const).map((freq) => (
                                         <button
                                             key={freq}
-                                            onClick={() => setAutoConfig({ ...autoConfig, frequency: freq })}
+                                            onClick={() => { setAutoConfig({ ...autoConfig, frequency: freq }); }}
                                             className={cn(
                                                 "flex-1 py-2 rounded-xl text-[9px] font-bold uppercase transition-all",
                                                 autoConfig.frequency === freq
@@ -154,7 +154,7 @@ const BackupPage: React.FC = () => {
                                     <input
                                         type="range" min="7" max="365" step="7"
                                         value={autoConfig.retentionDays}
-                                        onChange={(e) => setAutoConfig({ ...autoConfig, retentionDays: parseInt(e.target.value) })}
+                                        onChange={(e) => { setAutoConfig({ ...autoConfig, retentionDays: parseInt(e.target.value) }); }}
                                         className="flex-1 h-1.5 bg-gray-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-600"
                                     />
                                     <span className="text-xs font-bold font-mono text-blue-600 w-8">{autoConfig.retentionDays}</span>

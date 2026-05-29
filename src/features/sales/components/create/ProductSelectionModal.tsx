@@ -24,7 +24,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
         const handler = setTimeout(() => {
             setDebouncedSearch(searchTerm);
         }, 250);
-        return () => clearTimeout(handler);
+        return () => { clearTimeout(handler); };
     }, [searchTerm]);
 
     const { products, isLoading, refetch } = useProducts(debouncedSearch);
@@ -74,8 +74,8 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
     // Filter columns based on visibleColumns state
     const columns = useMemo(() => {
         return allCols.filter(col => {
-            const key = col.sortKey as string;
-            return visibleColumns[key] !== false;
+            const key = col.sortKey!;
+            return visibleColumns[key];
         });
     }, [allCols, visibleColumns]);
 
@@ -105,7 +105,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
         <div className="flex items-center gap-1.5 font-cairo">
             <button
                 type="button"
-                onClick={() => setIsAddModalOpen(true)}
+                onClick={() => { setIsAddModalOpen(true); }}
                 className="flex items-center gap-1 px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold active:scale-95 transition-all shadow-sm shadow-blue-500/10"
             >
                 <Plus size={12} />
@@ -115,7 +115,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
             <div className="relative">
                 <button
                     type="button"
-                    onClick={() => setShowSettings(!showSettings)}
+                    onClick={() => { setShowSettings(!showSettings); }}
                     className="flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-bold active:scale-95 transition-all shadow-sm"
                 >
                     <Settings size={12} />
@@ -124,7 +124,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
 
                 {showSettings && (
                     <>
-                        <div className="fixed inset-0 z-40" onClick={() => setShowSettings(false)}></div>
+                        <div className="fixed inset-0 z-40" onClick={() => { setShowSettings(false); }}></div>
                         <div className="absolute left-0 mt-2 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 p-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
                             <h4 className="text-[10px] font-black text-slate-900 dark:text-white mb-2 pb-1 border-b dark:border-slate-200/10">أعمدة جدول المنتجات</h4>
                             <div className="space-y-1.5 max-h-60 overflow-y-auto custom-scrollbar">
@@ -132,8 +132,8 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                                     <label key={col.key} className="flex items-center gap-2 text-[10px] font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                         <input
                                             type="checkbox"
-                                            checked={visibleColumns[col.key] !== false}
-                                            onChange={() => handleColumnToggle(col.key)}
+                                            checked={visibleColumns[col.key]}
+                                            onChange={() => { handleColumnToggle(col.key); }}
                                             className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 w-3 h-3"
                                         />
                                         <span>{col.label}</span>
@@ -172,7 +172,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                         <input
                             type="text"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => { setSearchTerm(e.target.value); }}
                             placeholder="ابحث بالاسم، رقم القطعة، الشركة الصانعة..."
                             className="w-full pl-3 pr-9 py-1.5 text-xs bg-[var(--app-bg)] text-[var(--app-text)] border border-[var(--app-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                         />
@@ -186,7 +186,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                     {/* Adjacent Zoom Controls */}
                     <div className="flex items-center gap-1 bg-[var(--app-surface)] border border-[var(--app-border)] rounded-lg p-0.5 shrink-0 select-none">
                         <button 
-                            onClick={() => setZoomLevel(z => Math.max(0.7, z - 0.1))} 
+                            onClick={() => { setZoomLevel(z => Math.max(0.7, z - 0.1)); }} 
                             className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 hover:bg-[var(--app-bg)] rounded transition-colors"
                             title="تصغير"
                         >
@@ -196,7 +196,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                             {Math.round(zoomLevel * 100)}%
                         </span>
                         <button 
-                            onClick={() => setZoomLevel(z => Math.min(1.5, z + 0.1))} 
+                            onClick={() => { setZoomLevel(z => Math.min(1.5, z + 0.1)); }} 
                             className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 hover:bg-[var(--app-bg)] rounded transition-colors"
                             title="تكبير"
                         >
@@ -233,7 +233,7 @@ const ProductSelectionModal: React.FC<Props> = ({ isOpen, onClose, onSelect, ini
                 {isAddModalOpen && (
                     <AddProductModal
                         isOpen={isAddModalOpen}
-                        onClose={() => setIsAddModalOpen(false)}
+                        onClose={() => { setIsAddModalOpen(false); }}
                         onSubmit={handleAddProductSubmit}
                         isSubmitting={isSaving}
                     />

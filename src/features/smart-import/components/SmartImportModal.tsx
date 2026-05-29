@@ -24,7 +24,7 @@ const SmartImportModal: React.FC<Props> = ({ isOpen, onClose, onConfirm, mode })
     const [step, setStep] = useState<'upload' | 'review'>('upload');
     const [isProcessing, setIsProcessing] = useState(false);
     const [extractedItems, setExtractedItems] = useState<any[]>([]);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     const [_filePreview, setFilePreview] = useState<string | null>(null);
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +34,7 @@ const SmartImportModal: React.FC<Props> = ({ isOpen, onClose, onConfirm, mode })
         // Preview setup
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
-            reader.onload = (e) => setFilePreview(e.target?.result as string);
+            reader.onload = (e) => { setFilePreview(e.target?.result as string); };
             reader.readAsDataURL(file);
         } else {
             setFilePreview(null);
@@ -225,7 +225,7 @@ const SmartImportModal: React.FC<Props> = ({ isOpen, onClose, onConfirm, mode })
                             <ExcelTable
                                 columns={columns}
                                 data={extractedItems}
-                                onCellUpdate={(rowIndex, key, val) => handleUpdateCell(rowIndex, key as string, val)}
+                                onCellUpdate={(rowIndex, key, val) => { handleUpdateCell(rowIndex, key, val); }}
                                 onRowClick={handleRemoveRow}
                                 title={`تم استخراج ${extractedItems.length} سجل`}
                             />

@@ -140,12 +140,12 @@ export interface Product {
   compatibility?: CarCompatibility[] | undefined;
 
   location?: string | undefined;
-  locations?: {
+  locations?: Array<{
     warehouse_id: string;
     aisle: string;
     shelf: string;
     bin: string;
-  }[] | undefined;
+  }> | undefined;
   uoms?: ProductUOM[] | undefined;
 }
 
@@ -210,7 +210,7 @@ export interface StockTransfer {
   from_warehouse_id: string;
   to_warehouse_id: string;
   status: 'pending' | 'completed' | 'cancelled';
-  items: { product_id: string; quantity: number }[];
+  items: Array<{ product_id: string; quantity: number }>;
   notes?: string;
   created_at: string;
   created_by: string;
@@ -219,14 +219,14 @@ export interface StockTransfer {
 export interface TransferFormData {
   from_warehouse_id: string;
   to_warehouse_id: string;
-  items: { product_id: string; quantity: number }[];
+  items: Array<{ product_id: string; quantity: number }>;
   notes?: string;
 }
 
 export interface CreateTransferDTO {
   from_warehouse_id: string;
   to_warehouse_id: string;
-  items: { product_id: string; quantity: number }[];
+  items: Array<{ product_id: string; quantity: number }>;
   notes?: string;
   company_id: string;
   user_id: string;
@@ -245,9 +245,9 @@ export interface InventoryAnalysisData {
     outOfStockItems: number;
     potentialRevenue: number;
   };
-  trendData: { date: string; in: number; out: number }[];
-  topMovingItems: { name: string; qty: number; trend: string }[];
-  categoryDistribution: { name: string; value: number; fill: string }[];
+  trendData: Array<{ date: string; in: number; out: number }>;
+  topMovingItems: Array<{ name: string; qty: number; trend: string }>;
+  categoryDistribution: Array<{ name: string; value: number; fill: string }>;
 }
 
 export interface InventoryStats {

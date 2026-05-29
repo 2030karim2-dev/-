@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabaseClient';
-import { InvalidationPreset, INVALIDATION_PRESETS } from '../../lib/invalidation';
+import { type InvalidationPreset, INVALIDATION_PRESETS } from '../../lib/invalidation';
 import { useAuthStore } from '../../features/auth/store';
 import { logger } from '../../core/utils/logger';
 

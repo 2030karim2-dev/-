@@ -111,7 +111,7 @@ const ProfitLossView: React.FC = () => {
                {(data?.revenues.length || 0) > 5 && (
                   <div className="p-4 border-t border-slate-50 dark:border-slate-800/50">
                      <button
-                        onClick={() => setShowAllRevenues(!showAllRevenues)}
+                        onClick={() => { setShowAllRevenues(!showAllRevenues); }}
                         className="w-full text-center text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors flex items-center justify-center gap-2"
                      >
                         {showAllRevenues ? <><ChevronUp size={14} /> عرض ملخص</> : <><ChevronDown size={14} /> عرض التفاصيل ({data?.revenues.length})</>}
@@ -145,7 +145,7 @@ const ProfitLossView: React.FC = () => {
                {(data?.expenses.length || 0) > 5 && (
                   <div className="p-4 border-t border-slate-50 dark:border-slate-800/50">
                      <button
-                        onClick={() => setShowAllExpenses(!showAllExpenses)}
+                        onClick={() => { setShowAllExpenses(!showAllExpenses); }}
                         className="w-full text-center text-xs font-bold text-rose-600 hover:text-rose-700 transition-colors flex items-center justify-center gap-2"
                      >
                         {showAllExpenses ? <><ChevronUp size={14} /> عرض ملخص</> : <><ChevronDown size={14} /> عرض التفاصيل ({data?.expenses.length})</>}

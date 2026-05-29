@@ -1,7 +1,7 @@
 
 import { useAuthStore } from './store';
 import { authApi } from './api';
-import { AuthUser } from './types';
+import type { AuthUser } from './types';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../core/routes/paths';

@@ -1,5 +1,5 @@
 import { settingsApi } from './api';
-import { CompanyFormData, WarehouseFormData, FiscalYearFormData, ExchangeRateFormData, AutoBackupConfig } from './types.ts';
+import type { CompanyFormData, WarehouseFormData, FiscalYearFormData, ExchangeRateFormData, AutoBackupConfig } from './types.ts';
 import { supabase } from '../../lib/supabaseClient';
 
 export const settingsService = {
@@ -90,7 +90,7 @@ export const settingsService = {
         };
     },
 
-    getBackupLogs: (): { id: string; action: string; size: string; time: string; status: string; icon: string }[] => {
+    getBackupLogs: (): Array<{ id: string; action: string; size: string; time: string; status: string; icon: string }> => {
         const logs = localStorage.getItem('alz_backup_logs');
         return logs ? JSON.parse(logs) : [];
     },

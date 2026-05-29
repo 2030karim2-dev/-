@@ -3,13 +3,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { partiesService } from './service';
 import { useAuthStore } from '../auth/store';
 import { useFeedbackStore } from '../feedback/store';
-import { PartyFormData, PartyType, Party, PartyView } from './types';
+import type { PartyFormData, PartyType, Party, PartyView } from './types';
 import { useMemo, useState } from 'react';
 import { AuthorizeActionUsecase } from '../../core/usecases/auth/AuthorizeActionUsecase';
 import { syncStore } from '../../core/lib/sync-store';
 import { partyCache } from './lib/party-cache';
 
-export const useParties = (type: PartyType, searchTerm: string = '') => {
+export const useParties = (type: PartyType, searchTerm = '') => {
   const { user } = useAuthStore();
   const companyId = user?.company_id;
 
@@ -99,7 +99,7 @@ export const usePartyMutations = (type: PartyType) => {
       queryClient.invalidateQueries({ queryKey: ['parties', user?.company_id, type] });
       showToast('تم حذف السجل نهائياً', 'success');
     },
-    onError: (err: Error) => showToast(err.message, 'error', err)
+    onError: (err: Error) => { showToast(err.message, 'error', err); }
   });
 
   return { saveParty: saveParty.mutate, deleteParty: deleteParty.mutate, isSaving: saveParty.isPending };

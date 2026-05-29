@@ -84,7 +84,7 @@ export const useTableKeyboardNavigation = <T,>({
         return forward ? 1 : -1;
     }, [isRTL]);
 
-    const moveFocus = useCallback((r: number, c: number, wrap: boolean = true) => {
+    const moveFocus = useCallback((r: number, c: number, wrap = true) => {
         const newRow = wrap ? wrapRow(r) : Math.max(0, Math.min(maxRow, r));
         const newCol = wrap ? wrapCol(c) : Math.max(0, Math.min(maxCol, c));
         setFocusedCell({ row: newRow, col: newCol });
@@ -106,7 +106,7 @@ export const useTableKeyboardNavigation = <T,>({
 
     const startEditing = useCallback((rowIdx: number, colIdx: number) => {
         const col = columns[colIdx];
-        if (col && col.isEditable && onCellUpdate && col.accessorKey) {
+        if (col?.isEditable && onCellUpdate && col.accessorKey) {
             const row = orderedData[rowIdx];
             setEditValue(row ? (row as Record<string, unknown>)[col.accessorKey as string] : '');
             setEditingCell({ row: rowIdx, col: colIdx });
@@ -117,7 +117,7 @@ export const useTableKeyboardNavigation = <T,>({
         if (editingCell && onCellUpdate) {
             const { row, col } = editingCell;
             const colDef = columns[col];
-            if (colDef && colDef.accessorKey) {
+            if (colDef?.accessorKey) {
                 await onCellUpdate(row, colDef.accessorKey as string, editValue);
             }
         }
@@ -134,7 +134,7 @@ export const useTableKeyboardNavigation = <T,>({
         if (focusedCell && onCellUpdate) {
             const { row, col } = focusedCell;
             const colDef = columns[col];
-            if (colDef && colDef.accessorKey && colDef.isEditable) {
+            if (colDef?.accessorKey && colDef.isEditable) {
                 await onCellUpdate(row, colDef.accessorKey as string, '');
             }
         }
@@ -146,7 +146,7 @@ export const useTableKeyboardNavigation = <T,>({
         const { row, col } = focusedCell;
         const colDef = columns[col];
 
-        if (colDef && colDef.accessorKey) {
+        if (colDef?.accessorKey) {
             const rowData = orderedData[row];
             if (rowData) {
                 const value = (rowData as Record<string, unknown>)[colDef.accessorKey as string];
@@ -196,7 +196,7 @@ export const useTableKeyboardNavigation = <T,>({
         const { row, col } = focusedCell;
         const colDef = columns[col];
 
-        if (colDef && colDef.accessorKey && colDef.isEditable) {
+        if (colDef?.accessorKey && colDef.isEditable) {
             // If single value, paste to current cell
             if (clipboard.length === 1) {
                 await onCellUpdate(row, colDef.accessorKey as string, clipboard[0]);
@@ -407,7 +407,7 @@ export const useTableKeyboardNavigation = <T,>({
         };
 
         tableEl.addEventListener('keydown', handleKeyDown);
-        return () => tableEl.removeEventListener('keydown', handleKeyDown);
+        return () => { tableEl.removeEventListener('keydown', handleKeyDown); };
     }, [
         focusedCell, editingCell,
         cancelEdit, handleNavigationKeys, handleEditAndActionKeys, handleClipboardKeys, tableRef

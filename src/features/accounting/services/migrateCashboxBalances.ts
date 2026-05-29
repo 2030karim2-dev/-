@@ -16,7 +16,7 @@ export const migrateCashboxBalances = async (companyId: string) => {
         .from('active_accounts')
         .select('*')
         .eq('company_id', companyId)
-        .eq('parent_id', mainCashbox.id!)
+        .eq('parent_id', mainCashbox.id)
         .eq('currency_code', 'SAR')
         .single();
 
@@ -30,7 +30,7 @@ export const migrateCashboxBalances = async (companyId: string) => {
     const { error: updateErr } = await supabase
         .from('journal_entry_lines')
         .update({ account_id: sarCashbox.id! })
-        .eq('account_id', mainCashbox.id!);
+        .eq('account_id', mainCashbox.id);
 
     if (updateErr) throw new Error("فشل في تحويل القيود المحاسبية للصندوق الجديد");
 

@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import { Package, DollarSign, Activity, BellRing } from 'lucide-react';
-import { Product } from '../types';
+import type { Product } from '../types';
 import { aiInventoryService } from '../services/aiInventoryService';
 import InventoryStats from './InventoryStats';
 import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
 import Card from '../../../ui/base/Card';
 import { cn } from '../../../core/utils';
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface Props {
     stats: any;

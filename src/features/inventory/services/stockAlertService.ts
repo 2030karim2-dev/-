@@ -1,11 +1,11 @@
 
-import { Product } from '../types';
+import type { Product } from '../types';
 
 export const stockAlertService = {
   /**
    * حساب معدل الاستهلاك اليومي (خوارزمية بسيطة)
    */
-  calculateDailyVelocity: (salesHistory: { quantity: number }[], days: number = 30): number => {
+  calculateDailyVelocity: (salesHistory: Array<{ quantity: number }>, days = 30): number => {
     const totalQty = salesHistory.reduce((sum, sale) => sum + sale.quantity, 0);
     return totalQty / days;
   },

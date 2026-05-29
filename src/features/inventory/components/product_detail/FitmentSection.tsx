@@ -53,12 +53,12 @@ const FitmentSection: React.FC<Props> = ({ productId }) => {
         setIsSearching(true);
         setSearchError(false);
         inventoryApi.searchVehicles(debouncedSearchTerm)
-            .then((res) => setFoundVehicles(res.data || []))
+            .then((res) => { setFoundVehicles(res.data || []); })
             .catch(() => {
                 setFoundVehicles([]);
                 setSearchError(true);
             })
-            .finally(() => setIsSearching(false));
+            .finally(() => { setIsSearching(false); });
     }, [debouncedSearchTerm, isAdding]);
 
     return (
@@ -116,7 +116,7 @@ const FitmentSection: React.FC<Props> = ({ productId }) => {
                     {!isSearching && foundVehicles.map((v: any) => (
                         <button
                             key={v.id}
-                            onClick={() => addMutation.mutate({ company_id: user?.company_id || '', product_id: productId, vehicle_id: v.id })}
+                            onClick={() => { addMutation.mutate({ company_id: user?.company_id || '', product_id: productId, vehicle_id: v.id }); }}
                             className="w-full text-right px-4 py-2 text-[10px] hover:bg-white dark:hover:bg-slate-900 flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
                         >
                             <span className="font-bold text-slate-700 dark:text-slate-300">{v.make} {v.model}</span>
@@ -157,7 +157,7 @@ const FitmentSection: React.FC<Props> = ({ productId }) => {
                                     </td>
                                     <td className="px-2 py-2">
                                         <button
-                                            onClick={() => removeMutation.mutate(fit.id)}
+                                            onClick={() => { removeMutation.mutate(fit.id); }}
                                             className="opacity-0 group-hover:opacity-100 p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded transition-all"
                                         >
                                             <Trash2 size={12} />

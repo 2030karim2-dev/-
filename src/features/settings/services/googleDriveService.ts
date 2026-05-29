@@ -5,8 +5,8 @@ declare global {
 }
 
 export class GoogleDriveService {
-    private static CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
-    private static SCOPES = 'https://www.googleapis.com/auth/drive.file';
+    private static readonly CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+    private static readonly SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
     private static loadGsiScript(): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -18,8 +18,8 @@ export class GoogleDriveService {
             script.src = 'https://accounts.google.com/gsi/client';
             script.async = true;
             script.defer = true;
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error('Failed to load Google Identity Services script'));
+            script.onload = () => { resolve(); };
+            script.onerror = () => { reject(new Error('Failed to load Google Identity Services script')); };
             document.head.appendChild(script);
         });
     }
@@ -36,7 +36,7 @@ export class GoogleDriveService {
                 client_id: this.CLIENT_ID,
                 scope: this.SCOPES,
                 callback: (tokenResponse: any) => {
-                    if (tokenResponse && tokenResponse.access_token) {
+                    if (tokenResponse?.access_token) {
                         resolve(tokenResponse.access_token);
                     } else {
                         reject(new Error('فشل الحصول على إذن الدخول من Google'));

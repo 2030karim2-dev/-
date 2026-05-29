@@ -10,7 +10,7 @@ interface JournalEntryCardProps {
 const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    const toggleExpand = () => setIsExpanded(!isExpanded);
+    const toggleExpand = () => { setIsExpanded(!isExpanded); };
 
     // Calculate totals for verification
     const totalDebit = (entry.journal_entry_lines || []).reduce((sum: number, line: any) => sum + (line.debit_amount || 0), 0);

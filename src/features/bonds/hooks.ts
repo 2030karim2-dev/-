@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { bondsService } from './service';
 import { useAuthStore } from '../auth/store';
 import { useFeedbackStore } from '../feedback/store';
-import { BondType, BondFormData } from './types';
+import type { BondType, BondFormData } from './types';
 import { AuthorizeActionUsecase } from '../../core/usecases/auth/AuthorizeActionUsecase';
 
 export const useBonds = (type: BondType) => {

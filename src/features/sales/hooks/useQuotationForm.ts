@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Product } from '@/features/inventory/types';
+import type { Product } from '@/features/inventory/types';
 import { salesQuotationsApi } from '@/features/sales/api';
 
 export interface ItemRow {
@@ -57,7 +57,7 @@ export const useQuotationForm = (companyId: string | undefined, userId: string |
     setItems(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleOpenProductSearch = (index: number, query: string = '') => {
+  const handleOpenProductSearch = (index: number, query = '') => {
     setProductModal({ isOpen: true, rowIndex: index, query });
   };
 

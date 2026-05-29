@@ -80,7 +80,7 @@ const CTASection: React.FC<CTASectionProps> = ({ sectionRef }) => {
                                 {(['login', 'register'] as const).map((tab) => (
                                     <button
                                         key={tab}
-                                        onClick={() => setAuthTab(tab)}
+                                        onClick={() => { setAuthTab(tab); }}
                                         aria-pressed={authTab === tab}
                                         className={`relative flex-1 py-5 text-sm font-black transition-colors z-10 rounded-t-[1.5rem]
                         ${authTab === tab
@@ -118,7 +118,7 @@ const CTASection: React.FC<CTASectionProps> = ({ sectionRef }) => {
                                             exit={{ opacity: 0, x: -20 }}
                                             transition={{ duration: 0.3 }}
                                         >
-                                            <RegisterForm onSuccess={() => setAuthTab('login')} />
+                                            <RegisterForm onSuccess={() => { setAuthTab('login'); }} />
                                         </motion.div>
                                     )}
                                 </AnimatePresence>

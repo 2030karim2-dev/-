@@ -108,7 +108,7 @@ const ExchangeRateHistory: React.FC = () => {
                         <Filter size={12} className="text-gray-400" />
                         <select
                             value={filterCurrency}
-                            onChange={e => setFilterCurrency(e.target.value)}
+                            onChange={e => { setFilterCurrency(e.target.value); }}
                             className="bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-lg py-1.5 px-3 text-[10px] md:text-xs font-bold text-gray-700 dark:text-slate-300 outline-none focus:border-blue-500 transition-colors"
                         >
                             <option value="all">جميع العملات</option>

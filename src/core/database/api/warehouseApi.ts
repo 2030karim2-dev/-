@@ -19,7 +19,7 @@ export const warehouseApi = {
     /**
      * Create inventory transactions
      */
-    createInventoryTransactions: async (transactions: TableInsert<'inventory_transactions'>[]) => {
+    createInventoryTransactions: async (transactions: Array<TableInsert<'inventory_transactions'>>) => {
         const response = await supabase
             .from('inventory_transactions')
             .insert(transactions);

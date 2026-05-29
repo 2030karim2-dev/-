@@ -3,7 +3,7 @@ import React from 'react';
 import { Sparkles, Plus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { aiPosService } from '../../features/ai/posService';
-import { CartItem } from '../../features/sales/types';
+import type { CartItem } from '../../features/sales/types';
 import Spinner from '../base/Spinner';
 
 interface Props {
@@ -38,7 +38,7 @@ const SmartRecommendations: React.FC<Props> = ({ cartItems, onAdd }) => {
             {suggestions?.map((item, idx) => (
               <button
                 key={idx}
-                onClick={() => onAdd(item)}
+                onClick={() => { onAdd(item); }}
                 className="bg-white/10 hover:bg-white/20 border border-white/20 px-2.5 py-1 rounded-lg text-[8px] font-semibold transition-all flex items-center gap-1.5 active:scale-95 group"
               >
                 <span>{item}</span>

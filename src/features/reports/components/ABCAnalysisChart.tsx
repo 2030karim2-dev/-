@@ -4,7 +4,7 @@ import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, S
 import { cn } from '@/core/utils';
 
 interface ABCAnalysisChartProps {
-    data: { name: string; value: number; color: string }[];
+    data: Array<{ name: string; value: number; color: string }>;
 }
 
 const renderActiveShape = (props: any) => {
@@ -103,7 +103,7 @@ export const ABCAnalysisChart: React.FC<ABCAnalysisChartProps> = ({ data }) => {
                             </Pie>
                             <RechartsTooltip
                                 content={({ active, payload }: any) => {
-                                    if (active && payload && payload.length) {
+                                    if (active && payload?.length) {
                                         const entry = payload[0].payload;
                                         const info = getCategoryInfo(entry.name);
                                         return (

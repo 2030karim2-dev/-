@@ -12,6 +12,6 @@ export const useNotificationPolling = (companyId?: string) => {
         const interval = setInterval(() => {
             notificationService.checkSystemHealth(companyId);
         }, 1000 * 60 * 10);
-        return () => clearInterval(interval);
+        return () => { clearInterval(interval); };
     }, [companyId, showToast]);
 };

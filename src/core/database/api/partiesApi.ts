@@ -200,7 +200,7 @@ export const partiesApi = {
             .single();
 
         if (error) {
-            if ((error as any).code === '23505') {
+            if ((error).code === '23505') {
                 throw new Error('عذراً، هذا الاسم موجود مسبقاً في قائمة الفئات');
             }
             throw parseError(error);

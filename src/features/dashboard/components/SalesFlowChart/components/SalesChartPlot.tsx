@@ -6,13 +6,13 @@ import {
 import { cn } from '../../../../../core/utils';
 import { useThemeStore } from '../../../../../lib/themeStore';
 import { formatNumber } from './SalesChartSummary';
-import { ChartType, SeriesType } from '../hooks/useSalesFlowChart';
+import type { ChartType, SeriesType } from '../hooks/useSalesFlowChart';
 
 export const CustomTooltip = ({ active, payload, label }: any) => {
     const { theme } = useThemeStore();
     const isDark = theme === 'dark';
 
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
         return (
             <div className={cn(
                 "p-4 rounded-3xl border shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-2xl transition-all duration-200",
@@ -73,7 +73,7 @@ export const SalesChartPlot: React.FC<SalesChartPlotProps> = ({
             if (containerRef.current && containerRef.current.offsetWidth > 0) {
                 setIsMounted(true);
             } else {
-                retryTimer = setTimeout(() => setIsMounted(true), 500);
+                retryTimer = setTimeout(() => { setIsMounted(true); }, 500);
             }
         }, 300);
         return () => {

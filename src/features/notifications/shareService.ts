@@ -37,7 +37,7 @@ export const shareService = {
     shareText: async (
         companyId: string,
         message: string,
-        eventType: string = 'share'
+        eventType = 'share'
     ): Promise<{ success: boolean; results?: any[] }> => {
         return await messagingApi.sendNotification(companyId, eventType, message);
     },
@@ -49,7 +49,7 @@ export const shareService = {
         companyId: string,
         element: HTMLElement,
         caption: string,
-        eventType: string = 'share'
+        eventType = 'share'
     ): Promise<{ success: boolean; results?: any[] }> => {
         try {
             const imageBase64 = await elementToBase64(element);
@@ -87,7 +87,7 @@ export const shareService = {
     shareBulk: async (
         companyId: string,
         messages: string[],
-        eventType: string = 'share'
+        eventType = 'share'
     ): Promise<{ success: boolean; sent: number; failed: number }> => {
         let sent = 0;
         let failed = 0;

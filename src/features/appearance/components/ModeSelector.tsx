@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
-import { ThemeMode } from '../types';
+import type { ThemeMode } from '../types';
 import { cn } from '../../../core/utils';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const ModeSelector: React.FC<Props> = ({ activeMode, onChange }) => {
-  const modes: { id: ThemeMode; label: string; icon: any }[] = [
+  const modes: Array<{ id: ThemeMode; label: string; icon: any }> = [
     { id: 'light', label: 'نهاري', icon: Sun },
     { id: 'dark', label: 'ليلي', icon: Moon },
     { id: 'system', label: 'تلقائي', icon: Monitor },
@@ -21,7 +21,7 @@ const ModeSelector: React.FC<Props> = ({ activeMode, onChange }) => {
       {modes.map((m) => (
         <button
           key={m.id}
-          onClick={() => onChange(m.id)}
+          onClick={() => { onChange(m.id); }}
           className={cn(
             "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-all duration-300 font-bold text-[10px]",
             activeMode === m.id 

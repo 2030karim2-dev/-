@@ -68,7 +68,7 @@ export const ReturnDetailsStep: React.FC = () => {
                                     <button
                                         key={status.value}
                                         type="button"
-                                        onClick={() => setValue('status', status.value, { shouldValidate: true })}
+                                        onClick={() => { setValue('status', status.value, { shouldValidate: true }); }}
                                         className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${isSelected
                                             ? `border-${status.color}-500 ${status.bgColor}`
                                             : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
@@ -101,7 +101,7 @@ export const ReturnDetailsStep: React.FC = () => {
                             <button
                                 key={reason.value}
                                 type="button"
-                                onClick={() => setValue('returnReason', reason.value, { shouldValidate: true })}
+                                onClick={() => { setValue('returnReason', reason.value, { shouldValidate: true }); }}
                                 className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all group ${selectedReason === reason.value
                                     ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
                                     : 'border-slate-200 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-800 bg-slate-50 dark:bg-slate-900'

@@ -32,7 +32,7 @@ export const AuditModal: React.FC<Props> = ({ onClose }) => {
 
         if (fetchError) {
             console.error('Audit failed:', fetchError);
-            const err = fetchError as Error;
+            const err = fetchError;
             showToast('Audit Failed: ' + err.message, 'error');
             setIsAuditing(false);
             return;

@@ -5,7 +5,7 @@
 
 import type { ThemePreset } from './types';
 
-type ThemeLoader = () => Promise<{ [key: string]: ThemePreset[] }>;
+type ThemeLoader = () => Promise<Record<string, ThemePreset[]>>;
 
 const loaders: Record<string, ThemeLoader> = {
     premium: () => import('./presets/premium'),
@@ -26,7 +26,7 @@ export async function loadThemes(category: string): Promise<ThemePreset[]> {
 
     const mod = await loader();
     const key = Object.keys(mod).find(k => k.endsWith('Presets')) || Object.keys(mod)[0];
-    const presets = (mod[key] as ThemePreset[]) || [];
+    const presets = (mod[key]) || [];
     cache.set(category, presets);
     return presets;
 }

@@ -71,7 +71,7 @@ const CustomSelect = ({
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () => { document.removeEventListener('mousedown', handleClickOutside); };
     }, []);
 
     // NUCLEAR STYLING: Force background and text color to bypass ANY theme conflict
@@ -146,7 +146,7 @@ const CustomSelect = ({
     return (
         <div className="relative" ref={containerRef}>
             <div 
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => { setIsOpen(!isOpen); }}
                 className={cn(
                     "w-full bg-[var(--app-surface)] border-2 rounded-xl py-3 px-4 text-sm font-black outline-none transition-all shadow-md cursor-pointer flex justify-between items-center group/select",
                     isOpen ? borderColorClass : "border-[var(--app-border)]",

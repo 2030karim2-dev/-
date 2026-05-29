@@ -1,6 +1,6 @@
 import React from 'react';
 import { Edit, Trash2, ExternalLink, Hash } from 'lucide-react';
-import { Vehicle } from '../../inventory/types';
+import type { Vehicle } from '../../inventory/types';
 import { cn } from '../../../core/utils';
 
 interface Props {
@@ -60,7 +60,7 @@ const VehicleCard: React.FC<Props> = ({ vehicle: v, isSelected, onSelect, onEdit
                         href={`https://partsouq.com/en/catalog/genuine/search?q=${v.vin_prefix}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => { e.stopPropagation(); }}
                         className="flex items-center justify-center gap-2 py-1.5 px-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-lg text-[10px] font-bold transition-colors"
                     >
                         <ExternalLink size={12} />

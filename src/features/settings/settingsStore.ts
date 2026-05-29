@@ -7,14 +7,14 @@ import { persist } from 'zustand/middleware';
 
 // Import types and defaults from extracted files
 import {
-    InvoiceSettings,
-    InventorySettings,
-    PaymentSettings,
-    POSSettings,
-    PrintSettings,
-    IntegrationSettings,
-    LocalizationSettings,
-    BankAccount,
+    type InvoiceSettings,
+    type InventorySettings,
+    type PaymentSettings,
+    type POSSettings,
+    type PrintSettings,
+    type IntegrationSettings,
+    type LocalizationSettings,
+    type BankAccount,
     DEFAULT_INVOICE_SETTINGS,
     DEFAULT_INVENTORY_SETTINGS,
     DEFAULT_PAYMENT_SETTINGS,
@@ -61,7 +61,7 @@ interface SettingsState {
 }
 
 // Type for actions only
-type SettingsActions = {
+interface SettingsActions {
     setInvoiceSettings: (settings: Partial<InvoiceSettings>) => void;
     setInventorySettings: (settings: Partial<InventorySettings>) => void;
     setPaymentSettings: (settings: Partial<PaymentSettings>) => void;
@@ -76,7 +76,7 @@ type SettingsActions = {
     togglePaymentMethod: (id: string) => void;
     resetAllSettings: () => void;
     resetSection: (section: string) => void;
-};
+}
 
 // ------------------------------------------
 // Store Implementation

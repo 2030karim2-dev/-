@@ -63,14 +63,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tot
                     <div className="flex border-b border-slate-200 dark:border-slate-800 h-16 bg-slate-50/50 dark:bg-slate-950/20">
                         <button
                             type="button"
-                            onClick={() => setMethod('cash')}
+                            onClick={() => { setMethod('cash'); }}
                             className={`flex-1 flex items-center justify-center gap-2 font-bold text-xs md:text-sm uppercase transition-all ${method === 'cash' ? 'bg-blue-600 text-white shadow-inner shadow-blue-700' : 'bg-transparent text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/40'}`}
                         >
                             <Banknote size={18} /> {t('payment_method_cash')}
                         </button>
                         <button
                             type="button"
-                            onClick={() => setMethod('card')}
+                            onClick={() => { setMethod('card'); }}
                             className={`flex-1 flex items-center justify-center gap-2 font-bold text-xs md:text-sm uppercase transition-all border-r border-slate-200 dark:border-slate-800 ${method === 'card' ? 'bg-blue-600 text-white shadow-inner shadow-blue-700' : 'bg-transparent text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/40'}`}
                         >
                             <CreditCard size={18} /> {t('payment_method_card')}
@@ -85,7 +85,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, tot
                                 <input
                                     type="number"
                                     value={received}
-                                    onChange={(e) => setReceived(e.target.value)}
+                                    onChange={(e) => { setReceived(e.target.value); }}
                                     className="w-full text-center text-3xl font-black py-7 bg-white dark:bg-slate-900 outline-none font-mono text-slate-800 dark:text-white focus:bg-blue-50/10 dark:focus:bg-blue-900/5 transition-colors"
                                     autoFocus
                                     dir="ltr"

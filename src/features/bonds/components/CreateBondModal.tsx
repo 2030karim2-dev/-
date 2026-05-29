@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { DollarSign, Calendar, FileText, ArrowDown, ArrowUpCircle, ArrowRightLeft, Search, Landmark, Save, Tag, Building, Wallet } from 'lucide-react';
-import { BondFormData, BondType } from '../types';
+import type { BondFormData, BondType } from '../types';
 // Fix: Corrected import path to point to the barrel file.
 import { useAccounts } from '../../accounting/hooks/index';
 import { useCurrencies } from '../../settings/hooks';
@@ -158,11 +158,11 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
                otherAccounts: otherAccounts.map(a => ({ id: a.id, name: a.name }))
             }}
             onDataExtracted={(data) => {
-               type BondAIData = {
+               interface BondAIData {
                  amount?: number; currency_code?: string;
                  counterparty_type?: 'party' | 'account'; counterparty_id?: string;
                  cash_account_id?: string; description?: string; date?: string;
-               };
+               }
                const d = data as BondAIData;
                if (d.amount) setValue(selectedCurrency === 'SAR' ? 'amount' : 'foreign_amount', d.amount, { shouldValidate: true });
                if (d.currency_code) setValue('currency_code', d.currency_code, { shouldValidate: true });
@@ -272,8 +272,8 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
 
               <div className="space-y-3">
                 <div className={cn("flex h-11 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-2xl border dark:border-slate-800", type === 'transfer' && "opacity-50 pointer-events-none")}>
-                  <button type="button" onClick={() => setValue('counterparty_type', 'party')} className={cn("flex-1 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 transition-all", counterpartyType === 'party' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-md" : "text-gray-400 hover:text-gray-500")}><Building size={14} /> جهة (عميل/مورد)</button>
-                  <button type="button" onClick={() => setValue('counterparty_type', 'account')} className={cn("flex-1 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 transition-all", counterpartyType === 'account' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-md" : "text-gray-400 hover:text-gray-500")}><Landmark size={14} /> حساب عام</button>
+                  <button type="button" onClick={() => { setValue('counterparty_type', 'party'); }} className={cn("flex-1 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 transition-all", counterpartyType === 'party' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-md" : "text-gray-400 hover:text-gray-500")}><Building size={14} /> جهة (عميل/مورد)</button>
+                  <button type="button" onClick={() => { setValue('counterparty_type', 'account'); }} className={cn("flex-1 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 transition-all", counterpartyType === 'account' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-md" : "text-gray-400 hover:text-gray-500")}><Landmark size={14} /> حساب عام</button>
                 </div>
 
                 {counterpartyType === 'party' ? (
@@ -281,7 +281,7 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
                     <input
                       type="text"
                       value={partyQuery}
-                      onChange={(e) => setPartyQuery(e.target.value)}
+                      onChange={(e) => { setPartyQuery(e.target.value); }}
                       placeholder="ابحث عن العميل أو المورد..."
                       className="w-full p-4 pl-12 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500/30 dark:focus:border-blue-500/20 rounded-2xl text-sm font-bold outline-none transition-all placeholder:text-gray-300"
                     />
@@ -289,7 +289,7 @@ const CreateBondModal: React.FC<CreateBondModalProps> = ({ isOpen, onClose, type
                     {partyQuery.length > 1 && parties.length > 0 && (
                       <div className="absolute z-20 w-full mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-h-56 overflow-auto border dark:border-slate-700 animate-in fade-in zoom-in-95 backdrop-blur-xl">
                         {parties.map((p: any) => (
-                          <div key={p.id} onClick={() => handlePartySelect(p)} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer flex justify-between items-center border-b last:border-0 dark:border-slate-700/50 transition-colors">
+                          <div key={p.id} onClick={() => { handlePartySelect(p); }} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer flex justify-between items-center border-b last:border-0 dark:border-slate-700/50 transition-colors">
                             <div className="flex flex-col">
                               <span className="text-sm font-black text-gray-800 dark:text-slate-100">{p.name}</span>
                               <span className="text-[10px] text-gray-400 font-bold">{p.code || p.phone || p.id.split('-')[0]}</span>

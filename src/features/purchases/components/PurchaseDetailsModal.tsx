@@ -29,7 +29,7 @@ const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, 
     const handlePrint = useReactToPrint({
         contentRef: printRef,
         documentTitle: ` فاتورة مشتريات #${invoice?.invoice_number}`,
-        onAfterPrint: () => console.info('Print success'),
+        onAfterPrint: () => { console.info('Print success'); },
     });
 
     // Size controls
@@ -52,7 +52,7 @@ const PurchaseDetailsModal: React.FC<PurchaseDetailsModalProps> = ({ invoiceId, 
         if (currentIndex > 0) setModalSize(sizeOrder[currentIndex - 1]);
     };
 
-    const toggleFullscreen = () => setModalSize(prev => prev === 'full' ? '3xl' : 'full');
+    const toggleFullscreen = () => { setModalSize(prev => prev === 'full' ? '3xl' : 'full'); };
 
 
 

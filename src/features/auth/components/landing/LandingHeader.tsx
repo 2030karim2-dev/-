@@ -77,7 +77,7 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({ scrollToAuth, scrollToFea
 
                         {/* Mobile Menu Toggle */}
                         <button
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            onClick={() => { setMobileMenuOpen(!mobileMenuOpen); }}
                             aria-label={mobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
                             className="md:hidden w-10 h-10 rounded-2xl bg-gray-100/50 dark:bg-slate-800/50 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm"
                         >

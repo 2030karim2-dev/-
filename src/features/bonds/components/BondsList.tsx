@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowDownCircle, ArrowUpCircle, Printer, Calendar, User, FileText, Wallet, Trash2, MessageCircle } from 'lucide-react';
-import { Bond } from '../types';
+import type { Bond } from '../types';
 import { cn, formatCurrency } from '../../../core/utils';
 import { useDeleteBond } from '../hooks';
 
@@ -123,13 +123,13 @@ const BondsList: React.FC<Props> = ({ bonds, isLoading, searchTerm, displayMode 
                                 </td>
                                 <td className="px-4 py-3 text-center">
                                     <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                        <button onClick={() => handleWhatsAppShare(bond)} className="p-1.5 rounded-lg text-gray-300 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="إرسال عبر واتساب">
+                                        <button onClick={() => { handleWhatsAppShare(bond); }} className="p-1.5 rounded-lg text-gray-300 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="إرسال عبر واتساب">
                                             <MessageCircle size={14} />
                                         </button>
                                         <button className="p-1.5 rounded-lg text-gray-300 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="طباعة">
                                             <Printer size={14} />
                                         </button>
-                                        <button onClick={() => handleDelete(bond.id, bond.payment_number)} className="p-1.5 rounded-lg text-gray-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20" title="حذف">
+                                        <button onClick={() => { handleDelete(bond.id, bond.payment_number); }} className="p-1.5 rounded-lg text-gray-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20" title="حذف">
                                             <Trash2 size={14} />
                                         </button>
                                     </div>
@@ -190,10 +190,10 @@ const BondsList: React.FC<Props> = ({ bonds, isLoading, searchTerm, displayMode 
                                 </div>
                             </div>
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                <button onClick={() => handleWhatsAppShare(bond)} className="p-1.5 rounded-lg text-gray-300 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="واتساب">
+                                <button onClick={() => { handleWhatsAppShare(bond); }} className="p-1.5 rounded-lg text-gray-300 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="واتساب">
                                     <MessageCircle size={14} />
                                 </button>
-                                <button onClick={() => handleDelete(bond.id, bond.payment_number)} className="p-1.5 rounded-lg text-gray-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20" title="حذف">
+                                <button onClick={() => { handleDelete(bond.id, bond.payment_number); }} className="p-1.5 rounded-lg text-gray-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20" title="حذف">
                                     <Trash2 size={14} />
                                 </button>
                             </div>

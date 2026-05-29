@@ -45,7 +45,7 @@ export const PaymentMethodsChart: React.FC<PaymentMethodsChartProps> = ({
             }
         });
         ro.observe(containerRef.current);
-        return () => ro.disconnect();
+        return () => { ro.disconnect(); };
     }, []);
 
     const getMethodInfo = (method: string) => {
@@ -117,7 +117,7 @@ export const PaymentMethodsChart: React.FC<PaymentMethodsChartProps> = ({
                             </Pie>
                             <Tooltip
                                 content={({ active, payload }: any) => {
-                                    if (active && payload && payload.length) {
+                                    if (active && payload?.length) {
                                         const data = payload[0].payload;
                                         const info = getMethodInfo(data.method);
                                         return (

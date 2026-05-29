@@ -14,12 +14,12 @@ interface InvoiceExcelData {
     issueDate: string;
     customerName: string;
     issuedBy: string;
-    items: {
+    items: Array<{
         name: string;
         quantity: number;
         unitPrice: number;
         total: number;
-    }[];
+    }>;
     subtotal: number;
     totalAmount: number;
 }

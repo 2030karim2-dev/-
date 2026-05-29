@@ -1,6 +1,6 @@
 
 import { reportsApi } from './api';
-import { PartyDebt, ReportsStats } from './types';
+import type { PartyDebt, ReportsStats } from './types';
 import { supabase } from '../../lib/supabaseClient';
 
 
@@ -70,8 +70,8 @@ export const reportsService = {
     if (error) throw error;
 
     const result = data as {
-      revenues: { id: string; code: string; name: string; netBalance: number }[],
-      expenses: { id: string; code: string; name: string; netBalance: number }[],
+      revenues: Array<{ id: string; code: string; name: string; netBalance: number }>,
+      expenses: Array<{ id: string; code: string; name: string; netBalance: number }>,
       totalRevenues: number,
       totalExpenses: number,
       netProfit: number
@@ -106,7 +106,7 @@ export const reportsService = {
     });
     if (error) throw error;
 
-    const result = data as any;
+    const result = data;
     const mapItems = (items: any[], type: string) => (items || []).map((a: any) => ({
       id: a.id, code: a.code, name: a.name, type,
       totalDebit: 0, totalCredit: 0, netBalance: a.netBalance
@@ -130,7 +130,7 @@ export const reportsService = {
     });
     if (error) throw error;
 
-    const result = data as any;
+    const result = data;
     return {
       summary: result.summary,
       debts: (result.debts || []) as PartyDebt[]
@@ -183,7 +183,7 @@ export const reportsService = {
     });
     if (liqError) throw liqError;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const monthlyTrend = ((monthlyData || []) as Array<{ month: string, inflow: number, outflow: number, net: number }>).map(d => ({
       month: d.month,
       in: Math.max(0, Number(d.inflow) || 0),

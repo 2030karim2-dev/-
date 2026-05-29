@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, Building2, Package, Hash } from 'lucide-react';
-import { Invoice } from '../../types';
+import type { Invoice } from '../../types';
 
 interface Props {
     selectedInvoice: Invoice;

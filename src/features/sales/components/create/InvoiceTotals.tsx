@@ -17,7 +17,7 @@ const InvoiceTotals: React.FC = () => {
                         className="w-full h-full mt-2 bg-transparent text-xs font-bold outline-none resize-none"
                         placeholder="أضف أي ملاحظات أو شروط خاصة بالفاتورة هنا..."
                         value={notes}
-                        onChange={(e) => setMetadata('notes', e.target.value)}
+                        onChange={(e) => { setMetadata('notes', e.target.value); }}
                     />
                 </div>
 

@@ -13,7 +13,7 @@ export const journalsApi = {
     /**
      * Fetch paginated journal entries with lines and relations
      */
-    fetchJournals: async (companyId: string, pageParam: number = 0) => {
+    fetchJournals: async (companyId: string, pageParam = 0) => {
         const limit = 50;
         const from = pageParam * limit;
         const to = from + limit - 1;

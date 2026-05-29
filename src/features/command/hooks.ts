@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { useCommandPaletteStore, CommandAction } from './store';
+import { useCommandPaletteStore, type CommandAction } from './store';
 import {  useNavigate } from 'react-router-dom';
 import { useThemeStore } from '../../lib/themeStore';
 import { MENU_ITEMS } from '../../core/constants';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import { Sun, Moon } from 'lucide-react';
 // FIX: Add missing import for 'React' to resolve error when using React.FC.
-import React from 'react';
+import type React from 'react';
 
 export const useCommandPalette = () => {
   const { isOpen, openPalette, closePalette, actions } = useCommandPaletteStore();

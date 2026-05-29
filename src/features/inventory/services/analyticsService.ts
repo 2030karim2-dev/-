@@ -25,13 +25,13 @@ export const analyticsService = {
     /**
      * Get low stock products
      */
-    getLowStockProducts: async (companyId: string, threshold: number = 10) => {
+    getLowStockProducts: async (companyId: string, threshold = 10) => {
         const { data, error } = await supabase.from('products')
             .select('id, name_ar, sku, product_stock(quantity)')
             .eq('company_id', companyId);
         if (error) throw error;
 
-        return ((data as { id: string; name_ar: string; sku: string; product_stock?: { quantity?: number }[] }[]) || [])
+        return ((data as Array<{ id: string; name_ar: string; sku: string; product_stock?: Array<{ quantity?: number }> }>) || [])
             .map((p) => {
                 const productStock = p.product_stock;
                 return {
@@ -59,11 +59,11 @@ export const analyticsService = {
 
         const categoryMap = new Map<string, { name: string; value: number; quantity: number }>();
 
-        (data as Record<string, unknown>[])?.forEach((p) => {
+        (data as Array<Record<string, unknown>>)?.forEach((p) => {
             const categoryId = (p.category_id as string) || 'uncategorized';
             const categories = p.categories as { name_ar?: string } | undefined;
             const categoryName = categories?.name_ar || 'غير مصنف';
-            const productStock = p.product_stock as { quantity?: number }[] | undefined;
+            const productStock = p.product_stock as Array<{ quantity?: number }> | undefined;
             const stock = productStock?.reduce((sum: number, s) => sum + (s.quantity || 0), 0) || 0;
             const value = stock * ((p.cost_price as number) || 0);
 
@@ -82,7 +82,7 @@ export const analyticsService = {
     /**
      * Get stock movement history
      */
-    getStockMovementHistory: async (companyId: string, days: number = 30) => {
+    getStockMovementHistory: async (companyId: string, days = 30) => {
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - days);
 
@@ -93,7 +93,7 @@ export const analyticsService = {
             .order('created_at', { ascending: false });
         if (error) throw error;
 
-        return ((data as any) || []).map((m: any) => {
+        return ((data) || []).map((m: any) => {
             const products = m.products as { name_ar?: string } | undefined;
             return {
                 id: m.id,
@@ -108,7 +108,7 @@ export const analyticsService = {
     /**
      * Get top selling products
      */
-    getTopSellingProducts: async (companyId: string, limit: number = 10) => {
+    getTopSellingProducts: async (companyId: string, limit = 10) => {
         const { data, error } = await supabase.rpc('get_top_selling_products', {
             p_company_id: companyId,
             p_limit: limit
@@ -133,7 +133,7 @@ export const analyticsService = {
         // 2. Fetch All Products with Stock for accurate forecasting & stagnant analysis
         const productsData = await inventoryApi.getProducts(companyId);
 
-        const allProducts = ((productsData as Record<string, unknown>[]) || []).map((p) => {
+        const allProducts = ((productsData as Array<Record<string, unknown>>) || []).map((p) => {
             const stockList = Array.isArray(p.stock) ? p.stock : [];
             const totalStock = stockList.reduce((sum: number, s: Record<string, unknown>) => sum + (Number(s.quantity) || 0), 0);
             return {
@@ -163,7 +163,7 @@ export const analyticsService = {
         }>();
 
         // Helper to process sales
-        ((sales as Record<string, unknown>[]) || []).forEach((item) => {
+        ((sales as Array<Record<string, unknown>>) || []).forEach((item) => {
             const pid = item.product_id as string;
             const qty = (item.quantity as number) || 0;
             const rev = (item.total as number) || 0;

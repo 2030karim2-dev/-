@@ -14,7 +14,7 @@
 import React from 'react';
 import { cn } from '@/core/utils';
 import { Loader2 } from 'lucide-react';
-import { BaseCardProps } from './types';
+import type { BaseCardProps } from './types';
 import { CARD_SIZES, CARD_VARIANTS, CARD_ELEVATIONS, CARD_BORDERS, GLASS_PRESETS } from './constants';
 
 export const Card: React.FC<BaseCardProps> = ({

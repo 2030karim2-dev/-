@@ -74,7 +74,7 @@ export const useDashboardData = () => {
     const clientTotalExpenses = expenses.reduce((sum: number, e: any) => sum + toBaseCurrency(e), 0);
 
     // Server-side totals (RPC) used for debts/suppliers as they are not subject to the 30-day limit
-    const serverTotals = (rawData.serverTotals || {}) as any;
+    const serverTotals = (rawData.serverTotals || {});
     const serverTotalSales = Number(serverTotals.total_sales) || 0;
     const serverTotalPurchases = Number(serverTotals.total_purchases) || 0;
     const serverTotalExpenses = Number(serverTotals.total_expenses) || 0;
@@ -181,7 +181,7 @@ export const useDashboardData = () => {
       },
       alerts: insightsResult.alerts as any,
       insights: insightsResult.insights as any,
-      lowStockProducts: baseMetrics.lowStockProducts as any
+      lowStockProducts: baseMetrics.lowStockProducts
     };
   }, [baseMetrics, statsResult, insightsResult, rawData]);
 

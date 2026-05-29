@@ -17,7 +17,7 @@ interface MetaBlockProps {
     value: string | undefined;
     icon: React.ElementType;
     isSelect?: boolean;
-    options?: { id: string; label: string }[];
+    options?: Array<{ id: string; label: string }>;
     field?: string;
     colorClass?: string;
     onChange?: (field: string, value: string) => void;
@@ -32,7 +32,7 @@ const MetaBlock: React.FC<MetaBlockProps> = ({ label, value, icon: Icon, isSelec
         {isSelect && options && field && onChange ? (
             <select
                 value={value}
-                onChange={(e) => onChange(field, e.target.value)}
+                onChange={(e) => { onChange(field, e.target.value); }}
                 className="bg-transparent text-[11px] font-bold outline-none cursor-pointer text-gray-800 dark:text-slate-100 text-right w-full py-0.5"
             >
                 {options.map((opt) => (
@@ -73,10 +73,10 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
                 setMetadata('exchangeRate', 1);
                 setMetadata('exchangeOperator', 'multiply');
             } else {
-                const rateObj = (rates.data as { currency_code: string; rate_to_base: number }[])?.find(r => r.currency_code === currency);
+                const rateObj = (rates.data as Array<{ currency_code: string; rate_to_base: number }>)?.find(r => r.currency_code === currency);
                 if (rateObj) {
                     setMetadata('exchangeRate', rateObj.rate_to_base);
-                    const currencyConfig = (currencies.data as { code: string; exchange_operator: string }[])?.find(c => c.code === currency);
+                    const currencyConfig = (currencies.data as Array<{ code: string; exchange_operator: string }>)?.find(c => c.code === currency);
                     if (currencyConfig) {
                         setMetadata('exchangeOperator', currencyConfig.exchange_operator);
                     }
@@ -103,11 +103,11 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
 
         // 3. Handle Auto-Warehouse Selection (Once on load or when at default)
         if (warehouses && warehouses.length > 0 && (warehouseId === 'wh_main' || !warehouseId)) {
-            const castWarehouses = warehouses as Record<string, unknown>[];
+            const castWarehouses = warehouses as Array<Record<string, unknown>>;
             const primary = castWarehouses.find((w) => w.is_primary);
             const target = primary || castWarehouses[0];
             if (target && warehouseId) {
-                setMetadata('warehouseId', warehouseId as string);
+                setMetadata('warehouseId', warehouseId);
             }
         }
 
@@ -133,7 +133,7 @@ const InvoiceMeta: React.FC<Props> = ({ invoiceNumber }) => {
                 </div>
                 <div className="flex -space-x-px border-t border-gray-100 dark:border-slate-800">
                     <MetaBlock label="العملة" field="currency" value={currency} icon={Coins} isSelect
-                        options={(currencies.data as { code: string }[])?.map(c => ({ id: c.code, label: c.code })) || [{ id: 'SAR', label: 'SAR' }]}
+                        options={(currencies.data as Array<{ code: string }>)?.map(c => ({ id: c.code, label: c.code })) || [{ id: 'SAR', label: 'SAR' }]}
                         onChange={setMetadata} />
                     {currency && currency !== 'SAR' && (
                         <div className="flex-1 bg-white dark:bg-slate-900/50 border-r border-gray-100 dark:border-slate-800 p-2.5 flex flex-col group hover:bg-gray-50/40 transition-colors">

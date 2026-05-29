@@ -1,13 +1,13 @@
 import React from 'react';
 import { cn } from '../../core/utils';
 import EmptyState from '../base/EmptyState';
-import { Column } from './ExcelTable';
+import type { Column } from './ExcelTable';
 import { useVirtualizer } from '@tanstack/react-virtual';
 
 interface ExcelTableBodyProps<T> {
     isLoading: boolean;
     orderedData: T[];
-    columns: Column<T>[];
+    columns: Array<Column<T>>;
     enableSelection: boolean;
     emptyMessage: string | undefined;
     selectedRowIds: Set<string>;
@@ -142,12 +142,12 @@ function ExcelTableBodyInner<T>({
                         ref={rowVirtualizer.measureElement}
                         data-index={virtualRow.index}
                         draggable={!!onOrderChange}
-                        onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent, rowIdx)}
-                        onDragEnter={(e) => handleDragEnter(e as unknown as React.DragEvent, rowIdx)}
-                        onDragEnd={() => handleDragEnd()}
-                        onDrop={() => handleDrop()}
-                        onDragOver={(e) => e.preventDefault()}
-                        onClick={() => onRowClick && onRowClick(row)}
+                        onDragStart={(e) => { handleDragStart(e as unknown as React.DragEvent, rowIdx); }}
+                        onDragEnter={(e) => { handleDragEnter(e as unknown as React.DragEvent, rowIdx); }}
+                        onDragEnd={() => { handleDragEnd(); }}
+                        onDrop={() => { handleDrop(); }}
+                        onDragOver={(e) => { e.preventDefault(); }}
+                        onClick={() => onRowClick?.(row)}
                         className={cn(
                             "transition-colors group border-b border-[var(--app-border)] bg-[var(--app-surface)] text-[var(--app-text)]",
                             onRowClick ? "cursor-pointer" : "",
@@ -165,7 +165,7 @@ function ExcelTableBodyInner<T>({
                                         className="w-3.5 h-3.5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
                                         checked={isSelected}
                                         onChange={() => { }}
-                                        onClick={(e) => toggleRowSelection(rowId, e)}
+                                        onClick={(e) => { toggleRowSelection(rowId, e); }}
                                     />
                                 </div>
                             </td>
@@ -197,8 +197,8 @@ function ExcelTableBodyInner<T>({
                                         onRowClick?.(row);
                                         handleCellClick(rowIdx, colIdx, e.shiftKey);
                                     }}
-                                    onMouseDown={(e) => handleMouseDownCell(e, rowIdx, colIdx)}
-                                    onMouseEnter={() => handleMouseEnterCell()}
+                                    onMouseDown={(e) => { handleMouseDownCell(e, rowIdx, colIdx); }}
+                                    onMouseEnter={() => { handleMouseEnterCell(); }}
                                     onDoubleClick={() => { onRowDoubleClick?.(row); if (col.isEditable) startEditing(rowIdx, colIdx); }}
                                     className={cn(
                                         "p-0 text-[11px] font-medium border-r border-gray-300 dark:border-slate-700/50 transition-all cursor-cell relative",
@@ -216,7 +216,7 @@ function ExcelTableBodyInner<T>({
                                             type="text"
                                             value={editValue}
                                             autoFocus
-                                            onChange={(e) => setEditValue(e.target.value)}
+                                            onChange={(e) => { setEditValue(e.target.value); }}
                                             onBlur={saveEdit}
                                             onKeyDown={handleEditInputKeyDown}
                                             className={cn(

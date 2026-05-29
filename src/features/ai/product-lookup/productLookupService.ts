@@ -5,7 +5,7 @@
  */
 import { productService } from '../../inventory/services/productService';
 import { supabase } from '../../../lib/supabaseClient';
-import { AIEntityItem, ProductMatch, LookupResult } from '../core/types';
+import type { AIEntityItem, ProductMatch, LookupResult } from '../core/types';
 
 export type { ProductMatch, LookupResult };
 

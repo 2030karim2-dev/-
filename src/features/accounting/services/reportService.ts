@@ -1,6 +1,6 @@
 
 import { reportsApi } from '../api/index';
-import { TrialBalanceItem, LedgerEntry } from '../types/index';
+import type { TrialBalanceItem, LedgerEntry } from '../types/index';
 import { supabase } from '../../../lib/supabaseClient';
 
 
@@ -15,7 +15,7 @@ export const reportService = {
         });
         if (error) throw error;
 
-        const result = data as any;
+        const result = data;
         return (result.entries || []).map((line: any) => ({
             date: line.entry_date,
             journal_id: '',
@@ -67,7 +67,7 @@ export const reportService = {
             ...(toDate ? { p_to: toDate } : {})
         });
         if (plError) throw plError;
-        const pl = plData as any;
+        const pl = plData;
 
         // Balance Sheet from server
         const { data: bsData, error: bsError } = await supabase.rpc('report_balance_sheet', {
@@ -76,7 +76,7 @@ export const reportService = {
             ...(toDate ? { p_to: toDate } : {})
         });
         if (bsError) throw bsError;
-        const bs = bsData as any;
+        const bs = bsData;
 
         // Map account arrays to TrialBalanceItem format
         const mapToTBI = (items: any[], type: string) => (items || []).map((a: any) => ({

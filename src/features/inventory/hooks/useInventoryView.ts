@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Product } from '../types';
+import type { Product } from '../types';
 
 export const useInventoryView = () => {
   const [searchParams, setSearchParams] = useSearchParams();

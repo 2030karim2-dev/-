@@ -14,7 +14,7 @@
  *   </FeatureBoundary>
  */
 
-import React, { Suspense, ReactNode } from 'react';
+import React, { Suspense, type ReactNode } from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
 import PageLoader from '../../ui/base/PageLoader';
 import { useLocation } from 'react-router-dom';

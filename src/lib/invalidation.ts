@@ -3,7 +3,7 @@
 // Ensures comprehensive data synchronization after mutations
 // ============================================
 
-import { QueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 
 /**
  * Data dependency graph for the ERP system.

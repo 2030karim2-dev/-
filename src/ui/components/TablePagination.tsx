@@ -1,11 +1,11 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/core/utils';
 
-type TablePaginationProps = {
+interface TablePaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-};
+}
 
 export default function TablePagination({ currentPage, totalPages, onPageChange }: TablePaginationProps) {
   const handlePrev = () => {

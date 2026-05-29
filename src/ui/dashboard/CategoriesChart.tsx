@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recha
 import { useThemeStore } from '../../lib/themeStore';
 
 interface CategoriesChartProps {
-  data: { name: string; value: number }[];
+  data: Array<{ name: string; value: number }>;
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6'];
@@ -59,7 +59,7 @@ const CategoriesChart: React.FC<CategoriesChartProps> = ({ data }) => {
       if (checkDimensions()) clearInterval(interval);
     }, 500);
 
-    return () => clearInterval(interval);
+    return () => { clearInterval(interval); };
   }, []);
 
   const onPieEnter = (_: any, _index: number) => {

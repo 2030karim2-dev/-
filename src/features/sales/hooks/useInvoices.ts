@@ -4,7 +4,7 @@ import { useAuthStore } from '@/features/auth/store';
 import { useFeedbackStore } from '@/features/feedback/store';
 import { invalidateByPreset } from '@/lib/invalidation';
 import { syncStore } from '@/core/lib/sync-store';
-import { CreateInvoiceDTO } from '../types';
+import type { CreateInvoiceDTO } from '../types';
 
 export const useInvoices = () => {
   const { user } = useAuthStore();

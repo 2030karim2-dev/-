@@ -23,7 +23,7 @@ const WarehouseManager: React.FC = () => {
   };
 
   const handleSave = (data: any) => {
-    save(data, { onSuccess: () => setModalOpen(false) });
+    save(data, { onSuccess: () => { setModalOpen(false); } });
   };
 
   const handleDelete = (id: string) => {
@@ -53,7 +53,7 @@ const WarehouseManager: React.FC = () => {
             title={wh.name}
             subtitle={wh.location || "بدون عنوان"}
             tags={[]}
-            onClick={() => handleEdit(wh)}
+            onClick={() => { handleEdit(wh); }}
             actions={
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onClick={(e) => { e.stopPropagation(); handleEdit(wh); }} className="p-1.5 text-gray-400 hover:text-blue-500 dark:hover:bg-blue-950/20 rounded-lg" title="تعديل">
@@ -70,7 +70,7 @@ const WarehouseManager: React.FC = () => {
 
       <WarehouseModal
         isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => { setModalOpen(false); }}
         onSave={handleSave}
         isSaving={isSaving}
         initialData={editingWarehouse}

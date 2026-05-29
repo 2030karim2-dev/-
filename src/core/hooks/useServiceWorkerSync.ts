@@ -20,6 +20,6 @@ export const useServiceWorkerSync = () => {
             }
         };
         navigator.serviceWorker.addEventListener('message', handleMessage);
-        return () => navigator.serviceWorker.removeEventListener('message', handleMessage);
+        return () => { navigator.serviceWorker.removeEventListener('message', handleMessage); };
     }, [queryClient, showToast]);
 };

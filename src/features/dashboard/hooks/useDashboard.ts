@@ -62,7 +62,7 @@ export interface Alert {
 export interface DashboardData {
     summary: DashboardSummary;
     salesChartData: SalesDataPoint[];
-    categoryChartData: { name: string; value: number; color: string }[];
+    categoryChartData: Array<{ name: string; value: number; color: string }>;
     topProducts: TopProduct[];
     topCustomers: TopCustomer[];
     recentTransactions: RecentTransaction[];
@@ -183,7 +183,7 @@ export const useInventoryChart = () => {
     };
 };
 
-export const useRecentActivity = (limit: number = 5) => {
+export const useRecentActivity = (limit = 5) => {
     const { recentTransactions, isLoading } = useDashboard({ period: 'week' });
 
     return {
@@ -192,7 +192,7 @@ export const useRecentActivity = (limit: number = 5) => {
     };
 };
 
-export const useTopProducts = (limit: number = 5) => {
+export const useTopProducts = (limit = 5) => {
     const { topProducts, isLoading } = useDashboard({ period: 'month' });
 
     return {
@@ -201,7 +201,7 @@ export const useTopProducts = (limit: number = 5) => {
     };
 };
 
-export const useTopCustomers = (limit: number = 5) => {
+export const useTopCustomers = (limit = 5) => {
     const { topCustomers, isLoading } = useDashboard({ period: 'month' });
 
     return {

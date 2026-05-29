@@ -4,16 +4,16 @@
 // Fire-and-forget: never blocks the transaction
 
 import { messagingApi } from './messagingApi';
-import { messageTemplates, SaleData, PurchaseData, BondData, ExpenseData, StockTransferData } from './messageTemplates';
+import { messageTemplates, type SaleData, type PurchaseData, type BondData, type ExpenseData, type StockTransferData } from './messageTemplates';
 
-type EventMap = {
+interface EventMap {
     sale: SaleData;
     purchase: PurchaseData;
     bond_receipt: BondData;
     bond_payment: BondData;
     expense: ExpenseData;
     stock_transfer: StockTransferData;
-};
+}
 
 // Map frontend event types to the DB event_type values
 const eventTypeToDbField: Record<string, string> = {

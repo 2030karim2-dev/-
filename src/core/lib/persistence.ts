@@ -1,5 +1,5 @@
 import { del, get, set } from 'idb-keyval';
-import { Persister } from '@tanstack/react-query-persist-client';
+import type { Persister } from '@tanstack/react-query-persist-client';
 
 /**
  * Creates an IndexedDB persister for TanStack Query
@@ -8,7 +8,7 @@ import { Persister } from '@tanstack/react-query-persist-client';
  * Note: localStoragePersister was removed because IndexedDB is universally
  * supported in our target environments and avoids the 5MB limit + sync IO of localStorage.
  */
-export function createIndexedDBPersister(idbKey: string = 'alzhra-query-cache'): Persister {
+export function createIndexedDBPersister(idbKey = 'alzhra-query-cache'): Persister {
     return {
         persistClient: async (client) => {
             await set(idbKey, client);

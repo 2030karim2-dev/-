@@ -10,7 +10,7 @@ interface Props {
 const ToggleSwitch: React.FC<Props> = ({ checked, onChange }) => {
   return (
     <div 
-      onClick={() => onChange(!checked)}
+      onClick={() => { onChange(!checked); }}
       className={cn(
         "w-10 h-6 rounded-full transition-all cursor-pointer relative p-1",
         checked ? "bg-emerald-500" : "bg-gray-200 dark:bg-slate-700"

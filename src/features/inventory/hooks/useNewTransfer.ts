@@ -9,7 +9,7 @@ export const useNewTransfer = (onSuccess: () => void) => {
     const [fromWh, setFromWh] = useState('');
     const [toWh, setToWh] = useState('');
     const [notes, setNotes] = useState('');
-    const [selectedItems, setSelectedItems] = useState<{ product: any, qty: number }[]>([]);
+    const [selectedItems, setSelectedItems] = useState<Array<{ product: any, qty: number }>>([]);
     const [productQuery, setProductQuery] = useState('');
 
     const handleAddItem = (p: any) => {

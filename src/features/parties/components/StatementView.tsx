@@ -5,11 +5,11 @@ import ExcelTable from '../../../ui/common/ExcelTable';
 import { formatCurrency, cn } from '../../../core/utils';
 import { tafqeet } from '../../../core/utils/tafqeet';
 import { Printer, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
-import { PartyType } from '../types';
+import type { PartyType } from '../types';
 import Button from '../../../ui/base/Button';
 import ShareButton from '../../../ui/common/ShareButton';
 import { exportStatementToExcel } from '../utils/statementExcelExporter';
-import { partiesService, StatementMovement } from '../service';
+import { partiesService, type StatementMovement } from '../service';
 import { useAuthStore } from '../../auth/store';
 import { FileDown } from 'lucide-react';
 import { useCompany } from '../../settings/hooks';
@@ -109,7 +109,7 @@ const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
           <label className="text-xs font-bold text-gray-500">اختر {partyType === 'customer' ? 'العميل' : 'المورد'}</label>
           <select
             value={selectedPartyId}
-            onChange={(e) => setSelectedPartyId(e.target.value)}
+            onChange={(e) => { setSelectedPartyId(e.target.value); }}
             className="w-full mt-1 bg-gray-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg py-2 px-3 text-sm font-bold"
           >
             <option value="">-- اختر من القائمة --</option>
@@ -137,7 +137,7 @@ const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
                     phone: companyDetails.phone || '',
                     tax_number: companyDetails.tax_number || '',
                     logo_url: companyDetails.logo_url || ''
-                  } as any, selectedParty.name, statement as any);
+                  }, selectedParty.name, statement as any);
                 } catch (err) {
                   console.error('Export failed', err);
                 } finally {
@@ -150,7 +150,7 @@ const StatementView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
             >
               تصدير Excel
             </Button>
-            <Button onClick={() => window.print()} className="" leftIcon={<Printer size={14} />}>
+            <Button onClick={() => { window.print(); }} className="" leftIcon={<Printer size={14} />}>
               طباعة الكشف
             </Button>
           </div>

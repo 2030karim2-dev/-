@@ -33,7 +33,7 @@ export const useWarehouseMutations = () => {
       queryClient.invalidateQueries({ queryKey: ['settings_warehouses'] });
       showToast("تم حذف المستودع", 'info');
     },
-    onError: (err: any) => showToast(err.message, 'error')
+    onError: (err: any) => { showToast(err.message, 'error'); }
   });
 
   const setPrimary = useMutation({

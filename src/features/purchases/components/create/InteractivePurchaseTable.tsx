@@ -55,7 +55,7 @@ const InteractivePurchaseTable: React.FC = () => {
         setTimeout(() => {
             const nextCell = tableRef.current?.querySelector(
                 `[data-row-index="${modalState.rowIndex}"][data-col-field="quantity"]`
-            ) as HTMLInputElement;
+            )!;
             nextCell?.focus();
             if (nextCell) nextCell.select();
         }, 50);
@@ -77,7 +77,7 @@ const InteractivePurchaseTable: React.FC = () => {
         const moveFocus = (row: number, colField: keyof PurchaseInvoiceItem) => {
             const nextCell = tableRef.current?.querySelector(
                 `[data-row-index="${row}"][data-col-field="${colField}"]`
-            ) as HTMLInputElement;
+            )!;
             nextCell?.focus();
             if (nextCell instanceof HTMLInputElement) nextCell.select();
         };
@@ -89,7 +89,7 @@ const InteractivePurchaseTable: React.FC = () => {
                 e.preventDefault();
                 if (rowIndex === items.length - 1 && field === 'costPrice') {
                     addItem();
-                    setTimeout(() => moveFocus(rowIndex + 1, 'name'), 50);
+                    setTimeout(() => { moveFocus(rowIndex + 1, 'name'); }, 50);
                 } else {
                     moveFocus(rowIndex + 1, field);
                 }
@@ -101,7 +101,7 @@ const InteractivePurchaseTable: React.FC = () => {
                     moveFocus(rowIndex, fieldsOrder[nextColIndex]);
                 } else if (!e.shiftKey && rowIndex === items.length - 1) {
                     addItem();
-                    setTimeout(() => moveFocus(rowIndex + 1, fieldsOrder[0]), 50);
+                    setTimeout(() => { moveFocus(rowIndex + 1, fieldsOrder[0]); }, 50);
                 } else if (!e.shiftKey) {
                     moveFocus(rowIndex + 1, fieldsOrder[0]);
                 } else if (e.shiftKey && rowIndex > 0) {
@@ -116,7 +116,7 @@ const InteractivePurchaseTable: React.FC = () => {
     // ── Resize handle element ───────────────────────────────────
     const ResizeHandle = ({ field }: { field: string }) => (
         <div
-            onMouseDown={(e) => onResizeMouseDown(e, field)}
+            onMouseDown={(e) => { onResizeMouseDown(e, field); }}
             className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-300 transition-colors z-20"
         />
     );
@@ -129,7 +129,7 @@ const InteractivePurchaseTable: React.FC = () => {
                 <div className="flex bg-white/10 p-0.5 rounded-none border border-white/20">
                     {useDiscountStore.getState().discountEnabled && (
                         <button
-                            onClick={() => toggleColumn('showDiscount')}
+                            onClick={() => { toggleColumn('showDiscount'); }}
                             className={cn("px-3 py-1 text-[9px] font-bold uppercase transition-all", showDiscount ? "bg-white text-blue-600" : "text-blue-100")}
                         >
                             إظهار الخصم
@@ -181,8 +181,8 @@ const InteractivePurchaseTable: React.FC = () => {
                                             value={item.name}
                                             data-row-index={index}
                                             data-col-field="name"
-                                            onKeyDown={(e) => handleKeyDown(e, index, 'name')}
-                                            onClick={() => handleOpenSearch(index, item.name || '')}
+                                            onKeyDown={(e) => { handleKeyDown(e, index, 'name'); }}
+                                            onClick={() => { handleOpenSearch(index, item.name || ''); }}
                                             readOnly
                                             className="flex-1 p-2 bg-transparent outline-none text-right font-bold text-[11px] text-blue-900 dark:text-slate-100 cursor-pointer placeholder:text-blue-200"
                                             placeholder="اختر صنفاً..."
@@ -193,19 +193,19 @@ const InteractivePurchaseTable: React.FC = () => {
                                 <td className="p-2 border-l dark:border-slate-800 text-center text-[10px] font-mono font-bold text-gray-500">{item.partNumber || '---'}</td>
                                 <td className="p-2 border-l dark:border-slate-800 text-center text-[10px] font-bold text-blue-600">{item.brand || '---'}</td>
                                 <td className="p-0 border-l dark:border-slate-800">
-                                    <input type="number" value={item.quantity || ''} onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                                        onKeyDown={(e) => handleKeyDown(e, index, 'quantity')} data-row-index={index} data-col-field="quantity"
+                                    <input type="number" value={item.quantity || ''} onChange={(e) => { updateItem(index, 'quantity', parseFloat(e.target.value) || 0); }}
+                                        onKeyDown={(e) => { handleKeyDown(e, index, 'quantity'); }} data-row-index={index} data-col-field="quantity"
                                         className="w-full h-full p-2 bg-transparent outline-none text-center font-mono font-bold text-[11px] focus:bg-blue-50 dark:focus:bg-slate-800" placeholder="0" />
                                 </td>
                                 <td className="p-0 border-l dark:border-slate-800">
-                                    <input type="number" value={item.costPrice || ''} onChange={(e) => updateItem(index, 'costPrice', parseFloat(e.target.value) || 0)}
-                                        onKeyDown={(e) => handleKeyDown(e, index, 'costPrice')} data-row-index={index} data-col-field="costPrice"
+                                    <input type="number" value={item.costPrice || ''} onChange={(e) => { updateItem(index, 'costPrice', parseFloat(e.target.value) || 0); }}
+                                        onKeyDown={(e) => { handleKeyDown(e, index, 'costPrice'); }} data-row-index={index} data-col-field="costPrice"
                                         className="w-full h-full p-2 bg-transparent outline-none text-center font-mono font-bold text-[11px] text-rose-600 focus:bg-rose-50 dark:focus:bg-slate-800" placeholder="0.00" />
                                 </td>
                                 {showDiscount && (
                                     <td className="p-0 border-l dark:border-slate-800">
-                                        <input type="number" value={item.discount || ''} onChange={(e) => updateItem(index, 'discount', parseFloat(e.target.value) || 0)}
-                                            onKeyDown={(e) => handleKeyDown(e, index, 'discount')} data-row-index={index} data-col-field="discount"
+                                        <input type="number" value={item.discount || ''} onChange={(e) => { updateItem(index, 'discount', parseFloat(e.target.value) || 0); }}
+                                            onKeyDown={(e) => { handleKeyDown(e, index, 'discount'); }} data-row-index={index} data-col-field="discount"
                                             className="w-full h-full p-2 bg-transparent outline-none text-center font-mono font-bold text-[11px] focus:bg-amber-50 dark:focus:bg-slate-800" />
                                     </td>
                                 )}
@@ -213,7 +213,7 @@ const InteractivePurchaseTable: React.FC = () => {
                                     {((Number(item.quantity) * Number(item.costPrice)) - (showDiscount ? Number(item.discount || 0) : 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                                 </td>
                                 <td className="p-0 bg-blue-50/30">
-                                    <button onClick={() => removeItem(index)} className="w-full h-full flex items-center justify-center text-rose-300 hover:text-rose-600 transition-colors">
+                                    <button onClick={() => { removeItem(index); }} className="w-full h-full flex items-center justify-center text-rose-300 hover:text-rose-600 transition-colors">
                                         <Trash2 size={12} />
                                     </button>
                                 </td>
@@ -231,7 +231,7 @@ const InteractivePurchaseTable: React.FC = () => {
 
             <ProductSelectionModal
                 isOpen={modalState.isOpen}
-                onClose={() => setModalState({ ...modalState, isOpen: false })}
+                onClose={() => { setModalState({ ...modalState, isOpen: false }); }}
                 onSelect={handleProductSelect}
                 initialQuery={modalState.query}
             />

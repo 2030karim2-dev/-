@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Product } from '../types';
+import type { Product } from '../types';
 
 export interface SmartSuggestion {
     productName: string;
@@ -37,7 +37,7 @@ export const useSmartTransferSuggestions = (products: Product[] | undefined, war
 
         const suggestions: SmartSuggestion[] = [];
         const whMap = new Map<string, string>();
-        warehouses.forEach((w) => whMap.set(w.id, (w.name || w.name_ar || 'مستودع') as string));
+        warehouses.forEach((w) => whMap.set(w.id, (w.name || w.name_ar || 'مستودع')));
 
         for (const product of products) {
             const dist = product.warehouse_distribution || [];

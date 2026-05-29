@@ -5,7 +5,7 @@ import ExpenseBreakdownChart from '../components/ExpenseBreakdownChart';
 import Card from '../../../ui/base/Card';
 import { formatCurrency } from '../../../core/utils';
 import { expensesService } from '../service';
-import { Expense } from '../types';
+import type { Expense } from '../types';
 
 interface ExpensesListViewProps {
     expenses: Expense[];

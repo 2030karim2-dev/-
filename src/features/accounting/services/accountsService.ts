@@ -1,5 +1,5 @@
 
-import { Account, AccountFormData } from '../types/index';
+import type { Account, AccountFormData } from '../types/index';
 import { accountsApi } from '../api/accountsApi';
 // Fix: Added missing supabase import
 import { supabase } from '../../../lib/supabaseClient';

@@ -1,7 +1,7 @@
 import { useProductMutations } from './useProducts';
 import { useCurrencies } from '../../settings/hooks';
 import { useFeedbackStore } from '../../feedback/store';
-import { Product } from '../types';
+import type { Product } from '../types';
 
 export const useProductImport = (products: Product[]) => {
     const { saveProduct } = useProductMutations();
@@ -12,7 +12,7 @@ export const useProductImport = (products: Product[]) => {
         const { items, currency } = data;
         try {
             let successCount = 0;
-            const rate = currency ? ((rates.data as any)?.[currency] || 1) : 1;
+            const rate = currency ? ((rates.data)?.[currency] || 1) : 1;
 
             for (const item of items) {
                 const isDuplicate = products.some(p => p.name.trim().toLowerCase() === item.name.trim().toLowerCase());

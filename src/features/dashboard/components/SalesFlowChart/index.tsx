@@ -1,6 +1,6 @@
 import React from 'react';
 import { useThemeStore } from '../../../../lib/themeStore';
-import { useSalesFlowChart, ChartDataPoint, SeriesType } from './hooks/useSalesFlowChart';
+import { useSalesFlowChart, type ChartDataPoint, type SeriesType } from './hooks/useSalesFlowChart';
 import { SalesChartHeader } from './components/SalesChartHeader';
 import { SalesChartPlot } from './components/SalesChartPlot';
 import { SalesChartSummary } from './components/SalesChartSummary';

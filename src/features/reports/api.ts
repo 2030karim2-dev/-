@@ -8,11 +8,11 @@ interface AccountWithLines {
   name_ar: string;
   type: string;
   balance: number;
-  journal_entry_lines?: {
+  journal_entry_lines?: Array<{
     debit_amount: number;
     credit_amount: number;
     journal_entries: { entry_date: string; status: string };
-  }[];
+  }>;
 }
 
 interface PartyInvoice {
@@ -27,7 +27,7 @@ interface PartyJournal {
   entry_number: number;
   entry_date: string;
   description: string | null;
-  journal_entry_lines: { debit_amount: number; credit_amount: number }[];
+  journal_entry_lines: Array<{ debit_amount: number; credit_amount: number }>;
 }
 
 interface JournalLineRaw {

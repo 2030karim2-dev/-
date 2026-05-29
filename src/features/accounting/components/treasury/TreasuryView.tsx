@@ -7,7 +7,7 @@ import EmptyState from '../../../../ui/base/EmptyState';
 import { Wallet } from 'lucide-react';
 import CreateBondModal from '../../../bonds/components/CreateBondModal';
 import { useBondMutation } from '../../../bonds/hooks';
-import { BondType } from '../../../bonds/types';
+import type { BondType } from '../../../bonds/types';
 
 interface Props {
     dateRange: { from: string; to: string };
@@ -73,7 +73,7 @@ const TreasuryView: React.FC<Props> = ({ dateRange }) => {
 
             <CreateBondModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => { setIsModalOpen(false); }}
                 type={activeAction}
                 onSubmit={handleBondSubmit}
                 isSubmitting={bondMutation.isPending}

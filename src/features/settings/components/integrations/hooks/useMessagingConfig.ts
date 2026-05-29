@@ -3,7 +3,7 @@
 // ============================================
 import { useState, useEffect, useCallback } from 'react';
 import { useFeedbackStore } from '@/features/feedback/store';
-import { messagingApi, MessagingConfig, DEFAULT_MESSAGING_CONFIG } from '@/features/notifications/messagingApi';
+import { messagingApi, type MessagingConfig, DEFAULT_MESSAGING_CONFIG } from '@/features/notifications/messagingApi';
 import { messagingService } from '@/features/notifications/messagingService';
 
 export const useMessagingConfig = (companyId: string) => {

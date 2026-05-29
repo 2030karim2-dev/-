@@ -1,8 +1,8 @@
 // ============================================
 // useTabDragDrop — منطق السحب والإفلات بين التابات
 // ============================================
-import { useState, useCallback, MutableRefObject } from 'react';
-import { TabItem } from '../types';
+import { useState, useCallback, type MutableRefObject } from 'react';
+import type { TabItem } from '../types';
 
 export interface DragState {
     isDragging: boolean;
@@ -25,7 +25,7 @@ interface UseTabDragDropOptions {
     tabs: TabItem[];
     setTabs: (tabs: TabItem[]) => void;
     onTabsReorder?: (tabs: TabItem[]) => void;
-    tabRefs: MutableRefObject<{ [key: string]: HTMLButtonElement | null }>;
+    tabRefs: MutableRefObject<Record<string, HTMLButtonElement | null>>;
     announceChange: (msg: string) => void;
 }
 

@@ -1,5 +1,5 @@
 
-import { Database } from '../../core/database.types';
+import type { Database } from '../../core/database.types';
 
 export type PartyType = 'customer' | 'supplier';
 export type PartyStatus = 'active' | 'blocked';

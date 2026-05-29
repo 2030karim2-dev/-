@@ -3,7 +3,7 @@
 // Al-Zahra Smart ERP
 // ============================================
 
-import { Permission, Role } from '../types/common';
+import type { Permission, Role } from '../types/common';
 
 /**
  * Role-based permissions mapping

@@ -71,7 +71,7 @@ export const messagingApi = {
      * Save/update messaging config
      */
     saveConfig: async (config: MessagingConfig): Promise<{ error: any }> => {
-        const { error } = await (supabase.from('messaging_config') as any)
+        const { error } = await (supabase.from('messaging_config'))
             .upsert(
                 { ...config, updated_at: new Date().toISOString() },
                 { onConflict: 'company_id' }

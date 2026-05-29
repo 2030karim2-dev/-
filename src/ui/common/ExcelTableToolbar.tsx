@@ -80,16 +80,16 @@ const ExcelTableToolbar: React.FC<ExcelTableToolbarProps> = ({
                                 <div className="w-px h-4 bg-[var(--app-border)] mx-0.5" />
                             </>
                         )}
-                        <button onClick={() => setIsZoomed(!isZoomed)} className="p-1.5 text-[var(--app-text-secondary)] hover:text-blue-500 transition-colors rounded hover:bg-[var(--app-surface)] shadow-sm">
+                        <button onClick={() => { setIsZoomed(!isZoomed); }} className="p-1.5 text-[var(--app-text-secondary)] hover:text-blue-500 transition-colors rounded hover:bg-[var(--app-surface)] shadow-sm">
                             {isZoomed ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
                         </button>
-                        <button onClick={() => setZoomLevel(z => Math.max(0.7, z - 0.1))} className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 rounded hover:bg-[var(--app-surface)] shadow-sm"><Minus size={12} /></button>
+                        <button onClick={() => { setZoomLevel(z => Math.max(0.7, z - 0.1)); }} className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 rounded hover:bg-[var(--app-surface)] shadow-sm"><Minus size={12} /></button>
                         <span className="text-[10px] w-8 text-center font-mono font-medium text-[var(--app-text-secondary)]">{Math.round(zoomLevel * 100)}%</span>
-                        <button onClick={() => setZoomLevel(z => Math.min(1.5, z + 0.1))} className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 rounded hover:bg-[var(--app-surface)] shadow-sm"><Plus size={12} /></button>
+                        <button onClick={() => { setZoomLevel(z => Math.min(1.5, z + 0.1)); }} className="p-1 text-[var(--app-text-secondary)] hover:text-blue-500 rounded hover:bg-[var(--app-surface)] shadow-sm"><Plus size={12} /></button>
                     </div>
                     {/* Keyboard shortcuts toggle */}
                     <button
-                        onClick={() => setShowShortcuts(!showShortcuts)}
+                        onClick={() => { setShowShortcuts(!showShortcuts); }}
                         className={cn(
                             "p-1.5 rounded-lg transition-colors",
                             showShortcuts ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" : "text-[var(--app-text-secondary)] hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"

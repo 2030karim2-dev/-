@@ -46,7 +46,7 @@ export class AppError extends Error {
     constructor(
         message: string,
         public code: ErrorCode,
-        public statusCode: number = 500,
+        public statusCode = 500,
         public details?: UnknownRecord
     ) {
         super(message);

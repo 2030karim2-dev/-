@@ -120,7 +120,7 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                             className="inv-title editable-field outline-none"
                             contentEditable
                             suppressContentEditableWarning
-                            onBlur={(e) => setHeader(prev => ({ ...prev, nameAr: e.currentTarget.textContent || '' }))}
+                            onBlur={(e) => { setHeader(prev => ({ ...prev, nameAr: e.currentTarget.textContent || '' })); }}
                         >
                             {header.nameAr || 'اسم الشركة'}
                         </h1>
@@ -128,7 +128,7 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                             className="text-xs font-bold editable-field outline-none text-blue-600 dark:text-blue-400"
                             contentEditable
                             suppressContentEditableWarning
-                            onBlur={(e) => setHeader(prev => ({ ...prev, specialization: e.currentTarget.textContent || '' }))}
+                            onBlur={(e) => { setHeader(prev => ({ ...prev, specialization: e.currentTarget.textContent || '' })); }}
                         >
                             {header.specialization}
                         </p>
@@ -136,7 +136,7 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                             className="inv-subtitle editable-field outline-none"
                             contentEditable
                             suppressContentEditableWarning
-                            onBlur={(e) => setHeader(prev => ({ ...prev, address: e.currentTarget.textContent || '' }))}
+                            onBlur={(e) => { setHeader(prev => ({ ...prev, address: e.currentTarget.textContent || '' })); }}
                         >
                             {header.address || 'العنوان غير مسجل'}
                         </p>
@@ -145,7 +145,7 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                                 className="editable-field outline-none"
                                 contentEditable
                                 suppressContentEditableWarning
-                                onBlur={(e) => setHeader(prev => ({ ...prev, phone: e.currentTarget.textContent || '' }))}
+                                onBlur={(e) => { setHeader(prev => ({ ...prev, phone: e.currentTarget.textContent || '' })); }}
                             >
                                 {header.phone && `هاتف: ${header.phone}`}
                             </span>
@@ -153,7 +153,7 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                                 className="editable-field outline-none"
                                 contentEditable
                                 suppressContentEditableWarning
-                                onBlur={(e) => setHeader(prev => ({ ...prev, email: e.currentTarget.textContent || '' }))}
+                                onBlur={(e) => { setHeader(prev => ({ ...prev, email: e.currentTarget.textContent || '' })); }}
                             >
                                 {header.email && `إيميل: ${header.email}`}
                             </span>
@@ -165,7 +165,7 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                                 className="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest editable-field"
                                 contentEditable
                                 suppressContentEditableWarning
-                                onBlur={(e) => setHeader(prev => ({ ...prev, headerText: e.currentTarget.textContent || '' }))}
+                                onBlur={(e) => { setHeader(prev => ({ ...prev, headerText: e.currentTarget.textContent || '' })); }}
                             >
                                 {header.headerText}
                             </p>
@@ -176,7 +176,7 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                             className="inv-title editable-field outline-none"
                             contentEditable
                             suppressContentEditableWarning
-                            onBlur={(e) => setHeader(prev => ({ ...prev, nameEn: e.currentTarget.textContent || '' }))}
+                            onBlur={(e) => { setHeader(prev => ({ ...prev, nameEn: e.currentTarget.textContent || '' })); }}
                         >
                             {header.nameEn || 'Company Name'}
                         </h1>
@@ -184,7 +184,7 @@ const PrintableInvoice = ({ invoice }: { invoice: any }) => {
                             className="inv-subtitle editable-field outline-none"
                             contentEditable
                             suppressContentEditableWarning
-                            onBlur={(e) => setHeader(prev => ({ ...prev, titleEn: e.currentTarget.textContent || '' }))}
+                            onBlur={(e) => { setHeader(prev => ({ ...prev, titleEn: e.currentTarget.textContent || '' })); }}
                         >
                             {header.titleEn}
                         </p>

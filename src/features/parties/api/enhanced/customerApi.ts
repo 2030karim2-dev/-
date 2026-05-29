@@ -27,13 +27,13 @@ export const customerApi = {
             companyId: item.company_id || '',
             customerId: item.customer_id || '',
             customerName: item.customer_parties?.name,
-            activityType: item.activity_type as any,
+            activityType: item.activity_type,
             subject: item.subject,
             description: item.description === null ? undefined : item.description,
             scheduledAt: item.scheduled_at === null ? undefined : item.scheduled_at,
             completedAt: item.completed_at === null ? undefined : item.completed_at,
-            status: (item.status || 'pending') as any,
-            priority: (item.priority || 'medium') as any,
+            status: (item.status || 'pending'),
+            priority: (item.priority || 'medium'),
             assignedTo: item.assigned_to === null ? undefined : item.assigned_to,
             assignedToName: (item.assigned_to_profile?.full_name) === null ? undefined : item.assigned_to_profile?.full_name,
             outcome: item.outcome === null ? undefined : item.outcome,
@@ -119,7 +119,7 @@ export const customerApi = {
             .single();
 
         if (error) throw error;
-        return data as any as CustomerActivity;
+        return data as CustomerActivity;
     },
 
 
@@ -150,7 +150,7 @@ export const customerApi = {
 
         const { error } = await supabase
             .from('customer_activities')
-            .update(updateData as any)
+            .update(updateData)
             .eq('id', activityId);
 
         if (error) throw error;
@@ -185,7 +185,7 @@ export const customerApi = {
             id: item.id,
             companyId: item.company_id || '',
             customerId: item.customer_id || '',
-            noteType: item.note_type as any,
+            noteType: item.note_type,
             content: item.content,
             isImportant: item.is_important || false,
             createdBy: item.created_by || '',
@@ -211,7 +211,7 @@ export const customerApi = {
             .single();
 
         if (error) throw error;
-        return data as any as CustomerNote;
+        return data as CustomerNote;
     },
 
     async deleteNote(noteId: string): Promise<void> {
@@ -347,10 +347,10 @@ export const customerApi = {
             .rpc('get_customer_stats', { p_company_id: companyId });
 
         if (error) throw error;
-        return data as any as CustomerStats;
+        return data as CustomerStats;
     },
 
-    async getTopCustomers(companyId: string, limit: number = 10): Promise<TopCustomer[]> {
+    async getTopCustomers(companyId: string, limit = 10): Promise<TopCustomer[]> {
         const { data, error } = await supabase
             .rpc('get_top_customers_by_revenue', {
                 p_company_id: companyId,
@@ -370,7 +370,7 @@ export const customerApi = {
     // Dashboard/Overview
     // ============================================================
 
-    async getUpcomingActivities(companyId: string, days: number = 7): Promise<CustomerActivity[]> {
+    async getUpcomingActivities(companyId: string, days = 7): Promise<CustomerActivity[]> {
         const fromDate = new Date();
         const toDate = new Date();
         toDate.setDate(toDate.getDate() + days);

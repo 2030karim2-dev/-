@@ -71,7 +71,7 @@ export const authApi = {
     const fetchPromise = (async () => {
       try {
         // 1. Try RPC first
-        const { data, error } = await (supabase.rpc as any)('get_user_profile', {
+        const { data, error } = await (supabase.rpc)('get_user_profile', {
           p_user_id: userId,
         });
 
@@ -121,7 +121,7 @@ export const authApi = {
           return { data: null, error: profileRes.error };
         }
 
-        const profileData = profileRes.data as any;
+        const profileData = profileRes.data;
 
         // Get email from session user if missing
         const { data: { user } } = await supabase.auth.getUser();
@@ -131,9 +131,9 @@ export const authApi = {
           email: user?.email || '',
           full_name: profileData?.full_name || user?.user_metadata?.full_name || '',
           avatar_url: profileData?.avatar_url || user?.user_metadata?.avatar_url,
-          role: (roleRes.data as any)?.role || 'viewer',
-          company_id: (roleRes.data as any)?.company_id,
-          company_name: (roleRes.data as any)?.companies?.name_ar,
+          role: (roleRes.data)?.role || 'viewer',
+          company_id: (roleRes.data)?.company_id,
+          company_name: (roleRes.data)?.companies?.name_ar,
         };
 
         return { data: fallbackData, error: null };

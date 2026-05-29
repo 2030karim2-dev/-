@@ -95,7 +95,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 type="text"
                 placeholder={t('global_search_placeholder')}
                 value={globalSearchVal}
-                onChange={(e) => setGlobalSearchVal(e.target.value)}
+                onChange={(e) => { setGlobalSearchVal(e.target.value); }}
                 autoComplete="off"
                 aria-label={t('global_search_placeholder')}
                 className="w-full bg-[var(--app-bg)] border border-[var(--app-border)] rounded-lg py-1.5 ps-9 pe-10 text-xs text-[var(--app-text)] placeholder:text-[var(--app-text-secondary)] focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all font-bold"
@@ -104,7 +104,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               {globalSearchVal && (
                 <button 
                   type="button"
-                  onClick={() => setGlobalSearchVal('')}
+                  onClick={() => { setGlobalSearchVal(''); }}
                   className={`absolute top-2.5 text-gray-400 hover:text-rose-500 transition-colors ${dir === 'rtl' ? 'left-3' : 'right-3'}`}
                 >
                   <X size={14} />

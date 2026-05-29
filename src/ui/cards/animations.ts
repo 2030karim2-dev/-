@@ -4,7 +4,7 @@
  * Using Framer Motion
  */
 
-import { Variants } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 
 // ======== Card Entrance Animations ========
 

@@ -35,7 +35,7 @@ const AlertsSection: React.FC = () => {
                     اتخاذ إجراء <ArrowLeft size={10} />
                 </button>
                 <button
-                    onClick={() => setIsVisible(false)}
+                    onClick={() => { setIsVisible(false); }}
                     className="p-1.5 text-rose-300 hover:text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
                 >
                     <X size={14} />

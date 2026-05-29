@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { purchasesService, purchasesApi } from '../service';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
-import { CreatePurchaseDTO } from '../types';
+import type { CreatePurchaseDTO } from '../types';
 
 // Hook to fetch purchase returns
 export const usePurchaseReturns = () => {

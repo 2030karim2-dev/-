@@ -9,7 +9,7 @@ import { Send, Bot, User, Loader2, Sparkles, X, Mic, MicOff } from 'lucide-react
 import { useSpeechRecognition } from '../chat/useSpeechRecognition';
 import { useAIPrefillStore } from '../chat/store';
 import { useNavigate } from 'react-router-dom';
-import { ProductMatch } from '../core/types';
+import type { ProductMatch } from '../core/types';
 
 interface AICommandCenterProps {
     isOpen: boolean;
@@ -37,7 +37,7 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({ isOpen, onClose }) =>
     const navigate = useNavigate();
     const { productLookupResults, productLookupAction, clearProductLookup, setPendingPrefill } = useAIPrefillStore();
 
-    const handleProductPickerComplete = (selectedProducts: { product: ProductMatch; quantity: number }[]) => {
+    const handleProductPickerComplete = (selectedProducts: Array<{ product: ProductMatch; quantity: number }>) => {
         if (!productLookupAction) return;
         
         const enrichedAction = { ...productLookupAction };

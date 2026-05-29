@@ -6,7 +6,7 @@ import { useAuthStore } from '../../../auth/store';
 import { useParties } from '../../../parties/hooks';
 import { formatCurrency } from '../../../../core/utils';
 import ProductSelectionModal from '../../../sales/components/create/ProductSelectionModal';
-import { Product } from '../../../inventory/types';
+import type { Product } from '../../../inventory/types';
 
 interface Props {
   onClose: () => void;
@@ -67,7 +67,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
     setItems(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleOpenProductSearch = (index: number, query: string = '') => {
+  const handleOpenProductSearch = (index: number, query = '') => {
     setProductModal({ isOpen: true, rowIndex: index, query });
   };
 
@@ -142,7 +142,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
                     <Building2 size={14} className="text-violet-600" />
                     <span className="text-sm font-bold text-gray-800 dark:text-slate-100 truncate">{selectedParty.name}</span>
                   </div>
-                  <button onClick={() => setSelectedParty(null)} className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded text-gray-400 hover:text-rose-500 transition-all">
+                  <button onClick={() => { setSelectedParty(null); }} className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded text-gray-400 hover:text-rose-500 transition-all">
                     <X size={14} />
                   </button>
                 </div>
@@ -152,7 +152,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
                     type="text"
                     value={partyQuery}
                     onChange={(e) => { setPartyQuery(e.target.value); setIsPartyDropdownOpen(true); }}
-                    onFocus={() => setIsPartyDropdownOpen(true)}
+                    onFocus={() => { setIsPartyDropdownOpen(true); }}
                     placeholder="بحث عن مورد..."
                     className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
@@ -194,7 +194,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
             <input
               type="date"
               value={issueDate}
-              onChange={(e) => setIssueDate(e.target.value)}
+              onChange={(e) => { setIssueDate(e.target.value); }}
               className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
           </div>
@@ -205,7 +205,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
             <input
               type="text"
               value={deliveryTerms}
-              onChange={(e) => setDeliveryTerms(e.target.value)}
+              onChange={(e) => { setDeliveryTerms(e.target.value); }}
               placeholder="مثال: 5 أيام عمل"
               className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
@@ -246,7 +246,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
                           <input
                             type="text"
                             value={item.description}
-                            onChange={(e) => updateItem(idx, 'description', e.target.value)}
+                            onChange={(e) => { updateItem(idx, 'description', e.target.value); }}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' || e.key === 'F2') {
                                 e.preventDefault();
@@ -257,7 +257,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
                             className="w-full bg-transparent border-0 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-400 pr-1"
                           />
                           <button 
-                            onClick={() => handleOpenProductSearch(idx, item.description)}
+                            onClick={() => { handleOpenProductSearch(idx, item.description); }}
                             className="absolute left-0 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-violet-500 opacity-0 group-hover/search:opacity-100 transition-all"
                           >
                             <Search size={14} />
@@ -269,7 +269,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
                           type="number"
                           min={1}
                           value={item.quantity}
-                          onChange={(e) => updateItem(idx, 'quantity', Number(e.target.value))}
+                          onChange={(e) => { updateItem(idx, 'quantity', Number(e.target.value)); }}
                           className="w-full bg-transparent border-0 outline-none text-sm text-center text-gray-900 dark:text-white"
                         />
                       </td>
@@ -279,7 +279,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
                           min={0}
                           step={0.01}
                           value={item.unitPrice}
-                          onChange={(e) => updateItem(idx, 'unitPrice', Number(e.target.value))}
+                          onChange={(e) => { updateItem(idx, 'unitPrice', Number(e.target.value)); }}
                           className="w-full bg-transparent border-0 outline-none text-sm text-center font-mono text-gray-900 dark:text-white"
                         />
                       </td>
@@ -288,7 +288,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
                       </td>
                       <td className="py-2 px-1">
                         <button
-                          onClick={() => removeItem(idx)}
+                          onClick={() => { removeItem(idx); }}
                           className="p-1 text-gray-400 hover:text-rose-500 transition-colors"
                           disabled={items.length <= 1}
                         >
@@ -323,7 +323,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
             <input
               type="text"
               value={paymentTerms}
-              onChange={(e) => setPaymentTerms(e.target.value)}
+              onChange={(e) => { setPaymentTerms(e.target.value); }}
               placeholder="مثال: آجل 30 يوم"
               className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
@@ -333,7 +333,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
             <input
               type="text"
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={(e) => { setNotes(e.target.value); }}
               placeholder="ملاحظات..."
               className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
@@ -343,7 +343,7 @@ const CreatePurchaseQuotationModal: React.FC<Props> = ({ onClose, onSuccess, rfq
 
       <ProductSelectionModal 
         isOpen={productModal.isOpen}
-        onClose={() => setProductModal(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => { setProductModal(prev => ({ ...prev, isOpen: false })); }}
         onSelect={handleProductSelect}
         initialQuery={productModal.query}
         mode="purchase"

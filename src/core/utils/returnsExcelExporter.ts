@@ -8,7 +8,7 @@ const XLSX = _XLSX as any;
 
 interface ReturnExcelData {
     companyName: string;
-    returns: {
+    returns: Array<{
         invoiceNumber: string;
         issueDate: string;
         customerName: string;
@@ -19,7 +19,7 @@ interface ReturnExcelData {
         totalAmount: number;
         status: string;
         notes?: string;
-    }[];
+    }>;
     summary: {
         totalReturns: number;
         totalAmount: number;
@@ -160,12 +160,12 @@ export const exportSingleReturnToExcel = (data: {
     returnReason?: string;
     issuedBy: string;
     status: string;
-    items: {
+    items: Array<{
         name: string;
         quantity: number;
         unitPrice: number;
         total: number;
-    }[];
+    }>;
     subtotal: number;
     notes?: string;
     type: 'sales' | 'purchase';

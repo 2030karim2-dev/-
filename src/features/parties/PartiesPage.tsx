@@ -1,12 +1,12 @@
 import React, { useMemo, useState, Suspense, lazy } from 'react';
-import { Users, UserPlus, FileText, LayoutGrid, Edit, Trash2, History, LucideIcon } from 'lucide-react';
+import { Users, UserPlus, FileText, LayoutGrid, Edit, Trash2, History, type LucideIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useParties, usePartyMutations, usePartiesView } from './hooks';
-import { Party, PartyView, PartyType, PartyFormData } from './types';
+import type { Party, PartyView, PartyType, PartyFormData } from './types';
 import { useAIPrefillStore } from '../ai/store';
 import MicroHeader from '../../ui/base/MicroHeader';
 import PartiesStats from './components/PartiesStats';
-import ExcelTable, { Column } from '../../ui/common/ExcelTable';
+import ExcelTable, { type Column } from '../../ui/common/ExcelTable';
 import Button from '../../ui/base/Button';
 import Avatar from '../../ui/base/Avatar';
 import { formatCurrency, cn } from '../../core/utils';
@@ -55,7 +55,7 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
     React.useEffect(() => {
         const intent = partyType === 'customer' ? 'create_customer' : 'create_supplier';
         const aiData = consumePrefill(intent);
-        if (aiData && aiData.entities) {
+        if (aiData?.entities) {
             setPrefillData({
                 name: aiData.entities.partyName || ''
             });
@@ -68,7 +68,7 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
     const displayIcon = icon || Users;
     const displayIconColor = iconColor || (partyType === 'customer' ? 'text-emerald-600' : 'text-blue-600');
 
-    const columns: Column<Party>[] = useMemo(() => [
+    const columns: Array<Column<Party>> = useMemo(() => [
         {
             header: t('name'),
             accessor: (row: Party) => (
@@ -211,7 +211,7 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                                 isRTL={true}
                                 showSearch={false}
                                 isLoading={isLoading}
-                                onRowDoubleClick={(row: any) => handleEdit(row as Party)}
+                                onRowDoubleClick={(row: any) => { handleEdit(row as Party); }}
                             />
                         </div>
                     </div>
@@ -238,14 +238,14 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                         { id: 'categories', label: t('categories'), icon: LayoutGrid }
                     ]}
                     activeTab={activeView}
-                    onTabChange={(id) => setActiveView(id as PartyView)}
+                    onTabChange={(id) => { setActiveView(id as PartyView); }}
                     isMaximized={isMaximized}
                     onToggleMaximize={() => {
                         setIsMaximized(!isMaximized);
                         if (isMaximized) setIsZenMode(false);
                     }}
                     isZenMode={isZenMode}
-                    onToggleZen={() => setIsZenMode(!isZenMode)}
+                    onToggleZen={() => { setIsZenMode(!isZenMode); }}
                 />
 
             <div className={cn(
@@ -269,7 +269,7 @@ const PartiesPage: React.FC<PartiesPageProps> = ({ partyType, title, icon, iconC
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     onSubmit={(data) => {
-                        const payload = { data: data as PartyFormData };
+                        const payload = { data: data };
                         if (editingParty?.id) {
                             (payload as any).id = editingParty.id;
                         }

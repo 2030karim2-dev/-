@@ -86,7 +86,7 @@ export async function generateAIContent(
         }
 
         // Extract token usage if available from the proxy response
-        const usage = (data as any)?.usage;
+        const usage = (data)?.usage;
 
         const metricData: any = {
             model,
@@ -106,7 +106,7 @@ export async function generateAIContent(
         aiMetrics.recordMetric(metricData);
 
         // Edge Function returns the full OpenRouter response
-        const content = (data as any)?.choices?.[0]?.message?.content ?? '';
+        const content = (data)?.choices?.[0]?.message?.content ?? '';
 
         if (!content) {
             console.warn('[AI Provider] Empty response from AI model');

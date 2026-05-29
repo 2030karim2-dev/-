@@ -48,7 +48,7 @@ const TelegramCard: React.FC<Props> = ({ config, onUpdate }) => (
                 <input
                     type="checkbox"
                     checked={config.telegram_enabled}
-                    onChange={(e) => onUpdate({ telegram_enabled: e.target.checked })}
+                    onChange={(e) => { onUpdate({ telegram_enabled: e.target.checked }); }}
                     className="w-5 h-5 text-blue-600 rounded-lg focus:ring-blue-500 cursor-pointer"
                 />
                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300">تفعيل إشعارات تليجرام</span>
@@ -61,7 +61,7 @@ const TelegramCard: React.FC<Props> = ({ config, onUpdate }) => (
                         <input
                             type="password"
                             value={config.telegram_bot_token}
-                            onChange={(e) => onUpdate({ telegram_bot_token: e.target.value })}
+                            onChange={(e) => { onUpdate({ telegram_bot_token: e.target.value }); }}
                             className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-mono"
                             placeholder="123456:ABC-DEF..."
                             dir="ltr"
@@ -75,7 +75,7 @@ const TelegramCard: React.FC<Props> = ({ config, onUpdate }) => (
                         <input
                             type="text"
                             value={config.telegram_chat_id}
-                            onChange={(e) => onUpdate({ telegram_chat_id: e.target.value })}
+                            onChange={(e) => { onUpdate({ telegram_chat_id: e.target.value }); }}
                             className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-mono"
                             placeholder="-1001234567890"
                             dir="ltr"

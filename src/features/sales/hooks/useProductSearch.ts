@@ -62,7 +62,7 @@ export const useProductSearch = (searchTerm: string, options?: UseProductSearchO
             // Map results to sum quantities from the nested stock array
             return results.map((item: any) => {
                 const stockArray = Array.isArray(item.quantity) ? item.quantity : [];
-                const totalQty = (stockArray as { quantity: string | number }[]).reduce(
+                const totalQty = (stockArray as Array<{ quantity: string | number }>).reduce(
                     (sum: number, s: { quantity: string | number }) => sum + (Number(s.quantity) || 0),
                     0
                 );

@@ -18,7 +18,7 @@
  * 2. Uncomment the Datadog block below
  */
 
-import { logger, APMAdapter, APMEvent } from './logger';
+import { logger, type APMAdapter, type APMEvent } from './logger';
 
 // ── In-House Error Buffer (zero external dependencies) ──────────────────────
 

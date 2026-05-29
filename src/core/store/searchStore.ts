@@ -12,14 +12,14 @@ export const useSearchStore = create<SearchState>((set) => ({
   pageSearchValue: '',
   pageSearchPlaceholder: '',
   onPageSearchChange: null,
-  setPageSearch: (config) => set({
+  setPageSearch: (config) => { set({
     pageSearchValue: config?.value ?? '',
     pageSearchPlaceholder: config?.placeholder ?? '',
     onPageSearchChange: config?.onChange ?? null,
-  }),
-  clearPageSearch: () => set({
+  }); },
+  clearPageSearch: () => { set({
     pageSearchValue: '',
     pageSearchPlaceholder: '',
     onPageSearchChange: null,
-  }),
+  }); },
 }));

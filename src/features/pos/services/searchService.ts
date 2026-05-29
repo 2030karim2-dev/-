@@ -74,7 +74,7 @@ export const posSearchService = {
         companyId: string,
         query: string,
         filters?: POSSearchFilters,
-        limit: number = 20
+        limit = 20
     ): Promise<POSSearchResponse> {
         const startTime = performance.now();
         const cacheKey = `${companyId}:${query}:${JSON.stringify(filters)}:${limit}`;
@@ -170,7 +170,7 @@ export const posSearchService = {
         companyId: string,
         query: string,
         filters?: POSSearchFilters,
-        limit: number = 20
+        limit = 20
     ): Promise<POSSearchResult[]> {
         try {
             // Use the paginated search RPC for server-side normalized search
@@ -243,7 +243,7 @@ export const posSearchService = {
         companyId: string,
         query: string,
         _filters?: POSSearchFilters,
-        limit: number = 20
+        limit = 20
     ): Promise<POSSearchResult[]> {
         const { data, error } = await supabase
             .from('products')
@@ -304,7 +304,7 @@ export const posSearchService = {
      */
     async getPopularProducts(
         companyId: string,
-        limit: number = 10
+        limit = 10
     ): Promise<POSSearchResult[]> {
         try {
             const thirtyDaysAgo = new Date();
@@ -372,7 +372,7 @@ export const posSearchService = {
     async getRecentSales(
         companyId: string,
         query: string,
-        limit: number = 5
+        limit = 5
     ): Promise<POSSearchResult[]> {
         try {
             const { data, error } = await supabase
@@ -394,7 +394,7 @@ export const posSearchService = {
             const results: POSSearchResult[] = [];
 
             for (const row of data) {
-                const product = (row as any).products;
+                const product = (row).products;
                 if (!product || seen.has(product.id)) continue;
                 seen.add(product.id);
 
@@ -413,7 +413,7 @@ export const posSearchService = {
                     image_url: product.image_url || null,
                     alternative_numbers: product.alternative_numbers || null,
                     score: 15, // Higher score for recently sold items
-                    last_sale_date: (row as any).invoices?.created_at,
+                    last_sale_date: (row).invoices?.created_at,
                 });
             }
 
@@ -443,9 +443,9 @@ export const posSearchService = {
 
             const map = new Map<string, { count: number; last_date?: string }>();
             for (const row of data) {
-                const productId = (row as any).product_id;
+                const productId = (row).product_id;
                 const existing = map.get(productId);
-                const createdAt = (row as any).invoices?.created_at;
+                const createdAt = (row).invoices?.created_at;
 
                 if (existing) {
                     existing.count++;
@@ -492,29 +492,29 @@ export const posSearchService = {
 
         if (error || !data) return null;
 
-        const stockList = Array.isArray((data as any).product_stock)
-            ? (data as any).product_stock
+        const stockList = Array.isArray((data).product_stock)
+            ? (data).product_stock
             : [];
         const totalStock = stockList.reduce(
             (sum: number, s: any) => sum + (Number(s.quantity) || 0), 0
         );
 
         return {
-            id: (data as any).id,
+            id: (data).id,
             type: 'code',
-            name: (data as any).name_ar || '',
-            name_ar: (data as any).name_ar || '',
-            sku: (data as any).sku || '',
-            part_number: (data as any).part_number || '',
-            brand: (data as any).brand || '',
-            size: (data as any).size || '',
-            selling_price: Number((data as any).sale_price) || 0,
-            cost_price: Number((data as any).purchase_price) || 0,
+            name: (data).name_ar || '',
+            name_ar: (data).name_ar || '',
+            sku: (data).sku || '',
+            part_number: (data).part_number || '',
+            brand: (data).brand || '',
+            size: (data).size || '',
+            selling_price: Number((data).sale_price) || 0,
+            cost_price: Number((data).purchase_price) || 0,
             stock_quantity: totalStock,
-            unit: (data as any).unit || 'pcs',
-            image_url: (data as any).image_url || null,
-            alternative_numbers: (data as any).alternative_numbers || null,
-            barcode: (data as any).barcode || null,
+            unit: (data).unit || 'pcs',
+            image_url: (data).image_url || null,
+            alternative_numbers: (data).alternative_numbers || null,
+            barcode: (data).barcode || null,
             score: 100,
             match_type: 'barcode',
         };

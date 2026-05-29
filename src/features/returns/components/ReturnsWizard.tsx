@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Package, Save, Receipt, Loader2, ListPlus } from 'lucide-react';
-import { ReturnType, Invoice } from '../types';
+import type { ReturnType, Invoice } from '../types';
 import { formatCurrency } from '../../../core/utils';
 import { useDraggableModal } from '../../../ui/hooks/useDraggableModal';
 import { useReturnWizard } from '../hooks/useReturnWizard';
@@ -88,7 +88,7 @@ const ReturnsWizard: React.FC<Props> = ({ isOpen, onClose, returnType, invoices:
                                     {invoices?.map((invoice: Invoice) => (
                                         <div
                                             key={invoice.id}
-                                            onClick={() => handleInvoiceSelect(invoice.id)}
+                                            onClick={() => { handleInvoiceSelect(invoice.id); }}
                                             className="group p-6 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 cursor-pointer transition-all duration-300 relative overflow-hidden"
                                         >
                                             <div className="flex items-start justify-between mb-4">
@@ -161,7 +161,7 @@ const ReturnsWizard: React.FC<Props> = ({ isOpen, onClose, returnType, invoices:
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={selectedItems[item.id] || false}
-                                                                    onChange={(e) => handleItemSelect(item.id, e.target.checked)}
+                                                                    onChange={(e) => { handleItemSelect(item.id, e.target.checked); }}
                                                                     className="peer w-5 h-5 appearance-none rounded-lg border-2 border-slate-300 dark:border-slate-600 checked:bg-blue-500 checked:border-blue-500 focus:ring-4 focus:ring-blue-500/20 focus:outline-none transition-all cursor-pointer"
                                                                 />
                                                                 <svg className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -192,7 +192,7 @@ const ReturnsWizard: React.FC<Props> = ({ isOpen, onClose, returnType, invoices:
                                                                     min={0}
                                                                     max={item.quantity}
                                                                     value={returnQuantities[item.id] || ''}
-                                                                    onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value) || 0, item.quantity)}
+                                                                    onChange={(e) => { handleQuantityChange(item.id, parseInt(e.target.value) || 0, item.quantity); }}
                                                                     className={`w-20 px-3 py-2 text-center text-sm font-bold font-mono rounded-xl border focus:outline-none focus:ring-4 transition-all
                                                                         ${returnQuantities[item.id] > 0
                                                                             ? 'border-blue-500 bg-white dark:bg-slate-900 focus:border-blue-500 focus:ring-blue-500/20 shadow-inner'

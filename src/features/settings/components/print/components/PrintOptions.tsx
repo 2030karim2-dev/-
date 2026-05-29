@@ -23,7 +23,7 @@ export const PrintOptions: React.FC<PrintOptionsProps> = ({ print, handleUpdate,
                         type="checkbox"
                         id="print_header"
                         checked={print.print_header}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate({ print_header: e.target.checked })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { handleUpdate({ print_header: e.target.checked }); }}
                         className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
                     />
                     <label htmlFor="print_header" className="text-sm text-slate-600 dark:text-slate-300">
@@ -35,7 +35,7 @@ export const PrintOptions: React.FC<PrintOptionsProps> = ({ print, handleUpdate,
                         type="checkbox"
                         id="print_footer"
                         checked={print.print_footer}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate({ print_footer: e.target.checked })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { handleUpdate({ print_footer: e.target.checked }); }}
                         className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
                     />
                     <label htmlFor="print_footer" className="text-sm text-slate-600 dark:text-slate-300">
@@ -47,7 +47,7 @@ export const PrintOptions: React.FC<PrintOptionsProps> = ({ print, handleUpdate,
                         type="checkbox"
                         id="print_logo"
                         checked={print.print_logo}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate({ print_logo: e.target.checked })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { handleUpdate({ print_logo: e.target.checked }); }}
                         className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
                     />
                     <label htmlFor="print_logo" className="text-sm text-slate-600 dark:text-slate-300">
@@ -59,7 +59,7 @@ export const PrintOptions: React.FC<PrintOptionsProps> = ({ print, handleUpdate,
                         type="checkbox"
                         id="print_qr_code"
                         checked={print.print_qr_code}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate({ print_qr_code: e.target.checked })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { handleUpdate({ print_qr_code: e.target.checked }); }}
                         className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
                     />
                     <label htmlFor="print_qr_code" className="text-sm text-slate-600 dark:text-slate-300">

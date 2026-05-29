@@ -4,7 +4,7 @@
 // Al-Zahra Smart ERP
 // ============================================
 
-import { Database } from '../database.types';
+import type { Database } from '../database.types';
 
 // ============================================
 // Table Types

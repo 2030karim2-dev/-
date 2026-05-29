@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MENU_ITEMS } from '../../../core/constants';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 import Icon from '../../common/Icon';
-import { IconColor } from '../../../core/types';
+import type { IconColor } from '../../../core/types';
 import { cn } from '../../../core/utils';
 import { useAuthStore } from '../../../features/auth/store';
 

@@ -14,7 +14,7 @@ import {
   Brain,
   Car
 } from 'lucide-react';
-import { MenuItem } from './types';
+import type { MenuItem } from './types';
 import { ROUTES } from './routes/paths';
 
 export const MENU_ITEMS: MenuItem[] = [

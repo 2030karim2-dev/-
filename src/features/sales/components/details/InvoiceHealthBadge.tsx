@@ -54,7 +54,7 @@ const InvoiceHealthBadge: React.FC<Props> = ({ invoice }) => {
     return (
         <div className="relative">
             <button
-                onClick={() => setShowAlerts(!showAlerts)}
+                onClick={() => { setShowAlerts(!showAlerts); }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all ${c.bg} ${c.text}`}
             >
                 <Icon size={12} />

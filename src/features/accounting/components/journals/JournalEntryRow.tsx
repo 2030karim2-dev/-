@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight, CheckCircle2, Clock } from 'lucide-react';
 import {  formatNumberDisplay } from '../../../../core/utils';
 import Badge from '../../../../ui/base/Badge';
 
-import { UIJournalEntry, UIJournalLine } from '../../types/models';
+import type { UIJournalEntry, UIJournalLine } from '../../types/models';
 
 interface JournalEntryRowProps {
     entry: UIJournalEntry;
@@ -12,7 +12,7 @@ interface JournalEntryRowProps {
 const JournalEntryRow: React.FC<JournalEntryRowProps> = ({ entry }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    const toggleExpand = () => setIsExpanded(!isExpanded);
+    const toggleExpand = () => { setIsExpanded(!isExpanded); };
 
     // Calculate totals
     const totalDebit = (entry.journal_entry_lines || []).reduce((sum: number, line: UIJournalLine) => sum + (line.debit_amount || 0), 0);

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Hash } from 'lucide-react';
 import Input from '../../../../ui/base/Input';
-import { UseFormRegister } from 'react-hook-form';
+import type { UseFormRegister } from 'react-hook-form';
 
 interface Props {
   register: UseFormRegister<any>;

@@ -16,7 +16,7 @@ interface AddNoteModalProps {
     customerName: string;
 }
 
-const noteTypes: { value: NoteType; label: string; icon: any; color: string }[] = [
+const noteTypes: Array<{ value: NoteType; label: string; icon: any; color: string }> = [
     { value: 'general', label: 'عامة', icon: StickyNote, color: 'text-blue-500' },
     { value: 'complaint', label: 'شكوى', icon: AlertCircle, color: 'text-rose-500' },
     { value: 'feedback', label: 'رأي / ملاحظة', icon: Info, color: 'text-amber-500' },
@@ -55,7 +55,7 @@ export const AddNoteModal: React.FC<AddNoteModalProps> = ({
             <Button variant="ghost" onClick={onClose}>إلغاء</Button>
             <Button
                 variant="primary"
-                onClick={() => handleSubmit()}
+                onClick={() => { handleSubmit(); }}
                 disabled={!content.trim()}
             >
                 حفظ الملاحظة
@@ -83,7 +83,7 @@ export const AddNoteModal: React.FC<AddNoteModalProps> = ({
                             <button
                                 key={type.value}
                                 type="button"
-                                onClick={() => setNoteType(type.value)}
+                                onClick={() => { setNoteType(type.value); }}
                                 className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${isSelected
                                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
                                     : 'border-gray-100 dark:border-slate-800 hover:border-gray-200 dark:hover:border-slate-700'
@@ -101,7 +101,7 @@ export const AddNoteModal: React.FC<AddNoteModalProps> = ({
                     <label className="text-xs font-bold text-gray-500 px-1">محتوى الملاحظة</label>
                     <textarea
                         value={content}
-                        onChange={(e) => setContent(e.target.value)}
+                        onChange={(e) => { setContent(e.target.value); }}
                         placeholder="اكتب تفاصيل الملاحظة هنا..."
                         rows={4}
                         className="w-full bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none transition-all"
@@ -111,7 +111,7 @@ export const AddNoteModal: React.FC<AddNoteModalProps> = ({
                 {/* Importance Toggle */}
                 <label className="flex items-center gap-2 cursor-pointer group">
                     <div
-                        onClick={() => setIsImportant(!isImportant)}
+                        onClick={() => { setIsImportant(!isImportant); }}
                         className={`w-4 h-4 rounded border transition-colors flex items-center justify-center ${isImportant ? 'bg-amber-500 border-amber-500' : 'border-gray-300 dark:border-slate-600'
                             }`}
                     >

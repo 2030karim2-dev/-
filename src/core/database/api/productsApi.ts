@@ -12,7 +12,7 @@ export const productsApi = {
     /**
      * Fetch paginated products with category and stock relations
      */
-    getProducts: async (companyId: string, page: number = 1, limitNum: number = 200) => {
+    getProducts: async (companyId: string, page = 1, limitNum = 200) => {
         const from = (page - 1) * limitNum;
         const to = from + limitNum - 1;
 
@@ -105,8 +105,8 @@ export const productsApi = {
             if (!error) return { data, error: null };
 
             // If function is missing, fallback to client-side non-atomic sequence
-            const errCode = (error as any).code || '';
-            const errMessage = (error as any).message?.toLowerCase() || '';
+            const errCode = (error).code || '';
+            const errMessage = (error).message?.toLowerCase() || '';
             if (errCode === 'PGRST202' || errMessage.includes('could not find the function') || errMessage.includes('404')) {
                 await supabase.from('product_uoms' as any).delete().eq('product_id', productId);
                 if (uoms && uoms.length > 0) {

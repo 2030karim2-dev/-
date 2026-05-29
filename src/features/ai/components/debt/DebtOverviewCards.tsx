@@ -1,6 +1,6 @@
 import React from 'react';
 import { TrendingUp, AlertCircle, Clock, ShieldAlert } from 'lucide-react';
-import { DebtMetrics } from '../../hooks/useDebtManagement';
+import type { DebtMetrics } from '../../hooks/useDebtManagement';
 
 interface Props {
   metrics: DebtMetrics;

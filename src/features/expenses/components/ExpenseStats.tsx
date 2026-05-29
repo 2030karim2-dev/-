@@ -2,7 +2,7 @@
 import React from 'react';
 import { Receipt, CreditCard, Clock, Layers } from 'lucide-react';
 import StatCard from '../../../ui/common/StatCard';
-import { ExpenseStats as StatsType } from '../types';
+import type { ExpenseStats as StatsType } from '../types';
 import { formatCurrency, formatNumberDisplay } from '../../../core/utils';
 
 interface Props {

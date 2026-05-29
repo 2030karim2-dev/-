@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useBackupActions } from '../hooks';
 import { settingsService } from '../service';
-import { AutoBackupConfig } from '../types.ts';
+import type { AutoBackupConfig } from '../types.ts';
 import { useFeedbackStore } from '../../feedback/store';
 import { GoogleDriveService } from '../services/googleDriveService';
 

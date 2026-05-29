@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity, BarChart3, Zap, CheckCircle2 } from 'lucide-react';
 import { cn } from '../../../../../core/utils';
-import { ChartType, PeriodType, SeriesType } from '../hooks/useSalesFlowChart';
+import type { ChartType, PeriodType, SeriesType } from '../hooks/useSalesFlowChart';
 
 interface SalesChartHeaderProps {
     seriesConfig: Record<SeriesType, { label: string; color: string }>;
@@ -39,7 +39,7 @@ export const SalesChartHeader: React.FC<SalesChartHeaderProps> = ({
                 {(Object.keys(seriesConfig) as SeriesType[]).map(s => (
                     <button
                         key={s}
-                        onClick={() => toggleSeries(s)}
+                        onClick={() => { toggleSeries(s); }}
                         className={cn(
                             "flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold border transition-all whitespace-nowrap",
                             visibleSeries[s]
@@ -65,7 +65,7 @@ export const SalesChartHeader: React.FC<SalesChartHeaderProps> = ({
                         {(['week', 'month', 'quarter', 'year', 'all'] as PeriodType[]).map(p => (
                             <button
                                 key={p}
-                                onClick={() => handlePeriodChange(p)}
+                                onClick={() => { handlePeriodChange(p); }}
                                 className={cn(
                                     "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
                                     period === p
@@ -80,9 +80,9 @@ export const SalesChartHeader: React.FC<SalesChartHeaderProps> = ({
                 )}
 
                 <div className="flex items-center gap-1 bg-[var(--app-surface-hover)] p-1 rounded-xl">
-                    <button onClick={() => setChartType('area')} className={cn("p-1.5 rounded-lg transition-all", chartType === 'area' ? "bg-[var(--app-surface)] text-[var(--accent)] shadow-sm" : "opacity-50")}><Activity size={14} /></button>
-                    <button onClick={() => setChartType('bar')} className={cn("p-1.5 rounded-lg transition-all", chartType === 'bar' ? "bg-[var(--app-surface)] text-[var(--accent)] shadow-sm" : "opacity-50")}><BarChart3 size={14} /></button>
-                    <button onClick={() => setChartType('composed')} className={cn("p-1.5 rounded-lg transition-all", chartType === 'composed' ? "bg-[var(--app-surface)] text-[var(--accent)] shadow-sm" : "opacity-50")}><Zap size={14} /></button>
+                    <button onClick={() => { setChartType('area'); }} className={cn("p-1.5 rounded-lg transition-all", chartType === 'area' ? "bg-[var(--app-surface)] text-[var(--accent)] shadow-sm" : "opacity-50")}><Activity size={14} /></button>
+                    <button onClick={() => { setChartType('bar'); }} className={cn("p-1.5 rounded-lg transition-all", chartType === 'bar' ? "bg-[var(--app-surface)] text-[var(--accent)] shadow-sm" : "opacity-50")}><BarChart3 size={14} /></button>
+                    <button onClick={() => { setChartType('composed'); }} className={cn("p-1.5 rounded-lg transition-all", chartType === 'composed' ? "bg-[var(--app-surface)] text-[var(--accent)] shadow-sm" : "opacity-50")}><Zap size={14} /></button>
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-import { Database } from '../../database.types';
+import type { Database } from '../../database.types';
 
 export type Tables = Database['public']['Tables'];
 export type Views = Database['public']['Views'];

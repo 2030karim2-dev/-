@@ -27,7 +27,7 @@ export interface Column<T> {
 }
 
 interface ExcelTableProps<T> {
-  columns: Column<T>[];
+  columns: Array<Column<T>>;
   data: T[];
   title?: string;
   subtitle?: string;
@@ -293,7 +293,7 @@ function ExcelTable<T>({
 
 
   return (
-    <FullscreenContainer isMaximized={isZoomed} onToggleMaximize={() => setIsZoomed(false)}>
+    <FullscreenContainer isMaximized={isZoomed} onToggleMaximize={() => { setIsZoomed(false); }}>
       <div className={cn(
         "w-full flex flex-col transition-all duration-300 relative",
         isZoomed ? "h-full bg-white dark:bg-slate-950 p-4" : "h-full"
@@ -303,7 +303,7 @@ function ExcelTable<T>({
           currentTheme={currentTheme}
           showSearch={showSearch}
           internalSearch={effectiveSearch}
-          setInternalSearch={isMainSearch ? onSearchChange! : setInternalSearch}
+          setInternalSearch={isMainSearch ? onSearchChange : setInternalSearch}
           isRTL={isRTL}
           onExport={onExport}
           enableResize={enableResize}
@@ -311,7 +311,7 @@ function ExcelTable<T>({
           isZoomed={isZoomed}
           setIsZoomed={setIsZoomed}
           zoomLevel={zoomLevel}
-          setZoomLevel={setZoomLevel as React.Dispatch<React.SetStateAction<number>>}
+          setZoomLevel={setZoomLevel}
           showShortcuts={showShortcuts}
           setShowShortcuts={setShowShortcuts}
         />
@@ -334,28 +334,28 @@ function ExcelTable<T>({
               {/* Top */}
               <div
                 className="absolute top-0 left-0 right-0 h-1.5 cursor-n-resize hover:bg-blue-500/30 transition-colors z-10"
-                onMouseDown={(e) => handleWrapperResizeStart('n', e)}
+                onMouseDown={(e) => { handleWrapperResizeStart('n', e); }}
               />
               {/* Bottom */}
               <div
                 className="absolute bottom-0 left-0 right-0 h-1.5 cursor-s-resize hover:bg-blue-500/30 transition-colors z-10"
-                onMouseDown={(e) => handleWrapperResizeStart('s', e)}
+                onMouseDown={(e) => { handleWrapperResizeStart('s', e); }}
               />
               {/* Left */}
               <div
                 className="absolute top-0 bottom-0 left-0 w-1.5 cursor-w-resize hover:bg-blue-500/30 transition-colors z-10"
-                onMouseDown={(e) => handleWrapperResizeStart('w', e)}
+                onMouseDown={(e) => { handleWrapperResizeStart('w', e); }}
               />
               {/* Right */}
               <div
                 className="absolute top-0 bottom-0 right-0 w-1.5 cursor-e-resize hover:bg-blue-500/30 transition-colors z-10"
-                onMouseDown={(e) => handleWrapperResizeStart('e', e)}
+                onMouseDown={(e) => { handleWrapperResizeStart('e', e); }}
               />
               {/* Corners */}
-              <div className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('nw', e)} />
-              <div className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('ne', e)} />
-              <div className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('sw', e)} />
-              <div className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => handleWrapperResizeStart('se', e)} />
+              <div className="absolute top-0 left-0 w-3 h-3 cursor-nw-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => { handleWrapperResizeStart('nw', e); }} />
+              <div className="absolute top-0 right-0 w-3 h-3 cursor-ne-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => { handleWrapperResizeStart('ne', e); }} />
+              <div className="absolute bottom-0 left-0 w-3 h-3 cursor-sw-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => { handleWrapperResizeStart('sw', e); }} />
+              <div className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize hover:bg-blue-500/30 transition-colors z-10" onMouseDown={(e) => { handleWrapperResizeStart('se', e); }} />
             </>
           )}
           {/* Drag Handle in Title */}
@@ -369,8 +369,8 @@ function ExcelTable<T>({
             tabIndex={-1}
             className="flex-1 overflow-auto data-table-scroll custom-scrollbar smooth-scroll outline-none"
             onMouseDown={handleMouseDownOnTable}
-            onMouseUp={() => handleMouseUpOnTable(endSelection)}
-            onMouseLeave={() => handleMouseLeaveOnTable(endSelection)}
+            onMouseUp={() => { handleMouseUpOnTable(endSelection); }}
+            onMouseLeave={() => { handleMouseLeaveOnTable(endSelection); }}
           >
             <table
               style={{ fontSize: `${zoomLevel * 11}px` }}
@@ -414,7 +414,7 @@ function ExcelTable<T>({
                 focusedCell={focusedCell}
                 editingCell={editingCell}
                 handleCellClick={handleCellClick}
-                handleMouseDownCell={(e: React.MouseEvent, row: number, col: number) => handleMouseDownCell(e, row, col, handleCellClick, startSelection)}
+                handleMouseDownCell={(e: React.MouseEvent, row: number, col: number) => { handleMouseDownCell(e, row, col, handleCellClick, startSelection); }}
                 handleMouseEnterCell={handleMouseEnterCell}
                 onRowDoubleClick={onRowDoubleClick as any}
                 startEditing={startEditing}

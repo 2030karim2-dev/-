@@ -24,7 +24,7 @@ export const DefaultPrinterSettings: React.FC<DefaultPrinterSettingsProps> = ({ 
                     </label>
                     <select
                         value={print.default_printer}
-                        onChange={(e) => handleUpdate({ default_printer: e.target.value })}
+                        onChange={(e) => { handleUpdate({ default_printer: e.target.value }); }}
                         className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     >
                         <option value="thermal">{t.thermal_printer || 'طابعة حرارية (80mm)'}</option>
@@ -40,7 +40,7 @@ export const DefaultPrinterSettings: React.FC<DefaultPrinterSettingsProps> = ({ 
                     <input
                         type="text"
                         value={print.printer_name}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate({ printer_name: e.target.value })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { handleUpdate({ printer_name: e.target.value }); }}
                         className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                         placeholder={t.printer_name_placeholder || 'أدخل اسم الطابعة...'}
                     />

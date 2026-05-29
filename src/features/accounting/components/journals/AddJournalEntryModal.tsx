@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { X, Save, Loader2, Calculator } from 'lucide-react';
-import { JournalEntryFormData } from '../../types/index';
+import type { JournalEntryFormData } from '../../types/index';
 import { cn } from '../../../../core/utils';
 import { useJournalEntryForm } from '../../hooks/useJournalEntryForm';
 import JournalEntryTable from './JournalEntryTable';
@@ -85,10 +85,10 @@ const AddJournalEntryModal: React.FC<AddJournalEntryModalProps> = ({ isOpen, onC
                                     accounts: accounts?.map((a: any) => ({ id: a.id, name: a.name, code: a.code, type: a.type }))
                                 }}
                                 onDataExtracted={(data) => {
-                                    type JournalAIData = {
+                                    interface JournalAIData {
                                       date?: string; description?: string; currency_code?: string;
-                                      lines?: { account_id?: string; debit_amount?: number; credit_amount?: number; description?: string }[];
-                                    };
+                                      lines?: Array<{ account_id?: string; debit_amount?: number; credit_amount?: number; description?: string }>;
+                                    }
                                     const d = data as JournalAIData;
                                     if (d.date) setValue('date', d.date, { shouldValidate: true });
                                     if (d.description) setValue('description', d.description, { shouldValidate: true });

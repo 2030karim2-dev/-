@@ -4,7 +4,7 @@
 // Views: account_balances, active_accounts
 // ============================================
 
-export type AccountRow = {
+export interface AccountRow {
   code: string;
   company_id: string;
   created_at: string;
@@ -18,9 +18,9 @@ export type AccountRow = {
   parent_id: string | null;
   type: string;
   updated_at: string | null;
-};
+}
 
-export type AccountInsert = {
+export interface AccountInsert {
   code: string;
   company_id: string;
   created_at?: string;
@@ -34,9 +34,9 @@ export type AccountInsert = {
   parent_id?: string | null;
   type: string;
   updated_at?: string | null;
-};
+}
 
-export type AccountUpdate = {
+export interface AccountUpdate {
   code?: string;
   company_id?: string;
   created_at?: string;
@@ -50,9 +50,9 @@ export type AccountUpdate = {
   parent_id?: string | null;
   type?: string;
   updated_at?: string | null;
-};
+}
 
-export type JournalEntryRow = {
+export interface JournalEntryRow {
   company_id: string;
   created_at: string;
   created_by: string;
@@ -64,9 +64,9 @@ export type JournalEntryRow = {
   is_template: boolean;
   status: string;
   updated_at: string | null;
-};
+}
 
-export type JournalEntryInsert = {
+export interface JournalEntryInsert {
   company_id: string;
   created_at?: string;
   created_by?: string;
@@ -78,9 +78,9 @@ export type JournalEntryInsert = {
   is_template?: boolean;
   status?: string;
   updated_at?: string | null;
-};
+}
 
-export type JournalEntryUpdate = {
+export interface JournalEntryUpdate {
   company_id?: string;
   created_at?: string;
   created_by?: string;
@@ -92,9 +92,9 @@ export type JournalEntryUpdate = {
   is_template?: boolean;
   status?: string;
   updated_at?: string | null;
-};
+}
 
-export type JournalEntryLineRow = {
+export interface JournalEntryLineRow {
   account_id: string;
   company_id: string;
   created_at: string;
@@ -104,9 +104,9 @@ export type JournalEntryLineRow = {
   entry_id: string;
   id: string;
   updated_at: string | null;
-};
+}
 
-export type JournalEntryLineInsert = {
+export interface JournalEntryLineInsert {
   account_id: string;
   company_id: string;
   created_at?: string;
@@ -116,9 +116,9 @@ export type JournalEntryLineInsert = {
   entry_id: string;
   id?: string;
   updated_at?: string | null;
-};
+}
 
-export type JournalEntryLineUpdate = {
+export interface JournalEntryLineUpdate {
   account_id?: string;
   company_id?: string;
   created_at?: string;
@@ -128,9 +128,9 @@ export type JournalEntryLineUpdate = {
   entry_id?: string;
   id?: string;
   updated_at?: string | null;
-};
+}
 
-export type AccountBalanceView = {
+export interface AccountBalanceView {
   account_code: string;
   account_id: string;
   account_name: string;
@@ -139,9 +139,9 @@ export type AccountBalanceView = {
   company_id: string;
   credit_total: number;
   debit_total: number;
-};
+}
 
-export type ActiveAccountView = {
+export interface ActiveAccountView {
   code: string;
   company_id: string;
   created_at: string;
@@ -154,4 +154,4 @@ export type ActiveAccountView = {
   parent_id: string | null;
   type: string;
   updated_at: string | null;
-};
+}

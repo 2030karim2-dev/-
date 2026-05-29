@@ -1,6 +1,6 @@
 import React from 'react';
 import { Users, CreditCard, ShoppingCart, AlertCircle } from 'lucide-react';
-import { PartyStats, PartyType } from '../types';
+import type { PartyStats, PartyType } from '../types';
 import { formatCurrency, formatNumberDisplay, cn } from '../../../core/utils';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 

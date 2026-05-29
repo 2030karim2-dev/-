@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useCommandPalette, GlobalCommandRegistrar } from '../../features/command/hooks';
-import { CommandAction } from '../../features/command/store';
+import type { CommandAction } from '../../features/command/store';
 import { Search, CornerDownLeft } from 'lucide-react';
 import { cn } from '../../core/utils';
 
@@ -33,13 +33,13 @@ const CommandPalette: React.FC = () => {
 
   const groupedActions: Record<string, CommandAction[]> = useMemo(() => {
     // Fix: Added a type assertion to the reduce accumulator to ensure TypeScript correctly infers the shape of the grouped actions object.
-    return filteredActions.reduce((acc, action) => {
+    return filteredActions.reduce<Record<string, CommandAction[]>>((acc, action) => {
       if (!acc[action.section]) {
         acc[action.section] = [];
       }
       acc[action.section].push(action);
       return acc;
-    }, {} as Record<string, CommandAction[]>);
+    }, {});
   }, [filteredActions]);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const CommandPalette: React.FC = () => {
       <GlobalCommandRegistrar />
       <div
         className="bg-[var(--app-surface)] w-full max-w-2xl rounded-2xl shadow-2xl border border-[var(--app-border)] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
-        onClick={e => e.stopPropagation()}
+        onClick={e => { e.stopPropagation(); }}
         onKeyDown={handleKeyDown}
       >
         <div className="flex items-center gap-3 p-4 border-b border-[var(--app-border)]">
@@ -91,7 +91,7 @@ const CommandPalette: React.FC = () => {
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => { setQuery(e.target.value); }}
             placeholder="ابحث عن صفحة أو إجراء..."
             className="w-full bg-transparent outline-none text-base font-medium text-[var(--app-text)] placeholder:text-[var(--app-text-secondary)] placeholder:opacity-60"
           />

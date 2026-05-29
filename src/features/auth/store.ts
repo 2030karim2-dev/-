@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AuthUser } from './types';
+import type { AuthUser } from './types';
 import { supabase } from '../../lib/supabaseClient';
 import { authApi } from './api';
 import { queryClient } from '../../lib/queryClient';
@@ -84,7 +84,7 @@ export const useAuthStore = create<AuthState>()(
 
           // 1. Create a timeout promise
           const timeoutPromise = new Promise<{ timeout: boolean }>(resolve =>
-            setTimeout(() => resolve({ timeout: true }), SESSION_CHECK_TIMEOUT)
+            setTimeout(() => { resolve({ timeout: true }); }, SESSION_CHECK_TIMEOUT)
           );
 
           // 2. Try to get session with timeout
@@ -122,7 +122,7 @@ export const useAuthStore = create<AuthState>()(
 
             const profilePromise = authApi.getProfile(session.user.id).catch(() => ({ data: null, error: null, isAborted: false }));
             const profileTimeout = new Promise<{ timeout: boolean }>(resolve =>
-              setTimeout(() => resolve({ timeout: true }), PROFILE_FETCH_TIMEOUT)
+              setTimeout(() => { resolve({ timeout: true }); }, PROFILE_FETCH_TIMEOUT)
             );
 
             const profileResult = await Promise.race([profilePromise, profileTimeout]);

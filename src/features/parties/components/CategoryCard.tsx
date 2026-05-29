@@ -1,6 +1,6 @@
 import React from 'react';
 import { LayoutGrid, Users, Edit, Trash2 } from 'lucide-react';
-import { PartyCategory } from '../types';
+import type { PartyCategory } from '../types';
 
 
 interface Props {

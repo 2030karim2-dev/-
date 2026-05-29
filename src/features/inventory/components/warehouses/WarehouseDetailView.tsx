@@ -16,7 +16,7 @@ const WarehouseDetailView: React.FC<Props> = ({ warehouseId, warehouses }) => {
 
     const lowStockCount = React.useMemo(() => {
         if (!products) return 0;
-        return products.filter((p: any) => p.stock_quantity <= ((p as any).min_stock_level || 5)).length;
+        return products.filter((p: any) => p.stock_quantity <= ((p).min_stock_level || 5)).length;
     }, [products]);
 
     if (!warehouse) return null;
@@ -82,7 +82,7 @@ const WarehouseDetailView: React.FC<Props> = ({ warehouseId, warehouses }) => {
             <div className="flex-1 min-h-0 border border-[var(--app-border)]/50 rounded-lg overflow-hidden flex flex-col bg-white dark:bg-slate-900">
                 <div className="flex-1 overflow-hidden">
                     <WarehouseProductList
-                        products={(products || []) as any}
+                        products={(products || [])}
                         isLoading={isLoadingProducts}
                     />
                 </div>

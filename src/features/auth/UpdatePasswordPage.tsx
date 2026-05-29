@@ -44,7 +44,7 @@ const UpdatePasswordPage: React.FC = () => {
               <input
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); }}
                 className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all text-sm"
                 placeholder="••••••••"
                 required
@@ -60,7 +60,7 @@ const UpdatePasswordPage: React.FC = () => {
               <input
                 type="password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => { setConfirmPassword(e.target.value); }}
                 className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all text-sm"
                 placeholder="••••••••"
                 required

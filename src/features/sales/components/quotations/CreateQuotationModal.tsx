@@ -88,7 +88,7 @@ const CreateQuotationModal: React.FC<Props> = ({ onClose, onSuccess }) => {
                     <User size={14} className="text-indigo-600" />
                     <span className="text-sm font-bold text-gray-800 dark:text-slate-100 truncate">{selectedParty.name}</span>
                   </div>
-                  <button onClick={() => setSelectedParty(null)} className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded text-gray-400 hover:text-rose-500 transition-all">
+                  <button onClick={() => { setSelectedParty(null); }} className="p-1 hover:bg-white dark:hover:bg-slate-800 rounded text-gray-400 hover:text-rose-500 transition-all">
                     <X size={14} />
                   </button>
                 </div>
@@ -98,7 +98,7 @@ const CreateQuotationModal: React.FC<Props> = ({ onClose, onSuccess }) => {
                     type="text"
                     value={partyQuery}
                     onChange={(e) => { setPartyQuery(e.target.value); setIsPartyDropdownOpen(true); }}
-                    onFocus={() => setIsPartyDropdownOpen(true)}
+                    onFocus={() => { setIsPartyDropdownOpen(true); }}
                     placeholder="بحث عن عميل..."
                     className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
@@ -140,7 +140,7 @@ const CreateQuotationModal: React.FC<Props> = ({ onClose, onSuccess }) => {
             <input
               type="date"
               value={issueDate}
-              onChange={(e) => setIssueDate(e.target.value)}
+              onChange={(e) => { setIssueDate(e.target.value); }}
               className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -154,7 +154,7 @@ const CreateQuotationModal: React.FC<Props> = ({ onClose, onSuccess }) => {
                 min={1}
                 max={365}
                 value={validDays}
-                onChange={(e) => setValidDays(Number(e.target.value) || 7)}
+                onChange={(e) => { setValidDays(Number(e.target.value) || 7); }}
                 className="w-20 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <span className="text-xs text-gray-500">يوم (حتى {new Date(validUntil).toLocaleDateString('ar-SA')})</span>
@@ -181,7 +181,7 @@ const CreateQuotationModal: React.FC<Props> = ({ onClose, onSuccess }) => {
             <input
               type="text"
               value={paymentTerms}
-              onChange={(e) => setPaymentTerms(e.target.value)}
+              onChange={(e) => { setPaymentTerms(e.target.value); }}
               placeholder="مثال: دفع 50% مقدم والباقي عند التسليم"
               className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
@@ -191,7 +191,7 @@ const CreateQuotationModal: React.FC<Props> = ({ onClose, onSuccess }) => {
             <input
               type="text"
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={(e) => { setNotes(e.target.value); }}
               placeholder="ملاحظات إضافية..."
               className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
@@ -201,7 +201,7 @@ const CreateQuotationModal: React.FC<Props> = ({ onClose, onSuccess }) => {
           <label className="text-xs font-bold text-gray-600 dark:text-gray-400">الشروط والأحكام</label>
           <textarea
             value={terms}
-            onChange={(e) => setTerms(e.target.value)}
+            onChange={(e) => { setTerms(e.target.value); }}
             rows={2}
             placeholder="الشروط والأحكام العامة للعرض..."
             className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
@@ -211,7 +211,7 @@ const CreateQuotationModal: React.FC<Props> = ({ onClose, onSuccess }) => {
 
       <ProductSelectionModal 
         isOpen={productModal.isOpen}
-        onClose={() => setProductModal(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => { setProductModal(prev => ({ ...prev, isOpen: false })); }}
         onSelect={handleProductSelect}
         initialQuery={productModal.query}
       />

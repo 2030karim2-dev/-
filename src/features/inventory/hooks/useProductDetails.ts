@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { inventoryApi } from '../api';
-import { Product } from '../types';
+import type { Product } from '../types';
 
 export const useProductDetails = (product: Product | null) => {
     const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({

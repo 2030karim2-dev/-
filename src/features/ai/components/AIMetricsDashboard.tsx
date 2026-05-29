@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, CheckCircle, XCircle, Clock, Database } from 'lucide-react';
-import { aiMetrics, AIMetric } from '../core/metrics';
+import { aiMetrics, type AIMetric } from '../core/metrics';
 import { aiFeedback } from '../core/feedback';
 
 export const AIMetricsDashboard: React.FC = () => {
@@ -19,7 +19,7 @@ export const AIMetricsDashboard: React.FC = () => {
 
         updateData();
         const interval = setInterval(updateData, 5000);
-        return () => clearInterval(interval);
+        return () => { clearInterval(interval); };
     }, []);
 
     if (!summary) {

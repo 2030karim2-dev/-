@@ -156,7 +156,7 @@ export interface SalesReturnResult {
 // ============================================================================
 
 export const MoneyUtils = {
-    create(amount: number, currency: CurrencyCode = 'SAR', exchangeRate: number = 1): Money {
+    create(amount: number, currency: CurrencyCode = 'SAR', exchangeRate = 1): Money {
         return {
             amount: Math.round(amount * 100) / 100,
             currency,
@@ -198,7 +198,7 @@ export const MoneyUtils = {
         };
     },
 
-    format(money: Money, locale: string = 'ar-SA'): string {
+    format(money: Money, locale = 'ar-SA'): string {
         const symbols: Record<CurrencyCode, string> = {
             SAR: 'ر.س',
             YER: 'ر.ي',

@@ -19,27 +19,27 @@ interface SalesAnalytics {
     netSales: number;
     invoiceCount: number;
     averageInvoiceValue: number;
-    topProducts: {
+    topProducts: Array<{
         productId: string;
         productName: string;
         quantity: number;
         revenue: number;
-    }[];
-    topCustomers: {
+    }>;
+    topCustomers: Array<{
         customerId: string;
         customerName: string;
         totalAmount: number;
         invoiceCount: number;
-    }[];
-    salesByDay: {
+    }>;
+    salesByDay: Array<{
         date: string;
         sales: number;
         returns: number;
-    }[];
-    salesByPaymentMethod: {
+    }>;
+    salesByPaymentMethod: Array<{
         method: string;
         amount: number;
-    }[];
+    }>;
 }
 
 export const useSalesAnalytics = (params: SalesAnalyticsParams) => {

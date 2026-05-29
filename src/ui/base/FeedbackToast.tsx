@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useFeedbackStore, ToastType } from '../../features/feedback/store';
+import { useFeedbackStore, type ToastType } from '../../features/feedback/store';
 import { CheckCircle, AlertCircle, Info, X, AlertTriangle, ChevronDown, Terminal } from 'lucide-react';
 import { cn } from '../../core/utils';
 
@@ -38,14 +38,14 @@ const FeedbackToast: React.FC = () => {
               <div className="flex items-center gap-1">
                 {toast.details && (
                   <button
-                    onClick={() => setExpandedId(isExpanded ? null : toast.id)}
+                    onClick={() => { setExpandedId(isExpanded ? null : toast.id); }}
                     className="p-1 hover:bg-[var(--app-surface-hover)] rounded-lg text-[var(--app-text-secondary)] transition-all"
                   >
                     <ChevronDown size={14} className={cn("transition-transform", isExpanded ? "rotate-180" : "")} />
                   </button>
                 )}
                 <button
-                  onClick={() => hideToast(toast.id)}
+                  onClick={() => { hideToast(toast.id); }}
                   className="p-1 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg text-[var(--app-text-secondary)] hover:text-rose-500 transition-colors"
                 >
                   <X size={14} />

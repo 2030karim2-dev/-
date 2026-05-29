@@ -1,7 +1,7 @@
-import { Product, ProductFormData } from '../types';
+import type { Product, ProductFormData } from '../types';
 import { inventoryApi } from '../api';
 import { supabase } from '../../../lib/supabaseClient';
-import { InsertDto } from '../../../core/database.helpers';
+import type { InsertDto } from '../../../core/database.helpers';
 import { logger } from '../../../core/utils/logger';
 
 interface RawStock {
@@ -41,7 +41,7 @@ export const productService = {
     /**
      * Get all products for a company
      */
-    getProducts: async (companyId: string, page: number = 1, limitNum: number = 10000): Promise<Product[]> => {
+    getProducts: async (companyId: string, page = 1, limitNum = 10000): Promise<Product[]> => {
         const data = await inventoryApi.getProducts(companyId, page, limitNum);
         return productService.mapRawProducts(data || []);
     },
@@ -52,7 +52,7 @@ export const productService = {
      */
     mapRawProducts: (rows: unknown[]): Product[] => {
         return (rows as RawProduct[]).map((prod) => {
-            if (!prod || !prod.id) return null;
+            if (!prod?.id) return null;
 
             const stockList = Array.isArray(prod.stock) ? prod.stock : [];
             const totalStock = stockList.reduce((sum: number, s: RawStock) => {
@@ -132,7 +132,7 @@ export const productService = {
      *
      * @param limit Optional limit (default: 200) — applied client-side if RPC ignores it
      */
-    searchProducts: async (companyId: string, term: string, limit: number = 200): Promise<Product[]> => {
+    searchProducts: async (companyId: string, term: string, limit = 200): Promise<Product[]> => {
         const { data, error } = await supabase.rpc('search_inventory', {
             p_term: term,
             p_company_id: companyId
@@ -174,7 +174,7 @@ export const productService = {
             image_url: data.image_url || null,
             alternative_numbers: data.alternative_numbers || null,
             barcode: data.barcode || null,
-            category_id: (data.category && data.category.length === 36) ? data.category : null
+            category_id: (data.category?.length === 36) ? data.category : null
         } as any;
 
         const product = await inventoryApi.createProduct(payload) as any;
@@ -231,7 +231,7 @@ export const productService = {
             if (data.category) payload.category_id = data.category.length === 36 ? data.category : null;
 
             logger.debug('ProductService', `Sending update payload to API`, payload);
-            const product = await inventoryApi.updateProduct(id, payload as any);
+            const product = await inventoryApi.updateProduct(id, payload);
 
             // Update UOMs
             if (data.uoms) {

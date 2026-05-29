@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { Product } from '../inventory/types';
+import type { Product } from '../inventory/types';
 import { useDiscountStore } from '../settings/taxDiscountStore';
 
 export interface PurchaseInvoiceItem {
@@ -35,7 +35,7 @@ interface PurchaseState {
 
   // Actions
   initializeItems: (count: number) => void;
-  bulkLoadItems: (newItems: Record<string, unknown>[]) => void;
+  bulkLoadItems: (newItems: Array<Record<string, unknown>>) => void;
   updateItem: (index: number, field: keyof PurchaseInvoiceItem, value: string | number) => void;
   setProductForRow: (index: number, product: Product) => void;
   addItem: () => void;
@@ -141,7 +141,7 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
     get().calculateTotals();
   },
 
-  addItem: () => set(state => ({ items: [...state.items, createNewItem()] })),
+  addItem: () => { set(state => ({ items: [...state.items, createNewItem()] })); },
   removeItem: (index) => {
     set(state => {
       const newItems = state.items.filter((_, i) => i !== index);
@@ -164,14 +164,14 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
     });
   },
 
-  setSupplier: (supplier) => set({ supplier }),
-  setMetadata: (field, value) => set((state) => ({ ...state, [field]: value })),
+  setSupplier: (supplier) => { set({ supplier }); },
+  setMetadata: (field, value) => { set((state) => ({ ...state, [field]: value })); },
   toggleColumn: (field) => {
     set(state => ({ [field]: !state[field] }));
     get().calculateTotals();
   },
 
-  resetCart: () => set({
+  resetCart: () => { set({
     items: Array.from({ length: 6 }, createNewItem),
     supplier: null,
     totals: { grandTotal: 0 },
@@ -182,5 +182,5 @@ export const usePurchaseStore = create<PurchaseState>((set, get) => ({
     invoiceNumber: '',
     issueDate: new Date().toISOString().split('T')[0],
     notes: ''
-  })
+  }); }
 }));

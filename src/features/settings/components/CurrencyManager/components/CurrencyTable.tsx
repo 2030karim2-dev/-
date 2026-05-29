@@ -136,21 +136,21 @@ export const CurrencyTable: React.FC<CurrencyTableProps> = ({
                                                             autoFocus
                                                             type="number"
                                                             defaultValue={marketRate}
-                                                            onChange={(e) => setNewRateValue(parseFloat(e.target.value))}
+                                                            onChange={(e) => { setNewRateValue(parseFloat(e.target.value)); }}
                                                             className="w-full bg-white dark:bg-slate-950 border-2 border-blue-500 p-2.5 rounded-2xl text-sm font-bold font-mono outline-none shadow-[0_0_15px_rgba(59,130,246,0.15)] focus:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-shadow pr-8"
                                                             placeholder="مثال: 410"
                                                         />
                                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-blue-300 select-none">{curr.code}</span>
                                                     </div>
                                                 <button
-                                                    onClick={() => handleUpdateRate(curr.code)}
+                                                    onClick={() => { handleUpdateRate(curr.code); }}
                                                     className="shrink-0 p-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 active:scale-95 transition-all outline-none"
                                                     title="حفظ التعديل"
                                                 >
                                                     <Save size={18} />
                                                 </button>
                                                 <button
-                                                    onClick={() => setActiveRateEdit(null)}
+                                                    onClick={() => { setActiveRateEdit(null); }}
                                                     className="shrink-0 p-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 hover:border-gray-300 hover:bg-gray-50 text-gray-400 hover:text-gray-600 rounded-2xl transition-all outline-none active:scale-95"
                                                     title="إلغاء التعديل"
                                                 >

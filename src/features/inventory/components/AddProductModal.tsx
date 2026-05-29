@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Save, Zap, ShieldCheck, Package, DollarSign, Box } from 'lucide-react';
-import { ProductFormData, Product } from '../types';
+import type { ProductFormData, Product } from '../types';
 import { productFormSchema } from '../schema';
 import Modal from '../../../ui/base/Modal';
 import Button from '../../../ui/base/Button';

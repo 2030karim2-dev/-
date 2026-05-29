@@ -20,7 +20,7 @@ export const categoryService = {
 
         const categories = Array.isArray(categoriesResponse)
             ? categoriesResponse
-            : (categoriesResponse as any)?.data || [];
+            : (categoriesResponse)?.data || [];
 
         const products = Array.isArray(productsResponse)
             ? productsResponse

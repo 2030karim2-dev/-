@@ -1,10 +1,10 @@
 import React from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '../../core/utils';
-import { Column } from './ExcelTable';
+import type { Column } from './ExcelTable';
 
 interface ExcelTableHeaderProps<T> {
-    columns: Column<T>[];
+    columns: Array<Column<T>>;
     enableSelection: boolean;
     orderedDataLength: number;
     selectedRowIdsSize: number;
@@ -72,8 +72,8 @@ function ExcelTableHeaderInner<T>({
                         </div>
                         {/* Column Resize Handle */}
                         <div
-                            onMouseDown={(e) => handleMouseDown(e, idx)}
-                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => { handleMouseDown(e, idx); }}
+                            onClick={(e) => { e.stopPropagation(); }}
                             className="absolute top-0 h-full w-1 cursor-col-resize hover:bg-blue-400/50 transition-colors z-[13]"
                             style={isRTL ? { left: 0, right: 'auto' } : { right: 0 }}
                         />

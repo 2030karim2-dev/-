@@ -1,6 +1,6 @@
 
 import { bondsApi } from './api';
-import { Bond, BondType, BondFormData } from './types';
+import type { Bond, BondType, BondFormData } from './types';
 import { messagingService } from '../notifications/messagingService';
 
 // Raw shape returned by the Supabase join query in bondsApi.getBonds

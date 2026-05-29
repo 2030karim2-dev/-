@@ -26,11 +26,11 @@ export interface InvoiceSummary {
 
 export interface CreateInvoicePayload {
   partyId: string | null;
-  items: {
+  items: Array<{
     productId: string;
     quantity: number;
     unitPrice: number;
-  }[];
+  }>;
   paymentMethod: 'cash' | 'credit';
   notes?: string;
   treasuryAccountId?: string;

@@ -6,7 +6,7 @@
  * and maintaining backward compatibility during migrations.
  */
 
-import { CardMigrationFlags, FeatureFlagConfig } from '@/ui/cards/types';
+import type { CardMigrationFlags, FeatureFlagConfig } from '@/ui/cards/types';
 // import { logger } from '../core/utils/logger';
 
 // ======== Feature Flags ========

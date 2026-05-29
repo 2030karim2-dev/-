@@ -75,7 +75,7 @@ const StartAuditModal: React.FC<StartAuditModalProps> = ({ isOpen, onClose }) =>
                         <input
                             type="text"
                             value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            onChange={(e) => { setFormData({ ...formData, title: e.target.value }); }}
                             className="w-full bg-gray-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg py-3 px-4 text-sm font-bold"
                         />
                     </div>
@@ -86,7 +86,7 @@ const StartAuditModal: React.FC<StartAuditModalProps> = ({ isOpen, onClose }) =>
                             {warehouses?.map((w: any) => (
                                 <button
                                     key={w.id}
-                                    onClick={() => setFormData({ ...formData, warehouse_id: w.id })}
+                                    onClick={() => { setFormData({ ...formData, warehouse_id: w.id }); }}
                                     className={cn("flex items-center justify-between p-3.5 rounded-xl border text-right transition-all",
                                         formData.warehouse_id === w.id
                                             ? 'bg-blue-50 border-blue-600 ring-2 ring-blue-500/20 dark:bg-blue-900/20'
@@ -107,11 +107,11 @@ const StartAuditModal: React.FC<StartAuditModalProps> = ({ isOpen, onClose }) =>
                         <label className="text-xs font-bold text-gray-400 uppercase mr-1">نطاق الجرد</label>
                         <div className="flex bg-gray-100 dark:bg-slate-800 p-1.5 rounded-xl">
                             <button
-                                onClick={() => setFormData({ ...formData, category: 'all' })}
+                                onClick={() => { setFormData({ ...formData, category: 'all' }); }}
                                 className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${formData.category === 'all' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-gray-400'}`}
                             >كافة الأصناف</button>
                             <button
-                                onClick={() => setFormData({ ...formData, category: 'partial' })}
+                                onClick={() => { setFormData({ ...formData, category: 'partial' }); }}
                                 className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${formData.category === 'partial' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-gray-400'}`}
                             >أصناف مختارة</button>
                         </div>

@@ -14,7 +14,7 @@ export const useInvoiceSettings = () => {
     const handleSave = () => {
         setSaved(true);
         showToast('تم حفظ إعدادات الفواتير بنجاح ✓', 'success');
-        setTimeout(() => setSaved(false), 3000);
+        setTimeout(() => { setSaved(false); }, 3000);
     };
 
     const handleReset = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, ArrowRight } from 'lucide-react';
-import { ReturnType } from '../../types';
+import type { ReturnType } from '../../types';
 
 interface Props {
     returnType: ReturnType;

@@ -14,7 +14,7 @@ const WarehouseListSidebar: React.FC<Props> = ({ warehouses, selectedId, onSelec
             {warehouses.map(wh => (
                 <button
                     key={wh.id}
-                    onClick={() => onSelect(wh.id)}
+                    onClick={() => { onSelect(wh.id); }}
                     className={cn(
                         "text-right px-2.5 py-1.5 transition-all group relative overflow-hidden flex flex-col gap-1 w-full",
                         "hover:bg-[var(--app-surface-hover)] active:scale-[0.99]",

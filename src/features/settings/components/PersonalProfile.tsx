@@ -37,7 +37,7 @@ const PersonalProfile: React.FC<PersonalProfileProps> = ({ onNavigateToSection }
                 });
                 setSaved(true);
                 showToast('تم تحديث البيانات الشخصية بنجاح', 'success');
-                setTimeout(() => setSaved(false), 3000);
+                setTimeout(() => { setSaved(false); }, 3000);
             }
         } catch (err: any) {
             showToast(err.message || 'فشل تحديث البيانات', 'error');
@@ -146,7 +146,7 @@ const PersonalProfile: React.FC<PersonalProfileProps> = ({ onNavigateToSection }
                             <Input
                                 label="الاسم الكامل"
                                 value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
+                                onChange={(e) => { setFullName(e.target.value); }}
                                 icon={<User size={16} />}
                                 placeholder="ادخل اسمك الكامل"
                                 required

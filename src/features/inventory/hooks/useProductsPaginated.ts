@@ -21,7 +21,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { useAuthStore } from '../../auth/store';
 import { productService } from '../services/productService';
-import { Product } from '../types';
+import type { Product } from '../types';
 import { useDebounce } from '../../../lib/hooks/useDebounce';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -109,7 +109,7 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
       if (error) throw error;
 
       const products = productService.mapRawProducts(data ?? []);
-      const totalCount = (data as any)?.[0]?.total_count ?? 0;
+      const totalCount = (data)?.[0]?.total_count ?? 0;
       const totalPages = Math.ceil(totalCount / pageSize);
 
       return { data: products, totalCount, page, pageSize, totalPages };
@@ -140,7 +140,7 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
         if (error) throw error;
 
         const products = productService.mapRawProducts(data ?? []);
-        const totalCount = (data as any)?.[0]?.total_count ?? 0;
+        const totalCount = (data)?.[0]?.total_count ?? 0;
         return { data: products, totalCount, page: page + 1, pageSize, totalPages: Math.ceil(totalCount / pageSize) };
       },
       staleTime: 1000 * 30,
@@ -152,9 +152,9 @@ export const useProductsPaginated = (options: UseProductsPaginatedOptions = {}) 
 
   // ── Navigation helpers ───────────────────────────────────────────────────
 
-  const goToPage = useCallback((p: number) => setPage(p), []);
-  const nextPage = useCallback(() => setPage((p) => p + 1), []);
-  const prevPage = useCallback(() => setPage((p) => Math.max(1, p - 1)), []);
+  const goToPage = useCallback((p: number) => { setPage(p); }, []);
+  const nextPage = useCallback(() => { setPage((p) => p + 1); }, []);
+  const prevPage = useCallback(() => { setPage((p) => Math.max(1, p - 1)); }, []);
 
   return {
     // Data

@@ -4,7 +4,7 @@ import { useCreatePayment } from '../hooks';
 import { useParties } from '../../parties/hooks';
 import { useAuthStore } from '../../auth/store';
 
-import { Party } from '../../parties/types';
+import type { Party } from '../../parties/types';
 import { formatCurrency } from '../../../core/utils';
 
 interface CreatePaymentModalProps {
@@ -85,7 +85,7 @@ const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({ isOpen, onClose
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" onClick={() => setSelectedSupplier(null)} className="p-1.5 hover:bg-white dark:hover:bg-slate-800 text-gray-400 hover:text-red-500 rounded-md transition-all shadow-sm">
+                                <button type="button" onClick={() => { setSelectedSupplier(null); }} className="p-1.5 hover:bg-white dark:hover:bg-slate-800 text-gray-400 hover:text-red-500 rounded-md transition-all shadow-sm">
                                     <X size={18} />
                                 </button>
                             </div>
@@ -128,7 +128,7 @@ const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({ isOpen, onClose
                                     type="number"
                                     step="0.01"
                                     value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
+                                    onChange={(e) => { setAmount(e.target.value); }}
                                     className="w-full pl-4 pr-11 py-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 font-mono font-bold text-xl dark:text-slate-100 transition-all text-left"
                                     placeholder="0.00"
                                     required
@@ -143,7 +143,7 @@ const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({ isOpen, onClose
                                 <input
                                     type="date"
                                     value={date}
-                                    onChange={(e) => setDate(e.target.value)}
+                                    onChange={(e) => { setDate(e.target.value); }}
                                     className="w-full pl-4 pr-11 py-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 dark:text-slate-100 font-bold transition-all"
                                     required
                                     dir="ltr"
@@ -157,7 +157,7 @@ const CreatePaymentModal: React.FC<CreatePaymentModalProps> = ({ isOpen, onClose
                         <label className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest block">البيان / الوصف</label>
                         <textarea
                             value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
+                            onChange={(e) => { setNotes(e.target.value); }}
                             className="w-full p-4 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 dark:text-slate-200 transition-all resize-none h-28"
                             placeholder="مثال: دفعة من الحساب مقابل فاتورة رقم 102..."
                         />

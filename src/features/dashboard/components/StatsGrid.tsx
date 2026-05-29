@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDashboardData } from '../hooks';
-import { TrendingUp, ShoppingCart, DollarSign, Receipt, LucideIcon } from 'lucide-react';
+import { TrendingUp, ShoppingCart, DollarSign, Receipt, type LucideIcon } from 'lucide-react';
 // import { formatCurrency } from '../../../core/utils';
 import StatCard from '../../../ui/common/StatCard';
 

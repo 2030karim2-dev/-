@@ -310,7 +310,7 @@ export const calculateLineItem = (item: SalesItemInput): LineItemCalculation => 
 };
 
 export interface InvoiceSummaryInput {
-    readonly items: ReadonlyArray<SalesItemInput>;
+    readonly items: readonly SalesItemInput[];
     readonly globalDiscount?: NumericInput;
     readonly globalTaxRate?: NumericInput;
 }
@@ -380,7 +380,7 @@ export interface JournalLineInput {
  * SOX Control: IC-2026-001 Remediation
  */
 export const validateJournalBalance = (
-    lines: ReadonlyArray<JournalLineInput>
+    lines: readonly JournalLineInput[]
 ): JournalBalance => {
     const debitTotal = lines.reduce(
         (sum, line) => sum.plus(safeDecimal(line.debit)),
@@ -407,7 +407,7 @@ export const validateJournalBalance = (
  * Throws if journal is unbalanced
  */
 export const assertJournalBalanced = (
-    lines: ReadonlyArray<JournalLineInput>,
+    lines: readonly JournalLineInput[],
     context?: Record<string, unknown>
 ): void => {
     const balance = validateJournalBalance(lines);
@@ -484,7 +484,7 @@ export const convertCurrency = (input: CurrencyConversionInput): CurrencyConvers
  * Cleanup routine for Decimal instances
  * Explicitly nullifies references for GC
  */
-export const cleanupDecimals = (...decimals: (Decimal | null | undefined)[]): void => {
+export const cleanupDecimals = (...decimals: Array<Decimal | null | undefined>): void => {
     decimals.forEach(d => {
         if (d) {
             // In JavaScript, we can't force GC, but we can help by:

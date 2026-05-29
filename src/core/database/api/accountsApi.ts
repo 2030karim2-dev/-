@@ -40,7 +40,7 @@ export const accountsApi = {
     /**
      * Bulk insert accounts
      */
-    insertAccounts: async (accounts: TableInsert<'accounts'>[]) => {
+    insertAccounts: async (accounts: Array<TableInsert<'accounts'>>) => {
         const response = await supabase
             .from('accounts')
             .insert(accounts)

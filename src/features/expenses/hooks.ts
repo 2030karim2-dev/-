@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { expensesService } from './service';
 import { useAuthStore } from '../auth/store';
 import { useFeedbackStore } from '../feedback/store';
-import { ExpenseFormData } from './types';
+import type { ExpenseFormData } from './types';
 import { useMemo } from 'react';
 import { AuthorizeActionUsecase } from '../../core/usecases/auth/AuthorizeActionUsecase';
 import { supabase } from '../../lib/supabaseClient';
@@ -61,7 +61,7 @@ export const useExpenseCategoryMutation = () => {
   });
 };
 
-export const useExpensesData = (searchTerm: string = '') => {
+export const useExpensesData = (searchTerm = '') => {
   const { user } = useAuthStore();
   const companyId = user?.company_id;
 
@@ -120,7 +120,7 @@ export const useExpenseActions = () => {
       invalidateByPreset(queryClient, 'expense');
       showToast('تم إلغاء المصروف بنجاح', 'success');
     },
-    onError: (error: Error) => showToast(error.message, 'error')
+    onError: (error: Error) => { showToast(error.message, 'error'); }
   });
 
   return {

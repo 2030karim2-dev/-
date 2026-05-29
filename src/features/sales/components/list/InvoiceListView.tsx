@@ -9,7 +9,7 @@ import ShareButton from '../../../../ui/common/ShareButton';
 import EmptyState from '../../../../ui/base/EmptyState';
 import PageLoader from '../../../../ui/base/PageLoader';
 import ErrorDisplay from '../../../../ui/base/ErrorDisplay';
-import { InvoiceListItem, InvoiceType } from '../../types';
+import type { InvoiceListItem, InvoiceType } from '../../types';
 
 interface InvoiceListViewProps {
     viewType: InvoiceType;
@@ -99,7 +99,7 @@ const InvoiceListView: React.FC<InvoiceListViewProps> = ({ viewType, searchTerm,
                         title={`مشاركة فاتورة #${row.invoiceNumber}`}
                         message={`🧾 فاتورة #${row.invoiceNumber}\n━━━━━━━━━━━━━━\n👤 ${row.customerName}\n💰 ${formatCurrency(row.total)}\n📅 ${row.date}\n💳 ${row.paymentMethod === 'cash' ? 'نقدي' : 'آجل'}`}
                     />
-                    <button onClick={() => onViewDetails(row.id)} className="p-1.5 hover:bg-blue-50 dark:hover:bg-slate-800 text-blue-600 dark:text-blue-400 rounded transition-colors">
+                    <button onClick={() => { onViewDetails(row.id); }} className="p-1.5 hover:bg-blue-50 dark:hover:bg-slate-800 text-blue-600 dark:text-blue-400 rounded transition-colors">
                         <Eye size={16} />
                     </button>
                     <button
@@ -135,7 +135,7 @@ const InvoiceListView: React.FC<InvoiceListViewProps> = ({ viewType, searchTerm,
             <div className="flex-1 min-h-0 bg-white dark:bg-slate-900 rounded-2xl border dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
                 <ExcelTable
                     columns={columns}
-                    data={(filteredData as InvoiceListItem[]).map(item => ({
+                    data={(filteredData).map(item => ({
                         ...item,
                         invoiceNumber: item.invoiceNumber || '',
                         paymentMethod: item.paymentMethod || 'cash'

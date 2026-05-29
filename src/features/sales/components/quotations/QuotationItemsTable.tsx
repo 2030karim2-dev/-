@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, Trash2, Search } from 'lucide-react';
 import { formatCurrency } from '@/core/utils';
-import { ItemRow } from '../../hooks/useQuotationForm';
+import type { ItemRow } from '../../hooks/useQuotationForm';
 
 interface QuotationItemsTableProps {
   items: ItemRow[];
@@ -53,7 +53,7 @@ const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
                       <input
                         type="text"
                         value={item.description}
-                        onChange={(e) => updateItem(idx, 'description', e.target.value)}
+                        onChange={(e) => { updateItem(idx, 'description', e.target.value); }}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === 'F2') {
                             e.preventDefault();
@@ -64,7 +64,7 @@ const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
                         className="w-full bg-transparent border-0 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-400 pr-1"
                       />
                       <button 
-                        onClick={() => handleOpenProductSearch(idx, item.description)}
+                        onClick={() => { handleOpenProductSearch(idx, item.description); }}
                         className="absolute left-0 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-indigo-500 opacity-0 group-hover/search:opacity-100 transition-all"
                       >
                         <Search size={14} />
@@ -76,7 +76,7 @@ const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
                       type="number"
                       min={1}
                       value={item.quantity}
-                      onChange={(e) => updateItem(idx, 'quantity', Number(e.target.value))}
+                      onChange={(e) => { updateItem(idx, 'quantity', Number(e.target.value)); }}
                       className="w-full bg-transparent border-0 outline-none text-sm text-center text-gray-900 dark:text-white"
                     />
                   </td>
@@ -86,7 +86,7 @@ const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
                       min={0}
                       step={0.01}
                       value={item.unitPrice}
-                      onChange={(e) => updateItem(idx, 'unitPrice', Number(e.target.value))}
+                      onChange={(e) => { updateItem(idx, 'unitPrice', Number(e.target.value)); }}
                       className="w-full bg-transparent border-0 outline-none text-sm text-center font-mono text-gray-900 dark:text-white"
                     />
                   </td>
@@ -96,7 +96,7 @@ const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
                       min={0}
                       max={100}
                       value={item.discountPercent}
-                      onChange={(e) => updateItem(idx, 'discountPercent', Number(e.target.value))}
+                      onChange={(e) => { updateItem(idx, 'discountPercent', Number(e.target.value)); }}
                       className="w-full bg-transparent border-0 outline-none text-sm text-center text-gray-900 dark:text-white"
                     />
                   </td>
@@ -105,7 +105,7 @@ const QuotationItemsTable: React.FC<QuotationItemsTableProps> = ({
                   </td>
                   <td className="py-2 px-1">
                     <button
-                      onClick={() => removeItem(idx)}
+                      onClick={() => { removeItem(idx); }}
                       className="p-1 text-gray-400 hover:text-rose-500 transition-colors"
                       disabled={items.length <= 1}
                     >

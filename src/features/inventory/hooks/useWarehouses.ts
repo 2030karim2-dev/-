@@ -48,13 +48,13 @@ export const useWarehouseMutations = () => {
 
     const remove = useMutation({
         mutationFn: async ({ id }: { id: string }) => {
-            return await inventoryApi.deleteWarehouse(id);
+            await inventoryApi.deleteWarehouse(id);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['warehouses'] });
             showToast("تم حذف المستودع", 'info');
         },
-        onError: (err: Error) => showToast(err.message, 'error')
+        onError: (err: Error) => { showToast(err.message, 'error'); }
     });
 
     return {

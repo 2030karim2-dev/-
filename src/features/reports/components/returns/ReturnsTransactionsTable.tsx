@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatCurrency } from '../../../../core/utils';
-import { ReportView, ReturnsType } from '../../hooks/useReturnsReport';
+import type { ReportView, ReturnsType } from '../../hooks/useReturnsReport';
 
 interface Props {
     reportView: ReportView;

@@ -43,7 +43,7 @@ const AuditSessionPage: React.FC = () => {
     const { data: searchResults, isLoading: isLoadingSearch } = useSearchProducts(debouncedFilter);
 
     const { register, reset, watch, getValues } = useForm({
-        defaultValues: { items: [] as Record<string, unknown>[] }
+        defaultValues: { items: [] as Array<Record<string, unknown>> }
     });
     const watchedItems = watch('items');
 
@@ -129,7 +129,7 @@ const AuditSessionPage: React.FC = () => {
      const confirmRemoveItem = () => {
          if (itemToDelete) {
              removeItemFromAudit(itemToDelete, {
-                 onSuccess: () => setItemToDelete(null)
+                 onSuccess: () => { setItemToDelete(null); }
              });
          }
      };
@@ -167,7 +167,7 @@ const AuditSessionPage: React.FC = () => {
             await new Promise<void>((resolve) => {
                 addItemToAudit(
                     { sessionId, productId: p.id, expectedQuantity },
-                    { onSuccess: resolve, onError: () => resolve() }
+                    { onSuccess: resolve, onError: () => { resolve(); } }
                 );
             });
             setBulkProgress({ current: i + 1, total: newProducts.length });
@@ -194,7 +194,7 @@ const AuditSessionPage: React.FC = () => {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => setShowBulkConfirm(true)}
+                                onClick={() => { setShowBulkConfirm(true); }}
                                 isLoading={isBulkAdding}
                                 leftIcon={isBulkAdding
                                     ? <Loader2 size={14} className="animate-spin" />
@@ -239,10 +239,10 @@ const AuditSessionPage: React.FC = () => {
                                 variant="default"
                                 size="md"
                                 className="flex-1"
-                                onEscape={() => setShowResults(false)}
+                                onEscape={() => { setShowResults(false); }}
                             />
                             <button
-                                onClick={() => setIsScannerOpen(true)}
+                                onClick={() => { setIsScannerOpen(true); }}
                                 className="flex items-center justify-center bg-blue-600 text-white w-12 rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all shrink-0"
                             >
                                 <ScanBarcode size={22} />
@@ -252,7 +252,7 @@ const AuditSessionPage: React.FC = () => {
                         {/* Search Results Dropdown */}
                         <SearchDropdown
                             open={showResults && !!filter.trim()}
-                            onClose={() => setShowResults(false)}
+                            onClose={() => { setShowResults(false); }}
                             loading={isLoadingSearch || isAddingItem}
                             hasResults={(searchResults?.length ?? 0) > 0}
                             emptyMessage="لا توجد نتائج مطابقة"
@@ -290,7 +290,7 @@ const AuditSessionPage: React.FC = () => {
                 </div>
             )}
 
-            <div className="flex-1 overflow-y-auto p-4 pb-16 custom-scrollbar" onClick={() => setShowResults(false)}>
+            <div className="flex-1 overflow-y-auto p-4 pb-16 custom-scrollbar" onClick={() => { setShowResults(false); }}>
                 <div className="max-w-[1600px] mx-auto space-y-4">
                     <AuditStats stats={stats} session={session} />
                     
@@ -301,7 +301,7 @@ const AuditSessionPage: React.FC = () => {
                             <span className="text-[10px] font-bold whitespace-nowrap">تصفية حسب الفئة:</span>
                         </div>
                         <button
-                            onClick={() => setSelectedCategory(null)}
+                            onClick={() => { setSelectedCategory(null); }}
                             className={`px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all whitespace-nowrap ${!selectedCategory ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-gray-50 dark:bg-slate-800 text-gray-500'}`}
                         >
                             الكل
@@ -309,7 +309,7 @@ const AuditSessionPage: React.FC = () => {
                         {categories?.map((cat: any) => (
                             <button
                                 key={cat.id}
-                                onClick={() => setSelectedCategory(cat.name)}
+                                onClick={() => { setSelectedCategory(cat.name); }}
                                 className={`px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all whitespace-nowrap ${selectedCategory === cat.name ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-gray-50 dark:bg-slate-800 text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
                             >
                                 {cat.name}
@@ -331,13 +331,13 @@ const AuditSessionPage: React.FC = () => {
             {isScannerOpen && (
                 <ScannerOverlay 
                     onScan={handleScan} 
-                    onClose={() => setIsScannerOpen(false)} 
+                    onClose={() => { setIsScannerOpen(false); }} 
                 />
             )}
 
             <ConfirmModal
                 isOpen={!!itemToDelete}
-                onClose={() => setItemToDelete(null)}
+                onClose={() => { setItemToDelete(null); }}
                 onConfirm={confirmRemoveItem}
                 title="إزالة الصنف من الجرد"
                 message="هل أنت متأكد من رغبتك في إزالة هذا الصنف من جلسة الجرد الميداني الحالية؟"
@@ -348,7 +348,7 @@ const AuditSessionPage: React.FC = () => {
 
             <ConfirmModal
                 isOpen={showBulkConfirm}
-                onClose={() => setShowBulkConfirm(false)}
+                onClose={() => { setShowBulkConfirm(false); }}
                 onConfirm={handleBulkAddWarehouseProducts}
                 title="جرد كامل المستودع"
                 message="سيتم إضافة جميع منتجات هذا المستودع إلى جلسة الجرد الحالية تلقائياً. هذه العملية قد تستغرق بعض الوقت. هل تريد المتابعة؟"

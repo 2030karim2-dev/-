@@ -1,5 +1,5 @@
 import React from 'react';
-import { AIParsedResponse } from '../core/types';
+import type { AIParsedResponse } from '../core/types';
 import Button from '../../../ui/base/Button';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 import { CheckCircle2, User as UserIcon, Wallet, CalendarDays, FileText, PackageSearch, Tag, Info, Banknote } from 'lucide-react';

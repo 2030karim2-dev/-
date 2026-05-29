@@ -13,7 +13,7 @@ const WarehouseManager: React.FC = () => {
     if (!newWarehouse.name_ar) return;
 
     addWarehouse({ ...newWarehouse }, {
-      onSuccess: () => setNewWarehouse({ name_ar: '', location: '' })
+      onSuccess: () => { setNewWarehouse({ name_ar: '', location: '' }); }
     });
   };
 
@@ -46,7 +46,7 @@ const WarehouseManager: React.FC = () => {
             type="text"
             placeholder="اسم المستودع (مثال: الفرع الرئيسي)"
             value={newWarehouse.name_ar}
-            onChange={(e) => setNewWarehouse({ ...newWarehouse, name_ar: e.target.value })}
+            onChange={(e) => { setNewWarehouse({ ...newWarehouse, name_ar: e.target.value }); }}
             className="flex-1 p-2.5 border border-gray-200 rounded-lg focus:border-amber-500 outline-none"
             required
           />
@@ -54,7 +54,7 @@ const WarehouseManager: React.FC = () => {
             type="text"
             placeholder="الموقع / العنوان"
             value={newWarehouse.location}
-            onChange={(e) => setNewWarehouse({ ...newWarehouse, location: e.target.value })}
+            onChange={(e) => { setNewWarehouse({ ...newWarehouse, location: e.target.value }); }}
             className="flex-1 p-2.5 border border-gray-200 rounded-lg focus:border-amber-500 outline-none"
           />
           <button
@@ -86,14 +86,14 @@ const WarehouseManager: React.FC = () => {
               <div className="flex items-center gap-2">
                 {!wh.is_primary && (
                   <button
-                    onClick={() => setPrimary(wh.id)}
+                    onClick={() => { setPrimary(wh.id); }}
                     className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 px-3 py-1.5 rounded-lg transition-colors"
                   >
                     تعيين كأساسي
                   </button>
                 )}
                 <button
-                  onClick={() => handleDelete(wh.id)}
+                  onClick={() => { handleDelete(wh.id); }}
                   className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <Trash2 size={18} />

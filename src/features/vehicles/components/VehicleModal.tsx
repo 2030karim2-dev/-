@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Save } from 'lucide-react';
-import { Vehicle } from '../../inventory/types';
+import type { Vehicle } from '../../inventory/types';
 
 interface Props {
     vehicle?: Vehicle | null;
@@ -24,31 +24,31 @@ const VehicleModal: React.FC<Props> = ({ vehicle, onClose, onSave }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500">الشركة (Make)</label>
-                            <input className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.make} onChange={e => setFormData({ ...formData, make: e.target.value })} placeholder="Toyota" />
+                            <input className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.make} onChange={e => { setFormData({ ...formData, make: e.target.value }); }} placeholder="Toyota" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500">الموديل (Model)</label>
-                            <input className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.model} onChange={e => setFormData({ ...formData, model: e.target.value })} placeholder="Camry" />
+                            <input className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.model} onChange={e => { setFormData({ ...formData, model: e.target.value }); }} placeholder="Camry" />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500">من سنة</label>
-                            <input type="number" className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.year_start} onChange={e => setFormData({ ...formData, year_start: Number(e.target.value) })} />
+                            <input type="number" className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.year_start} onChange={e => { setFormData({ ...formData, year_start: Number(e.target.value) }); }} />
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500">إلى سنة</label>
-                            <input type="number" className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.year_end} onChange={e => setFormData({ ...formData, year_end: Number(e.target.value) })} />
+                            <input type="number" className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.year_end} onChange={e => { setFormData({ ...formData, year_end: Number(e.target.value) }); }} />
                         </div>
                     </div>
                     <div className="space-y-1">
                         <label className="text-xs font-bold text-gray-500">المحرك (Engine)</label>
-                        <input className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.engine || ''} onChange={e => setFormData({ ...formData, engine: e.target.value })} placeholder="2.5L I4" />
+                        <input className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.engine || ''} onChange={e => { setFormData({ ...formData, engine: e.target.value }); }} placeholder="2.5L I4" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500">ناقل الحركة</label>
-                            <select className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.transmission || ''} onChange={e => setFormData({ ...formData, transmission: e.target.value })}>
+                            <select className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.transmission || ''} onChange={e => { setFormData({ ...formData, transmission: e.target.value }); }}>
                                 <option value="">غير محدد</option>
                                 <option value="Automatic">أوتوماتيك</option>
                                 <option value="Manual">يدوي</option>
@@ -57,7 +57,7 @@ const VehicleModal: React.FC<Props> = ({ vehicle, onClose, onSave }) => {
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500">نوع الوقود</label>
-                            <select className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.fuel_type || ''} onChange={e => setFormData({ ...formData, fuel_type: e.target.value })}>
+                            <select className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.fuel_type || ''} onChange={e => { setFormData({ ...formData, fuel_type: e.target.value }); }}>
                                 <option value="">غير محدد</option>
                                 <option value="Gasoline">بنزين</option>
                                 <option value="Diesel">ديزل</option>
@@ -69,7 +69,7 @@ const VehicleModal: React.FC<Props> = ({ vehicle, onClose, onSave }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500">نوع الدفع (Drive)</label>
-                            <select className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.drive_type || ''} onChange={e => setFormData({ ...formData, drive_type: e.target.value })}>
+                            <select className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.drive_type || ''} onChange={e => { setFormData({ ...formData, drive_type: e.target.value }); }}>
                                 <option value="">غير محدد</option>
                                 <option value="FWD">دفع أمامي (FWD)</option>
                                 <option value="RWD">دفع خلفي (RWD)</option>
@@ -79,7 +79,7 @@ const VehicleModal: React.FC<Props> = ({ vehicle, onClose, onSave }) => {
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500">المواصفات (Region)</label>
-                            <select className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.region || ''} onChange={e => setFormData({ ...formData, region: e.target.value })}>
+                            <select className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800" value={formData.region || ''} onChange={e => { setFormData({ ...formData, region: e.target.value }); }}>
                                 <option value="">غير محدد</option>
                                 <option value="GCC">خليجي (GCC)</option>
                                 <option value="US">أمريكي (US)</option>
@@ -91,13 +91,13 @@ const VehicleModal: React.FC<Props> = ({ vehicle, onClose, onSave }) => {
                     </div>
                     <div className="space-y-1">
                         <label className="text-xs font-bold text-gray-500">VIN Prefix (للتعرف الآلي)</label>
-                        <input className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 font-mono tracking-widest uppercase" value={formData.vin_prefix || ''} onChange={e => setFormData({ ...formData, vin_prefix: e.target.value })} placeholder="XXXXXXXX" maxLength={10} />
+                        <input className="w-full p-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 font-mono tracking-widest uppercase" value={formData.vin_prefix || ''} onChange={e => { setFormData({ ...formData, vin_prefix: e.target.value }); }} placeholder="XXXXXXXX" maxLength={10} />
                         <p className="text-[10px] text-gray-400">أول 8-10 خانات من رقم الهيكل لربط السيارة تلقائياً</p>
                     </div>
                 </div>
                 <div className="p-4 border-t dark:border-slate-800 flex justify-end gap-2">
                     <button onClick={onClose} className="px-4 py-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 font-bold">إلغاء</button>
-                    <button onClick={() => onSave(formData)} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold flex items-center gap-2">
+                    <button onClick={() => { onSave(formData); }} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold flex items-center gap-2">
                         <Save size={16} /> حفظ
                     </button>
                 </div>

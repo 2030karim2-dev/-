@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertTriangle, Edit2, ArrowRight, Merge } from 'lucide-react';
-import { DuplicatePair } from '../../hooks/useInventoryDedupe';
+import type { DuplicatePair } from '../../hooks/useInventoryDedupe';
 import { formatCurrency, cn } from '../../../../core/utils';
 import Button from '../../../../ui/base/Button';
 
@@ -47,7 +47,7 @@ const DuplicateList: React.FC<Props> = ({ duplicates, onEdit }) => {
                                         variant="ghost"
                                         size="sm"
                                         className="p-1 h-7 w-7 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                                        onClick={() => onEdit(pair.product_a_id)}
+                                        onClick={() => { onEdit(pair.product_a_id); }}
                                     >
                                         <Edit2 size={12} />
                                     </Button>
@@ -81,7 +81,7 @@ const DuplicateList: React.FC<Props> = ({ duplicates, onEdit }) => {
                                         variant="ghost"
                                         size="sm"
                                         className="p-1 h-7 w-7 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-                                        onClick={() => onEdit(pair.product_b_id)}
+                                        onClick={() => { onEdit(pair.product_b_id); }}
                                     >
                                         <Edit2 size={12} />
                                     </Button>

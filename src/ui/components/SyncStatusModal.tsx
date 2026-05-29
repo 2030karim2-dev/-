@@ -34,7 +34,7 @@ const SyncStatusModal: React.FC<SyncStatusModalProps> = ({ isOpen, onClose }) =>
         loadPending();
         // Poll for changes while open
         const interval = setInterval(loadPending, 3000);
-        return () => clearInterval(interval);
+        return () => { clearInterval(interval); };
     }, [isOpen]);
 
     const handleRemove = async (id: string) => {

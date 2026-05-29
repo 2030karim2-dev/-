@@ -1,4 +1,4 @@
-import { TableRow, TableInsert, TableUpdate } from './common.types';
+import type { TableRow, TableInsert, TableUpdate } from './common.types';
 
 // ============================================
 // Invoices

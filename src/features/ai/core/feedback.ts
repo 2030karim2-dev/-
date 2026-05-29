@@ -15,7 +15,7 @@ export interface AIFeedback {
 }
 
 class AIFeedbackTracker {
-    private feedbackList: AIFeedback[] = [];
+    private readonly feedbackList: AIFeedback[] = [];
     private readonly MAX_STORED_FEEDBACK = 500;
 
     /**

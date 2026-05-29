@@ -87,7 +87,7 @@ export const InventorySettings: React.FC = () => {
                                     name="cost_method"
                                     value={method.id}
                                     checked={inventory.cost_method === method.id}
-                                    onChange={(e) => handleUpdate({ cost_method: e.target.value as 'fifo' | 'lifo' | 'average' })}
+                                    onChange={(e) => { handleUpdate({ cost_method: e.target.value as 'fifo' | 'lifo' | 'average' }); }}
                                     className="mt-0.5 w-3.5 h-3.5 text-purple-600 focus:ring-purple-500"
                                 />
                                 <div>
@@ -117,7 +117,7 @@ export const InventorySettings: React.FC = () => {
                                     type="number"
                                     min={0}
                                     value={inventory.default_low_stock_threshold}
-                                    onChange={(e) => handleUpdate({ default_low_stock_threshold: parseInt(e.target.value) || 5 })}
+                                    onChange={(e) => { handleUpdate({ default_low_stock_threshold: parseInt(e.target.value) || 5 }); }}
                                     className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none"
                                 />
                             </div>
@@ -130,7 +130,7 @@ export const InventorySettings: React.FC = () => {
                                         id="enable_low_stock_alert"
                                         type="checkbox"
                                         checked={inventory.enable_low_stock_alert}
-                                        onChange={(e) => handleUpdate({ enable_low_stock_alert: e.target.checked })}
+                                        onChange={(e) => { handleUpdate({ enable_low_stock_alert: e.target.checked }); }}
                                         className="sr-only peer"
                                     />
                                     <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-purple-600"></div>
@@ -158,7 +158,7 @@ export const InventorySettings: React.FC = () => {
                                     <input
                                         type="checkbox"
                                         checked={alert.checked}
-                                        onChange={(e) => handleUpdate({ [alert.id]: e.target.checked })}
+                                        onChange={(e) => { handleUpdate({ [alert.id]: e.target.checked }); }}
                                         className="w-4 h-4 text-purple-600 rounded border-slate-300 focus:ring-purple-500"
                                     />
                                 </div>
@@ -193,7 +193,7 @@ export const InventorySettings: React.FC = () => {
                             <input
                                 type="checkbox"
                                 checked={inventory.track_serial_numbers}
-                                onChange={(e) => handleUpdate({ track_serial_numbers: e.target.checked })}
+                                onChange={(e) => { handleUpdate({ track_serial_numbers: e.target.checked }); }}
                                 className="sr-only peer"
                             />
                             <div className="w-9 h-5 bg-slate-200 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:bg-purple-600 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
@@ -215,7 +215,7 @@ export const InventorySettings: React.FC = () => {
                             <input
                                 type="checkbox"
                                 checked={inventory.track_expiry_dates}
-                                onChange={(e) => handleUpdate({ track_expiry_dates: e.target.checked })}
+                                onChange={(e) => { handleUpdate({ track_expiry_dates: e.target.checked }); }}
                                 className="sr-only peer"
                             />
                             <div className="w-9 h-5 bg-slate-200 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:bg-purple-600 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>

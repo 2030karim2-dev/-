@@ -2,7 +2,7 @@ import React from 'react';
 import { Layers, Trash2, TrendingUp, AlertCircle, Package, Box, BarChart3 } from 'lucide-react';
 import { formatNumberDisplay } from '../../../core/utils';
 import { cn } from '../../../core/utils';
-import ExcelTable, { Column } from '../../../ui/common/ExcelTable';
+import ExcelTable, { type Column } from '../../../ui/common/ExcelTable';
 import { useInventoryCategoryMutations } from '../hooks/index';
 
 interface Category {
@@ -22,7 +22,7 @@ interface Props {
 const CategoryExcelGrid: React.FC<Props> = ({ categories, onFilterProduct }) => {
     const { deleteCategory } = useInventoryCategoryMutations();
 
-    const columns: Column<Category>[] = [
+    const columns: Array<Column<Category>> = [
         {
             header: 'اسم القسم',
             accessor: (c) => (
@@ -84,7 +84,7 @@ const CategoryExcelGrid: React.FC<Props> = ({ categories, onFilterProduct }) => 
             accessor: (c) => (
                 <div className="flex justify-center items-center gap-2">
                     <button
-                        onClick={() => onFilterProduct(c.name)}
+                        onClick={() => { onFilterProduct(c.name); }}
                         className="p-1.5 text-blue-600 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800/50 transition-colors border border-blue-100 dark:border-blue-800/50"
                         title="تحليل"
                     >

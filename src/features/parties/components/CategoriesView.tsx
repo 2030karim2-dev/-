@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useCategories, useCategoryMutations } from '../hooks';
-import { PartyType } from '../types';
+import type { PartyType } from '../types';
 import Button from '../../../ui/base/Button';
 import CategoryCard from './CategoryCard';
 import CategoryModal from './CategoryModal';
@@ -26,7 +26,7 @@ const CategoriesView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
 
   const handleSave = (data: { name: string }) => {
     save({ name: data.name, id: editingCategory?.id }, {
-      onSuccess: () => setIsModalOpen(false)
+      onSuccess: () => { setIsModalOpen(false); }
     });
   };
 
@@ -43,15 +43,15 @@ const CategoriesView: React.FC<{ partyType: PartyType }> = ({ partyType }) => {
           <CategoryCard
             key={cat.id}
             category={cat}
-            onEdit={() => handleEdit(cat)}
-            onDelete={() => remove(cat.id)}
+            onEdit={() => { handleEdit(cat); }}
+            onDelete={() => { remove(cat.id); }}
           />
         ))}
       </div>
 
       <CategoryModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => { setIsModalOpen(false); }}
         onSave={handleSave}
         isSaving={isSaving}
         initialData={editingCategory}

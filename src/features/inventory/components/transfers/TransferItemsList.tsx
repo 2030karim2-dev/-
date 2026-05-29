@@ -3,7 +3,7 @@ import { Trash2, Plus, Box, PackageSearch } from 'lucide-react';
 import ProductExcelGrid from '../ProductExcelGrid';
 
 interface Props {
-    items: { product: any, qty: number }[];
+    items: Array<{ product: any, qty: number }>;
     onRemove: (id: string) => void;
     onUpdateQty: (id: string, qty: number) => void;
     searchResults?: any[];

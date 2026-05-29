@@ -20,7 +20,7 @@ const HeaderSearch: React.FC = () => {
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => { setQuery(e.target.value); }}
           placeholder="ابحث عن العميل، الصنف، الفاتورة... (اضغط Enter)"
           className="w-full bg-[#f3f4f6] dark:bg-slate-800 border-none rounded-lg py-2.5 pr-10 pl-4 text-sm text-gray-600 dark:text-slate-300 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent/20 dark:focus:ring-accent/40 transition-all"
         />

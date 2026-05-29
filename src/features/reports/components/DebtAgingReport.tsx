@@ -40,8 +40,8 @@ const useDebtAging = () => {
                 if (remaining <= 0) return;
 
                 const partyId = inv.party_id;
-                const partyName = (inv.parties as any)?.name || 'غير محدد';
-                const partyType = (inv.parties as any)?.type || 'customer';
+                const partyName = (inv.parties)?.name || 'غير محدد';
+                const partyType = (inv.parties)?.type || 'customer';
 
                 if (!partyAging[partyId]) {
                     partyAging[partyId] = { id: partyId, name: partyName, type: partyType, current: 0, days30: 0, days60: 0, days90: 0, total: 0, oldestDate: inv.issue_date };

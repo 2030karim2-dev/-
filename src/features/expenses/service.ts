@@ -1,6 +1,6 @@
 
 import { expensesApi } from './api';
-import { Expense, ExpenseFormData, ExpenseCategorySummary, ExpenseStats } from './types';
+import type { Expense, ExpenseFormData, ExpenseCategorySummary, ExpenseStats } from './types';
 import { messagingService } from '../notifications/messagingService';
 import { toBaseCurrency } from '../../core/utils/currencyUtils';
 import { supabase } from '../../lib/supabaseClient';
@@ -60,7 +60,7 @@ export const expensesService = {
       p_company_id: companyId
     });
     if (error) throw error;
-    const result = data as any;
+    const result = data;
     return {
       totalExpenses: result.totalExpenses || 0,
       paidExpenses: result.paidExpenses || 0,

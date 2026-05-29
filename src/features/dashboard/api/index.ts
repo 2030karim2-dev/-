@@ -73,7 +73,7 @@ export const dashboardApi = {
                 .gte('entry_date', dateLimit)
                 .order('entry_date', { ascending: false })
                 .limit(100)
-                .abortSignal(signal as any) as any,
+                .abortSignal(signal as any),
 
             // 7. Products with stock — only active, max 500 (for low-stock widget)
             supabase.from('products')
@@ -81,7 +81,7 @@ export const dashboardApi = {
                 .eq('company_id', companyId)
                 .eq('status', 'active')
                 .limit(500)
-                .abortSignal(signal as any) as any,
+                .abortSignal(signal as any),
 
             // 8. Best-selling items — last 90 days, max 100 (for top products widget)
             supabase.from('invoice_items')
@@ -91,7 +91,7 @@ export const dashboardApi = {
                 .neq('invoices.status', 'void')
                 .gte('invoices.issue_date', dateLimit)
                 .limit(100)
-                .abortSignal(signal as any) as any,
+                .abortSignal(signal as any),
 
             // 9. Server Aggregated Totals (lightweight RPC)
             supabase.rpc('get_dashboard_totals' as any, { p_company_id: companyId })

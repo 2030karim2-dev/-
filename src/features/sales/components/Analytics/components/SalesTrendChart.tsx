@@ -14,7 +14,7 @@ interface SalesTrendChartProps {
 }
 
 const CustomTooltip = ({ active, payload, label, t, formatCurrency }: any) => {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
         return (
             <div className="p-4 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-2xl transition-all duration-300">
                 <p className="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-tight border-b border-slate-100 dark:border-slate-800 pb-2">
@@ -57,7 +57,7 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
             }
         });
         ro.observe(containerRef.current);
-        return () => ro.disconnect();
+        return () => { ro.disconnect(); };
     }, []);
 
     const commonProps = {
@@ -160,7 +160,7 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
                 </div>
                 <div className="flex gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
                     <button
-                        onClick={() => setActiveChart('area')}
+                        onClick={() => { setActiveChart('area'); }}
                         className={cn(
                             "p-2 rounded-lg transition-all duration-300",
                             activeChart === 'area' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-slate-400 hover:text-slate-600"
@@ -170,7 +170,7 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
                         <AreaChartIcon size={16} />
                     </button>
                     <button
-                        onClick={() => setActiveChart('bar')}
+                        onClick={() => { setActiveChart('bar'); }}
                         className={cn(
                             "p-2 rounded-lg transition-all duration-300",
                             activeChart === 'bar' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-slate-400 hover:text-slate-600"
@@ -180,7 +180,7 @@ export const SalesTrendChart: React.FC<SalesTrendChartProps> = ({
                         <BarChart2 size={16} />
                     </button>
                     <button
-                        onClick={() => setActiveChart('line')}
+                        onClick={() => { setActiveChart('line'); }}
                         className={cn(
                             "p-2 rounded-lg transition-all duration-300",
                             activeChart === 'line' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-slate-400 hover:text-slate-600"

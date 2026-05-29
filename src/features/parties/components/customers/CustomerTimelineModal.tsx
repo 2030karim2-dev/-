@@ -128,8 +128,8 @@ export const CustomerTimelineModal: React.FC<CustomerTimelineModalProps> = ({
                             <CustomerTimeline
                                 activities={activities}
                                 notes={notes}
-                                onAddActivity={() => setIsAddActivityOpen(true)}
-                                onAddNote={() => setIsAddNoteOpen(true)}
+                                onAddActivity={() => { setIsAddActivityOpen(true); }}
+                                onAddNote={() => { setIsAddNoteOpen(true); }}
                                 onEditActivity={(activity) => {
                                     // For now, just alert. Can be expanded later
                                     alert(`تعديل النشاط: ${activity.subject}`);
@@ -151,16 +151,16 @@ export const CustomerTimelineModal: React.FC<CustomerTimelineModalProps> = ({
             {/* Add Activity Modal */}
             <AddActivityModal
                 isOpen={isAddActivityOpen}
-                onClose={() => setIsAddActivityOpen(false)}
-                onSubmit={(data) => addActivityMutation.mutate(data)}
+                onClose={() => { setIsAddActivityOpen(false); }}
+                onSubmit={(data) => { addActivityMutation.mutate(data); }}
                 customerName={customer.name}
             />
 
             {/* Add Note Modal */}
             <AddNoteModal
                 isOpen={isAddNoteOpen}
-                onClose={() => setIsAddNoteOpen(false)}
-                onSubmit={(data) => addNoteMutation.mutate(data)}
+                onClose={() => { setIsAddNoteOpen(false); }}
+                onSubmit={(data) => { addNoteMutation.mutate(data); }}
                 customerName={customer.name}
             />
         </>

@@ -6,7 +6,7 @@ import { TrendingUp, TrendingDown, Calendar } from 'lucide-react';
 import { cn } from '../../core/utils';
 
 interface SalesChartProps {
-  data: { name: string; sales: number; date?: string }[];
+  data: Array<{ name: string; sales: number; date?: string }>;
   showPeriodSelector?: boolean;
   onPeriodChange?: (period: string) => void;
 }
@@ -39,7 +39,7 @@ const SalesChart: React.FC<SalesChartProps> = ({
       if (checkDimensions()) clearInterval(interval);
     }, 500);
 
-    return () => clearInterval(interval);
+    return () => { clearInterval(interval); };
   }, []);
 
   // Calculate summary stats
@@ -86,7 +86,7 @@ const SalesChart: React.FC<SalesChartProps> = ({
           {(['today', 'week', 'month', 'year'] as PeriodType[]).map(p => (
             <button
               key={p}
-              onClick={() => handlePeriodChange(p)}
+              onClick={() => { handlePeriodChange(p); }}
               className={cn(
                 "px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-300",
                 period === p

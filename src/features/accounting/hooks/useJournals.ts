@@ -3,7 +3,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import { journalService } from '../services/journalService';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
-import { JournalEntryFormData } from '../types/models';
+import type { JournalEntryFormData } from '../types/models';
 import { PostTransactionUsecase } from '../../../core/usecases/accounting/PostTransactionUsecase';
 import { AuthorizeActionUsecase } from '../../../core/usecases/auth/AuthorizeActionUsecase';
 import { invalidateByPreset } from '../../../lib/invalidation';
@@ -14,7 +14,7 @@ export const useJournals = () => {
 
   return useInfiniteQuery({
     queryKey: ['journals', companyId],
-    queryFn: async ({ pageParam = 0 }) => {
+    queryFn: async ({ pageParam }) => {
       if (!companyId) return [];
       try {
         const result = await journalService.formatJournalsForUI(companyId, pageParam);

@@ -1,4 +1,4 @@
-import { ThemePreset } from './types';
+import type { ThemePreset } from './types';
 import { premiumPresets } from './presets/premium';
 import { warmAndRoyalPresets } from './presets/warmAndRoyal';
 import { businessPresets } from './presets/business';

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Car, Plus, Hash } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inventoryApi } from '../inventory/api';
-import { Vehicle } from '../inventory/types';
+import type { Vehicle } from '../inventory/types';
 import MicroHeader from '../../ui/base/MicroHeader';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import FullscreenContainer from '../../ui/base/FullscreenContainer';
@@ -80,7 +80,7 @@ const VehiclesPage: React.FC = () => {
                     actions={headerActions}
                     tabs={TABS}
                     activeTab={activeTab}
-                    onTabChange={(id) => setActiveTab(id as ViewTab)}
+                    onTabChange={(id) => { setActiveTab(id as ViewTab); }}
                     searchPlaceholder={t('search_vehicles')}
                     searchValue={searchTerm}
                     onSearchChange={setSearchTerm}
@@ -90,7 +90,7 @@ const VehiclesPage: React.FC = () => {
                         if (isMaximized) setIsZenMode(false);
                     }}
                     isZenMode={isZenMode}
-                    onToggleZen={() => setIsZenMode(!isZenMode)}
+                    onToggleZen={() => { setIsZenMode(!isZenMode); }}
                 />
 
                 <div className={cn(
@@ -115,9 +115,9 @@ const VehiclesPage: React.FC = () => {
                                                 key={v.id}
                                                 vehicle={v}
                                                 isSelected={selectedVehicle?.id === v.id}
-                                                onSelect={() => setSelectedVehicle(selectedVehicle?.id === v.id ? null : v)}
+                                                onSelect={() => { setSelectedVehicle(selectedVehicle?.id === v.id ? null : v); }}
                                                 onEdit={() => { setEditVehicle(v); setIsModalOpen(true); }}
-                                                onDelete={() => deleteMutation.mutate(v.id)}
+                                                onDelete={() => { deleteMutation.mutate(v.id); }}
                                             />
                                         ))}
                                     </div>
@@ -142,7 +142,7 @@ const VehiclesPage: React.FC = () => {
                     <VehicleModal
                         vehicle={editVehicle}
                         onClose={() => { setIsModalOpen(false); setEditVehicle(null); }}
-                        onSave={(v) => upsertMutation.mutate(editVehicle ? { ...v, id: editVehicle.id } : v)}
+                        onSave={(v) => { upsertMutation.mutate(editVehicle ? { ...v, id: editVehicle.id } : v); }}
                     />
                 )}
             </div>

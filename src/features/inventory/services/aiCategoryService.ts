@@ -27,7 +27,7 @@ export const aiCategoryService = {
     /**
      * Fetch products that need categorization (category_id is null or name is 'عام')
      */
-    getUncategorizedProducts: async (companyId: string, limitNum: number = 100) => {
+    getUncategorizedProducts: async (companyId: string, limitNum = 100) => {
         // 1. Find the 'General' category ID if it exists
         const { data: generalCat } = await supabase
             .from('product_categories')
@@ -63,8 +63,8 @@ export const aiCategoryService = {
      * Classify a batch of products using AI
      */
     classifyBatch: async (
-        products: { id: string; name_ar: string }[],
-        categories: { id: string; name: string }[]
+        products: Array<{ id: string; name_ar: string }>,
+        categories: Array<{ id: string; name: string }>
     ): Promise<ClassificationResult[]> => {
         if (products.length === 0) return [];
 
@@ -144,7 +144,7 @@ export const aiCategoryService = {
         if (catFetchError) throw catFetchError;
 
         const categoryMap: Record<string, string> = {}; // Name -> ID
-        (existingCategories as { id: string, name: string }[])?.forEach((c) => {
+        (existingCategories as Array<{ id: string, name: string }>)?.forEach((c) => {
             if (c.name) categoryMap[c.name] = c.id;
         });
 

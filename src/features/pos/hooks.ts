@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 // import { ProcessPOSCheckoutUsecase } from '../../core/usecases/sales/ProcessPOSCheckoutUsecase';
 import { useAuthStore } from '../auth/store';
 import { useFeedbackStore } from '../feedback/store';
-import { CreateInvoiceDTO } from '../sales/types';
+import type { CreateInvoiceDTO } from '../sales/types';
 // Fix: Import 'salesService' to resolve the 'Cannot find name' error.
 import { salesService } from '../sales/service';
 

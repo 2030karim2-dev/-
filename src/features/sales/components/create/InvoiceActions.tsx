@@ -2,7 +2,7 @@
 import React from 'react';
 import Button from '../../../../ui/base/Button';
 import { Save, Printer, FileDown } from 'lucide-react';
-import { InvoiceStatus } from '../../types';
+import type { InvoiceStatus } from '../../types';
 
 interface Props {
   onSave: (status: InvoiceStatus) => void;
@@ -14,7 +14,7 @@ const InvoiceActions: React.FC<Props> = ({ onSave, onPrint, isSaving }) => {
   return (
     <div className="flex flex-wrap items-center justify-end gap-2 p-2">
         <Button 
-            onClick={() => onSave('draft')}
+            onClick={() => { onSave('draft'); }}
             isLoading={isSaving} 
             variant="secondary" 
             className="rounded-xl"
@@ -33,7 +33,7 @@ const InvoiceActions: React.FC<Props> = ({ onSave, onPrint, isSaving }) => {
         </Button>
 
         <Button 
-            onClick={() => onSave('posted')} 
+            onClick={() => { onSave('posted'); }} 
             isLoading={isSaving} 
             variant="primary"
             className="min-w-[160px] rounded-xl"

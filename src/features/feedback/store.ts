@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { AppError, parseError } from '../../core/utils/errorUtils';
+import { type AppError, parseError } from '../../core/utils/errorUtils';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 

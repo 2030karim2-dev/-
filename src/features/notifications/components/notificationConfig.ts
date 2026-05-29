@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Info, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
 // Type icons mapping

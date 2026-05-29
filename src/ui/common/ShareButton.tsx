@@ -39,7 +39,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
     return (
         <>
             <button
-                onClick={() => setIsOpen(true)}
+                onClick={() => { setIsOpen(true); }}
                 className={`inline-flex items-center justify-center gap-1.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-xl transition-all ${size === 'sm' ? 'p-1.5' : 'px-3 py-2'
                     } ${className}`}
                 title="مشاركة عبر واتساب/تليجرام"
@@ -50,7 +50,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
 
             <ShareModal
                 isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
+                onClose={() => { setIsOpen(false); }}
                 message={message}
                 elementRef={elementRef}
                 title={title}

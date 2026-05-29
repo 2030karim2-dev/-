@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { JournalEntryFormData } from '../types/index';
+import type { JournalEntryFormData } from '../types/index';
 import { useAccounts } from './index';
 import { useCurrencies } from '../../settings/hooks';
 

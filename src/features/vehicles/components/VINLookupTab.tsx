@@ -154,7 +154,7 @@ const VINLookupTab: React.FC = () => {
                                 )}
                             </div>
                             <button
-                                onClick={() => setShowPartForm(true)}
+                                onClick={() => { setShowPartForm(true); }}
                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 active:scale-95 transition-all"
                             >
                                 <Plus size={14} /> إضافة قطعة
@@ -165,7 +165,7 @@ const VINLookupTab: React.FC = () => {
                         {showPartForm && (
                             <PartEntryForm
                                 onAdd={addPart}
-                                onCancel={() => setShowPartForm(false)}
+                                onCancel={() => { setShowPartForm(false); }}
                                 decodedVehicle={decodedVehicle}
                             />
                         )}
@@ -194,7 +194,7 @@ const VINLookupTab: React.FC = () => {
                                                 <div className="flex items-center gap-2 mt-2">
                                                     <select
                                                         value={part.action}
-                                                        onChange={e => setParts(prev => prev.map(p => p.id === part.id ? { ...p, action: e.target.value as any, linkedProductId: undefined, linkedProductName: undefined } as any : p))}
+                                                        onChange={e => { setParts(prev => prev.map(p => p.id === part.id ? { ...p, action: e.target.value as any, linkedProductId: undefined, linkedProductName: undefined } as any : p)); }}
                                                         className="text-[11px] font-bold px-2 py-1 rounded-lg border dark:border-slate-700 dark:bg-slate-800 bg-white"
                                                     >
                                                         <option value="new">➕ إضافة كمنتج جديد</option>
@@ -208,7 +208,7 @@ const VINLookupTab: React.FC = () => {
                                                                 <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg">
                                                                     <Link2 size={12} />
                                                                     {part.linkedProductName}
-                                                                    <button onClick={() => setParts(prev => prev.map(p => p.id === part.id ? { ...p, linkedProductId: undefined, linkedProductName: undefined } as any : p))} className="mr-1 text-gray-400 hover:text-red-500">
+                                                                    <button onClick={() => { setParts(prev => prev.map(p => p.id === part.id ? { ...p, linkedProductId: undefined, linkedProductName: undefined } as any : p)); }} className="mr-1 text-gray-400 hover:text-red-500">
                                                                         <X size={12} />
                                                                     </button>
                                                                 </div>
@@ -219,7 +219,7 @@ const VINLookupTab: React.FC = () => {
                                                                         placeholder="ابحث عن المنتج..."
                                                                         value={linkingPartId === part.id ? productSearch : ''}
                                                                         onChange={e => { setLinkingPartId(part.id); setProductSearch(e.target.value); }}
-                                                                        onFocus={() => setLinkingPartId(part.id)}
+                                                                        onFocus={() => { setLinkingPartId(part.id); }}
                                                                     />
                                                                     {linkingPartId === part.id && searchResults && searchResults.length > 0 && (
                                                                         <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-white dark:bg-slate-900 border dark:border-slate-700 rounded-lg shadow-xl max-h-40 overflow-y-auto">
@@ -255,7 +255,7 @@ const VINLookupTab: React.FC = () => {
                                                     {savingStates[part.id] ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
                                                     حفظ
                                                 </button>
-                                                <button onClick={() => removePart(part.id)} className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-900/30 text-rose-500 rounded-lg transition-colors">
+                                                <button onClick={() => { removePart(part.id); }} className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-900/30 text-rose-500 rounded-lg transition-colors">
                                                     <Trash2 size={14} />
                                                 </button>
                                             </div>
@@ -269,7 +269,7 @@ const VINLookupTab: React.FC = () => {
                         {parts.length > 1 && (
                             <div className="p-4 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
                                 <button
-                                    onClick={() => parts.forEach(p => savePartAsProduct(p))}
+                                    onClick={() => { parts.forEach(p => savePartAsProduct(p)); }}
                                     className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
                                 >
                                     <Save size={16} /> حفظ جميع القطع ({parts.length})

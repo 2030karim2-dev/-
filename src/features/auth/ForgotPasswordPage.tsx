@@ -56,7 +56,7 @@ const ForgotPasswordPage: React.FC = () => {
                             <input 
                                 type="email" 
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(e) => { setEmail(e.target.value); }}
                                 className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all text-sm"
                                 placeholder="name@company.com"
                                 required

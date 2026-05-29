@@ -61,8 +61,8 @@ export const getMainLayoutOffsetClasses = ({
     const sharedOptions = { breakpoint, isIPad, isTabletLandscape };
 
     if (isCollapsed) {
-        return collapsedOffsets[getCollapsedSidebarWidth(sharedOptions) as keyof typeof collapsedOffsets];
+        return collapsedOffsets[getCollapsedSidebarWidth(sharedOptions)];
     }
 
-    return expandedOffsets[getExpandedSidebarWidth(sharedOptions) as keyof typeof expandedOffsets];
+    return expandedOffsets[getExpandedSidebarWidth(sharedOptions)];
 };

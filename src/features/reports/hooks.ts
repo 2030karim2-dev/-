@@ -54,7 +54,7 @@ export const useProfitAndLoss = (options: { enabled?: boolean } = {}) => {
                 throw error;
             }
 
-            const result = data as any;
+            const result = data;
             return {
                 revenues: (result.revenues || []).map((r: any) => ({ id: r.id, name: r.name, netBalance: r.netBalance })),
                 expenses: (result.expenses || []).map((e: any) => ({ id: e.id, name: e.name, netBalance: e.netBalance })),

@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
             label={t('email_label')}
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); }}
             placeholder="name@company.com"
             icon={<Mail className="text-gray-400 dark:text-slate-500" />}
             dir="ltr"
@@ -60,10 +60,10 @@ const LoginPage: React.FC = () => {
               label={t('password_label')}
               type={showPassword ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); }}
               placeholder="••••••••"
               icon={showPassword ? <EyeOff className="text-gray-400 dark:text-slate-500" /> : <Eye className="text-gray-400 dark:text-slate-500" />}
-              onIconClick={() => setShowPassword(!showPassword)}
+              onIconClick={() => { setShowPassword(!showPassword); }}
               dir="ltr"
               required
               minLength={6}
@@ -81,7 +81,7 @@ const LoginPage: React.FC = () => {
               <input
                 type="checkbox"
                 checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+                onChange={(e) => { setRememberMe(e.target.checked); }}
                 className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
               <span className="text-[10px] font-bold text-gray-500 dark:text-slate-400 group-hover:text-blue-600 transition-colors">{t('remember_me')}</span>

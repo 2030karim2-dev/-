@@ -6,9 +6,9 @@
 import React, { useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useTranslation } from '../../../../lib/hooks/useTranslation';
-import { useProductSearch, ProductSearchResult } from '../../../sales/hooks/useProductSearch';
+import { useProductSearch, type ProductSearchResult } from '../../../sales/hooks/useProductSearch';
 import { useAuthStore } from '../../../auth/store';
-import { CartItem } from '../../../sales/types';
+import type { CartItem } from '../../../sales/types';
 
 interface ProductSearchProps {
     onSelectProduct: (product: CartItem) => void;
@@ -49,14 +49,14 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onSelectProduct, }) => {
                 <input
                     type="text"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => { setSearchTerm(e.target.value); }}
                     placeholder="ابحث عن منتج..."
                     className="w-full pr-10 pl-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     autoFocus
                 />
                 {searchTerm && (
                     <button
-                        onClick={() => setSearchTerm('')}
+                        onClick={() => { setSearchTerm(''); }}
                         className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
                         <X size={18} />
@@ -76,7 +76,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onSelectProduct, }) => {
                             {products.map((product: ProductSearchResult) => (
                                 <li
                                     key={product.id}
-                                    onClick={() => handleSelect(product)}
+                                    onClick={() => { handleSelect(product); }}
                                     className="p-3 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer border-b border-gray-100 dark:border-slate-700 last:border-0"
                                 >
                                     <div className="flex justify-between items-center">

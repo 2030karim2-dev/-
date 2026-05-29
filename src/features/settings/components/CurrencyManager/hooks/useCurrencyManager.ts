@@ -23,7 +23,7 @@ export const useCurrencyManager = () => {
             rate_to_base: rateToBase,
             effective_date: new Date().toISOString().split('T')[0]
         }, {
-            onSuccess: () => setActiveRateEdit(null)
+            onSuccess: () => { setActiveRateEdit(null); }
         });
     };
 

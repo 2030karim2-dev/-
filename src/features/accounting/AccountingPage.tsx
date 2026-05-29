@@ -2,7 +2,7 @@ import React, {  useMemo, Suspense, lazy } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 // Fix: Corrected import path to point to the barrel file.
 import { useJournalMutation, useAccountingView } from './hooks/index';
-import { AccountingView } from './types/index';
+import type { AccountingView } from './types/index';
 import { Calculator, Plus, FileText,  Calendar, BookOpen,  Landmark, Layers, LayoutDashboard,  RefreshCw, ShieldCheck, Wallet } from 'lucide-react';
 import MicroHeader from '../../ui/base/MicroHeader';
 import PageLoader from '../../ui/base/PageLoader';
@@ -40,10 +40,10 @@ const AccountingPage: React.FC = () => {
   const { createJournal, isCreating } = useJournalMutation();
 
   const handleCreate = (data: any) => {
-    createJournal(data, { onSuccess: () => closeJournalModal() });
+    createJournal(data, { onSuccess: () => { closeJournalModal(); } });
   };
 
-  const TABS: { id: AccountingView; label: string; icon: any }[] = [
+  const TABS: Array<{ id: AccountingView; label: string; icon: any }> = [
     { id: 'overview', label: t('accounting_overview'), icon: LayoutDashboard },
     { id: 'journal', label: t('journal'), icon: BookOpen },
     { id: 'treasury', label: t('treasury'), icon: Wallet },
@@ -84,7 +84,7 @@ const AccountingPage: React.FC = () => {
             <input
               type="date"
               value={dateRange.from}
-              onChange={(e) => setDateRange(prev => ({ ...prev, from: e.target.value }))}
+              onChange={(e) => { setDateRange(prev => ({ ...prev, from: e.target.value })); }}
               className="bg-white dark:bg-slate-800 border-none rounded p-1 outline-none font-mono text-blue-600 dark:text-blue-400"
             />
           </div>
@@ -94,7 +94,7 @@ const AccountingPage: React.FC = () => {
             <input
               type="date"
               value={dateRange.to}
-              onChange={(e) => setDateRange(prev => ({ ...prev, to: e.target.value }))}
+              onChange={(e) => { setDateRange(prev => ({ ...prev, to: e.target.value })); }}
               className="bg-white dark:bg-slate-800 border-none rounded p-1 outline-none font-mono text-blue-600 dark:text-blue-400"
             />
           </div>
@@ -140,7 +140,7 @@ const AccountingPage: React.FC = () => {
           actions={headerActions}
           tabs={TABS}
           activeTab={activeView}
-          onTabChange={(id) => setActiveView(id as AccountingView)}
+          onTabChange={(id) => { setActiveView(id as AccountingView); }}
           extraRow={dateFilterRow}
           isMaximized={isMaximized}
           onToggleMaximize={() => {
@@ -148,7 +148,7 @@ const AccountingPage: React.FC = () => {
             if (isMaximized) setIsZenMode(false);
           }}
           isZenMode={isZenMode}
-          onToggleZen={() => setIsZenMode(!isZenMode)}
+          onToggleZen={() => { setIsZenMode(!isZenMode); }}
         />
 
       <div className={cn(

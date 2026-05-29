@@ -4,9 +4,7 @@
 // ============================================
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-interface ColumnWidths {
-    [field: string]: number;
-}
+type ColumnWidths = Record<string, number>;
 
 interface UseColumnResizeOptions {
     /** مفتاح التخزين في localStorage لحفظ عرض الأعمدة */

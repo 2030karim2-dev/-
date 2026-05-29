@@ -5,7 +5,7 @@ import { useDebounce } from 'use-debounce';
 import { inventoryApi } from '../../api';
 import { useTranslation } from '../../../../lib/hooks/useTranslation';
 import { useAuthStore } from '../../../auth/store';
-import { Vehicle } from '../../types';
+import type { Vehicle } from '../../types';
 import SearchInput from '../../../../ui/components/SearchInput';
 import SearchDropdown from '../../../../ui/components/SearchDropdown';
 
@@ -53,7 +53,7 @@ const ProductFitment: React.FC<Props> = ({ productId }) => {
                 setSearchResults([]);
                 setSearchError(true);
             })
-            .finally(() => setIsSearching(false));
+            .finally(() => { setIsSearching(false); });
     }, [debouncedSearchTerm]);
 
     const addMutation = useMutation({
@@ -103,12 +103,12 @@ const ProductFitment: React.FC<Props> = ({ productId }) => {
                     variant="default"
                     size="md"
                     dir="ltr"
-                    onEscape={() => setDropdownOpen(false)}
+                    onEscape={() => { setDropdownOpen(false); }}
                 />
 
                 <SearchDropdown
                     open={dropdownOpen}
-                    onClose={() => setDropdownOpen(false)}
+                    onClose={() => { setDropdownOpen(false); }}
                     loading={isSearching}
                     hasResults={searchResults.length > 0}
                     emptyMessage={searchError ? 'حدث خطأ أثناء البحث' : 'لا توجد سيارات مطابقة'}
@@ -117,7 +117,7 @@ const ProductFitment: React.FC<Props> = ({ productId }) => {
                     {searchResults.map(vehicle => (
                         <button
                             key={vehicle.id}
-                            onClick={() => addMutation.mutate(vehicle.id)}
+                            onClick={() => { addMutation.mutate(vehicle.id); }}
                             disabled={addMutation.isPending}
                             className="w-full text-right p-2 hover:bg-indigo-50 dark:hover:bg-slate-700 text-xs flex justify-between items-center border-b dark:border-slate-700 last:border-0"
                         >
@@ -154,7 +154,7 @@ const ProductFitment: React.FC<Props> = ({ productId }) => {
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => removeMutation.mutate(fit.id)}
+                                    onClick={() => { removeMutation.mutate(fit.id); }}
                                     disabled={removeMutation.isPending}
                                     className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                 >

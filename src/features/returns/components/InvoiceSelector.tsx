@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { FileText, Search, X, ChevronDown, Calendar, User, Banknote } from 'lucide-react';
-import { Invoice } from '../types';
+import type { Invoice } from '../types';
 
 interface InvoiceSelectorProps {
     invoices: Invoice[];
@@ -40,7 +40,7 @@ const InvoiceSelector: React.FC<InvoiceSelectorProps> = ({
         return invoices.find(inv => inv.id === selectedInvoiceId);
     }, [invoices, selectedInvoiceId]);
 
-    const formatCurrency = (amount: number, currency: string = 'SAR') => {
+    const formatCurrency = (amount: number, currency = 'SAR') => {
         try {
             return new Intl.NumberFormat('ar-SA', {
                 style: 'currency',
@@ -66,7 +66,7 @@ const InvoiceSelector: React.FC<InvoiceSelectorProps> = ({
 
             <button
                 type="button"
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => { setIsOpen(!isOpen); }}
                 className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-xl text-sm font-bold hover:border-blue-500 focus:border-blue-500 transition-colors"
             >
                 <span className={selectedInvoice ? 'text-gray-900 dark:text-white' : 'text-gray-400'}>
@@ -86,14 +86,14 @@ const InvoiceSelector: React.FC<InvoiceSelectorProps> = ({
                             <input
                                 type="text"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => { setSearchTerm(e.target.value); }}
                                 placeholder="البحث برقم الفاتورة، اسم العميل، أو التاريخ..."
                                 className="w-full ps-12 pe-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-sm font-bold focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                                 autoFocus
                             />
                             {searchTerm && (
                                 <button
-                                    onClick={() => setSearchTerm('')}
+                                    onClick={() => { setSearchTerm(''); }}
                                     className="absolute end-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                 >
                                     <X size={18} />

@@ -11,7 +11,7 @@ import ShareButton from '../../../ui/common/ShareButton';
 
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b', '#14b8a6'];
 
-const useOperationalExpenses = (days: number = 30) => {
+const useOperationalExpenses = (days = 30) => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['operational_expenses', user?.company_id, days],
@@ -136,7 +136,7 @@ const OperationalExpensesReport: React.FC = () => {
                     {[7, 14, 30, 90].map(d => (
                         <button
                             key={d}
-                            onClick={() => setDays(d)}
+                            onClick={() => { setDays(d); }}
                             className={cn(
                                 "px-3 py-1 rounded-lg text-[10px] font-bold transition-colors",
                                 days === d
@@ -205,7 +205,7 @@ const OperationalExpensesReport: React.FC = () => {
                     </div>
                     {(data?.expensesByAccount.length || 0) > 10 && (
                         <button
-                            onClick={() => setShowAll(!showAll)}
+                            onClick={() => { setShowAll(!showAll); }}
                             className="w-full p-2 text-center text-[10px] font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center justify-center gap-1 border-t dark:border-slate-800"
                         >
                             {showAll ? <><ChevronUp size={12} /> إخفاء</> : <><ChevronDown size={12} /> عرض الكل ({data?.expensesByAccount.length})</>}

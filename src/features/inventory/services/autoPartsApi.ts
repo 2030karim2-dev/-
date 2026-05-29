@@ -194,7 +194,7 @@ export const autoPartsApi = {
           if (Array.isArray(data)) {
             vehiclesList = data.flatMap((item: any) => item.linkedVehicles || item.vehicles || [item]);
           } else if (data && typeof data === 'object') {
-            const arrayCandidates = Object.values(data).find(Array.isArray) as any[];
+            const arrayCandidates = Object.values(data).find(Array.isArray)!;
             if (arrayCandidates) {
               vehiclesList = arrayCandidates.flatMap((item: any) => item.linkedVehicles || item.vehicles || [item]);
             }

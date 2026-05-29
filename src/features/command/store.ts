@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export interface CommandAction {
   id: string;
@@ -22,8 +22,8 @@ interface CommandPaletteState {
 export const useCommandPaletteStore = create<CommandPaletteState>((set, _get) => ({
   isOpen: false,
   actions: [],
-  openPalette: () => set({ isOpen: true }),
-  closePalette: () => set({ isOpen: false }),
+  openPalette: () => { set({ isOpen: true }); },
+  closePalette: () => { set({ isOpen: false }); },
   registerActions: (newActions) => {
     set(state => {
       // Avoid duplicates by checking ID

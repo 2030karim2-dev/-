@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import interact from 'interactjs';
 
-type DraggableTableProps<T> = {
+interface DraggableTableProps<T> {
   data: T[];
   renderRow: (item: T, index: number) => React.ReactNode;
   onOrderChange?: (newData: T[]) => void;
   /** Optional className for the table element */
   className?: string;
-};
+}
 
 /**
  * Generic draggable table component using interactjs.

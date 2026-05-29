@@ -1,6 +1,6 @@
 import React from 'react';
 import { FileSpreadsheet, Printer, Calendar, Filter } from 'lucide-react';
-import { FilterState, DateRange, ReturnsType } from '../../hooks/useReturnsReport';
+import type { FilterState, DateRange, ReturnsType } from '../../hooks/useReturnsReport';
 
 interface Props {
     filters: FilterState;
@@ -48,7 +48,7 @@ const ReturnsFilterBar: React.FC<Props> = ({ filters, setFilters, handleExportEx
                         <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-rose-500 transition-colors pointer-events-none" />
                         <select
                             value={filters.dateRange}
-                            onChange={(e) => setFilters({ ...filters, dateRange: e.target.value as DateRange })}
+                            onChange={(e) => { setFilters({ ...filters, dateRange: e.target.value as DateRange }); }}
                             className="w-full pl-4 pr-12 py-3.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 focus:border-rose-500 rounded-2xl text-sm font-bold outline-none transition-all dark:text-white shadow-inner appearance-none"
                         >
                             <option value="today">اليوم</option>
@@ -67,7 +67,7 @@ const ReturnsFilterBar: React.FC<Props> = ({ filters, setFilters, handleExportEx
                         <Filter size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-rose-500 transition-colors pointer-events-none" />
                         <select
                             value={filters.type}
-                            onChange={(e) => setFilters({ ...filters, type: e.target.value as ReturnsType })}
+                            onChange={(e) => { setFilters({ ...filters, type: e.target.value as ReturnsType }); }}
                             className="w-full pl-4 pr-12 py-3.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 focus:border-rose-500 rounded-2xl text-sm font-bold outline-none transition-all dark:text-white shadow-inner appearance-none"
                         >
                             <option value="all">كافة التدفقات</option>
@@ -82,7 +82,7 @@ const ReturnsFilterBar: React.FC<Props> = ({ filters, setFilters, handleExportEx
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">الحالة الإدارية</label>
                     <select
                         value={filters.status}
-                        onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                        onChange={(e) => { setFilters({ ...filters, status: e.target.value }); }}
                         className="w-full px-6 py-3.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 focus:border-rose-500 rounded-2xl text-sm font-bold outline-none transition-all dark:text-white shadow-inner appearance-none"
                     >
                         <option value="all">جميع الحالات</option>
@@ -98,7 +98,7 @@ const ReturnsFilterBar: React.FC<Props> = ({ filters, setFilters, handleExportEx
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">سبب الاسترجاع</label>
                     <select
                         value={filters.reason}
-                        onChange={(e) => setFilters({ ...filters, reason: e.target.value })}
+                        onChange={(e) => { setFilters({ ...filters, reason: e.target.value }); }}
                         className="w-full px-6 py-3.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 focus:border-rose-500 rounded-2xl text-sm font-bold outline-none transition-all dark:text-white shadow-inner appearance-none"
                     >
                         <option value="all">جميع المسببات</option>
@@ -121,7 +121,7 @@ const ReturnsFilterBar: React.FC<Props> = ({ filters, setFilters, handleExportEx
                         <input
                             type="date"
                             value={filters.startDate || ''}
-                            onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+                            onChange={(e) => { setFilters({ ...filters, startDate: e.target.value }); }}
                             className="w-full px-5 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-bold dark:text-white outline-none focus:border-rose-500 transition-all"
                         />
                     </div>
@@ -130,7 +130,7 @@ const ReturnsFilterBar: React.FC<Props> = ({ filters, setFilters, handleExportEx
                         <input
                             type="date"
                             value={filters.endDate || ''}
-                            onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+                            onChange={(e) => { setFilters({ ...filters, endDate: e.target.value }); }}
                             className="w-full px-5 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-bold dark:text-white outline-none focus:border-rose-500 transition-all"
                         />
                     </div>

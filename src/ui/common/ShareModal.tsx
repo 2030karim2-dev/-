@@ -78,12 +78,12 @@ const ShareModal: React.FC<ShareModalProps> = ({
                 setStatus('error');
                 const failedChannels = result.results?.filter(r => !r.success).map(r => `${r.channel}: ${r.error}`).join(', ');
                 showToast(`فشل الإرسال: ${failedChannels || 'لا توجد قنوات مفعلة'}`, 'error');
-                setTimeout(() => setStatus('idle'), 2000);
+                setTimeout(() => { setStatus('idle'); }, 2000);
             }
         } catch {
             setStatus('error');
             showToast('حدث خطأ أثناء الإرسال', 'error');
-            setTimeout(() => setStatus('idle'), 2000);
+            setTimeout(() => { setStatus('idle'); }, 2000);
         }
     };
 
@@ -117,7 +117,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
                     <div className="p-4 border-b dark:border-slate-800">
                         <div className="flex gap-2">
                             <button
-                                onClick={() => setSendMode('image')}
+                                onClick={() => { setSendMode('image'); }}
                                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${sendMode === 'image'
                                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
@@ -127,7 +127,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
                                 إرسال كصورة
                             </button>
                             <button
-                                onClick={() => setSendMode('text')}
+                                onClick={() => { setSendMode('text'); }}
                                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${sendMode === 'text'
                                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'

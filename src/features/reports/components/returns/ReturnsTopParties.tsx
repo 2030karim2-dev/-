@@ -1,7 +1,7 @@
 import React from 'react';
 import { Package } from 'lucide-react';
 import { formatCurrency } from '../../../../core/utils';
-import { ReturnsType } from '../../hooks/useReturnsReport';
+import type { ReturnsType } from '../../hooks/useReturnsReport';
 
 interface Props {
     topParties: any[];

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { autoPartsApi, VehicleCompatibility, ArticleInfo } from '../services/autoPartsApi';
+import { autoPartsApi, type VehicleCompatibility, type ArticleInfo } from '../services/autoPartsApi';
 import { productsApi } from '../api/productsApi';
 import { useAuthStore } from '../../auth/store';
 
@@ -9,7 +9,7 @@ interface CompatibilityResult {
 }
 
 export function useVehicleCompatibility(articleNo: string) {
-  return useQuery<CompatibilityResult, Error>({
+  return useQuery<CompatibilityResult>({
     queryKey: ['vehicle_compatibility', articleNo],
     queryFn: () => autoPartsApi.getCompatibilityByArticle(articleNo),
     enabled: !!articleNo,

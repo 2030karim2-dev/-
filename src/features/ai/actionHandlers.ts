@@ -1,12 +1,12 @@
-import { AIParsedResponse } from './aiActions';
+import type { AIParsedResponse } from './aiActions';
 import { salesService } from '../sales/service';
 import { purchasesService } from '../purchases/service';
 import { expensesService } from '../expenses/service';
 import { bondsService } from '../bonds/service';
-import { CreateInvoiceDTO } from '../sales/types';
-import { CreatePurchaseDTO } from '../purchases/types';
-import { ExpenseFormData } from '../expenses/types';
-import { BondFormData } from '../bonds/types';
+import type { CreateInvoiceDTO } from '../sales/types';
+import type { CreatePurchaseDTO } from '../purchases/types';
+import type { ExpenseFormData } from '../expenses/types';
+import type { BondFormData } from '../bonds/types';
 
 /**
  * Maps the parsed AI intent and entities to the actual ERP service calls.
@@ -28,7 +28,7 @@ export async function executeParsedAction(
                     type: 'sale',
                     dueDate: entities.date || new Date().toISOString().split('T')[0],
                     currency: 'SAR',
-                    paymentMethod: (entities.paymentMethod === 'bank' ? 'credit' : (entities.paymentMethod as 'cash'|'credit' || 'cash')),
+                    paymentMethod: (entities.paymentMethod === 'bank' ? 'credit' : (entities.paymentMethod! || 'cash')),
                     status: 'paid',
                     discount: 0,
                     items: (entities.items || []).map(item => ({
@@ -51,7 +51,7 @@ export async function executeParsedAction(
                     type: 'return_sale',
                     dueDate: entities.date || new Date().toISOString().split('T')[0],
                     currency: 'SAR',
-                    paymentMethod: (entities.paymentMethod === 'bank' ? 'credit' : (entities.paymentMethod as 'cash'|'credit' || 'cash')),
+                    paymentMethod: (entities.paymentMethod === 'bank' ? 'credit' : (entities.paymentMethod! || 'cash')),
                     status: 'paid',
                     discount: 0,
                     items: (entities.items || []).map(item => ({
@@ -76,7 +76,7 @@ export async function executeParsedAction(
                     issueDate: entities.date || new Date().toISOString().split('T')[0],
                     dueDate: entities.date || new Date().toISOString().split('T')[0],
                     currency: 'SAR',
-                    paymentMethod: (entities.paymentMethod === 'bank' ? 'credit' : (entities.paymentMethod as 'cash'|'credit' || 'cash')),
+                    paymentMethod: (entities.paymentMethod === 'bank' ? 'credit' : (entities.paymentMethod! || 'cash')),
                     status: 'posted',
                     items: (entities.items || []).map(item => ({
                         productId: item.productCode || 'unknown',
@@ -101,7 +101,7 @@ export async function executeParsedAction(
                     issueDate: entities.date || new Date().toISOString().split('T')[0],
                     dueDate: entities.date || new Date().toISOString().split('T')[0],
                     currency: 'SAR',
-                    paymentMethod: (entities.paymentMethod === 'bank' ? 'credit' : (entities.paymentMethod as 'cash'|'credit' || 'cash')),
+                    paymentMethod: (entities.paymentMethod === 'bank' ? 'credit' : (entities.paymentMethod! || 'cash')),
                     status: 'posted',
                     items: (entities.items || []).map(item => ({
                         productId: item.productCode || 'unknown',

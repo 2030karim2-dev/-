@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { accountingService } from '../services/index';
 import { useAuthStore } from '../../auth/store';
-import { AccountFormData } from '../types/index';
+import type { AccountFormData } from '../types/index';
 import { useFeedbackStore } from '../../feedback/store';
 import { useNetworkStatus } from '../../../lib/hooks/useNetworkStatus';
 import { syncStore } from '../../../core/lib/sync-store';

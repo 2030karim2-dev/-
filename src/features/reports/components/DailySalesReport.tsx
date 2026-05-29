@@ -9,7 +9,7 @@ import StatCard from '../../../ui/common/StatCard';
 import ExcelTable from '../../../ui/common/ExcelTable';
 import ShareButton from '../../../ui/common/ShareButton';
 
-const useDailySalesReport = (days: number = 30) => {
+const useDailySalesReport = (days = 30) => {
     const { user } = useAuthStore();
     return useQuery({
         queryKey: ['daily_sales_report', user?.company_id, days],
@@ -98,7 +98,7 @@ const DailySalesReport: React.FC = () => {
         },
         {
             header: 'العميل',
-            accessor: (row: any) => <span className="text-[10px] font-bold text-gray-600 dark:text-slate-300">{(row.parties as any)?.name || '---'}</span>,
+            accessor: (row: any) => <span className="text-[10px] font-bold text-gray-600 dark:text-slate-300">{(row.parties)?.name || '---'}</span>,
         },
         {
             header: 'النوع',
@@ -159,7 +159,7 @@ const DailySalesReport: React.FC = () => {
                     {[7, 14, 30, 90].map(d => (
                         <button
                             key={d}
-                            onClick={() => setDays(d)}
+                            onClick={() => { setDays(d); }}
                             className={cn(
                                 "px-3 py-1 rounded-lg text-[10px] font-bold transition-colors",
                                 days === d
@@ -223,7 +223,7 @@ const DailySalesReport: React.FC = () => {
                 </div>
                 {(data?.invoices.length || 0) > 10 && (
                     <button
-                        onClick={() => setShowAllInvoices(!showAllInvoices)}
+                        onClick={() => { setShowAllInvoices(!showAllInvoices); }}
                         className="w-full p-2 text-center text-[10px] font-bold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 flex items-center justify-center gap-1 border-t dark:border-slate-800"
                     >
                         {showAllInvoices ? <><ChevronUp size={12} /> إخفاء</> : <><ChevronDown size={12} /> عرض الكل ({data?.invoices.length})</>}

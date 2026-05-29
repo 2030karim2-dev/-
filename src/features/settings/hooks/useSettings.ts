@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { settingsService } from '../services/settingsService';
 import { useAuthStore } from '../../auth/store';
-import { CompanyFormData } from '../types';
+import type { CompanyFormData } from '../types';
 
 export const useCompanyProfile = () => {
   const { user } = useAuthStore();

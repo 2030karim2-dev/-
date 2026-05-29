@@ -8,7 +8,7 @@ import { TrendingUp, TrendingDown, Scale } from 'lucide-react';
 import { cn } from '../../../core/utils';
 
 interface RevenueExpensesChartProps {
-    data: { name: string; revenue: number; expenses: number }[];
+    data: Array<{ name: string; revenue: number; expenses: number }>;
     className?: string;
 }
 
@@ -21,7 +21,7 @@ const formatNumber = (value: number) => {
 // --- Sub-components (Atoms/Molecules) ---
 
 const ChartTooltip = React.memo(({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
         const revenue = payload.find((p: any) => p.dataKey === 'revenue')?.value || 0;
         const expenses = payload.find((p: any) => p.dataKey === 'expenses')?.value || 0;
         const net = revenue - expenses;
@@ -153,7 +153,7 @@ const RevenueExpensesChart: React.FC<RevenueExpensesChartProps> = ({
             }
         });
         ro.observe(containerRef.current);
-        return () => ro.disconnect();
+        return () => { ro.disconnect(); };
     }, []);
 
     const metrics = React.useMemo(() => {

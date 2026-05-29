@@ -24,7 +24,7 @@ export const PaperSettings: React.FC<PaperSettingsProps> = ({ print, handleUpdat
                     </label>
                     <select
                         value={print.paper_size}
-                        onChange={(e) => handleUpdate({ paper_size: e.target.value as 'A4' | 'A5' | 'Letter' | 'Legal' })}
+                        onChange={(e) => { handleUpdate({ paper_size: e.target.value as 'A4' | 'A5' | 'Letter' | 'Legal' }); }}
                         className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     >
                         <option value="A4">A4</option>
@@ -42,7 +42,7 @@ export const PaperSettings: React.FC<PaperSettingsProps> = ({ print, handleUpdat
                         min={1}
                         max={5}
                         value={print.copies}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate({ copies: parseInt(e.target.value) || 1 })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { handleUpdate({ copies: parseInt(e.target.value) || 1 }); }}
                         className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     />
                 </div>
@@ -52,7 +52,7 @@ export const PaperSettings: React.FC<PaperSettingsProps> = ({ print, handleUpdat
                     </label>
                     <select
                         value={print.orientation}
-                        onChange={(e) => handleUpdate({ orientation: e.target.value as 'portrait' | 'landscape' })}
+                        onChange={(e) => { handleUpdate({ orientation: e.target.value as 'portrait' | 'landscape' }); }}
                         className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     >
                         <option value="portrait">{t.portrait || 'عمودي'}</option>

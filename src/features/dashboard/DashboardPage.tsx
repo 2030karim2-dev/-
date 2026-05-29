@@ -52,7 +52,7 @@ const DashboardError = ({ refetch, isFetching }: { refetch: () => void, isFetchi
             </p>
         </div>
         <button
-            onClick={() => refetch()}
+            onClick={() => { refetch(); }}
             className="flex items-center gap-2 px-6 py-3 bg-[var(--accent)] text-white rounded-xl font-bold hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-[var(--accent)]/20"
         >
             <RefreshCw size={18} className={isFetching ? 'animate-spin' : ''} />
@@ -101,7 +101,7 @@ const DashboardPage: React.FC = () => {
                 actions={
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={() => refetch()}
+                            onClick={() => { refetch(); }}
                             className="p-2 text-[var(--app-text-secondary)] hover:text-[var(--accent)] active:scale-90 transition-all rounded-lg hover:bg-[var(--app-surface-hover)]"
                         >
                             <RefreshCw size={14} className={isFetching ? 'animate-spin' : ''} />

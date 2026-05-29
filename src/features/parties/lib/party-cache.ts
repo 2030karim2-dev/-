@@ -4,7 +4,7 @@
  * Provides local storage persistence for parties to improve search performance.
  */
 
-import { Party, PartyType } from '../types';
+import type { Party, PartyType } from '../types';
 
 const CACHE_KEY_PREFIX = 'alzahra_party_cache_';
 

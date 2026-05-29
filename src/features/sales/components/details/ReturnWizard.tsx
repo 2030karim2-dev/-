@@ -10,7 +10,7 @@ interface Props {
 }
 
 const ReturnWizard: React.FC<Props> = ({ invoice, onReturn, onCancel, onAlert }) => {
-  const [returnItems, setReturnItems] = useState<{ [key: string]: number }>({});
+  const [returnItems, setReturnItems] = useState<Record<string, number>>({});
 
   const updateReturnQuantity = (itemId: string, qty: number) => {
     const item = invoice?.invoice_items?.find((i: any) => i.id === itemId);
@@ -96,7 +96,7 @@ const ReturnWizard: React.FC<Props> = ({ invoice, onReturn, onCancel, onAlert })
                   min="0"
                   max={item.quantity}
                   value={returnItems[item.id] || 0}
-                  onChange={(e) => updateReturnQuantity(item.id, parseInt(e.target.value) || 0)}
+                  onChange={(e) => { updateReturnQuantity(item.id, parseInt(e.target.value) || 0); }}
                   className="w-16 p-2 text-center font-bold border border-gray-200 dark:border-slate-600 rounded-lg dark:bg-slate-700 dark:text-white text-sm"
                 />
                 <span className="text-xs text-gray-500">/ {item.quantity}</span>

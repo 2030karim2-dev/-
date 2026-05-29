@@ -3,7 +3,7 @@ import { useDebounce } from 'use-debounce';
 import productService from '../services/productService';
 import { logger } from '../../../core/utils/logger';
 
-export const useSimilarityCheck = (name: string, company_id?: string, isEdit: boolean = false) => {
+export const useSimilarityCheck = (name: string, company_id?: string, isEdit = false) => {
     const [similarProducts, setSimilarProducts] = useState<any[]>([]);
     const [isChecking, setIsChecking] = useState(false);
     const [debouncedName] = useDebounce(name, 600);

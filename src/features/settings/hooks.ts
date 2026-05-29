@@ -4,7 +4,7 @@ import { settingsService } from './service';
 import { settingsApi } from './api';
 import { useAuthStore } from '../auth/store';
 import { useFeedbackStore } from '../feedback/store';
-import { CompanyFormData, WarehouseFormData, FiscalYearFormData, ExchangeRateFormData } from './types';
+import type { CompanyFormData, WarehouseFormData, FiscalYearFormData, ExchangeRateFormData } from './types';
 
 export const useCompany = () => {
   const { user } = useAuthStore();
@@ -203,7 +203,7 @@ export const useBackupActions = () => {
     try {
       await settingsService.importSystemData(file);
       showToast("تم استيراد البيانات بنجاح، سيتم إعادة التحميل", 'success');
-      setTimeout(() => window.location.reload(), 1500);
+      setTimeout(() => { window.location.reload(); }, 1500);
     } catch (err: any) {
       showToast(err.message, 'error');
     }

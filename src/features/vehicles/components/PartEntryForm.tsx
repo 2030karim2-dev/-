@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { PartEntry } from '../types';
+import type { PartEntry } from '../types';
 
 interface PartEntryFormProps {
     onAdd: (data: Omit<PartEntry, 'id'>) => void;
@@ -39,26 +39,26 @@ export const PartEntryForm: React.FC<PartEntryFormProps> = ({ onAdd, onCancel, d
                         className="w-full px-3 py-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 text-sm font-mono tracking-wider uppercase"
                         placeholder="04465-33471"
                         value={partNumber}
-                        onChange={e => setPartNumber(e.target.value)}
+                        onChange={e => { setPartNumber(e.target.value); }}
                         dir="ltr"
                         autoFocus
                     />
                 </div>
                 <div>
                     <label className="text-[10px] font-bold text-gray-500 block mb-1">الاسم بالعربية</label>
-                    <input className="w-full px-3 py-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 text-sm" placeholder="فحمات فرامل أمامية" value={nameAr} onChange={e => setNameAr(e.target.value)} />
+                    <input className="w-full px-3 py-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 text-sm" placeholder="فحمات فرامل أمامية" value={nameAr} onChange={e => { setNameAr(e.target.value); }} />
                 </div>
                 <div>
                     <label className="text-[10px] font-bold text-gray-500 block mb-1">الاسم بالإنجليزية</label>
-                    <input className="w-full px-3 py-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 text-sm" placeholder="Front Brake Pads" value={nameEn} onChange={e => setNameEn(e.target.value)} dir="ltr" />
+                    <input className="w-full px-3 py-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 text-sm" placeholder="Front Brake Pads" value={nameEn} onChange={e => { setNameEn(e.target.value); }} dir="ltr" />
                 </div>
                 <div>
                     <label className="text-[10px] font-bold text-gray-500 block mb-1">الماركة</label>
-                    <input className="w-full px-3 py-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 text-sm" value={brand} onChange={e => setBrand(e.target.value)} dir="ltr" />
+                    <input className="w-full px-3 py-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 text-sm" value={brand} onChange={e => { setBrand(e.target.value); }} dir="ltr" />
                 </div>
                 <div>
                     <label className="text-[10px] font-bold text-gray-500 block mb-1">المصدر</label>
-                    <select className="w-full px-3 py-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 text-sm" value={source} onChange={e => setSource(e.target.value)}>
+                    <select className="w-full px-3 py-2 rounded-lg border dark:border-slate-700 dark:bg-slate-800 text-sm" value={source} onChange={e => { setSource(e.target.value); }}>
                         <option value="PartsOuq">PartsOuq</option>
                         <option value="Afyal">Afyal</option>
                         <option value="ToyoDIY">ToyoDIY</option>

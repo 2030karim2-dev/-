@@ -59,13 +59,13 @@ export const InvoiceSettings: React.FC = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <SettingField label="بادئة فاتورة البيع" value={invoice.invoice_prefix} onChange={v => handleUpdate({ invoice_prefix: v })} placeholder="INV-" dir="ltr" />
-                            <SettingField label="رقم البداية" type="number" value={invoice.invoice_start_number} onChange={v => handleUpdate({ invoice_start_number: v })} />
+                            <SettingField label="بادئة فاتورة البيع" value={invoice.invoice_prefix} onChange={v => { handleUpdate({ invoice_prefix: v }); }} placeholder="INV-" dir="ltr" />
+                            <SettingField label="رقم البداية" type="number" value={invoice.invoice_start_number} onChange={v => { handleUpdate({ invoice_start_number: v }); }} />
                             <div>
                                 <label className="block text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">تنسيق اللاحقة</label>
                                 <select
                                     value={invoice.invoice_suffix_format}
-                                    onChange={e => handleUpdate({ invoice_suffix_format: e.target.value })}
+                                    onChange={e => { handleUpdate({ invoice_suffix_format: e.target.value }); }}
                                     className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs font-bold text-gray-800 dark:text-slate-200 outline-none transition-colors"
                                 >
                                     <option value="YYYY-MM-XXXX">YYYY-MM-XXXX (سنة-شهر-رقم)</option>
@@ -75,12 +75,12 @@ export const InvoiceSettings: React.FC = () => {
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <SettingField label="بادئة عرض السعر" value={invoice.quote_prefix} onChange={v => handleUpdate({ quote_prefix: v })} placeholder="Q-" dir="ltr" />
-                            <SettingField label="بادئة المرتجع" value={invoice.return_prefix} onChange={v => handleUpdate({ return_prefix: v })} placeholder="RET-" dir="ltr" />
+                            <SettingField label="بادئة عرض السعر" value={invoice.quote_prefix} onChange={v => { handleUpdate({ quote_prefix: v }); }} placeholder="Q-" dir="ltr" />
+                            <SettingField label="بادئة المرتجع" value={invoice.return_prefix} onChange={v => { handleUpdate({ return_prefix: v }); }} placeholder="RET-" dir="ltr" />
                         </div>
                         <SettingToggle
                             checked={invoice.auto_generate_number}
-                            onChange={v => handleUpdate({ auto_generate_number: v })}
+                            onChange={v => { handleUpdate({ auto_generate_number: v }); }}
                             label="توليد الأرقام تلقائياً"
                             description="النظام سيقوم بإنشاء رقم فاتورة تسلسلي عند كل فاتورة جديدة"
                         />
@@ -90,8 +90,8 @@ export const InvoiceSettings: React.FC = () => {
                 {/* ═══════════════════════════ 2. شروط الدفع ═══════════════════════════ */}
                 <SettingSection icon={<CreditCard size={16} />} title="شروط الدفع" subtitle="إعدادات الاستحقاق والمهل الافتراضية" color="bg-emerald-600 shadow-emerald-500/20">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <SettingField label="مهلة الدفع الافتراضية (أيام)" type="number" value={invoice.default_payment_terms} onChange={v => handleUpdate({ default_payment_terms: v })} />
-                        <SettingField label="أيام الاستحقاق الافتراضية" type="number" value={invoice.default_due_date_days} onChange={v => handleUpdate({ default_due_date_days: v })} />
+                        <SettingField label="مهلة الدفع الافتراضية (أيام)" type="number" value={invoice.default_payment_terms} onChange={v => { handleUpdate({ default_payment_terms: v }); }} />
+                        <SettingField label="أيام الاستحقاق الافتراضية" type="number" value={invoice.default_due_date_days} onChange={v => { handleUpdate({ default_due_date_days: v }); }} />
                     </div>
                     <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-100 dark:border-amber-900/20">
                         <p className="text-[8px] md:text-[9px] font-bold text-amber-700 dark:text-amber-400">
@@ -115,7 +115,7 @@ export const InvoiceSettings: React.FC = () => {
                                     <button
                                         key={tmpl.id}
                                         type="button"
-                                        onClick={() => handleUpdate({ invoice_template: tmpl.id })}
+                                        onClick={() => { handleUpdate({ invoice_template: tmpl.id }); }}
                                         className={cn(
                                             "p-3 md:p-4 rounded-xl border-2 text-center transition-all",
                                             invoice.invoice_template === tmpl.id
@@ -145,8 +145,8 @@ export const InvoiceSettings: React.FC = () => {
                         <div className="border-t border-gray-100 dark:border-slate-800 pt-4">
                             <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-3">عناصر العرض</p>
                             <div className="space-y-1 divide-y divide-gray-50 dark:divide-slate-800/50">
-                                <SettingToggle checked={invoice.show_logo} onChange={v => handleUpdate({ show_logo: v })} label="عرض شعار الشركة" description="يظهر في ترويسة الفاتورة المطبوعة" />
-                                <SettingToggle checked={invoice.show_bank_details} onChange={v => handleUpdate({ show_bank_details: v })} label="عرض البيانات البنكية" description="يعرض معلومات الحساب البنكي وال IBAN في التذييل" />
+                                <SettingToggle checked={invoice.show_logo} onChange={v => { handleUpdate({ show_logo: v }); }} label="عرض شعار الشركة" description="يظهر في ترويسة الفاتورة المطبوعة" />
+                                <SettingToggle checked={invoice.show_bank_details} onChange={v => { handleUpdate({ show_bank_details: v }); }} label="عرض البيانات البنكية" description="يعرض معلومات الحساب البنكي وال IBAN في التذييل" />
                             </div>
                         </div>
 
@@ -195,18 +195,18 @@ export const InvoiceSettings: React.FC = () => {
                 <SettingSection icon={<Building size={16} />} title="بيانات ترويسة الفاتورة" subtitle="المعلومات التي تظهر في أعلى الفاتورة المطبوعة" color="bg-blue-600 shadow-blue-500/20">
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <SettingField label="اسم الشركة (بالعربية)" value={invoice.company_name_ar} onChange={v => handleUpdate({ company_name_ar: v })} placeholder="شركة الزهراء لقطع الغيار" />
-                            <SettingField label="اسم الشركة (بالانجليزية)" value={invoice.company_name_en} onChange={v => handleUpdate({ company_name_en: v })} placeholder="Al Zahra Auto Parts" dir="ltr" />
+                            <SettingField label="اسم الشركة (بالعربية)" value={invoice.company_name_ar} onChange={v => { handleUpdate({ company_name_ar: v }); }} placeholder="شركة الزهراء لقطع الغيار" />
+                            <SettingField label="اسم الشركة (بالانجليزية)" value={invoice.company_name_en} onChange={v => { handleUpdate({ company_name_en: v }); }} placeholder="Al Zahra Auto Parts" dir="ltr" />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <SettingField label="تخصص الشركة / النشاط" value={invoice.company_specialization} onChange={v => handleUpdate({ company_specialization: v })} placeholder="بيع قطع غيار السيارات وزيوت" />
-                            <SettingField label="نص الترويسة الإضافي" value={invoice.invoice_header_text} onChange={v => handleUpdate({ invoice_header_text: v })} placeholder="فاتورة مبيعات" />
+                            <SettingField label="تخصص الشركة / النشاط" value={invoice.company_specialization} onChange={v => { handleUpdate({ company_specialization: v }); }} placeholder="بيع قطع غيار السيارات وزيوت" />
+                            <SettingField label="نص الترويسة الإضافي" value={invoice.invoice_header_text} onChange={v => { handleUpdate({ invoice_header_text: v }); }} placeholder="فاتورة مبيعات" />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <SettingField label="رقم الهاتف" value={invoice.company_phone} onChange={v => handleUpdate({ company_phone: v })} placeholder="77XXXXXXX" dir="ltr" />
-                            <SettingField label="البريد الإلكتروني" value={invoice.company_email} onChange={v => handleUpdate({ company_email: v })} placeholder="info@example.com" dir="ltr" />
+                            <SettingField label="رقم الهاتف" value={invoice.company_phone} onChange={v => { handleUpdate({ company_phone: v }); }} placeholder="77XXXXXXX" dir="ltr" />
+                            <SettingField label="البريد الإلكتروني" value={invoice.company_email} onChange={v => { handleUpdate({ company_email: v }); }} placeholder="info@example.com" dir="ltr" />
                         </div>
-                        <SettingField label="العنوان التفصيلي" value={invoice.company_address} onChange={v => handleUpdate({ company_address: v })} placeholder="صنعاء - شارع الستين" />
+                        <SettingField label="العنوان التفصيلي" value={invoice.company_address} onChange={v => { handleUpdate({ company_address: v }); }} placeholder="صنعاء - شارع الستين" />
                     </div>
                 </SettingSection>
 
@@ -217,7 +217,7 @@ export const InvoiceSettings: React.FC = () => {
                             <label className="block text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">ملاحظات الفاتورة (عربي)</label>
                             <textarea
                                 value={invoice.default_notes_ar}
-                                onChange={e => handleUpdate({ default_notes_ar: e.target.value })}
+                                onChange={e => { handleUpdate({ default_notes_ar: e.target.value }); }}
                                 rows={3}
                                 className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs font-bold text-gray-800 dark:text-slate-200 outline-none transition-colors resize-none"
                                 placeholder="مثال: شكراً لتعاملكم معنا. البضاعة المباعة لا تُرد ولا تُستبدل."
@@ -227,7 +227,7 @@ export const InvoiceSettings: React.FC = () => {
                             <label className="block text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">ملاحظات الفاتورة (EN)</label>
                             <textarea
                                 value={invoice.default_notes_en}
-                                onChange={e => handleUpdate({ default_notes_en: e.target.value })}
+                                onChange={e => { handleUpdate({ default_notes_en: e.target.value }); }}
                                 rows={3}
                                 dir="ltr"
                                 className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs font-bold text-gray-800 dark:text-slate-200 outline-none transition-colors resize-none"
@@ -238,7 +238,7 @@ export const InvoiceSettings: React.FC = () => {
                             <label className="block text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">الشروط والأحكام (عربي)</label>
                             <textarea
                                 value={invoice.default_terms_ar}
-                                onChange={e => handleUpdate({ default_terms_ar: e.target.value })}
+                                onChange={e => { handleUpdate({ default_terms_ar: e.target.value }); }}
                                 rows={3}
                                 className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs font-bold text-gray-800 dark:text-slate-200 outline-none transition-colors resize-none"
                                 placeholder="1. تم الاستلام بحالة ممتازة. 2. الضمان 30 يوماً..."
@@ -248,7 +248,7 @@ export const InvoiceSettings: React.FC = () => {
                             <label className="block text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">الشروط والأحكام (EN)</label>
                             <textarea
                                 value={invoice.default_terms_en}
-                                onChange={e => handleUpdate({ default_terms_en: e.target.value })}
+                                onChange={e => { handleUpdate({ default_terms_en: e.target.value }); }}
                                 rows={3}
                                 dir="ltr"
                                 className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs font-bold text-gray-800 dark:text-slate-200 outline-none transition-colors resize-none"

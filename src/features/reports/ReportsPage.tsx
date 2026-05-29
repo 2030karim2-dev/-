@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import MicroHeader from '../../ui/base/MicroHeader';
 import FullscreenContainer from '../../ui/base/FullscreenContainer';
-import { ReportTab } from './types';
+import type { ReportTab } from './types';
 import DebtReportView from './components/DebtReportView';
 import TrialBalanceView from './components/TrialBalanceView';
 import ProfitLossView from './components/ProfitLossView';
@@ -31,14 +31,14 @@ const ReportsPage: React.FC = () => {
   const [isMaximized, setIsMaximized] = useState(false);
   const [isZenMode, setIsZenMode] = useState(false);
 
-  const categories: { id: ReportCategory; label: string; icon: any; color: string }[] = [
+  const categories: Array<{ id: ReportCategory; label: string; icon: any; color: string }> = [
     { id: 'all', label: t('all'), icon: LayoutGrid, color: 'text-slate-500' },
     { id: 'sales', label: t('sales_and_inventory'), icon: Activity, color: 'text-emerald-500' },
     { id: 'financial', label: t('financial_statements'), icon: FileText, color: 'text-amber-500' },
     { id: 'accounting', label: t('accounting_and_debts'), icon: Layers, color: 'text-purple-500' },
   ];
 
-  const allTabs: { id: ReportTab; label: string; icon: any; category: ReportCategory }[] = [
+  const allTabs: Array<{ id: ReportTab; label: string; icon: any; category: ReportCategory }> = [
     { id: 'daily_sales', label: 'المبيعات اليومي', icon: ShoppingCart, category: 'sales' },
     { id: 'returns_report', label: 'تقرير المرتجعات', icon: RotateCcw, category: 'sales' },
     { id: 'trial_balance', label: t('trial_balance'), icon: Scale, category: 'financial' },
@@ -82,20 +82,20 @@ const ReportsPage: React.FC = () => {
           icon={BarChart3}
           tabs={filteredTabs}
           activeTab={activeTab}
-          onTabChange={(id) => setActiveTab(id as ReportTab)}
+          onTabChange={(id) => { setActiveTab(id as ReportTab); }}
           isMaximized={isMaximized}
           onToggleMaximize={() => {
             setIsMaximized(!isMaximized);
             if (isMaximized) setIsZenMode(false);
           }}
           isZenMode={isZenMode}
-          onToggleZen={() => setIsZenMode(!isZenMode)}
+          onToggleZen={() => { setIsZenMode(!isZenMode); }}
           extraRow={
             <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
               {categories.map((cat) => (
                 <button
                   key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
+                  onClick={() => { setActiveCategory(cat.id); }}
                   className={cn(
                     "flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all whitespace-nowrap text-[10px] font-bold uppercase tracking-tight",
                     activeCategory === cat.id

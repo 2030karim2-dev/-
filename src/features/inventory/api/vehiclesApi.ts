@@ -1,5 +1,5 @@
 import { supabase } from '../../../lib/supabaseClient';
-import { TableInsert, TableUpdate } from '@/core/types/supabase-helpers';
+import type { TableInsert, TableUpdate } from '@/core/types/supabase-helpers';
 
 /** Vehicle management and fitment */
 export const vehiclesApi = {

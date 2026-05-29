@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, forwardRef, useCallback } from 'react';
+import React, { type InputHTMLAttributes, forwardRef, useCallback } from 'react';
 import { cn } from '../../core/utils';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -36,7 +36,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               nextInput.focus();
               // Select all text if it's an input or textarea
               if (nextInput.tagName === 'INPUT' || nextInput.tagName === 'TEXTAREA') {
-                (nextInput as HTMLInputElement).select();
+                (nextInput).select();
               }
             }
           }

@@ -18,7 +18,7 @@ const STATUS_CONFIG: Record<QuotationStatus, { label: string; color: string; ico
   converted: { label: 'تم التحويل', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400', icon: <ArrowRightLeft size={12} /> },
 };
 
-const FILTER_TABS: { key: string; label: string }[] = [
+const FILTER_TABS: Array<{ key: string; label: string }> = [
   { key: 'all', label: 'الكل' },
   { key: 'draft', label: 'مسودة' },
   { key: 'sent', label: 'مرسل' },
@@ -85,7 +85,7 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
           </div>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => { setShowCreateModal(true); }}
           className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors shadow-sm shadow-indigo-600/20"
         >
           <Plus size={16} />
@@ -99,7 +99,7 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
           {FILTER_TABS.map(tab => (
             <button
               key={tab.key}
-              onClick={() => setStatusFilter(tab.key)}
+              onClick={() => { setStatusFilter(tab.key); }}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                 statusFilter === tab.key
                   ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
@@ -115,7 +115,7 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => { setSearchTerm(e.target.value); }}
             placeholder="بحث بالرقم أو اسم العميل..."
             className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl py-2 pr-9 pl-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
@@ -142,13 +142,13 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
                 <>
                   <td
                     className="py-3 px-4 font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer"
-                    onClick={() => setSelectedQuotationId(q.id)}
+                    onClick={() => { setSelectedQuotationId(q.id); }}
                   >
                     {q.quotation_number}
                   </td>
                   <td
                     className="py-3 px-4 font-medium text-gray-900 dark:text-white cursor-pointer"
-                    onClick={() => setSelectedQuotationId(q.id)}
+                    onClick={() => { setSelectedQuotationId(q.id); }}
                   >
                     {q.party?.name || 'عميل نقدي'}
                   </td>
@@ -203,7 +203,7 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
       {/* Modals */}
       {showCreateModal && (
         <CreateQuotationModal
-          onClose={() => setShowCreateModal(false)}
+          onClose={() => { setShowCreateModal(false); }}
           onSuccess={() => {
             setShowCreateModal(false);
             fetchQuotations();
@@ -214,7 +214,7 @@ export const QuotationsTab: React.FC<Props> = ({ onConvertToInvoice }) => {
       {selectedQuotationId && (
         <QuotationDetailsModal
           quotationId={selectedQuotationId}
-          onClose={() => setSelectedQuotationId(null)}
+          onClose={() => { setSelectedQuotationId(null); }}
           onRefresh={fetchQuotations}
           {...(onConvertToInvoice ? { onConvertToInvoice } : {})}
         />

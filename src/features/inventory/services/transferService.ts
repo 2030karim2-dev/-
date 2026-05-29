@@ -1,5 +1,5 @@
 // Transfer Service - Handles stock transfer operations
-import { CreateTransferDTO } from '../types';
+import type { CreateTransferDTO } from '../types';
 import { supabase } from '../../../lib/supabaseClient';
 
 export const transferService = {

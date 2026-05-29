@@ -1,6 +1,6 @@
 
 import { companyApi } from '../api/companyApi';
-import { CompanyFormData } from '../types';
+import type { CompanyFormData } from '../types';
 
 export const settingsService = {
   getCompanyProfile: async (companyId: string) => {

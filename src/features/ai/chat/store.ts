@@ -3,7 +3,7 @@
  * Manages AI prefill data and product lookup state.
  */
 import { create } from 'zustand';
-import { AIParsedResponse, AIIntent, LookupResult } from '../core/types';
+import type { AIParsedResponse, AIIntent, LookupResult } from '../core/types';
 
 interface AIStoreState {
     pendingPrefill: AIParsedResponse | null;
@@ -19,9 +19,9 @@ export const useAIPrefillStore = create<AIStoreState>((set, get) => ({
     pendingPrefill: null,
     productLookupResults: null,
     productLookupAction: null,
-    setPendingPrefill: (action) => set({ pendingPrefill: action }),
-    setProductLookup: (results, action) => set({ productLookupResults: results, productLookupAction: action }),
-    clearProductLookup: () => set({ productLookupResults: null, productLookupAction: null }),
+    setPendingPrefill: (action) => { set({ pendingPrefill: action }); },
+    setProductLookup: (results, action) => { set({ productLookupResults: results, productLookupAction: action }); },
+    clearProductLookup: () => { set({ productLookupResults: null, productLookupAction: null }); },
     consumePrefill: (intentPattern) => {
         const { pendingPrefill } = get();
         if (!pendingPrefill) return null;

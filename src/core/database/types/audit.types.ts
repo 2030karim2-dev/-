@@ -4,7 +4,7 @@
  * Types for audit logs, audit sessions, and audit items
  */
 
-import { TableRow, TableInsert, TableUpdate } from './common.types';
+import type { TableRow, TableInsert, TableUpdate } from './common.types';
 
 // ============================================
 // Audit Sessions

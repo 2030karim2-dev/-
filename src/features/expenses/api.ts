@@ -6,7 +6,7 @@
  */
 
 import { supabase } from '@/core/database/api';
-import { ExpenseFormData } from './types';
+import type { ExpenseFormData } from './types';
 
 // Typed interfaces for category create payload
 interface CategoryInsert {

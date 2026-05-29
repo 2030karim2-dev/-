@@ -1,8 +1,8 @@
 // ============================================
 // useTabKeyboard — التنقل بلوحة المفاتيح + Typeahead
 // ============================================
-import { useCallback, MutableRefObject } from 'react';
-import { TabItem } from '../types';
+import { useCallback, type MutableRefObject } from 'react';
+import type { TabItem } from '../types';
 
 const isRTL = () =>
     document.documentElement.dir === 'rtl' ||
@@ -12,7 +12,7 @@ interface UseTabKeyboardOptions {
     enabled: boolean;
     tabs: TabItem[];
     activeTab: string;
-    tabRefs: MutableRefObject<{ [key: string]: HTMLButtonElement | null }>;
+    tabRefs: MutableRefObject<Record<string, HTMLButtonElement | null>>;
     onTabActivate: (tabId: string) => void;
 }
 

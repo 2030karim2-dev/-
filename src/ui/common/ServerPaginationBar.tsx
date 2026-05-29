@@ -29,10 +29,10 @@ interface ServerPaginationBarProps {
 }
 
 /** Build the list of page items with ellipsis */
-function buildPageItems(page: number, totalPages: number): (number | '...')[] {
+function buildPageItems(page: number, totalPages: number): Array<number | '...'> {
   if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  const pages: (number | '...')[] = [1];
+  const pages: Array<number | '...'> = [1];
 
   if (page > 4) pages.push('...');
 
@@ -97,7 +97,7 @@ const ServerPaginationBar: React.FC<ServerPaginationBarProps> = ({
       <div className="flex items-center gap-1">
         {/* First page */}
         <PagBtn
-          onClick={() => onPageChange(1)}
+          onClick={() => { onPageChange(1); }}
           disabled={page === 1}
           title="الصفحة الأولى"
         >
@@ -106,7 +106,7 @@ const ServerPaginationBar: React.FC<ServerPaginationBarProps> = ({
 
         {/* Prev page */}
         <PagBtn
-          onClick={() => onPageChange(page - 1)}
+          onClick={() => { onPageChange(page - 1); }}
           disabled={page === 1}
           title="الصفحة السابقة"
         >
@@ -120,7 +120,7 @@ const ServerPaginationBar: React.FC<ServerPaginationBarProps> = ({
           ) : (
             <PagBtn
               key={item}
-              onClick={() => onPageChange(item)}
+              onClick={() => { onPageChange(item); }}
               active={item === page}
               title={`الصفحة ${item}`}
             >
@@ -131,7 +131,7 @@ const ServerPaginationBar: React.FC<ServerPaginationBarProps> = ({
 
         {/* Next page */}
         <PagBtn
-          onClick={() => onPageChange(page + 1)}
+          onClick={() => { onPageChange(page + 1); }}
           disabled={page >= totalPages}
           title="الصفحة التالية"
         >
@@ -140,7 +140,7 @@ const ServerPaginationBar: React.FC<ServerPaginationBarProps> = ({
 
         {/* Last page */}
         <PagBtn
-          onClick={() => onPageChange(totalPages)}
+          onClick={() => { onPageChange(totalPages); }}
           disabled={page >= totalPages}
           title="الصفحة الأخيرة"
         >

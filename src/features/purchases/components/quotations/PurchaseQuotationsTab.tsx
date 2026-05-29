@@ -77,7 +77,7 @@ export const PurchaseQuotationsTab: React.FC<Props> = ({ onConvertToPurchase }) 
           </div>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => { setShowCreateModal(true); }}
           className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-medium transition-colors shadow-sm shadow-violet-600/20"
         >
           <Plus size={16} />
@@ -91,7 +91,7 @@ export const PurchaseQuotationsTab: React.FC<Props> = ({ onConvertToPurchase }) 
         <input
           type="text"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => { setSearchTerm(e.target.value); }}
           placeholder="بحث بالرقم أو اسم المورد..."
           className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl py-2 pr-9 pl-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
         />
@@ -101,7 +101,7 @@ export const PurchaseQuotationsTab: React.FC<Props> = ({ onConvertToPurchase }) 
       {compareGroupId && (
         <QuotationComparisonView
           rfqGroupId={compareGroupId}
-          onClose={() => setCompareGroupId(null)}
+          onClose={() => { setCompareGroupId(null); }}
           {...(onConvertToPurchase ? { onConvertToPurchase } : {})}
         />
       )}
@@ -141,7 +141,7 @@ export const PurchaseQuotationsTab: React.FC<Props> = ({ onConvertToPurchase }) 
                 </div>
                 {quots.length >= 2 && (
                   <button
-                    onClick={() => setCompareGroupId(compareGroupId === groupId ? null : groupId)}
+                    onClick={() => { setCompareGroupId(compareGroupId === groupId ? null : groupId); }}
                     className="flex items-center gap-2 px-3 py-2 bg-violet-50 hover:bg-violet-100 dark:bg-violet-900/20 dark:hover:bg-violet-900/40 text-violet-700 dark:text-violet-400 rounded-xl text-xs font-bold transition-colors"
                   >
                     <Scale size={14} />
@@ -187,7 +187,7 @@ export const PurchaseQuotationsTab: React.FC<Props> = ({ onConvertToPurchase }) 
       {/* Create Modal */}
       {showCreateModal && (
         <CreatePurchaseQuotationModal
-          onClose={() => setShowCreateModal(false)}
+          onClose={() => { setShowCreateModal(false); }}
           onSuccess={() => {
             setShowCreateModal(false);
             fetchQuotations();

@@ -1,6 +1,6 @@
 
 import { journalsApi } from '../api/journalsApi';
-import { UIJournalEntry, JournalEntryFormData } from '../types/models';
+import type { UIJournalEntry, JournalEntryFormData } from '../types/models';
 import { PostTransactionUsecase } from '../../../core/usecases/accounting/PostTransactionUsecase';
 
 // Typed raw shapes from Supabase join query
@@ -48,7 +48,7 @@ export const journalService = {
   /**
    * تنسيق البيانات القادمة من الـ API لتناسب العرض
    */
-  formatJournalsForUI: async (companyId: string, pageParam: number = 0): Promise<UIJournalEntry[]> => {
+  formatJournalsForUI: async (companyId: string, pageParam = 0): Promise<UIJournalEntry[]> => {
     const { data: rawData, error } = await journalsApi.fetchJournals(companyId, pageParam);
     if (error) throw error;
 

@@ -75,7 +75,7 @@ const RegisterPage: React.FC = () => {
               <input 
                 type="text" 
                 value={formData.fullName}
-                onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                onChange={(e) => { setFormData({...formData, fullName: e.target.value}); }}
                 className="w-full pl-4 pr-10 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm dark:text-white"
                 placeholder="الاسم الثلاثي"
                 required
@@ -90,7 +90,7 @@ const RegisterPage: React.FC = () => {
               <input 
                 type="text" 
                 value={formData.companyName}
-                onChange={(e) => setFormData({...formData, companyName: e.target.value})}
+                onChange={(e) => { setFormData({...formData, companyName: e.target.value}); }}
                 className="w-full pl-4 pr-10 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm dark:text-white"
                 placeholder="اسم المركز / الورشة"
                 required
@@ -105,7 +105,7 @@ const RegisterPage: React.FC = () => {
               <input 
                 type="email" 
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                onChange={(e) => { setFormData({...formData, email: e.target.value}); }}
                 className="w-full pl-4 pr-10 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm dark:text-white"
                 placeholder="email@example.com"
                 required
@@ -121,7 +121,7 @@ const RegisterPage: React.FC = () => {
               <input 
                 type="password" 
                 value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                onChange={(e) => { setFormData({...formData, password: e.target.value}); }}
                 className="w-full pl-4 pr-10 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm dark:text-white"
                 placeholder="••••••••"
                 required

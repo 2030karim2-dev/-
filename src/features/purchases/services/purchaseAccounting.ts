@@ -3,7 +3,7 @@
 // import { accountsService } from '../../accounting/services/accountsService';
 // import { journalService } from '../../accounting/services/journalService';
 // import { bondsService } from '../../bonds/service';
-import { CreatePurchaseDTO } from '../types';
+import type { CreatePurchaseDTO } from '../types';
 // import { routeToChildByCurrency } from '../../../core/utils/accountRouting';
 
 export const purchaseAccountingService = {

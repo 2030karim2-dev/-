@@ -17,7 +17,7 @@ const AIChatButton: React.FC = () => {
             }
         };
         window.addEventListener('keydown', handler);
-        return () => window.removeEventListener('keydown', handler);
+        return () => { window.removeEventListener('keydown', handler); };
     }, [isAuthenticated]);
 
     if (!isAuthenticated) return null;
@@ -27,7 +27,7 @@ const AIChatButton: React.FC = () => {
             {/* Floating Action Button */}
             {!isOpen && (
                 <button
-                    onClick={() => setIsOpen(true)}
+                    onClick={() => { setIsOpen(true); }}
                     className="fixed bottom-20 md:bottom-6 left-6 z-[9998] w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white shadow-2xl shadow-blue-600/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 group"
                     title="المساعد الذكي (Ctrl+K)"
                 >
@@ -47,7 +47,7 @@ const AIChatButton: React.FC = () => {
             )}
 
             {/* Chat Panel */}
-            <AICommandCenter isOpen={isOpen} onClose={() => setIsOpen(false)} />
+            <AICommandCenter isOpen={isOpen} onClose={() => { setIsOpen(false); }} />
         </>
     );
 };

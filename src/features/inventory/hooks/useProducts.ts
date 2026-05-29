@@ -2,13 +2,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inventoryService } from '../service';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
-import { ProductFormData } from '../types';
+import type { ProductFormData } from '../types';
 import { useMemo } from 'react';
 import { syncStore } from '../../../core/lib/sync-store';
 import { queryKeys } from '../../../core/lib/react-query';
 import { normalizeArabic } from '../../../core/utils/textUtils.ts';
 
-export const useProducts = (searchTerm: string = '', options: { limitNum?: number, enabled?: boolean } = {}) => {
+export const useProducts = (searchTerm = '', options: { limitNum?: number, enabled?: boolean } = {}) => {
     const { user } = useAuthStore();
     const companyId = user?.company_id;
     const limit = options.limitNum || 200;

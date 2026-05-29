@@ -39,7 +39,7 @@ allFiles.forEach(file => {
     // Skip this script itself
     if (relativePath.includes('analyze-codebase')) return;
 
-    if (content.match(/useEffect\s*\([^,]+,\s*\[\]\)/) && content.includes('fetch')) {
+    if ((/useEffect\s*\([^,]+,\s*\[\]\)/.exec(content)) && content.includes('fetch')) {
         // A bit naive, but checks for empty dependency arrays that might need variables
         // issues.missingDepsInEffect.push(relativePath);
     }
@@ -49,7 +49,7 @@ allFiles.forEach(file => {
     }
 
     // Searching for api calls not wrapped in react-query
-    if (relativePath.includes('components') && content.match(/await\s+supabase/)) {
+    if (relativePath.includes('components') && (/await\s+supabase/.exec(content))) {
         issues.nakedApiCalls.push(relativePath);
     }
 
@@ -57,7 +57,7 @@ allFiles.forEach(file => {
         issues.consoleLogs.push(relativePath);
     }
 
-    if (content.match(/:\s*any[\s>,=]/) || content.match(/as\s+any/)) {
+    if ((/:\s*any[\s>,=]/.exec(content)) || (/as\s+any/.exec(content))) {
         issues.anyTypes.push(relativePath);
     }
 });
@@ -65,10 +65,10 @@ allFiles.forEach(file => {
 console.log("\n=== CODEBASE ANALYSIS REPORT ===");
 
 console.log(`\n❌ Direct DOM Manipulation (React Anti-Pattern): ${issues.directDOMManipulation.length} files`);
-issues.directDOMManipulation.slice(0, 5).forEach(f => console.log(`  - ${f}`));
+issues.directDOMManipulation.slice(0, 5).forEach(f => { console.log(`  - ${f}`); });
 
 console.log(`\n❌ Naked Supabase API Calls in Components (Should use React Query / Service layer): ${issues.nakedApiCalls.length} files`);
-issues.nakedApiCalls.slice(0, 10).forEach(f => console.log(`  - ${f}`));
+issues.nakedApiCalls.slice(0, 10).forEach(f => { console.log(`  - ${f}`); });
 
 console.log(`\n⚠️ Files containing 'any' types (Type Safety Risk): ${issues.anyTypes.length} files`);
 console.log(`  (Top 10 list omitted for brevity, but ${issues.anyTypes.length} is a metric to track)`);

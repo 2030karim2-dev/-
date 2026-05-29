@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Sector } from 'recharts';
-import { ExpenseCategorySummary } from '../types';
+import type { ExpenseCategorySummary } from '../types';
 import { formatCurrency } from '../../../core/utils';
 import { useThemeStore } from '@/lib/themeStore';
 import { cn } from '@/core/utils';
@@ -100,7 +100,7 @@ const ExpenseBreakdownChart: React.FC<Props> = ({ data }) => {
           </Pie>
           <Tooltip
             content={({ active, payload }: any) => {
-              if (active && payload && payload.length) {
+              if (active && payload?.length) {
                 return (
                   <div className={cn(
                     "p-4 rounded-3xl border shadow-2xl backdrop-blur-xl transition-all duration-300",

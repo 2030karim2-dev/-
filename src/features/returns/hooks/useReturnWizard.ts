@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSalesInvoicesForReturn, useCreateSalesReturn } from '../../sales/hooks/useSalesReturns';
 import { usePurchaseInvoicesForReturn, useCreatePurchaseReturn } from '../../purchases/hooks/usePurchaseReturns';
-import { Invoice, ReturnType } from '../types';
+import type { Invoice, ReturnType } from '../types';
 
 export const useReturnWizard = (
     returnType: ReturnType,
@@ -102,7 +102,7 @@ export const useReturnWizard = (
     }, []);
 
     // Handle quantity change with validation
-    const handleQuantityChange = useCallback((itemId: string, quantity: number, maxQty: number = 0) => {
+    const handleQuantityChange = useCallback((itemId: string, quantity: number, maxQty = 0) => {
         // Get the actual max quantity from the invoice item if not provided
         if (!maxQty && selectedInvoice?.invoice_items) {
             const item = selectedInvoice.invoice_items.find((i: any) => i.id === itemId);
@@ -184,7 +184,7 @@ export const useReturnWizard = (
                 issueDate: data.date,
                 returnReason: data.returnReason,
                 notes: data.notes,
-                status: (data.status === 'accepted' ? 'posted' : 'draft') as 'posted' | 'draft',
+                status: (data.status === 'accepted' ? 'posted' : 'draft'),
                 items: items.map((item: any) => ({
                     productId: item.productId,
                     name: item.name,

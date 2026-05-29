@@ -1,5 +1,5 @@
 import { supabase } from '@/core/database/api';
-import { CompanyFormData } from '../types';
+import type { CompanyFormData } from '../types';
 
 export const companyApi = {
   getCompany: async (companyId: string) => {

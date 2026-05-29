@@ -2,7 +2,7 @@
 /**
  * مكتبة تصدير البيانات إلى صيغ ملفات قياسية
  */
-export const exportToCSV = (data: Record<string, unknown>[], fileName: string, headers: string[]) => {
+export const exportToCSV = (data: Array<Record<string, unknown>>, fileName: string, headers: string[]) => {
   const replacer = (_key: string, value: unknown) => value === null ? '' : value;
   const csv = [
     headers.join(','), // Header row

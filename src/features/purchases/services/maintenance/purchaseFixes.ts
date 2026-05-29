@@ -13,7 +13,7 @@ export const purchaseFixesService = {
             console.info('Starting Fix for Incorrect Cash Purchase Entries...');
 
             // 1. Get all Cash Purchases
-            const { data: invoices, error } = await (supabase.from('invoices') as any)
+            const { data: invoices, error } = await (supabase.from('invoices'))
                 .select('*')
                 .eq('company_id', companyId)
                 .eq('type', 'purchase')
@@ -45,7 +45,7 @@ export const purchaseFixesService = {
             // 3. For each cash invoice, check if supplier account was credited
             for (const invoice of invoices) {
                 // Find journal lines that credit the supplier account for this invoice
-                const { data: supplierCredits } = await (supabase.from('journal_entry_lines') as any)
+                const { data: supplierCredits } = await (supabase.from('journal_entry_lines'))
                     .select(`
                         id, credit_amount, description,
                         journal:journal_entry_id(id, entry_date, description, status, company_id)
@@ -60,7 +60,7 @@ export const purchaseFixesService = {
                 }
 
                 // Check if a corrective entry already exists (debit on supplier for same invoice)
-                const { data: existingCorrection } = await (supabase.from('journal_entry_lines') as any)
+                const { data: existingCorrection } = await (supabase.from('journal_entry_lines'))
                     .select('id')
                     .eq('account_id', supplierAccount.id)
                     .gt('debit_amount', 0)
@@ -75,7 +75,7 @@ export const purchaseFixesService = {
                 console.info(`Invoice #${invoice.invoice_number} — creating corrective entry for SAR ${creditAmount}`);
 
                 // Create corrective journal entry: Dr Supplier / Cr Cash
-                const { data: journal, error: jError } = await (supabase.from('journal_entries') as any)
+                const { data: journal, error: jError } = await (supabase.from('journal_entries'))
                     .insert({
                         company_id: companyId,
                         entry_date: invoice.issue_date,
@@ -92,7 +92,7 @@ export const purchaseFixesService = {
                     continue;
                 }
 
-                const { error: lError } = await (supabase.from('journal_entry_lines') as any)
+                const { error: lError } = await (supabase.from('journal_entry_lines'))
                     .insert([
                         {
                             journal_entry_id: journal.id,
@@ -113,7 +113,7 @@ export const purchaseFixesService = {
                 if (lError) {
                     console.error(`Error creating corrective lines for #${invoice.invoice_number}:`, lError);
                     // Rollback header
-                    await (supabase.from('journal_entries') as any).delete().eq('id', journal.id);
+                    await (supabase.from('journal_entries')).delete().eq('id', journal.id);
                     continue;
                 }
 
@@ -141,7 +141,7 @@ export const purchaseFixesService = {
             let deletedCount = 0;
 
             // 1. Get all invoices to check against
-            const { data: invoices } = await (supabase.from('invoices') as any)
+            const { data: invoices } = await (supabase.from('invoices'))
                 .select('invoice_number')
                 .eq('company_id', companyId)
                 .eq('type', 'purchase');
@@ -152,7 +152,7 @@ export const purchaseFixesService = {
             for (const inv of invoices) {
                 // Find all Journals that mention this invoice # in description
                 // and are NOT corrections (reference_type != correction)
-                const { data: journals } = await (supabase.from('journal_entries') as any)
+                const { data: journals } = await (supabase.from('journal_entries'))
                     .select('id, entry_date, created_at, description')
                     .eq('company_id', companyId)
                     .neq('reference_type', 'correction')
@@ -168,9 +168,9 @@ export const purchaseFixesService = {
                     for (const dup of toDelete) {
                         console.info(`Deleting Duplicate Journal: ${dup.id} - ${dup.description}`);
                         // Delete lines first (cascade usually handles this, but being safe)
-                        await (supabase.from('journal_entry_lines') as any).delete().eq('journal_entry_id', dup.id);
+                        await (supabase.from('journal_entry_lines')).delete().eq('journal_entry_id', dup.id);
                         // Delete header
-                        await (supabase.from('journal_entries') as any).delete().eq('id', dup.id);
+                        await (supabase.from('journal_entries')).delete().eq('id', dup.id);
                         deletedCount++;
                     }
                 }

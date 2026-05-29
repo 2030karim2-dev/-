@@ -25,20 +25,20 @@ interface SalesReturn {
         id: string;
         name: string;
     } | null;
-    invoice_items?: {
+    invoice_items?: Array<{
         id: string;
         product_id: string;
         description: string;
         quantity: number;
         unit_price: number;
         total: number;
-    }[];
+    }>;
     created_at: string;
 }
 
 type SalesReturnQueryResult = Pick<Invoice, 'id' | 'invoice_number' | 'issue_date' | 'total_amount' | 'status' | 'notes' | 'created_at' | 'reference_invoice_id' | 'currency_code' | 'exchange_rate'> & {
     party: Pick<Party, 'id' | 'name'> | null;
-    invoice_items: Pick<InvoiceItem, 'id' | 'product_id' | 'description' | 'quantity' | 'unit_price' | 'total'>[];
+    invoice_items: Array<Pick<InvoiceItem, 'id' | 'product_id' | 'description' | 'quantity' | 'unit_price' | 'total'>>;
 };
 
 /*
@@ -146,7 +146,7 @@ export const useSalesReturnsStats = () => {
                 .is('deleted_at', null);
 
             if (error) throw error;
-            const typedData = data as unknown as Pick<Invoice, 'id' | 'total_amount' | 'status'>[];
+            const typedData = data as unknown as Array<Pick<Invoice, 'id' | 'total_amount' | 'status'>>;
 
             const returns = typedData || [];
             const returnCount = returns.length;

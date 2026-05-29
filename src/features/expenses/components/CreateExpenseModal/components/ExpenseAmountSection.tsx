@@ -1,7 +1,7 @@
 import React from 'react';
 import { DollarSign } from 'lucide-react';
-import { UseFormRegister, UseFormWatch, UseFormSetValue } from 'react-hook-form';
-import { ExpenseFormData } from '../../../types';
+import type { UseFormRegister, UseFormWatch, UseFormSetValue } from 'react-hook-form';
+import type { ExpenseFormData } from '../../../types';
 import { convertToBaseCurrency } from '../../../../../core/utils';
 
 interface ExpenseAmountSectionProps {

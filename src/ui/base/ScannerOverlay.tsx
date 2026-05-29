@@ -76,7 +76,7 @@ const ScannerOverlay: React.FC<Props> = ({ onScan: _onScan, onClose }) => {
       cancelAnimationFrame(animationFrameId);
       if (videoEl) {
         const stream = videoEl.srcObject as MediaStream | null;
-        stream?.getTracks().forEach(track => track.stop());
+        stream?.getTracks().forEach(track => { track.stop(); });
       }
     };
   }, [onClose, _onScan]);

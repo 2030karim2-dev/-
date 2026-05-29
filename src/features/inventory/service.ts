@@ -14,7 +14,7 @@
  * @see ./services/ for individual service modules
  */
 
-import { Product, ProductFormData, CreateTransferDTO } from './types';
+import type { Product, ProductFormData, CreateTransferDTO } from './types';
 // Import specialized services
 import { productService } from './services/productService';
 import { warehouseService } from './services/warehouseService';
@@ -104,11 +104,11 @@ export const inventoryService = {
     return auditService.startAudit(data, companyId, userId);
   },
 
-  addAuditItem: async (sessionId: string, productId: string, expectedQuantity: number = 0, companyId: string, userId: string) => {
+  addAuditItem: async (sessionId: string, productId: string, expectedQuantity = 0, companyId: string, userId: string) => {
     return auditService.addAuditItem(sessionId, productId, expectedQuantity, companyId, userId);
   },
 
-  finalizeAudit: async (sessionId: string, items: { id?: string; product_id: string; counted_quantity: number }[], _companyId: string, userId: string) => {
+  finalizeAudit: async (sessionId: string, items: Array<{ id?: string; product_id: string; counted_quantity: number }>, _companyId: string, userId: string) => {
     return auditService.finalizeAudit(sessionId, items, userId);
   },
 
@@ -120,7 +120,7 @@ export const inventoryService = {
     return auditService.getAuditSessionDetails(sessionId);
   },
 
-  saveAuditProgress: async (items: { id?: string; product_id: string; counted_quantity: number }[]) => {
+  saveAuditProgress: async (items: Array<{ id?: string; product_id: string; counted_quantity: number }>) => {
     return auditService.saveAuditProgress(items);
   },
 
@@ -156,7 +156,7 @@ export const inventoryService = {
   // Quick Adjustments
   // ==========================================
 
-  quickAdjustStock: async (companyId: string, items: { product_id: string; warehouse_id: string; quantity: number }[], userId: string) => {
+  quickAdjustStock: async (companyId: string, items: Array<{ product_id: string; warehouse_id: string; quantity: number }>, userId: string) => {
     const { warehouseApi } = await import('./api/warehouseApi');
 
     // Process in batches of 20 to prevent rate limiting and connection drops

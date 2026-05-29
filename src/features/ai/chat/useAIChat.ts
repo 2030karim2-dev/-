@@ -5,7 +5,7 @@
  */
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AIParsedResponse, ChatMessage } from '../core/types';
+import type { AIParsedResponse, ChatMessage } from '../core/types';
 import { parseAIResponse } from '../intent/intentParser';
 import { getRouteForIntent, isInvoiceIntent } from '../intent/intentRouter';
 import { useAuthStore } from '../../auth/store';

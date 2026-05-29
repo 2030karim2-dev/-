@@ -1,6 +1,6 @@
 
 import { purchasesApi } from './api';
-import { CreatePurchaseDTO, PurchaseInvoiceResponse } from './types';
+import type { CreatePurchaseDTO, PurchaseInvoiceResponse } from './types';
 import { purchaseAccountingService } from './services/purchaseAccounting';
 import { messagingService } from '../notifications/messagingService';
 import { toBaseCurrency } from '../../core/utils/currencyUtils';
@@ -81,7 +81,7 @@ export const purchasesService = {
       logger.error('PurchaseService', 'Error fetching purchase stats', { companyId, error });
       throw error;
     }
-    const result = data as any;
+    const result = data;
     return {
       invoiceCount: result.invoiceCount || 0,
       totalPurchases: result.totalPurchases || 0,
@@ -99,7 +99,7 @@ export const purchasesService = {
       logger.error('PurchaseService', 'Error fetching purchase analytics', { companyId, error });
       return { topSuppliers: [], chartData: [] };
     }
-    const result = data as any;
+    const result = data;
     return {
       topSuppliers: result.topSuppliers || [],
       chartData: result.chartData || []

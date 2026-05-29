@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LucideIcon, SearchX } from 'lucide-react';
+import { type LucideIcon, SearchX } from 'lucide-react';
 import { cn } from '../../core/utils';
 
 interface EmptyStateProps {

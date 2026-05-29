@@ -2,7 +2,7 @@
  * AI Module - Intent Router
  * Maps AI intents to application routes.
  */
-import { AIIntent } from '../core/types';
+import type { AIIntent } from '../core/types';
 
 export interface RouteMapping {
     path: string;

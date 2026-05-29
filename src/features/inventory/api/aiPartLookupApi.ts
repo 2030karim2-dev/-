@@ -29,7 +29,7 @@ export const aiPartLookupApi = {
      * Search for alternative part numbers using the AI Edge Function.
      * Scrapes real auto parts websites for genuine cross-references.
      */
-    async lookupPartNumber(partNumber: string, brand?: string | null | undefined): Promise<AIPartLookupResult> {
+    async lookupPartNumber(partNumber: string, brand?: string | null  ): Promise<AIPartLookupResult> {
         const response = await supabase.functions.invoke('ai-part-lookup', {
             body: { part_number: partNumber, brand: brand || undefined },
         });

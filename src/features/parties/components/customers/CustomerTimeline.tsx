@@ -176,7 +176,7 @@ export const CustomerTimeline: React.FC<CustomerTimelineProps> = ({
                     {(['all', 'activities', 'notes'] as const).map((filterType) => (
                         <button
                             key={filterType}
-                            onClick={() => setFilter(filterType)}
+                            onClick={() => { setFilter(filterType); }}
                             className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${filter === filterType
                                 ? 'bg-gray-900 text-white'
                                 : 'text-gray-600 hover:bg-gray-100'
@@ -259,21 +259,21 @@ export const CustomerTimeline: React.FC<CustomerTimelineProps> = ({
                                         {item.type === 'activity' && item.status === 'pending' && (
                                             <div className="flex gap-1">
                                                 <button
-                                                    onClick={() => onCompleteActivity(item.id)}
+                                                    onClick={() => { onCompleteActivity(item.id); }}
                                                     className="p-1 text-green-600 hover:bg-green-50 rounded"
                                                     title="تحديد كمكتمل"
                                                 >
                                                     <CheckCircle className="w-4 h-4" />
                                                 </button>
                                                 <button
-                                                    onClick={() => onEditActivity(item.data as CustomerActivity)}
+                                                    onClick={() => { onEditActivity(item.data as CustomerActivity); }}
                                                     className="p-1 text-blue-600 hover:bg-blue-50 rounded"
                                                     title="تعديل"
                                                 >
                                                     <Edit className="w-4 h-4" />
                                                 </button>
                                                 <button
-                                                    onClick={() => onDeleteActivity(item.id)}
+                                                    onClick={() => { onDeleteActivity(item.id); }}
                                                     className="p-1 text-red-600 hover:bg-red-50 rounded"
                                                     title="حذف"
                                                 >

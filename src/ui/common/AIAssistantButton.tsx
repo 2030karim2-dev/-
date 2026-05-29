@@ -52,7 +52,7 @@ ${schemaDescription}
             const responseText = await generateAIContent(userInput, systemInstruction, { jsonMode: true, temperature: 0.1 });
             
             // Extract JSON from response
-            const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            const jsonMatch = /```(?:json)?\s*([\s\S]*?)\s*```/.exec(responseText);
             const jsonText = jsonMatch ? jsonMatch[1].trim() : responseText.trim();
             
             let parsedData;
@@ -86,7 +86,7 @@ ${schemaDescription}
         <div className="flex w-full gap-2 p-1">
             <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => { setIsOpen(false); }}
                 className="flex-1 py-3 text-[11px] font-bold text-gray-500 bg-gray-50 dark:bg-slate-800 border dark:border-slate-700 uppercase tracking-widest hover:bg-gray-100 transition-colors"
                 disabled={isProcessing}
             >
@@ -108,7 +108,7 @@ ${schemaDescription}
         <>
             <button
                 type="button"
-                onClick={() => setIsOpen(true)}
+                onClick={() => { setIsOpen(true); }}
                 className={cn(
                     "flex items-center gap-2 px-3 py-2 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/40 rounded-xl transition-all border border-indigo-100 dark:border-indigo-800/30 shadow-sm",
                     className
@@ -140,7 +140,7 @@ ${schemaDescription}
                             <label className="text-xs font-bold text-gray-600 dark:text-slate-400">نص الطلب</label>
                             <textarea
                                 value={userInput}
-                                onChange={(e) => setUserInput(e.target.value)}
+                                onChange={(e) => { setUserInput(e.target.value); }}
                                 placeholder="اكتب طلبك هنا..."
                                 className="w-full p-4 bg-slate-50 dark:bg-slate-800 border-2 border-indigo-100 dark:border-indigo-900/30 focus:border-indigo-500 rounded-2xl text-sm font-bold min-h-[120px] outline-none transition-all resize-none shadow-inner"
                                 disabled={isProcessing}

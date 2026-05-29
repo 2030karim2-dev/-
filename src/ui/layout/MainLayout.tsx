@@ -96,15 +96,15 @@ const MainLayout: React.FC = () => {
       {isMobileSidebarOpen && (
         <div
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 md:hidden animate-in fade-in duration-300"
-          onClick={() => setIsMobileSidebarOpen(false)}
+          onClick={() => { setIsMobileSidebarOpen(false); }}
         ></div>
       )}
 
       <Sidebar
         isCollapsed={isSidebarCollapsed}
-        toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        toggleSidebar={() => { setIsSidebarCollapsed(!isSidebarCollapsed); }}
         isMobileOpen={isMobileSidebarOpen}
-        onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        onCloseMobile={() => { setIsMobileSidebarOpen(false); }}
         sidebarWidth={sidebarWidth}
       />
 
@@ -119,7 +119,7 @@ const MainLayout: React.FC = () => {
           isTabletLandscape,
         })
       )}>
-        <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
+        <Header onMenuClick={() => { setIsMobileSidebarOpen(true); }} />
 
         {isOnline && isUnstable && (
           <div className="bg-amber-500 text-white text-[9px] font-black py-1.5 flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg animate-in slide-in-from-top duration-500">

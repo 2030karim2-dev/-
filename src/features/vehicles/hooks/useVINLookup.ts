@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { inventoryApi } from '../../inventory/api';
 import { useAuthStore } from '../../auth/store';
 import { useFeedbackStore } from '../../feedback/store';
-import { PartEntry } from '../types';
+import type { PartEntry } from '../types';
 import { decodeVinBasic } from '../constants';
 
 export const useVINLookup = () => {
@@ -133,7 +133,7 @@ export const useVINLookup = () => {
     const handleCopyVin = useCallback(() => {
         navigator.clipboard.writeText(vinInput);
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        setTimeout(() => { setCopied(false); }, 2000);
     }, [vinInput]);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {

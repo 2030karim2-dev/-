@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, DollarSign, TrendingUp, TrendingDown, Package, ShieldCheck, Activity, Info, Settings2, FileClock, Link2, Sparkles, Loader2 } from 'lucide-react';
-import { Product } from '../../types';
+import type { Product } from '../../types';
 import { formatCurrency, formatNumberDisplay, cn } from '../../../../core/utils';
 import StatCard from './StatCard';
 import FitmentSection from './FitmentSection';
@@ -24,7 +24,7 @@ const ProductDetailsContent: React.FC<Props> = ({ product }) => {
     const [activeTab, setActiveTab] = useState<TabType>('overview');
     const { search: aiImageSearch, searchResult: aiResult, isSearching: isAISearching } = useAIPartLookup(product.part_number);
 
-    const tabs: { id: TabType; label: string; icon: any }[] = [
+    const tabs: Array<{ id: TabType; label: string; icon: any }> = [
         { id: 'overview', label: 'نظرة عامة', icon: Info },
         { id: 'inventory', label: 'المخزون', icon: Box },
         { id: 'specs', label: 'المواصفات', icon: Settings2 },
@@ -40,7 +40,7 @@ const ProductDetailsContent: React.FC<Props> = ({ product }) => {
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
+                            onClick={() => { setActiveTab(tab.id); }}
                             className={cn(
                                 "flex items-center gap-2 px-4 py-2 text-[11px] font-bold border-l border-slate-200 dark:border-slate-800 transition-colors uppercase tracking-tight shrink-0",
                                 activeTab === tab.id 
@@ -89,8 +89,8 @@ const ProductDetailsContent: React.FC<Props> = ({ product }) => {
                                         <StatCard icon={DollarSign} label="سعر التكلفة" value={formatCurrency(product.cost_price)} color="indigo" />
                                         <StatCard icon={TrendingUp} label="سعر البيع" value={formatCurrency(selling)} color="blue" />
                                         <StatCard icon={Activity} label="هامش الربح" value={`${margin.toFixed(1)}%`} color={margin > 0 ? "emerald" : "rose"} />
-                                        <StatCard icon={Package} label="المشتريات" value={formatNumberDisplay(stats.total_purchases as any)} color="slate" />
-                                        <StatCard icon={TrendingDown} label="المبيعات" value={formatNumberDisplay(stats.total_sales as any)} color="slate" />
+                                        <StatCard icon={Package} label="المشتريات" value={formatNumberDisplay(stats.total_purchases)} color="slate" />
+                                        <StatCard icon={TrendingDown} label="المبيعات" value={formatNumberDisplay(stats.total_sales)} color="slate" />
                                         <StatCard icon={ShieldCheck} label="متوفر" value={formatNumberDisplay(product.stock_quantity)} color="slate" />
                                     </div>
 

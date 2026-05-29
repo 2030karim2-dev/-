@@ -3,7 +3,7 @@ import { Search, ChevronDown, Check, X, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { cn } from '../../core/utils';
-import { Account } from '../../features/accounting/types/models';
+import type { Account } from '../../features/accounting/types/models';
 
 interface SearchableAccountSelectorProps {
   accounts: Account[];
@@ -54,7 +54,7 @@ const SearchableAccountSelector: React.FC<SearchableAccountSelectorProps> = ({
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => { document.removeEventListener('mousedown', handleClickOutside); };
   }, []);
 
   return (
@@ -62,7 +62,7 @@ const SearchableAccountSelector: React.FC<SearchableAccountSelectorProps> = ({
       {/* Trigger Button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { setIsOpen(!isOpen); }}
         className={cn(
           "w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border transition-all duration-300 font-cairo",
           isOpen 
@@ -112,13 +112,13 @@ const SearchableAccountSelector: React.FC<SearchableAccountSelectorProps> = ({
                   autoFocus
                   type="text"
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => { setSearch(e.target.value); }}
                   placeholder="ابحث برقم أو اسم الحساب..."
                   className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-700 rounded-xl py-2 px-9 text-xs font-bold outline-none focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/10 transition-all font-cairo"
                 />
                 {search && (
                   <button 
-                    onClick={() => setSearch('')}
+                    onClick={() => { setSearch(''); }}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-red-500 transition-colors"
                   >
                     <X size={14} />

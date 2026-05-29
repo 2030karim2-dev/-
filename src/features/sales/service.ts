@@ -1,6 +1,6 @@
 
 import { salesApi } from './api/index';
-import { CreateInvoiceDTO, InvoiceResponse } from './types';
+import type { CreateInvoiceDTO, InvoiceResponse } from './types';
 import { messagingService } from '../notifications/messagingService';
 import { toBaseCurrency } from '../../core/utils/currencyUtils';
 import { validateSalePayload, assertValid } from '../../core/utils/validationUtils';
@@ -29,7 +29,7 @@ interface RawInvoice {
 }
 
 export const salesService = {
-  fetchSalesLog: async (companyId: string, page: number = 0) => {
+  fetchSalesLog: async (companyId: string, page = 0) => {
     try {
       const data = await salesApi.getInvoices(companyId, page);
       return (data || []).map((inv: unknown) => {
@@ -77,7 +77,7 @@ export const salesService = {
     if (finalTreasuryAccountId && payload.currency) {
       const accounts = await accountsService.getAccounts(companyId);
       // 3. Resolve actual treasury account using the multi-currency router
-      const routed = routeToChildByCurrency(accounts as unknown as import('../../core/utils/accountRouting').RoutableAccount[], finalTreasuryAccountId, payload.currency);
+      const routed = routeToChildByCurrency(accounts as unknown as Array<import('../../core/utils/accountRouting').RoutableAccount>, finalTreasuryAccountId, payload.currency);
       if (routed) {
         finalTreasuryAccountId = routed.id;
       }

@@ -11,7 +11,7 @@ import ScannerOverlay from '../../../ui/base/ScannerOverlay';
 import { useWarehouses, useInventoryMutations } from '../hooks/useInventoryManagement';
 import { useSearchProducts } from '../hooks/useProducts';
 import { useDebounce } from 'use-debounce';
-import AuditSearchPanel, { SearchResult } from '../components/audit/AuditSearchPanel';
+import AuditSearchPanel, { type SearchResult } from '../components/audit/AuditSearchPanel';
 import QuickAuditItemsTable, { type AdjustedItem } from '../components/audit/QuickAuditItemsTable';
 
 const QuickAuditPage: React.FC = () => {
@@ -112,7 +112,7 @@ const QuickAuditPage: React.FC = () => {
                     <div className="flex items-center gap-3">
                         {/* ── Toggle: اعتماد فوري ── */}
                         <button
-                            onClick={() => setInstantApprove(v => !v)}
+                            onClick={() => { setInstantApprove(v => !v); }}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-black transition-all active:scale-95 ${
                                 instantApprove
                                     ? 'bg-amber-500 text-white border-amber-500 shadow-md shadow-amber-500/25'
@@ -162,7 +162,7 @@ const QuickAuditPage: React.FC = () => {
                         onWarehouseChange={setSelectedWarehouseId}
                         filter={filter}
                         onFilterChange={setFilter}
-                        onScannerOpen={() => setIsScannerOpen(true)}
+                        onScannerOpen={() => { setIsScannerOpen(true); }}
                         searchResults={searchResults as SearchResult[] | undefined}
                         isLoadingSearch={isLoadingSearch}
                         onAddItem={handleAddItem}
@@ -179,7 +179,7 @@ const QuickAuditPage: React.FC = () => {
             {isScannerOpen && (
                 <ScannerOverlay
                     onScan={handleScan}
-                    onClose={() => setIsScannerOpen(false)}
+                    onClose={() => { setIsScannerOpen(false); }}
                 />
             )}
         </div>

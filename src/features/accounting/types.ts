@@ -60,12 +60,12 @@ export interface CreateJournalEntryDTO {
     description: string;
     reference_type?: ReferenceType | undefined;
     reference_id?: string | undefined;
-    lines: {
+    lines: Array<{
         account_id: string;
         debit: number;
         credit: number;
         description?: string | undefined;
-    }[];
+    }>;
 }
 
 export interface AccountTreeNode extends Account {

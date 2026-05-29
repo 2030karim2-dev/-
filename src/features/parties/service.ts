@@ -1,7 +1,7 @@
 
 import { partiesApi } from './api';
 import { supabase } from '../../lib/supabaseClient';
-import { Party, PartyStats, PartyFormData, PartyType, PartyCategory } from './types';
+import type { Party, PartyStats, PartyFormData, PartyType, PartyCategory } from './types';
 
 export interface StatementMovement {
   id: string;
@@ -163,6 +163,6 @@ export const partiesService = {
       status: 'active'
     } as any, companyId);
 
-    return (created as unknown) as Party;
+    return (created) as Party;
   }
 };

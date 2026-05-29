@@ -22,7 +22,7 @@ export const IntegrationsSettings: React.FC = () => {
     const handleSave = () => {
         setSaved(true);
         showToast('تم حفظ إعدادات التكامل بنجاح ✓', 'success');
-        setTimeout(() => setSaved(false), 3000);
+        setTimeout(() => { setSaved(false); }, 3000);
     };
 
     const handleCopy = (text: string, label: string) => {
@@ -89,7 +89,7 @@ export const IntegrationsSettings: React.FC = () => {
                             type="checkbox"
                             id="email_enabled"
                             checked={integration.email_enabled}
-                            onChange={(e) => handleUpdate({ email_enabled: e.target.checked })}
+                            onChange={(e) => { handleUpdate({ email_enabled: e.target.checked }); }}
                             className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
                         />
                         <label htmlFor="email_enabled" className="text-sm text-slate-600 dark:text-slate-300">
@@ -105,7 +105,7 @@ export const IntegrationsSettings: React.FC = () => {
                                 <input
                                     type="text"
                                     value={integration.email_smtp_server}
-                                    onChange={(e) => handleUpdate({ email_smtp_server: e.target.value })}
+                                    onChange={(e) => { handleUpdate({ email_smtp_server: e.target.value }); }}
                                     className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                     placeholder="smtp.example.com"
                                 />
@@ -117,7 +117,7 @@ export const IntegrationsSettings: React.FC = () => {
                                 <input
                                     type="number"
                                     value={integration.email_smtp_port}
-                                    onChange={(e) => handleUpdate({ email_smtp_port: parseInt(e.target.value) || 587 })}
+                                    onChange={(e) => { handleUpdate({ email_smtp_port: parseInt(e.target.value) || 587 }); }}
                                     className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 />
                             </div>
@@ -128,7 +128,7 @@ export const IntegrationsSettings: React.FC = () => {
                                 <input
                                     type="text"
                                     value={integration.email_username}
-                                    onChange={(e) => handleUpdate({ email_username: e.target.value })}
+                                    onChange={(e) => { handleUpdate({ email_username: e.target.value }); }}
                                     className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 />
                             </div>
@@ -139,7 +139,7 @@ export const IntegrationsSettings: React.FC = () => {
                                 <input
                                     type="password"
                                     value={integration.email_password}
-                                    onChange={(e) => handleUpdate({ email_password: e.target.value })}
+                                    onChange={(e) => { handleUpdate({ email_password: e.target.value }); }}
                                     className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 />
                             </div>
@@ -180,7 +180,7 @@ export const IntegrationsSettings: React.FC = () => {
                             type="checkbox"
                             id="sms_enabled"
                             checked={integration.sms_enabled}
-                            onChange={(e) => handleUpdate({ sms_enabled: e.target.checked })}
+                            onChange={(e) => { handleUpdate({ sms_enabled: e.target.checked }); }}
                             className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
                         />
                         <label htmlFor="sms_enabled" className="text-sm text-slate-600 dark:text-slate-300">
@@ -195,7 +195,7 @@ export const IntegrationsSettings: React.FC = () => {
                                 </label>
                                 <select
                                     value={integration.sms_provider}
-                                    onChange={(e) => handleUpdate({ sms_provider: e.target.value })}
+                                    onChange={(e) => { handleUpdate({ sms_provider: e.target.value }); }}
                                     className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 >
                                     <option value="twilio">Twilio</option>
@@ -211,7 +211,7 @@ export const IntegrationsSettings: React.FC = () => {
                                 <input
                                     type="text"
                                     value={integration.sms_sender_name}
-                                    onChange={(e) => handleUpdate({ sms_sender_name: e.target.value })}
+                                    onChange={(e) => { handleUpdate({ sms_sender_name: e.target.value }); }}
                                     className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 />
                             </div>
@@ -239,7 +239,7 @@ export const IntegrationsSettings: React.FC = () => {
                             </span>
                             <button
                                 type="button"
-                                onClick={() => handleCopy(integration.api_public_key || 'pk_xxxxxxxxxxxx', 'المفتاح العام')}
+                                onClick={() => { handleCopy(integration.api_public_key || 'pk_xxxxxxxxxxxx', 'المفتاح العام'); }}
                                 className="text-xs text-indigo-600 hover:text-indigo-700"
                             >
                                 {t.copy || 'نسخ'}
@@ -256,7 +256,7 @@ export const IntegrationsSettings: React.FC = () => {
                             </span>
                             <button
                                 type="button"
-                                onClick={() => handleCopy(integration.api_secret_key || 'sk_xxxxxxxxxxxx', 'المفتاح السري')}
+                                onClick={() => { handleCopy(integration.api_secret_key || 'sk_xxxxxxxxxxxx', 'المفتاح السري'); }}
                                 className="text-xs text-indigo-600 hover:text-indigo-700"
                             >
                                 {t.copy || 'نسخ'}

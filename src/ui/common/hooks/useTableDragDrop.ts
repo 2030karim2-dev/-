@@ -15,7 +15,7 @@ export function useTableDragDrop<T>(
 
     const handleDragStart = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
         dragItem.current = index;
-        setTimeout(() => e.currentTarget.classList.add('opacity-50'), 0);
+        setTimeout(() => { e.currentTarget.classList.add('opacity-50'); }, 0);
     };
 
     const handleDragEnter = (_e: React.DragEvent<HTMLTableRowElement>, index: number) => {

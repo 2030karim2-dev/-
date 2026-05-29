@@ -24,7 +24,7 @@ const CompanyProfile: React.FC = () => {
 
   useEffect(() => {
     if (company) {
-      const comp = company as any;
+      const comp = company;
       reset({
         name: comp.name || comp.name_ar || '',
         english_name: comp.english_name || comp.name_en || '',
@@ -47,7 +47,7 @@ const CompanyProfile: React.FC = () => {
       onSuccess: () => {
         setSaved(true);
         showToast('تم حفظ بيانات المنشأة بنجاح ✓', 'success');
-        setTimeout(() => setSaved(false), 3000);
+        setTimeout(() => { setSaved(false); }, 3000);
       },
       onError: (err: any) => {
         showToast(`فشل الحفظ: ${err?.message || 'خطأ غير معروف'}`, 'error');

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CustomerDebtProfile } from '../../hooks/useDebtManagement';
+import type { CustomerDebtProfile } from '../../hooks/useDebtManagement';
 import { ShieldAlert, TrendingUp, TrendingDown, Info, ShieldCheck, Flag } from 'lucide-react';
 
 interface Props {

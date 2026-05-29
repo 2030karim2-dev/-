@@ -4,11 +4,11 @@
  */
 import React, { useState } from 'react';
 import { Package, Tag, Factory, Ruler, CheckCircle2, AlertTriangle } from 'lucide-react';
-import { LookupResult, ProductMatch } from '../core/types';
+import type { LookupResult, ProductMatch } from '../core/types';
 
 interface ProductPickerCardProps {
     lookupResults: LookupResult[];
-    onComplete: (selectedProducts: { product: ProductMatch; quantity: number }[]) => void;
+    onComplete: (selectedProducts: Array<{ product: ProductMatch; quantity: number }>) => void;
     onCancel: () => void;
 }
 
@@ -34,8 +34,8 @@ export const ProductPickerCard: React.FC<ProductPickerCardProps> = ({
 
     const handleConfirm = () => {
         const selected = lookupResults
-            .map((r, i) => selections[i] ? { product: selections[i]!, quantity: r.requestedQty } : null)
-            .filter(Boolean) as { product: ProductMatch; quantity: number }[];
+            .map((r, i) => selections[i] ? { product: selections[i], quantity: r.requestedQty } : null)
+            .filter(Boolean) as Array<{ product: ProductMatch; quantity: number }>;
         if (selected.length > 0) onComplete(selected);
     };
 
@@ -86,7 +86,7 @@ export const ProductPickerCard: React.FC<ProductPickerCardProps> = ({
                                 return (
                                     <button
                                         key={product.id}
-                                        onClick={() => handleSelect(resultIdx, product)}
+                                        onClick={() => { handleSelect(resultIdx, product); }}
                                         className={`w-full text-right p-3 flex items-start gap-3 transition-all hover:bg-blue-50 dark:hover:bg-blue-900/20 ${
                                             isSelected
                                                 ? 'bg-emerald-50 dark:bg-emerald-900/20 border-r-4 border-emerald-500'

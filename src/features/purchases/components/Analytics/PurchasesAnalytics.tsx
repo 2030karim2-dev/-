@@ -6,7 +6,7 @@ import { Loader2, TrendingDown, Users } from 'lucide-react';
 import { formatCurrency } from '../../../../core/utils';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
         return (
             <div className="p-3 rounded-xl border border-slate-200/50 dark:border-slate-700/50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-xl transition-all duration-200">
                 <p className="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-tight border-b border-slate-100 dark:border-slate-800 pb-1">{label}</p>
@@ -113,7 +113,7 @@ const PurchasesAnalytics: React.FC = () => {
                                 />
                                 <Tooltip
                                     content={({ active, payload, label }: any) => {
-                                        if (active && payload && payload.length) {
+                                        if (active && payload?.length) {
                                             return (
                                                 <div className="p-4 rounded-3xl border border-slate-200/50 dark:border-slate-700/50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl transition-all duration-300">
                                                     <p className="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest leading-none border-b border-slate-100 dark:border-slate-800 pb-2">

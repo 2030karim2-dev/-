@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '../core/database.types';
+import type { Database } from '../core/database.types';
 import { logger } from '../core/utils/logger';
 import { useConnectionStore } from '../core/store/connectionStore';
 
@@ -55,7 +55,7 @@ const customFetch = async (url: RequestInfo | URL, options: RequestInit = {}): P
     }, TIMEOUT);
 
     // Merge signals if options.signal exists
-    let signal = timeoutController.signal;
+    const signal = timeoutController.signal;
     if (options.signal) {
       // If signal is already aborted, silently bail out
       if (options.signal.aborted) {

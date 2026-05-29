@@ -1,4 +1,4 @@
-import { Product } from '../types';
+import type { Product } from '../types';
 import Decimal from 'decimal.js';
 
 export const costingService = {

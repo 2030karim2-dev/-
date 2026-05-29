@@ -45,7 +45,7 @@ const PermissionsManager: React.FC = () => {
           </div>
         </div>
         <button
-          onClick={() => showToast(t.contact_support_to_edit || 'تواصل مع الدعم الفني', 'info')}
+          onClick={() => { showToast(t.contact_support_to_edit || 'تواصل مع الدعم الفني', 'info'); }}
           className="bg-amber-50 dark:bg-amber-900/10 px-3 py-1.5 rounded-lg border border-amber-100 dark:border-amber-800/30 flex items-center gap-2"
         >
           <Info size={14} className="text-amber-500" />

@@ -47,7 +47,7 @@ export const POSCart: React.FC<POSCartProps> = ({ onPay, onSuspend }) => {
                         </div>
                         <select
                             value={currency}
-                            onChange={(e) => setMetadata('currency', e.target.value)}
+                            onChange={(e) => { setMetadata('currency', e.target.value); }}
                             className="w-full h-[38px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-black pr-7 pl-2 outline-none appearance-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:text-white text-center cursor-pointer transition-all"
                         >
                             <option value="YER">YER</option>
@@ -100,7 +100,7 @@ export const POSCart: React.FC<POSCartProps> = ({ onPay, onSuspend }) => {
                                         {item.quantity === 1 ? <Trash2 size={11} /> : <Minus size={11} />}
                                     </button>
                                     <button
-                                        onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                                        onClick={() => { updateQuantity(item.productId, item.quantity + 1); }}
                                         className="w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all border border-slate-200 dark:border-slate-800 active:scale-90"
                                         title="زيادة الكمية"
                                     >

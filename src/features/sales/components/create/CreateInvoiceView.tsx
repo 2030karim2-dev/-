@@ -10,7 +10,7 @@ import InteractiveInvoiceTable from './InteractiveInvoiceTable';
 import InvoiceTotals from './InvoiceTotals';
 import InvoiceActions from './InvoiceActions';
 import PrintableInvoice from '../PrintableInvoice';
-import { InvoiceStatus } from '../../types';
+import type { InvoiceStatus } from '../../types';
 import PageLoader from '../../../../ui/base/PageLoader';
 import ErrorDisplay from '../../../../ui/base/ErrorDisplay';
 

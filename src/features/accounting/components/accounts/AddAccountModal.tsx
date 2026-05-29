@@ -2,7 +2,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Layers, Save, Book, FolderTree } from 'lucide-react';
-import { AccountFormData, Account } from '../../types/index'; // Import Account type
+import type { AccountFormData, Account } from '../../types/index'; // Import Account type
 import Modal from '../../../../ui/base/Modal';
 import Button from '../../../../ui/base/Button';
 import Input from '../../../../ui/base/Input';
@@ -68,7 +68,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClose, onSu
                existingAccounts: accounts.map(a => ({ id: a.id, name: a.name, code: a.code, type: a.type }))
             }}
             onDataExtracted={(data) => {
-               type AccountAIData = { code?: string; name?: string; type?: string; parent_id?: string };
+               interface AccountAIData { code?: string; name?: string; type?: string; parent_id?: string }
                const d = data as AccountAIData;
                if (d.code) setValue('code', d.code, { shouldValidate: true });
                if (d.name) setValue('name', d.name, { shouldValidate: true });

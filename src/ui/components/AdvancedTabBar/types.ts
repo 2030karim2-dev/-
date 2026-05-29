@@ -2,7 +2,7 @@
 // AdvancedTabBar - TypeScript Interfaces
 // ============================================
 
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 /**
  * Individual tab item configuration

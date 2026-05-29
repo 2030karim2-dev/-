@@ -5,7 +5,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import * as z from 'zod';
 import { useFeedbackStore } from '../../feedback/store';
 import { zodResolver } from '../../../lib/zodResolver';
-import { ReturnType } from '../types';
+import type { ReturnType } from '../types';
 import { ReturnItemsStep } from './ReturnItemsStep';
 import { ReturnDetailsStep } from './ReturnDetailsStep';
 import { useSalesInvoicesForReturn, useCreateSalesReturn } from '../../sales/hooks/useSalesReturns';
@@ -93,7 +93,7 @@ export const AdvancedReturnModal: React.FC<AdvancedReturnModalProps> = ({
             }
         };
         window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        return () => { window.removeEventListener('keydown', handleKeyDown); };
     }, [isOpen, onClose]);
 
     // Center on first open and check mobile
@@ -121,7 +121,7 @@ export const AdvancedReturnModal: React.FC<AdvancedReturnModalProps> = ({
             });
         }
 
-        return () => window.removeEventListener('resize', checkMobile);
+        return () => { window.removeEventListener('resize', checkMobile); };
     }, [isOpen, isMaximized, size.width, size.height, isMobile]);
 
     // Drag Handlers
@@ -202,7 +202,7 @@ export const AdvancedReturnModal: React.FC<AdvancedReturnModalProps> = ({
                 <div
                     className={`flex flex-none items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 ${(isMaximized || isMobile) ? '' : 'cursor-move'}`}
                     onMouseDown={(!isMaximized && !isMobile) ? handleDragStart : undefined}
-                    onDoubleClick={!isMobile ? () => setIsMaximized(!isMaximized) : undefined}
+                    onDoubleClick={!isMobile ? () => { setIsMaximized(!isMaximized); } : undefined}
                 >
                     <div className="flex items-center gap-3 select-none pointer-events-none">
                         <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
@@ -221,7 +221,7 @@ export const AdvancedReturnModal: React.FC<AdvancedReturnModalProps> = ({
                     <div className="flex items-center gap-1.5 pointer-events-auto">
                         {!isMobile && (
                             <button
-                                onClick={() => setIsMaximized(!isMaximized)}
+                                onClick={() => { setIsMaximized(!isMaximized); }}
                                 className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-500 dark:text-slate-400 transition-colors"
                                 title={isMaximized ? "تصغير" : "تكبير"}
                             >
@@ -259,14 +259,14 @@ export const AdvancedReturnModal: React.FC<AdvancedReturnModalProps> = ({
 
                                     const payload: any = {
                                         invoiceId: data.invoiceId,
-                                        partyId: selectedInvoice?.party?.id || (selectedInvoice as any)?.party_id,
-                                        paymentMethod: (selectedInvoice as any)?.payment_method,
+                                        partyId: selectedInvoice?.party?.id || (selectedInvoice)?.party_id,
+                                        paymentMethod: (selectedInvoice)?.payment_method,
                                         items: selectedItems,
                                         returnReason: data.returnReason,
                                         status: data.status,
                                         issueDate: data.date,
-                                        currency: (selectedInvoice as any)?.currency || (selectedInvoice as any)?.currency_code,
-                                        exchangeRate: (selectedInvoice as any)?.exchange_rate
+                                        currency: (selectedInvoice)?.currency || (selectedInvoice)?.currency_code,
+                                        exchangeRate: (selectedInvoice)?.exchange_rate
                                     };
                                     if (data.notes) payload.notes = data.notes;
 
@@ -289,7 +289,7 @@ export const AdvancedReturnModal: React.FC<AdvancedReturnModalProps> = ({
                                     <span className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
                                     اختيار الفاتورة والأصناف
                                 </h2>
-                                <ReturnItemsStep invoices={invoices as any} isLoadingInvoices={isLoadingInvoices} />
+                                <ReturnItemsStep invoices={invoices} isLoadingInvoices={isLoadingInvoices} />
                             </div>
 
                             <div className="border-t-2 border-slate-100 dark:border-slate-800/50 block"></div>

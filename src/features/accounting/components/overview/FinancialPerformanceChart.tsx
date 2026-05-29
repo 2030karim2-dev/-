@@ -82,7 +82,7 @@ const FinancialPerformanceChart: React.FC = () => {
             <Tooltip
               cursor={{ fill: isDark ? '#ffffff05' : '#00000005' }}
               content={({ active, payload }: any) => {
-                if (active && payload && payload.length) {
+                if (active && payload?.length) {
                   return (
                     <div className={cn(
                       "p-4 rounded-3xl border shadow-2xl backdrop-blur-xl transition-all duration-300",

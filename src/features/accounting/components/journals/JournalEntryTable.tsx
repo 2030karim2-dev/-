@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form';
-import { JournalEntryFormData } from '../../types/index';
+import type { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form';
+import type { JournalEntryFormData } from '../../types/index';
 import SearchableAccountSelector from '../../../../ui/common/SearchableAccountSelector';
 
 interface JournalEntryTableProps {
@@ -51,7 +51,7 @@ const JournalEntryTable: React.FC<JournalEntryTableProps> = ({
                                 <SearchableAccountSelector
                                     accounts={accounts || []}
                                     selectedId={fields[index].account_id}
-                                    onSelect={(id: string) => setValue(`lines.${index}.account_id`, id, { shouldValidate: true })}
+                                    onSelect={(id: string) => { setValue(`lines.${index}.account_id`, id, { shouldValidate: true }); }}
                                     className="w-full"
                                 />
                             )}
@@ -99,7 +99,7 @@ const JournalEntryTable: React.FC<JournalEntryTableProps> = ({
                             />
                             <button
                                 type="button"
-                                onClick={() => remove(index)}
+                                onClick={() => { remove(index); }}
                                 className="absolute -left-10 top-2 p-1.5 text-gray-300 dark:text-slate-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
                             >
                                 <Trash2 size={16} />
@@ -111,7 +111,7 @@ const JournalEntryTable: React.FC<JournalEntryTableProps> = ({
 
             <button
                 type="button"
-                onClick={() => append({ account_id: '', description: '', debit_amount: 0, credit_amount: 0 })}
+                onClick={() => { append({ account_id: '', description: '', debit_amount: 0, credit_amount: 0 }); }}
                 className="w-full py-3 bg-gray-50/50 dark:bg-slate-800/30 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-400 text-sm font-bold flex items-center justify-center gap-2 border-t border-gray-100 dark:border-slate-800 transition-colors"
             >
                 <Plus size={18} />

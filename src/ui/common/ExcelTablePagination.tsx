@@ -33,7 +33,7 @@ export function ExcelTablePagination({
                 <span>عرض</span>
                 <select
                     value={itemsPerPage}
-                    onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                    onChange={(e) => { setItemsPerPage(Number(e.target.value)); }}
                     className="bg-[var(--app-surface)] border-[var(--app-border)] rounded p-1 outline-none focus:border-blue-500 text-[10px] text-[var(--app-text)]"
                 >
                     <option value={10}>10</option>
@@ -50,7 +50,7 @@ export function ExcelTablePagination({
 
             <div className="flex items-center gap-1">
                 <button
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); }}
                     disabled={currentPage === 1}
                     className={cn(
                         "flex items-center justify-center w-7 h-7 rounded hover:bg-[var(--app-surface-hover)] disabled:opacity-50 disabled:hover:bg-transparent transition-colors text-[10px] font-bold text-[var(--app-text-secondary)]",
@@ -75,7 +75,7 @@ export function ExcelTablePagination({
                         return (
                             <button
                                 key={pageNum}
-                                onClick={() => setCurrentPage(pageNum)}
+                                onClick={() => { setCurrentPage(pageNum); }}
                                 className={cn(
                                     "w-7 h-7 flex items-center justify-center rounded-lg text-[10px] font-bold transition-all",
                                     currentPage === pageNum
@@ -90,7 +90,7 @@ export function ExcelTablePagination({
                 </div>
 
                 <button
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); }}
                     disabled={currentPage === totalPages}
                     className={cn(
                         "flex items-center justify-center w-7 h-7 rounded hover:bg-[var(--app-surface-hover)] disabled:opacity-50 disabled:hover:bg-transparent transition-colors text-[10px] font-bold text-[var(--app-text-secondary)]",

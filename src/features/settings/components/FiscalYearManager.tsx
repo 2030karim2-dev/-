@@ -17,7 +17,7 @@ const FiscalYearManager: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAdd = (data: any) => {
-    addFiscalYear(data, { onSuccess: () => setIsModalOpen(false) });
+    addFiscalYear(data, { onSuccess: () => { setIsModalOpen(false); } });
   };
 
   const handleClose = (id: string) => {
@@ -38,7 +38,7 @@ const FiscalYearManager: React.FC = () => {
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden p-4 space-y-3">
       <div className="flex justify-between items-center px-1">
         <h3 className="text-sm font-bold text-gray-700 dark:text-slate-300">السنوات المالية</h3>
-        <Button onClick={() => setIsModalOpen(true)} size="sm" leftIcon={<Plus size={12} />}>سنة جديدة</Button>
+        <Button onClick={() => { setIsModalOpen(true); }} size="sm" leftIcon={<Plus size={12} />}>سنة جديدة</Button>
       </div>
 
       <div className="space-y-2">
@@ -61,7 +61,7 @@ const FiscalYearManager: React.FC = () => {
 
       <FiscalYearModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => { setIsModalOpen(false); }}
         onSave={handleAdd}
         isSaving={isAdding}
       />

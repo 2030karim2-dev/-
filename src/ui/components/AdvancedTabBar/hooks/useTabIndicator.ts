@@ -1,9 +1,9 @@
 // ============================================
 // useTabIndicator — منطق حساب موضع مؤشر التاب المتحرك
 // ============================================
-import { useState, useRef, useCallback, useEffect, RefObject, MutableRefObject } from 'react';
+import { useState, useRef, useCallback, useEffect, type RefObject, type MutableRefObject } from 'react';
 
-interface TabRefs { [key: string]: HTMLButtonElement | null; }
+type TabRefs = Record<string, HTMLButtonElement | null>;
 interface IndicatorPosition { x: number; width: number; opacity: number; }
 
 const isRTL = () =>
@@ -21,7 +21,7 @@ export const useTabIndicator = ({ activeTab, tabRefs, containerRef }: UseTabIndi
     const animationFrameId = useRef<number | null>(null);
     const isFirstRender = useRef(true);
 
-    const updateIndicatorPosition = useCallback((animate: boolean = true) => {
+    const updateIndicatorPosition = useCallback((animate = true) => {
         if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
 
         animationFrameId.current = requestAnimationFrame(() => {
@@ -39,7 +39,7 @@ export const useTabIndicator = ({ activeTab, tabRefs, containerRef }: UseTabIndi
             const paddingLeft = parseFloat(containerStyle.paddingLeft);
             const paddingRight = parseFloat(containerStyle.paddingRight);
 
-            let x = rtl
+            const x = rtl
                 ? containerRect.right - tabRect.right - paddingRight
                 : tabRect.left - containerRect.left - paddingLeft;
 
@@ -54,8 +54,8 @@ export const useTabIndicator = ({ activeTab, tabRefs, containerRef }: UseTabIndi
 
         if (isFirstRender.current) {
             isFirstRender.current = false;
-            t1 = setTimeout(() => updateIndicatorPosition(false), 0);
-            t2 = setTimeout(() => setIndicatorPosition(prev => ({ ...prev, opacity: 1 })), 50);
+            t1 = setTimeout(() => { updateIndicatorPosition(false); }, 0);
+            t2 = setTimeout(() => { setIndicatorPosition(prev => ({ ...prev, opacity: 1 })); }, 50);
         } else {
             updateIndicatorPosition(true);
         }
@@ -71,10 +71,10 @@ export const useTabIndicator = ({ activeTab, tabRefs, containerRef }: UseTabIndi
         if (!containerRef.current) return;
         const observer = new ResizeObserver(() => {
             if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
-            animationFrameId.current = requestAnimationFrame(() => updateIndicatorPosition(false));
+            animationFrameId.current = requestAnimationFrame(() => { updateIndicatorPosition(false); });
         });
         observer.observe(containerRef.current);
-        return () => observer.disconnect();
+        return () => { observer.disconnect(); };
     }, [containerRef, updateIndicatorPosition]);
 
     // تنظيف عند الـ unmount

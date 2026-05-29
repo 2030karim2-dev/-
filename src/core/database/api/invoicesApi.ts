@@ -73,7 +73,7 @@ export const salesInvoicesApi = {
     /**
      * Fetch paginated sales invoices
      */
-    getInvoices: async (companyId: string, page: number = 0, limit: number = 50) => {
+    getInvoices: async (companyId: string, page = 0, limit = 50) => {
         const from = page * limit;
         const to = from + limit - 1;
 

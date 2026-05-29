@@ -3,7 +3,7 @@
  * Alzhra Smart ERP - Card Design System v2.0
  */
 
-import React from 'react';
+import type React from 'react';
 
 // ======== Core Types ========
 

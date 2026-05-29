@@ -1,6 +1,6 @@
 import React from 'react';
 import { Save, Landmark } from 'lucide-react';
-import { ExpenseFormData } from '../../types';
+import type { ExpenseFormData } from '../../types';
 import Button from '../../../../ui/base/Button';
 import Modal from '../../../../ui/base/Modal';
 import { useExpenseForm } from './hooks/useExpenseForm';
@@ -103,10 +103,10 @@ const CreateExpenseModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubm
                             categories: categories?.map((c: any) => ({ id: c.id, name: c.name }))
                         }}
                         onDataExtracted={(data) => {
-                            type ExpenseAIData = {
+                            interface ExpenseAIData {
                               amount?: number; description?: string;
                               category_id?: string; payment_method?: string; currency_code?: string;
-                            };
+                            }
                             const d = data as ExpenseAIData;
                             if (d.amount) setValue('amount', d.amount, { shouldValidate: true });
                             if (d.description) setValue('description', d.description, { shouldValidate: true });
@@ -125,7 +125,7 @@ const CreateExpenseModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, isSubm
 
                 <ExpenseCategorySection
                     register={register}
-                    categories={categories as any[]}
+                    categories={categories!}
                     newCatMode={newCatMode}
                     setNewCatMode={setNewCatMode}
                     newCatName={newCatName}

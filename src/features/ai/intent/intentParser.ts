@@ -2,12 +2,12 @@
  * AI Module - Intent Parser
  * Parses raw AI response text into structured AIParsedResponse.
  */
-import { AIParsedResponse } from '../core/types';
+import type { AIParsedResponse } from '../core/types';
 
 export function parseAIResponse(aiResponse: string): AIParsedResponse {
     try {
         // Try to find a JSON block
-        const jsonMatch = aiResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        const jsonMatch = /```(?:json)?\s*([\s\S]*?)\s*```/.exec(aiResponse);
         const jsonText = jsonMatch ? jsonMatch[1].trim() : aiResponse.trim();
         
         // Check if it looks like JSON

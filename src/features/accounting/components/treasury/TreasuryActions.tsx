@@ -11,21 +11,21 @@ const TreasuryActions: React.FC<Props> = ({ onAction, onPrint }) => {
     return (
         <div className="flex gap-2 mb-4">
             <Button
-                onClick={() => onAction('receipt')}
+                onClick={() => { onAction('receipt'); }}
                 className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md active:scale-95 transition-all font-bold"
                 leftIcon={<ArrowDownLeft size={16} />}
             >
                 سند قبض
             </Button>
             <Button
-                onClick={() => onAction('payment')}
+                onClick={() => { onAction('payment'); }}
                 className="flex-1 bg-rose-600 hover:bg-rose-700 text-white shadow-md active:scale-95 transition-all font-bold"
                 leftIcon={<ArrowUpRight size={16} />}
             >
                 سند صرف
             </Button>
             <Button
-                onClick={() => onAction('transfer')}
+                onClick={() => { onAction('transfer'); }}
                 variant="outline"
                 className="flex-1 border-gray-200 text-gray-600 hover:bg-gray-50 bg-white"
                 leftIcon={<ArrowRightLeft size={16} />}

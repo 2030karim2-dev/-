@@ -79,7 +79,7 @@ const QuotationComparisonView: React.FC<Props> = ({ rfqGroupId, onClose, onConve
 
     // Collect all unique product descriptions
     const allDescriptions = new Set<string>();
-    suppliers.forEach(s => s.quotation_items?.forEach(i => allDescriptions.add(i.description)));
+    suppliers.forEach(s => { s.quotation_items?.forEach(i => allDescriptions.add(i.description)); });
     const descriptions = Array.from(allDescriptions);
 
     // Find cheapest and most expensive for each product
@@ -138,7 +138,7 @@ const QuotationComparisonView: React.FC<Props> = ({ rfqGroupId, onClose, onConve
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setExpanded(!expanded)}
+            onClick={() => { setExpanded(!expanded); }}
             className="p-2 text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-colors"
           >
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -165,7 +165,7 @@ const QuotationComparisonView: React.FC<Props> = ({ rfqGroupId, onClose, onConve
                   {suppliers.map((s) => (
                     <th key={s.id} className="text-center py-3 px-4 font-bold text-xs min-w-[140px]">
                       <div className="flex flex-col items-center gap-1">
-                        <span className={`${s.id === comparison.cheapestId ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                        <span className={s.id === comparison.cheapestId ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}>
                           {s.party?.name || 'مورد غير محدد'}
                         </span>
                         {s.id === comparison.cheapestId && (
@@ -188,7 +188,7 @@ const QuotationComparisonView: React.FC<Props> = ({ rfqGroupId, onClose, onConve
                     {suppliers.map((s) => {
                       const item = s.quotation_items?.find(i => i.description === desc);
                       const isCheapest = item && comparison.priceMap[desc]?.minSupplier === s.id;
-                      const isMostExpensive = item && item.unit_price === comparison.priceMap[desc]?.max && comparison.priceMap[desc]?.max !== comparison.priceMap[desc]?.min;
+                      const isMostExpensive = item?.unit_price === comparison.priceMap[desc]?.max && comparison.priceMap[desc]?.max !== comparison.priceMap[desc]?.min;
                       return (
                         <td key={s.id} className="py-3 px-4 text-center">
                           {item ? (

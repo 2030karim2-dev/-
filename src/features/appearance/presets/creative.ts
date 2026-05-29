@@ -1,4 +1,4 @@
-import { ThemePreset } from '../types';
+import type { ThemePreset } from '../types';
 
 export const creativePresets: ThemePreset[] = [
   {

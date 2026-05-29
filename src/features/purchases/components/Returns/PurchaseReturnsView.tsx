@@ -97,7 +97,7 @@ const PurchaseReturnsView: React.FC<PurchaseReturnsViewProps> = ({ searchTerm: p
             {/* Add Return Button */}
             <div className="flex justify-end shrink-0">
                 <Button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => { setIsModalOpen(true); }}
                     variant="danger"
                     size="sm"
                     leftIcon={<Plus size={14} />}
@@ -127,7 +127,7 @@ const PurchaseReturnsView: React.FC<PurchaseReturnsViewProps> = ({ searchTerm: p
                         {processedReturns.map((returnItem: any) => (
                             <div
                                 key={returnItem.id}
-                                onClick={() => onViewDetails(returnItem.id)}
+                                onClick={() => { onViewDetails(returnItem.id); }}
                                 className="p-3.5 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
                             >
                                 <div className="flex justify-between items-start">
@@ -187,7 +187,7 @@ const PurchaseReturnsView: React.FC<PurchaseReturnsViewProps> = ({ searchTerm: p
             {/* Advanced Return Modal */}
             <AdvancedReturnModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => { setIsModalOpen(false); }}
                 returnType="purchase"
                 partyName="مورد"
                 onSuccess={() => {

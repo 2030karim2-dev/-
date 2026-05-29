@@ -6,7 +6,7 @@
  * extended types or computed from invoices table with party_type filter.
  */
 
-import { TableRow, TableInsert, TableUpdate } from './common.types';
+import type { TableRow, TableInsert, TableUpdate } from './common.types';
 
 // ============================================
 // Supplier related types

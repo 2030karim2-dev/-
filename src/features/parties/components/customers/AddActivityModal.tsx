@@ -14,7 +14,7 @@ interface AddActivityModalProps {
     customerName: string;
 }
 
-const activityTypes: { value: ActivityType; label: string; color: string }[] = [
+const activityTypes: Array<{ value: ActivityType; label: string; color: string }> = [
     { value: 'call', label: 'مكالمة هاتفية', color: 'bg-blue-500' },
     { value: 'email', label: 'بريد إلكتروني', color: 'bg-green-500' },
     { value: 'meeting', label: 'اجتماع', color: 'bg-purple-500' },
@@ -24,7 +24,7 @@ const activityTypes: { value: ActivityType; label: string; color: string }[] = [
     { value: 'complaint', label: 'شكوى', color: 'bg-red-500' }
 ];
 
-const priorities: { value: Priority; label: string; color: string }[] = [
+const priorities: Array<{ value: Priority; label: string; color: string }> = [
     { value: 'low', label: 'منخفض', color: 'text-gray-600' },
     { value: 'medium', label: 'متوسط', color: 'text-blue-600' },
     { value: 'high', label: 'عالي', color: 'text-orange-600' },
@@ -95,7 +95,7 @@ export const AddActivityModal: React.FC<AddActivityModalProps> = ({
                                 <button
                                     key={type.value}
                                     type="button"
-                                    onClick={() => setFormData({ ...formData, activityType: type.value })}
+                                    onClick={() => { setFormData({ ...formData, activityType: type.value }); }}
                                     className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${formData.activityType === type.value
                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                                         : 'border-gray-200 hover:border-gray-300'
@@ -116,7 +116,7 @@ export const AddActivityModal: React.FC<AddActivityModalProps> = ({
                         <input
                             type="text"
                             value={formData.subject}
-                            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                            onChange={(e) => { setFormData({ ...formData, subject: e.target.value }); }}
                             placeholder="مثال: متابعة عرض السعر"
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
@@ -130,7 +130,7 @@ export const AddActivityModal: React.FC<AddActivityModalProps> = ({
                         </label>
                         <textarea
                             value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            onChange={(e) => { setFormData({ ...formData, description: e.target.value }); }}
                             placeholder="أضف المزيد من التفاصيل..."
                             rows={3}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
@@ -147,7 +147,7 @@ export const AddActivityModal: React.FC<AddActivityModalProps> = ({
                             <input
                                 type="datetime-local"
                                 value={formData.scheduledAt || ''}
-                                onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
+                                onChange={(e) => { setFormData({ ...formData, scheduledAt: e.target.value }); }}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
@@ -160,7 +160,7 @@ export const AddActivityModal: React.FC<AddActivityModalProps> = ({
                             </label>
                             <select
                                 value={formData.priority}
-                                onChange={(e) => setFormData({ ...formData, priority: e.target.value as Priority })}
+                                onChange={(e) => { setFormData({ ...formData, priority: e.target.value as Priority }); }}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 {priorities.map((p) => (

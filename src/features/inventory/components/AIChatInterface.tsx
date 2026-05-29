@@ -30,7 +30,7 @@ export const AIChatInterface: React.FC<AIChatInterfaceProps> = ({ initialQuery, 
   const triggerAiCall = async (newMessages: Message[], currentInput: string) => {
     try {
       const response = await chatMutation.mutateAsync(newMessages as any);
-      if (response && response.content) {
+      if (response?.content) {
         setMessages(prev => [...prev, { role: 'assistant', content: response.content }]);
       }
     } catch (error) {
@@ -74,7 +74,7 @@ export const AIChatInterface: React.FC<AIChatInterfaceProps> = ({ initialQuery, 
   };
 
   useEffect(() => {
-    if (initialQuery && initialQuery.trim()) {
+    if (initialQuery?.trim()) {
       const queryText = initialQuery.trim();
       if (onClearInitialQuery) {
         onClearInitialQuery();
@@ -174,7 +174,7 @@ export const AIChatInterface: React.FC<AIChatInterfaceProps> = ({ initialQuery, 
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => { setInput(e.target.value); }}
             placeholder="اسألني عن توافق أي قطعة..."
             className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-500 rounded-xl outline-none transition-all text-sm dark:text-white"
           />

@@ -3,7 +3,7 @@
  * Alzhra Smart ERP - Card Design System v2.0
  */
 
-import { CardVariantConfig, CardSizeConfig, GlassConfig } from './types';
+import type { CardVariantConfig, CardSizeConfig, GlassConfig } from './types';
 
 // ======== Size Tokens ========
 

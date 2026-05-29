@@ -67,7 +67,7 @@ export interface JournalEntryFormData {
   party_name?: string | undefined;
   currency_code?: string | undefined;
   exchange_rate?: number | undefined;
-  lines: Omit<JournalLine, 'id' | 'journal_entry_id'>[];
+  lines: Array<Omit<JournalLine, 'id' | 'journal_entry_id'>>;
 }
 
 export interface AccountFormData {

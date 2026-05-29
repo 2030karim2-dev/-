@@ -1,4 +1,4 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 
 interface ErrorBoundaryProps {
   children?: ReactNode;
@@ -63,7 +63,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             {texts[lang].message}
           </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => { window.location.reload(); }}
             style={{
               marginTop: '1.5rem',
               display: 'flex',

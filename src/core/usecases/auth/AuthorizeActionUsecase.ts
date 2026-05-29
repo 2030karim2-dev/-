@@ -1,4 +1,4 @@
-import { AuthUser } from '../../../features/auth/types';
+import type { AuthUser } from '../../../features/auth/types';
 
 type Action =
   | 'delete_product'

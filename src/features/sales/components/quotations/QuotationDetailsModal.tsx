@@ -13,7 +13,7 @@ interface Props {
   onConvertToInvoice?: () => void;
 }
 
-const STATUS_ACTIONS: Record<string, { label: string; icon: React.ReactNode; color: string; nextStatus: string }[]> = {
+const STATUS_ACTIONS: Record<string, Array<{ label: string; icon: React.ReactNode; color: string; nextStatus: string }>> = {
   draft: [
     { label: 'إرسال للعميل', icon: <Send size={14} />, color: 'bg-blue-600 hover:bg-blue-700', nextStatus: 'sent' },
   ],

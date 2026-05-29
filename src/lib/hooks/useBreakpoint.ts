@@ -51,10 +51,10 @@ export const useCurrentBreakpoint = (): BreakpointKey => {
       else if (width >= BREAKPOINTS['4xl']) setBreakpoint('4xl');
       else if (width >= BREAKPOINTS['3xl']) setBreakpoint('3xl');
       else if (width >= BREAKPOINTS['2xl']) setBreakpoint('2xl');
-      else if (width >= BREAKPOINTS['xl']) setBreakpoint('xl');
-      else if (width >= BREAKPOINTS['lg']) setBreakpoint('lg');
-      else if (width >= BREAKPOINTS['md']) setBreakpoint('md');
-      else if (width >= BREAKPOINTS['sm']) setBreakpoint('sm');
+      else if (width >= BREAKPOINTS.xl) setBreakpoint('xl');
+      else if (width >= BREAKPOINTS.lg) setBreakpoint('lg');
+      else if (width >= BREAKPOINTS.md) setBreakpoint('md');
+      else if (width >= BREAKPOINTS.sm) setBreakpoint('sm');
       else setBreakpoint('xs');
     };
 

@@ -24,7 +24,7 @@ export const FontSettings: React.FC<FontSettingsProps> = ({ print, handleUpdate,
                     </label>
                     <select
                         value={print.font_family}
-                        onChange={(e) => handleUpdate({ font_family: e.target.value })}
+                        onChange={(e) => { handleUpdate({ font_family: e.target.value }); }}
                         className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     >
                         <option value="Cairo">Cairo</option>
@@ -43,7 +43,7 @@ export const FontSettings: React.FC<FontSettingsProps> = ({ print, handleUpdate,
                         min={8}
                         max={24}
                         value={print.font_size}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate({ font_size: parseInt(e.target.value) || 12 })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { handleUpdate({ font_size: parseInt(e.target.value) || 12 }); }}
                         className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     />
                 </div>
@@ -57,7 +57,7 @@ export const FontSettings: React.FC<FontSettingsProps> = ({ print, handleUpdate,
                         max={3}
                         step={0.1}
                         value={print.line_spacing}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate({ line_spacing: parseFloat(e.target.value) || 1.5 })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { handleUpdate({ line_spacing: parseFloat(e.target.value) || 1.5 }); }}
                         className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                     />
                 </div>

@@ -103,7 +103,7 @@ export const DebtChatAssistant: React.FC<Props> = ({ debtContext }) => {
                     <input
                         type="text"
                         value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
+                        onChange={(e) => { setInputValue(e.target.value); }}
                         placeholder="اطرح سؤالاً عن الديون..."
                         className="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl pr-4 pl-12 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm shadow-sm"
                         disabled={isLoading}

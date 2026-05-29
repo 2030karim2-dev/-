@@ -30,7 +30,7 @@ export const useCrossReferenceMutations = (productId: string) => {
             queryClient.invalidateQueries({ queryKey: ['cross_references', productId] });
             showToast("تمت إضافة الرقم البديل للمنتج بنجاح", 'success');
         },
-        onError: (e: any) => showToast(e.message || "حدث خطأ أثناء الإضافة", 'error')
+        onError: (e: any) => { showToast(e.message || "حدث خطأ أثناء الإضافة", 'error'); }
     });
 
     const remove = useMutation({
@@ -71,7 +71,7 @@ export const useKitMutations = (kitId: string) => {
             queryClient.invalidateQueries({ queryKey: ['kit_components', kitId] });
             showToast("تمت إضافة المكون إلى الباقة", 'success');
         },
-        onError: (e: any) => showToast(e.message || "حدث خطأ أثناء الربط", 'error')
+        onError: (e: any) => { showToast(e.message || "حدث خطأ أثناء الربط", 'error'); }
     });
 
     const remove = useMutation({
@@ -113,7 +113,7 @@ export const useSupplierPriceMutations = (productId: string) => {
             queryClient.invalidateQueries({ queryKey: ['supplier_prices', productId] });
             showToast("تم حفظ تسعيرة المورد بنجاح", 'success');
         },
-        onError: (e: any) => showToast(e.message || "فشل حفظ التسعيرة", 'error')
+        onError: (e: any) => { showToast(e.message || "فشل حفظ التسعيرة", 'error'); }
     });
 
     return { addSupplierPrice: add.mutateAsync, isAdding: add.isPending };

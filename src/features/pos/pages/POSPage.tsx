@@ -19,7 +19,7 @@ import { posSearchService } from '../services/searchService';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
 import { useBreakpoint } from '../../../lib/hooks/useBreakpoint';
 import { formatCurrency } from '../../../core/utils';
-import { Product } from '../../inventory/types';
+import type { Product } from '../../inventory/types';
 
 
 const POSPage: React.FC = () => {
@@ -122,7 +122,7 @@ const POSPage: React.FC = () => {
       }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => { window.removeEventListener('keydown', handleKeyDown); };
   }, [initializeItems, items.length]);
 
   const handlePayConfirm = useCallback((method: 'cash' | 'card') => {
@@ -156,7 +156,7 @@ const POSPage: React.FC = () => {
   const actions = (
     <div className="flex gap-1.5">
       <button
-        onClick={() => setShowSuspended(!showSuspended)}
+        onClick={() => { setShowSuspended(!showSuspended); }}
         className="relative p-2 bg-amber-50 dark:bg-amber-900/20 text-amber-600 rounded-xl hover:bg-amber-100 active:scale-95 transition-all border border-amber-100 dark:border-amber-900/30"
         title={t('suspended_orders')}
       >
@@ -175,14 +175,14 @@ const POSPage: React.FC = () => {
         <Home size={18} />
       </button>
       <button
-        onClick={() => setIsQuickMode(!isQuickMode)}
+        onClick={() => { setIsQuickMode(!isQuickMode); }}
         className={`p-2 rounded-xl active:scale-95 transition-all border ${isQuickMode ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 border-blue-200 dark:border-blue-800' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 border-slate-100 dark:border-slate-800'}`}
         title="الوضع السريع"
       >
         <Zap size={18} />
       </button>
       <button
-        onClick={() => resetCart()}
+        onClick={() => { resetCart(); }}
         className="p-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-xl hover:bg-rose-100 active:scale-95 transition-all border border-rose-100 dark:border-rose-900/30"
         title={t('clear_cart')}
       >
@@ -234,7 +234,7 @@ const POSPage: React.FC = () => {
             {/* Quick Filters */}
             <button
               type="button"
-              onClick={() => setInStockOnly(!inStockOnly)}
+              onClick={() => { setInStockOnly(!inStockOnly); }}
               className={`
                 flex items-center justify-center gap-1.5 px-3 rounded-xl text-[10px] md:text-xs font-black transition-all active:scale-95 border-2 h-[34px] md:h-[38px] shrink-0
                 ${inStockOnly
@@ -251,7 +251,7 @@ const POSPage: React.FC = () => {
             {!isQuickMode && (
               <button
                 type="button"
-                onClick={() => setIsScannerOpen(true)}
+                onClick={() => { setIsScannerOpen(true); }}
                 className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white h-[34px] md:h-[38px] rounded-xl shadow-xl shadow-blue-500/10 active:scale-[0.98] transition-all font-bold text-[10px] md:text-xs uppercase tracking-wider px-3 shrink-0"
               >
                 <ScanBarcode size={14} />
@@ -271,7 +271,7 @@ const POSPage: React.FC = () => {
           {!isDesktop && (
             <div className="p-3 bg-white dark:bg-slate-900 border-b dark:border-slate-800 flex items-center justify-between">
               <button
-                onClick={() => setActiveMobileTab('products')}
+                onClick={() => { setActiveMobileTab('products'); }}
                 className="flex items-center gap-2 text-blue-600 font-bold text-xs"
               >
                 <ChevronLeft size={16} /> العودة للمنتجات
@@ -279,11 +279,11 @@ const POSPage: React.FC = () => {
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">مراجعة الطلب</span>
             </div>
           )}
-          <POSCart onPay={() => setIsPaymentModalOpen(true)} onSuspend={handleSuspend} />
+          <POSCart onPay={() => { setIsPaymentModalOpen(true); }} onSuspend={handleSuspend} />
 
           {!isQuickMode && (
             <div className="p-2 bg-gray-50 dark:bg-slate-950 border-t dark:border-slate-800 hidden md:block">
-              <SmartRecommendations cartItems={items.filter(i => i.productId) as any} onAdd={(name) => search.setQuery(name)} />
+              <SmartRecommendations cartItems={items.filter(i => i.productId) as any} onAdd={(name) => { search.setQuery(name); }} />
             </div>
           )}
         </aside>
@@ -293,7 +293,7 @@ const POSPage: React.FC = () => {
           ${isDesktop ? 'flex-1' : (activeMobileTab === 'products' ? 'flex-1' : 'hidden')} 
           overflow-hidden relative bg-gray-50/50 dark:bg-slate-950/50
         `}>
-          <ProductGrid searchTerm={search.debouncedQuery} onAddToCart={(p) => addProductToCart(p as any)} inStockOnly={inStockOnly} />
+          <ProductGrid searchTerm={search.debouncedQuery} onAddToCart={(p) => { addProductToCart(p as any); }} inStockOnly={inStockOnly} />
         </main>
       </div>
 
@@ -301,7 +301,7 @@ const POSPage: React.FC = () => {
       {!isDesktop && activeMobileTab === 'products' && items.length > 0 && (
         <div className="fixed bottom-0 inset-x-0 p-4 z-40 animate-in slide-in-from-bottom-10 h-24 pointer-events-none">
           <div
-            onClick={() => setActiveMobileTab('cart')}
+            onClick={() => { setActiveMobileTab('cart'); }}
             className="w-full max-w-md mx-auto h-full bg-blue-600 text-white rounded-[2rem] shadow-2xl shadow-blue-500/40 flex items-center justify-between px-6 py-3 cursor-pointer pointer-events-auto active:scale-[0.98] transition-all"
           >
             <div className="flex flex-col">
@@ -321,13 +321,13 @@ const POSPage: React.FC = () => {
       {isScannerOpen && (
         <ScannerOverlay
           onScan={(code) => handleBarcodeScanned(code)}
-          onClose={() => setIsScannerOpen(false)}
+          onClose={() => { setIsScannerOpen(false); }}
         />
       )}
 
       <PaymentModal
         isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
+        onClose={() => { setIsPaymentModalOpen(false); }}
         total={summary.totalAmount}
         currency={useSalesStore.getState().currency}
         onConfirm={handlePayConfirm}
@@ -342,7 +342,7 @@ const POSPage: React.FC = () => {
               <h3 className="font-black text-sm md:text-base text-slate-800 dark:text-white">الطلبـات المعلقـة ({suspendedOrders.length})</h3>
               <button
                 type="button"
-                onClick={() => setShowSuspended(false)}
+                onClick={() => { setShowSuspended(false); }}
                 className="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               >
                 إغلاق
@@ -390,7 +390,7 @@ const POSPage: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => removeSuspended(order.id)}
+                        onClick={() => { removeSuspended(order.id); }}
                         className="px-3 py-1.5 border border-rose-250 hover:bg-rose-50 hover:text-rose-600 dark:border-rose-900/30 dark:hover:bg-rose-950/20 text-rose-500 rounded-xl text-xs font-bold transition-all active:scale-95"
                       >
                         حذف

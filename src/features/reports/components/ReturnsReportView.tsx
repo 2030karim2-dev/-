@@ -54,7 +54,7 @@ const ReturnsReportView: React.FC = () => {
             {/* Insight Tabs Architecture */}
             <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-[2rem] w-fit border border-slate-200/50 dark:border-slate-700/50 self-center">
                 <button
-                    onClick={() => setReportView('overview')}
+                    onClick={() => { setReportView('overview'); }}
                     className={`px-8 py-3 text-xs font-black uppercase tracking-widest rounded-[1.5rem] transition-all duration-500 ${reportView === 'overview'
                         ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-xl scale-105'
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 opacity-60 hover:opacity-100'
@@ -63,7 +63,7 @@ const ReturnsReportView: React.FC = () => {
                     Overview
                 </button>
                 <button
-                    onClick={() => setReportView('sales')}
+                    onClick={() => { setReportView('sales'); }}
                     className={`px-8 py-3 text-xs font-black uppercase tracking-widest rounded-[1.5rem] transition-all duration-500 ${reportView === 'sales'
                         ? 'bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-xl scale-105'
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 opacity-60 hover:opacity-100'
@@ -72,7 +72,7 @@ const ReturnsReportView: React.FC = () => {
                     Sales Returns
                 </button>
                 <button
-                    onClick={() => setReportView('purchase')}
+                    onClick={() => { setReportView('purchase'); }}
                     className={`px-8 py-3 text-xs font-black uppercase tracking-widest rounded-[1.5rem] transition-all duration-500 ${reportView === 'purchase'
                         ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xl scale-105'
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 opacity-60 hover:opacity-100'

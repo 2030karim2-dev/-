@@ -54,7 +54,7 @@ const CompatibilitySearchForm: React.FC<Props> = ({ searchInput, setSearchInput,
                         <button
                             key={tag}
                             type="button"
-                            onClick={() => setSearchInput(tag)}
+                            onClick={() => { setSearchInput(tag); }}
                             className="px-3 py-1 bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-850 rounded-lg font-mono text-[10px] text-indigo-600 dark:text-indigo-400 transition-all active:scale-95"
                         >
                             {tag}

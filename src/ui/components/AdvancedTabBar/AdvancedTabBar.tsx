@@ -5,7 +5,7 @@
 import React, { useMemo } from 'react';
 import { cn } from '../../../core/utils';
 import { useAdvancedTabs } from './useAdvancedTabs';
-import { AdvancedTabBarProps, TabItem } from './types';
+import type { AdvancedTabBarProps, TabItem } from './types';
 import './styles.css';
 
 // ============================================
@@ -255,16 +255,16 @@ export const AdvancedTabBar: React.FC<AdvancedTabBarProps> = ({
                             isDragging={isDragging}
                             isDropTarget={isDropTarget}
                             size={size}
-                            onClick={() => handleTabClick(tab.id)}
-                            onMouseEnter={() => handleTabMouseEnter(tab.id)}
+                            onClick={() => { handleTabClick(tab.id); }}
+                            onMouseEnter={() => { handleTabMouseEnter(tab.id); }}
                             onMouseLeave={handleTabMouseLeave}
-                            onFocus={() => handleTabFocus(tab.id)}
+                            onFocus={() => { handleTabFocus(tab.id); }}
                             onBlur={handleTabBlur}
-                            onDragStart={(e) => handleDragStart(e, tab.id)}
+                            onDragStart={(e) => { handleDragStart(e, tab.id); }}
                             onDragEnd={handleDragEnd}
-                            onDragOver={(e) => handleDragOver(e, tab.id)}
+                            onDragOver={(e) => { handleDragOver(e, tab.id); }}
                             onDragLeave={handleDragLeave}
-                            onDrop={(e) => handleDrop(e, tab.id)}
+                            onDrop={(e) => { handleDrop(e, tab.id); }}
                             ariaAttributes={getTabAttributes(tab.id, index)}
                             setRef={setTabRef(tab.id)}
                         />

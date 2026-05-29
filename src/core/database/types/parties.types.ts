@@ -9,7 +9,7 @@
  * import { DBParty, DBPartyInsert, DBPartyUpdate } from './sales.types';
  */
 
-import { TableRow, TableInsert, TableUpdate } from './common.types';
+import type { TableRow, TableInsert, TableUpdate } from './common.types';
 import type { Views } from './common.types';
 
 // ============================================

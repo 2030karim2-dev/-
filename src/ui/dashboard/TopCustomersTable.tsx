@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 
 interface TopCustomersTableProps {
-  customers: { name: string; inv: number; amt: string }[];
+  customers: Array<{ name: string; inv: number; amt: string }>;
 }
 
 const TopCustomersTable: React.FC<TopCustomersTableProps> = ({ customers }) => {

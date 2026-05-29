@@ -30,7 +30,7 @@ const InventoryMovementView: React.FC = () => {
     }, [allProducts, selectedProductId]);
 
     const analysis = useMemo(() => {
-        const movementArr = (movement as { quantity: number; balance_after: number; entry_date?: string; type?: string; description?: string; unit_cost?: number; id?: string }[]) || [];
+        const movementArr = (movement as Array<{ quantity: number; balance_after: number; entry_date?: string; type?: string; description?: string; unit_cost?: number; id?: string }>) || [];
         if (!movementArr || movementArr.length === 0) return null;
         const totalIn = movementArr.reduce((sum, m) => sum + (m.quantity > 0 ? m.quantity : 0), 0);
         const totalOut = movementArr.reduce((sum, m) => sum + (m.quantity < 0 ? Math.abs(m.quantity) : 0), 0);
@@ -128,7 +128,7 @@ const InventoryMovementView: React.FC = () => {
                             type="text"
                             value={searchQuery}
                             onChange={(e) => { setSearchQuery(e.target.value); setIsDropdownOpen(true); }}
-                            onFocus={() => setIsDropdownOpen(true)}
+                            onFocus={() => { setIsDropdownOpen(true); }}
                             placeholder="حدد الصنف لمباشرة التحليل..."
                             className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-[1.5rem] py-4 pl-4 pr-14 text-sm font-bold outline-none transition-all dark:text-slate-100 shadow-inner"
                         />
@@ -137,7 +137,7 @@ const InventoryMovementView: React.FC = () => {
                     {isDropdownOpen && filteredProducts.length > 0 && (
                         <div className="absolute top-full left-0 right-0 mt-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-slate-800 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[100] max-h-80 overflow-y-auto animate-in fade-in slide-in-from-top-4 duration-300">
                             {filteredProducts.map((p: any) => (
-                                <div key={p.id} onClick={() => handleSelectProduct(p)} className="p-5 border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 group cursor-pointer flex justify-between items-center transition-all">
+                                <div key={p.id} onClick={() => { handleSelectProduct(p); }} className="p-5 border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 group cursor-pointer flex justify-between items-center transition-all">
                                     <div className="flex items-center gap-4">
                                         <div className="p-3 bg-blue-500/10 dark:bg-blue-500/20 rounded-2xl group-hover:bg-white/20 transition-colors">
                                             <Package size={18} className="text-blue-500 group-hover:text-white" />
@@ -161,7 +161,7 @@ const InventoryMovementView: React.FC = () => {
                         <input
                             type="date"
                             value={fromDate}
-                            onChange={(e) => setFromDate(e.target.value)}
+                            onChange={(e) => { setFromDate(e.target.value); }}
                             className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 rounded-2xl py-3.5 px-6 text-xs font-black font-mono outline-none focus:border-blue-500 w-full transition-all dark:text-white shadow-inner"
                         />
                     </div>
@@ -170,7 +170,7 @@ const InventoryMovementView: React.FC = () => {
                         <input
                             type="date"
                             value={toDate}
-                            onChange={(e) => setToDate(e.target.value)}
+                            onChange={(e) => { setToDate(e.target.value); }}
                             className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 rounded-2xl py-3.5 px-6 text-xs font-black font-mono outline-none focus:border-blue-500 w-full transition-all dark:text-white shadow-inner"
                         />
                     </div>

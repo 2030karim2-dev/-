@@ -6,7 +6,7 @@ import { formatCurrency } from '../../../../core/utils';
 
 interface ParsedInvoice {
     customerName: string;
-    items: { name: string; quantity: number; price: number }[];
+    items: Array<{ name: string; quantity: number; price: number }>;
     paymentMethod: string;
 }
 
@@ -42,7 +42,7 @@ const VoiceInvoiceButton: React.FC = () => {
             setMode('input');
         };
 
-        recognition.onend = () => setIsListening(false);
+        recognition.onend = () => { setIsListening(false); };
 
         setIsListening(true);
         setMode('input');
@@ -72,7 +72,7 @@ const VoiceInvoiceButton: React.FC = () => {
                     فاتورة بالصوت
                 </button>
                 <button
-                    onClick={() => setMode('input')}
+                    onClick={() => { setMode('input'); }}
                     className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
                 >
                     <MessageSquare size={14} />
@@ -96,7 +96,7 @@ const VoiceInvoiceButton: React.FC = () => {
                     <input
                         type="text"
                         value={textInput}
-                        onChange={(e) => setTextInput(e.target.value)}
+                        onChange={(e) => { setTextInput(e.target.value); }}
                         onKeyDown={(e) => e.key === 'Enter' && handleParse(textInput)}
                         placeholder='مثال: "3 فلتر زيت بـ 25 ريال للعميل أحمد"'
                         className="flex-1 rounded-lg border border-violet-200 dark:border-violet-800 bg-white dark:bg-slate-900 p-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500/30"

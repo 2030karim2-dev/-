@@ -20,10 +20,10 @@ interface OpeningBalanceLine {
     credit_amount: number;
 };
 
-type FormData = {
+interface FormData {
     lines: OpeningBalanceLine[];
     date: string;
-};
+}
 
 const OpeningBalancesModal: React.FC<OpeningBalancesModalProps> = ({ isOpen, onClose }) => {
     const { data: accounts, isLoading } = useAccounts();
@@ -130,7 +130,7 @@ const OpeningBalancesModal: React.FC<OpeningBalancesModalProps> = ({ isOpen, onC
                             type="text"
                             placeholder="بحث سريع..."
                             value={filter}
-                            onChange={(e) => setFilter(e.target.value)}
+                            onChange={(e) => { setFilter(e.target.value); }}
                             className="w-full pr-7 pl-2 py-1.5 bg-white dark:bg-slate-800 border dark:border-slate-700 text-[10px] font-bold outline-none"
                         />
                     </div>

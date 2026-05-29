@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Edit, Trash2, Package, X, Maximize2 } from 'lucide-react';
-import { Product } from '../types';
+import type { Product } from '../types';
 import StockStatusBadge from './product_detail/StockStatusBadge';
 import ProductDetailsContent from './product_detail/ProductDetailsContent';
 
@@ -48,7 +48,7 @@ const ProductDetailPane: React.FC<Props> = ({ product, onEdit, onDelete, onClose
         
         <div className="flex items-center gap-1.5 shrink-0">
           <button 
-            onClick={() => onEdit(product)} 
+            onClick={() => { onEdit(product); }} 
             className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded border border-transparent hover:border-blue-200 dark:hover:border-blue-800 transition-all active:scale-95"
             title="تعديل"
           >

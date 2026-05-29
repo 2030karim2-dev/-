@@ -3,17 +3,17 @@
  * Type definitions for dashboard queries with complex joins
  */
 
-import { Database } from '@/core/database.types';
+import type { Database } from '@/core/database.types';
 
 // Journal Entry with Lines (for bonds)
 export interface JournalEntryWithLines {
     id: string;
     entry_date: string;
     reference_type: 'receipt_bond' | 'payment_bond';
-    journal_entry_lines: {
+    journal_entry_lines: Array<{
         debit_amount: number;
         credit_amount: number;
-    }[];
+    }>;
 }
 
 // Product with Stock
@@ -21,10 +21,10 @@ export interface ProductWithStock {
     id: string;
     name_ar: string;
     min_stock_level: number;
-    product_stock: {
+    product_stock: Array<{
         quantity: number;
         warehouse_id: string;
-    }[];
+    }>;
 }
 
 // Invoice Item with Product and Invoice info

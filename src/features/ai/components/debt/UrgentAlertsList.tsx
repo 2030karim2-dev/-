@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertTriangle, Clock } from 'lucide-react';
-import { DebtAlert } from '../../hooks/useDebtManagement';
+import type { DebtAlert } from '../../hooks/useDebtManagement';
 
 interface Props {
   alerts: DebtAlert[];

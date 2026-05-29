@@ -85,7 +85,7 @@ class Logger {
         apmEnabled: import.meta.env.PROD,
     };
 
-    private loggedMessages = new Set<string>();
+    private readonly loggedMessages = new Set<string>();
     private sessionContext: Record<string, unknown> = {};
     private apmAdapter: APMAdapter | null = null;
 

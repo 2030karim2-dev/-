@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Box, FileText, Maximize2, Minimize2, Trash2 } from 'lucide-react';
-import { Product } from '../types';
+import type { Product } from '../types';
 import StockStatusBadge from './product_detail/StockStatusBadge';
 import ProductDetailsContent from './product_detail/ProductDetailsContent';
 import { cn } from '../../../core/utils';
@@ -26,7 +26,7 @@ const ProductDetailModal: React.FC<Props> = ({ product, onClose, onEdit, onDelet
             )}
         >
             <div 
-                onClick={e => e.stopPropagation()} 
+                onClick={e => { e.stopPropagation(); }} 
                 className={cn(
                     "bg-white dark:bg-slate-950 flex flex-col border border-slate-200 dark:border-slate-800 shadow-xl animate-in zoom-in-95 duration-200 overflow-hidden",
                     isMaximized 
@@ -90,7 +90,7 @@ const ProductDetailModal: React.FC<Props> = ({ product, onClose, onEdit, onDelet
                         
                         <button 
                             type="button" 
-                            onClick={() => setIsMaximized(!isMaximized)}
+                            onClick={() => { setIsMaximized(!isMaximized); }}
                             className="p-1.5 text-slate-400 hover:text-blue-600 rounded bg-transparent transition-colors"
                             title={isMaximized ? "تصغير" : "تكبير"}
                         >

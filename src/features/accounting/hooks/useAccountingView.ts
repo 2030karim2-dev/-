@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 // Fix: Corrected import path to point to the barrel file.
-import { AccountingView } from '../types/index';
+import type { AccountingView } from '../types/index';
 
 export const useAccountingView = () => {
   const [activeView, setActiveView] = useState<AccountingView>('overview');
@@ -11,8 +11,8 @@ export const useAccountingView = () => {
     to: new Date().toISOString().split('T')[0]
   });
 
-  const openJournalModal = () => setIsModalOpen(true);
-  const closeJournalModal = () => setIsModalOpen(false);
+  const openJournalModal = () => { setIsModalOpen(true); };
+  const closeJournalModal = () => { setIsModalOpen(false); };
 
   return {
     activeView,

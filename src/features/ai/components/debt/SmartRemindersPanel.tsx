@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MessageSquare, Copy, CheckCircle2 } from 'lucide-react';
-import { SmartReminder } from '../../hooks/useDebtManagement';
+import type { SmartReminder } from '../../hooks/useDebtManagement';
 
 interface Props {
   reminders: SmartReminder[];
@@ -12,7 +12,7 @@ export const SmartRemindersPanel: React.FC<Props> = ({ reminders }) => {
   const handleCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+    setTimeout(() => { setCopiedId(null); }, 2000);
   };
 
   if (!reminders || reminders.length === 0) {
@@ -84,7 +84,7 @@ export const SmartRemindersPanel: React.FC<Props> = ({ reminders }) => {
                 </p>
                 <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                        onClick={() => handleCopy(reminder.id, reminder.message)}
+                        onClick={() => { handleCopy(reminder.id, reminder.message); }}
                         className="bg-white border shadow-sm p-1.5 rounded-md hover:bg-blue-50 text-gray-600 hover:text-blue-600 focus:outline-none"
                         title="نسخ النص"
                     >
@@ -99,7 +99,7 @@ export const SmartRemindersPanel: React.FC<Props> = ({ reminders }) => {
             
             <div className="flex justify-end">
                 <button
-                    onClick={() => handleCopy(reminder.id, reminder.message)}
+                    onClick={() => { handleCopy(reminder.id, reminder.message); }}
                     className="text-xs font-semibold text-blue-600 flex items-center gap-1 hover:text-blue-800"
                 >
                     {copiedId === reminder.id ? 'تم النسخ بنجاح' : 'نسخ النص'}

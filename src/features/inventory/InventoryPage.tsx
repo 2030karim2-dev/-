@@ -90,7 +90,7 @@ const InventoryPage: React.FC = () => {
                         if (isMaximized) setIsZenMode(false);
                     }}
                     isZenMode={isZenMode}
-                    onToggleZen={() => setIsZenMode(!isZenMode)}
+                    onToggleZen={() => { setIsZenMode(!isZenMode); }}
                     actions={
                         <div className="flex items-center gap-3">
                             {activeView === 'products' && (
@@ -121,8 +121,8 @@ const InventoryPage: React.FC = () => {
                                 </button>
                                 {!isDesktop && activeView === 'products' && (
                                     <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-xl">
-                                        <button onClick={() => setDisplayMode('table')} className={`p-1.5 rounded-lg ${displayMode === 'table' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><List size={14} /></button>
-                                        <button onClick={() => setDisplayMode('grid')} className={`p-1.5 rounded-lg ${displayMode === 'grid' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><LayoutGrid size={14} /></button>
+                                        <button onClick={() => { setDisplayMode('table'); }} className={`p-1.5 rounded-lg ${displayMode === 'table' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><List size={14} /></button>
+                                        <button onClick={() => { setDisplayMode('grid'); }} className={`p-1.5 rounded-lg ${displayMode === 'grid' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><LayoutGrid size={14} /></button>
                                     </div>
                                 )}
                             </div>
@@ -149,7 +149,7 @@ const InventoryPage: React.FC = () => {
                                         <div className="flex items-center justify-between mb-4">
                                             <h3 className="font-bold text-sm text-[var(--app-text)]">تفاصيل المنتج</h3>
                                             <button
-                                                onClick={() => setSelectedProduct(null)}
+                                                onClick={() => { setSelectedProduct(null); }}
                                                 className="p-1.5 rounded-lg hover:bg-[var(--app-surface-hover)] text-[var(--app-text-secondary)] transition-colors"
                                             >
                                                 ✕
@@ -178,7 +178,7 @@ const InventoryPage: React.FC = () => {
                                         handleEdit={handleEdit}
                                         deleteProduct={deleteProduct}
                                         handleSmartImportConfirm={handleSmartImportConfirm}
-                                        onMaximizeProduct={() => setIsDetailsMaximized(true)}
+                                        onMaximizeProduct={() => { setIsDetailsMaximized(true); }}
                                     />
                                     {activeView === 'products' && (
                                         <ServerPaginationBar
@@ -198,7 +198,7 @@ const InventoryPage: React.FC = () => {
                             /* Standard Layout: single column */
                             <div className="flex-1 overflow-hidden flex flex-col transition-all duration-500">
                                 {isError ? (
-                                    <ErrorDisplay error={error?.message || null} onRetry={() => goToPage(page)} variant="full" />
+                                    <ErrorDisplay error={error?.message || null} onRetry={() => { goToPage(page); }} variant="full" />
                                 ) : (
                                     <>
                                         <InventoryViewRenderer
@@ -215,7 +215,7 @@ const InventoryPage: React.FC = () => {
                                             handleEdit={handleEdit}
                                             deleteProduct={deleteProduct}
                                             handleSmartImportConfirm={handleSmartImportConfirm}
-                                            onMaximizeProduct={() => setIsDetailsMaximized(true)}
+                                            onMaximizeProduct={() => { setIsDetailsMaximized(true); }}
                                         />
                                         {activeView === 'products' && (
                                             <ServerPaginationBar

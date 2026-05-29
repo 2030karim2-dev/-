@@ -8,7 +8,7 @@
 
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import {
-    TabItem, AnimationConfig, GradientConfig, A11yConfig,
+    type TabItem, type AnimationConfig, type GradientConfig, type A11yConfig,
     DEFAULT_ANIMATION_CONFIG, DEFAULT_LIGHT_GRADIENT, DEFAULT_DARK_GRADIENT, DEFAULT_A11Y_CONFIG
 } from './types';
 import { useTabIndicator } from './hooks/useTabIndicator';
@@ -16,7 +16,7 @@ import { useTabDragDrop } from './hooks/useTabDragDrop';
 import { useTabKeyboard } from './hooks/useTabKeyboard';
 
 // ── Types ────────────────────────────────────────────────
-interface TabRefs { [key: string]: HTMLButtonElement | null; }
+type TabRefs = Record<string, HTMLButtonElement | null>;
 
 interface UseAdvancedTabsProps {
     tabs: TabItem[];
@@ -39,9 +39,9 @@ const useSystemTheme = (): 'light' | 'dark' => {
     useEffect(() => {
         const mq = window.matchMedia('(prefers-color-scheme: dark)');
         setTheme(mq.matches ? 'dark' : 'light');
-        const handler = (e: MediaQueryListEvent) => setTheme(e.matches ? 'dark' : 'light');
+        const handler = (e: MediaQueryListEvent) => { setTheme(e.matches ? 'dark' : 'light'); };
         mq.addEventListener('change', handler);
-        return () => mq.removeEventListener('change', handler);
+        return () => { mq.removeEventListener('change', handler); };
     }, []);
     return theme;
 };
@@ -86,8 +86,7 @@ export const useAdvancedTabs = ({
             initialTabs.length !== prevTabsRef.current.length ||
             initialTabs.some((tab, i) => {
                 const prevTab = prevTabsRef.current[i];
-                return !prevTab ||
-                    tab.id !== prevTab.id ||
+                return tab.id !== prevTab?.id ||
                     tab.label !== prevTab.label ||
                     tab.disabled !== prevTab.disabled ||
                     tab.icon !== prevTab.icon;

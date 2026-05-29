@@ -3,7 +3,7 @@
 // Initial seed data for sales
 // ============================================
 
-import { InvoiceStatus, InvoiceType } from './types';
+import type { InvoiceStatus, InvoiceType } from './types';
 
 export interface SeedInvoice {
     invoice_number: string;

@@ -1,5 +1,5 @@
 
-import React, { ButtonHTMLAttributes } from 'react';
+import React, { type ButtonHTMLAttributes } from 'react';
 import { cn } from '../../core/utils';
 import Spinner from './Spinner';
 

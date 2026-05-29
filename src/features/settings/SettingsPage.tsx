@@ -16,14 +16,14 @@ import InventorySettings from './components/inventory/InventorySettings';
 import PrintSettings from './components/print';
 import IntegrationsSettings from './components/integrations/IntegrationsSettings';
 import LocalizationSettings from './components/localization/LocalizationSettings';
-import { SettingsSection } from './types';
+import type { SettingsSection } from './types';
 import { useTranslation } from '../../lib/hooks/useTranslation';
 import { cn } from '../../core/utils';
 import { useBreakpoint } from '../../lib/hooks/useBreakpoint';
 
 interface MenuGroup {
   title: string;
-  items: { id: SettingsSection; label: string; icon: any; desc: string; color: string }[];
+  items: Array<{ id: SettingsSection; label: string; icon: any; desc: string; color: string }>;
 }
 
 const SettingsPage: React.FC = () => {
@@ -127,7 +127,7 @@ const SettingsPage: React.FC = () => {
               {allItems.map(item => (
                 <button
                   key={item.id}
-                  onClick={() => setActiveSection(item.id)}
+                  onClick={() => { setActiveSection(item.id); }}
                   className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold whitespace-nowrap transition-all shrink-0",
                     activeSection === item.id
@@ -174,7 +174,7 @@ const SettingsPage: React.FC = () => {
               )}
             </div>
             <button
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              onClick={() => { setSidebarCollapsed(!sidebarCollapsed); }}
               className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors"
             >
               <ChevronLeft size={14} className={cn("transition-transform", sidebarCollapsed && "rotate-180")} />
@@ -189,7 +189,7 @@ const SettingsPage: React.FC = () => {
                 type="text"
                 placeholder="بحث في الإعدادات..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); }}
                 className="w-full pr-8 pl-3 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-lg text-[10px] font-bold outline-none focus:border-blue-400 dark:focus:border-blue-500 transition-colors"
               />
             </div>
@@ -211,7 +211,7 @@ const SettingsPage: React.FC = () => {
                 {group.items.map(item => (
                   <button
                     key={item.id}
-                    onClick={() => setActiveSection(item.id)}
+                    onClick={() => { setActiveSection(item.id); }}
                     className={cn(
                       "w-full flex items-center gap-2.5 rounded-xl transition-all",
                       sidebarCollapsed ? "p-2 justify-center" : "px-2.5 py-2",

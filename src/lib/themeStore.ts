@@ -152,7 +152,7 @@ export const useThemeStore = create<ThemeState>()(
         };
 
         mediaQuery.addEventListener('change', handleThemeChange);
-        themeMediaQueryCleanup = () => mediaQuery.removeEventListener('change', handleThemeChange);
+        themeMediaQueryCleanup = () => { mediaQuery.removeEventListener('change', handleThemeChange); };
       },
 
       setMode: (mode) => {

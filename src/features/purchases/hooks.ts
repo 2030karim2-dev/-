@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { purchasesService } from './service';
 import { useAuthStore } from '../auth/store';
 import { useFeedbackStore } from '../feedback/store';
-import { CreatePurchaseDTO, CreatePaymentDTO } from './types';
+import type { CreatePurchaseDTO, CreatePaymentDTO } from './types';
 import { purchasesApi } from './api';
 import { usePartySearch } from '../parties/hooks';
 import { invalidateByPreset } from '../../lib/invalidation';

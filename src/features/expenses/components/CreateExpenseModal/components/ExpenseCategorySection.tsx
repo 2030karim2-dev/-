@@ -1,7 +1,7 @@
 import React from 'react';
 import { Landmark, Plus, X, Tag, Calendar, FileText } from 'lucide-react';
-import { UseFormRegister } from 'react-hook-form';
-import { ExpenseFormData } from '../../../types';
+import type { UseFormRegister } from 'react-hook-form';
+import type { ExpenseFormData } from '../../../types';
 import Button from '../../../../../ui/base/Button';
 import Input from '../../../../../ui/base/Input';
 
@@ -31,17 +31,17 @@ export const ExpenseCategorySection: React.FC<ExpenseCategorySectionProps> = ({
                         </select>
                         <Landmark className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                     </div>
-                    <button type="button" onClick={() => setNewCatMode(true)} className="w-12 h-12 bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-gray-400 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-500 transition-colors border dark:border-slate-700">
+                    <button type="button" onClick={() => { setNewCatMode(true); }} className="w-12 h-12 bg-gray-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-gray-400 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-500 transition-colors border dark:border-slate-700">
                         <Plus size={16} />
                     </button>
                 </div>
                 {newCatMode && (
                     <div className="flex gap-2 p-3 bg-blue-50 dark:bg-slate-800/50 border border-blue-100 dark:border-slate-700 rounded-xl animate-in fade-in">
-                        <input autoFocus value={newCatName} onChange={(e) => setNewCatName(e.target.value)}
+                        <input autoFocus value={newCatName} onChange={(e) => { setNewCatName(e.target.value); }}
                             placeholder="اسم التصنيف الجديد..."
                             className="flex-1 bg-white dark:bg-slate-700 border-none rounded-lg text-sm font-bold outline-none px-3" />
                         <Button type="button" onClick={handleAddCategory} isLoading={isAddingCategory} size="sm" className="px-4">حفظ</Button>
-                        <button type="button" onClick={() => setNewCatMode(false)} className="p-2 text-gray-400 hover:text-rose-500"><X size={16} /></button>
+                        <button type="button" onClick={() => { setNewCatMode(false); }} className="p-2 text-gray-400 hover:text-rose-500"><X size={16} /></button>
                     </div>
                 )}
             </div>

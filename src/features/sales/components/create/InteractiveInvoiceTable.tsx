@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { useSalesStore, SalesCartItem } from '../../store';
+import { useSalesStore, type SalesCartItem } from '../../store';
 import { useDiscountStore } from '../../../settings/taxDiscountStore';
-import { Product } from '../../../inventory/types';
+import type { Product } from '../../../inventory/types';
 import { Plus, Settings } from 'lucide-react';
 import { cn } from '../../../../core/utils';
 import ProductSelectionModal from './ProductSelectionModal';
@@ -71,7 +71,7 @@ const InteractiveInvoiceTable: React.FC = () => {
     document.body.style.userSelect = '';
   }, [onMouseMove]);
 
-  const handleOpenSearch = useCallback((index: number, query: string = '') => {
+  const handleOpenSearch = useCallback((index: number, query = '') => {
     setModalState({ isOpen: true, rowIndex: index, query });
   }, []);
 
@@ -81,7 +81,7 @@ const InteractiveInvoiceTable: React.FC = () => {
 
     // Auto-focus quantity after selection
     setTimeout(() => {
-      const nextCell = tableRef.current?.querySelector(`[data-row-index="${modalState.rowIndex}"][data-col-field="quantity"]`) as HTMLInputElement;
+      const nextCell = tableRef.current?.querySelector(`[data-row-index="${modalState.rowIndex}"][data-col-field="quantity"]`)!;
       nextCell?.focus();
       nextCell?.select();
     }, 50);
@@ -96,13 +96,13 @@ const InteractiveInvoiceTable: React.FC = () => {
       return;
     }
 
-    const navigationFields: (keyof SalesCartItem)[] = ['name', 'quantity', 'price'];
+    const navigationFields: Array<keyof SalesCartItem> = ['name', 'quantity', 'price'];
     if (showDiscount) navigationFields.push('discount');
 
     const colIndex = navigationFields.indexOf(field);
 
     const moveFocus = (row: number, colField: keyof SalesCartItem) => {
-      const nextCell = tableRef.current?.querySelector(`[data-row-index="${row}"][data-col-field="${colField}"]`) as HTMLInputElement;
+      const nextCell = tableRef.current?.querySelector(`[data-row-index="${row}"][data-col-field="${colField}"]`)!;
       nextCell?.focus();
       if (nextCell) nextCell.select();
     };
@@ -114,7 +114,7 @@ const InteractiveInvoiceTable: React.FC = () => {
         e.preventDefault();
         if (rowIndex === items.length - 1 && field === navigationFields[navigationFields.length - 1]) {
           addItem();
-          setTimeout(() => moveFocus(rowIndex + 1, 'name'), 50);
+          setTimeout(() => { moveFocus(rowIndex + 1, 'name'); }, 50);
         } else {
           moveFocus(rowIndex + 1, field);
         }
@@ -126,7 +126,7 @@ const InteractiveInvoiceTable: React.FC = () => {
           moveFocus(rowIndex, navigationFields[nextColIndex]);
         } else if (!e.shiftKey && rowIndex === items.length - 1) {
           addItem();
-          setTimeout(() => moveFocus(rowIndex + 1, 'name'), 50);
+          setTimeout(() => { moveFocus(rowIndex + 1, 'name'); }, 50);
         } else if (!e.shiftKey) {
           moveFocus(rowIndex + 1, navigationFields[0]);
         } else if (e.shiftKey && rowIndex > 0) {
@@ -148,7 +148,7 @@ const InteractiveInvoiceTable: React.FC = () => {
         <div className="flex gap-1.5">
           <div className="flex bg-gray-100 dark:bg-slate-800 p-0.5 rounded-lg border dark:border-slate-800">
             {useDiscountStore.getState().discountEnabled && (
-              <button onClick={() => toggleColumn('showDiscount')} className={cn("px-4 py-1 text-[9px] font-bold uppercase transition-all rounded-md", showDiscount ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-gray-400")}>خصم</button>
+              <button onClick={() => { toggleColumn('showDiscount'); }} className={cn("px-4 py-1 text-[9px] font-bold uppercase transition-all rounded-md", showDiscount ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-gray-400")}>خصم</button>
             )}
 
           </div>
@@ -164,26 +164,26 @@ const InteractiveInvoiceTable: React.FC = () => {
               <th style={{ width: colWidths.index }} className="relative p-2 border-b border-l dark:border-slate-800 text-center">#</th>
               <th style={{ width: colWidths.description }} className="relative p-2 border-b border-l dark:border-slate-800 group">
                 وصف الصنف
-                <div onMouseDown={(e) => onMouseDown(e, 'description')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                <div onMouseDown={(e) => { onMouseDown(e, 'description'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
               </th>
               <th style={{ width: colWidths.quantity }} className="relative p-2 border-b border-l dark:border-slate-800 text-center group">
                 الكمية
-                <div onMouseDown={(e) => onMouseDown(e, 'quantity')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                <div onMouseDown={(e) => { onMouseDown(e, 'quantity'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
               </th>
               <th style={{ width: colWidths.price }} className="relative p-2 border-b border-l dark:border-slate-800 text-center group">
                 سعر الوحدة
-                <div onMouseDown={(e) => onMouseDown(e, 'price')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                <div onMouseDown={(e) => { onMouseDown(e, 'price'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
               </th>
               {showDiscount && (
                 <th style={{ width: colWidths.discount }} className="relative p-2 border-b border-l dark:border-slate-800 text-center group">
                   الخصم
-                  <div onMouseDown={(e) => onMouseDown(e, 'discount')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                  <div onMouseDown={(e) => { onMouseDown(e, 'discount'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
                 </th>
               )}
 
               <th style={{ width: colWidths.total }} className="relative p-2 border-b dark:border-slate-800 text-left group">
                 الإجمالي
-                <div onMouseDown={(e) => onMouseDown(e, 'total')} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
+                <div onMouseDown={(e) => { onMouseDown(e, 'total'); }} className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-500/50 transition-colors z-20 hover:w-1.5 active:bg-blue-600"></div>
               </th>
               <th className="p-2 w-10 text-center border-b dark:border-slate-800"></th>
             </tr>
@@ -211,7 +211,7 @@ const InteractiveInvoiceTable: React.FC = () => {
 
       <ProductSelectionModal
         isOpen={modalState.isOpen}
-        onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => { setModalState(prev => ({ ...prev, isOpen: false })); }}
         onSelect={handleProductSelect}
         initialQuery={modalState.query}
       />

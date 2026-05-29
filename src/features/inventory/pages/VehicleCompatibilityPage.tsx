@@ -55,7 +55,7 @@ const VehicleCompatibilityPage: React.FC = () => {
             
             <div className="flex p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border dark:border-slate-800">
               <button 
-                onClick={() => setActiveTab('catalog')}
+                onClick={() => { setActiveTab('catalog'); }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                   activeTab === 'catalog' 
                     ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm' 
@@ -65,7 +65,7 @@ const VehicleCompatibilityPage: React.FC = () => {
                 <Box size={16} /> البحث في الفهرس
               </button>
               <button 
-                onClick={() => setActiveTab('ai')}
+                onClick={() => { setActiveTab('ai'); }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                   activeTab === 'ai' 
                     ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm' 
@@ -143,7 +143,7 @@ const VehicleCompatibilityPage: React.FC = () => {
 
                     {/* AI Assistant Card */}
                     <button
-                      onClick={() => handleAiConsult(activeSearch)}
+                      onClick={() => { handleAiConsult(activeSearch); }}
                       className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 rounded-2xl p-5 flex items-center gap-4 transition-all hover:shadow-lg group text-right w-full"
                     >
                       <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-500 flex items-center justify-center shrink-0">
@@ -295,7 +295,7 @@ const VehicleCompatibilityPage: React.FC = () => {
                 
                 <AIChatInterface
                   initialQuery={aiQuery}
-                  onClearInitialQuery={() => setAiQuery('')}
+                  onClearInitialQuery={() => { setAiQuery(''); }}
                 />
               </div>
             </div>

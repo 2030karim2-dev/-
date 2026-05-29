@@ -64,7 +64,7 @@ const StockAuditView: React.FC = () => {
       {/* ── Action Buttons ── */}
       <div className="grid grid-cols-2 gap-3 shrink-0">
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => { setIsModalOpen(true); }}
           className="bg-white dark:bg-slate-900 border-2 border-dashed border-blue-300 dark:border-blue-800 rounded-xl p-3.5 text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2 hover:bg-blue-50/60 dark:hover:bg-blue-900/20 transition-all active:scale-95 shadow-sm group"
         >
           <div className="p-1 bg-blue-100 dark:bg-blue-900/40 rounded-lg group-hover:scale-110 transition-transform">
@@ -175,7 +175,7 @@ const StockAuditView: React.FC = () => {
         )}
       </div>
 
-      <StartAuditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <StartAuditModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); }} />
     </div>
   );
 };

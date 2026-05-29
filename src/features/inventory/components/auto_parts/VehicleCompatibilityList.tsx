@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useVehicleCompatibility } from '../../hooks/useVehicleCompatibility';
-import { Product } from '../../types';
+import type { Product } from '../../types';
 import SearchInput from '../../../../ui/components/SearchInput';
 
 

@@ -1,11 +1,11 @@
 
-import { Product } from '../types';
+import type { Product } from '../types';
 
 export const aiInventoryService = {
   /**
    * تحليل الأصناف التي لم تتحرك منذ فترة طويلة
    */
-  detectStagnantItems: (products: Product[], daysThreshold: number = 180): Product[] => {
+  detectStagnantItems: (products: Product[], daysThreshold = 180): Product[] => {
     return products.filter(p => {
       const createdAt = new Date(p.created_at).getTime();
       const now = new Date().getTime();

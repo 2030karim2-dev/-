@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../auth/store';
-import { posSearchService, POSSearchResult, POSSearchFilters } from '../services/searchService';
+import { posSearchService, type POSSearchResult, type POSSearchFilters } from '../services/searchService';
 
 // ── Re-exports ────────────────────────────────────────────────────
 export type { POSSearchResult } from '../services/searchService';
@@ -248,7 +248,7 @@ export function usePOSSearch(options: UsePOSSearchOptions = {}) {
         searchTimeMs: searchQuery.data?.search_time_ms ?? 0,
 
         // Cache control
-        invalidateCache: () => posSearchService.invalidateCache(),
+        invalidateCache: () => { posSearchService.invalidateCache(); },
     };
 }
 

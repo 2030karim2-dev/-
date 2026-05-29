@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Package, RotateCcw, Search, X } from 'lucide-react';
-import { InvoiceItem } from '../types';
+import type { InvoiceItem } from '../types';
 
 interface InvoiceItemsListProps {
     items: InvoiceItem[];
@@ -25,7 +25,7 @@ const InvoiceItemsList: React.FC<InvoiceItemsListProps> = ({
     const [focusedRow, setFocusedRow] = useState<number>(0);
     // 0: Checkbox, 1: Quantity Input
     const [_focusedCol, setFocusedCol] = useState<number>(0);
-    const itemRefs = useRef<(HTMLInputElement | null)[][]>([]);
+    const itemRefs = useRef<Array<Array<HTMLInputElement | null>>>([]);
 
     const formatCurrency = (amount: number) => {
         try {
@@ -126,13 +126,13 @@ const InvoiceItemsList: React.FC<InvoiceItemsListProps> = ({
                     <input
                         type="text"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => { setSearchTerm(e.target.value); }}
                         placeholder="البحث بالاسم، الكود، أو السعر..."
                         className="w-full pr-10 pl-4 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-sm font-bold focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                     />
                     {searchTerm && (
                         <button
-                            onClick={() => setSearchTerm('')}
+                            onClick={() => { setSearchTerm(''); }}
                             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                             <X size={16} />
@@ -179,10 +179,10 @@ const InvoiceItemsList: React.FC<InvoiceItemsListProps> = ({
                                     <input
                                         type="checkbox"
                                         checked={isSelected}
-                                        onChange={(e) => onItemSelect(item.id, e.target.checked)}
+                                        onChange={(e) => { onItemSelect(item.id, e.target.checked); }}
                                         ref={el => { if (itemRefs.current[index]) itemRefs.current[index][0] = el; }}
                                         onFocus={() => { setFocusedRow(index); setFocusedCol(0); }}
-                                        onKeyDown={(e) => handleKeyDown(e, index, 0, item, maxQty)}
+                                        onKeyDown={(e) => { handleKeyDown(e, index, 0, item, maxQty); }}
                                         className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition-shadow outline-none"
                                         tabIndex={0}
                                     />
@@ -235,7 +235,7 @@ const InvoiceItemsList: React.FC<InvoiceItemsListProps> = ({
                                             }}
                                             ref={el => { if (itemRefs.current[index]) itemRefs.current[index][1] = el; }}
                                             onFocus={() => { setFocusedRow(index); setFocusedCol(1); }}
-                                            onKeyDown={(e) => handleKeyDown(e, index, 1, item, maxQty)}
+                                            onKeyDown={(e) => { handleKeyDown(e, index, 1, item, maxQty); }}
                                             className="w-16 p-1 text-center text-sm border rounded font-bold transition-all outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-900 border-gray-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder-transparent hover:border-indigo-400"
                                             tabIndex={0}
                                         />

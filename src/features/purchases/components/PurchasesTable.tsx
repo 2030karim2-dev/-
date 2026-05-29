@@ -31,7 +31,7 @@ const PurchasesTable: React.FC<PurchasesTableProps> = ({ data, isLoading, onView
                         iconColorClass={item.type === 'return_purchase' ? 'text-rose-500' : 'text-blue-500'}
                         title={item.party?.name || 'مورد عام'}
                         subtitle={`#${item.invoice_number} | ${item.issue_date}`}
-                        onClick={() => onView(item.id)}
+                        onClick={() => { onView(item.id); }}
                         tags={[{ label: item.status, color: item.status === 'posted' ? 'emerald' : 'slate' }]}
                         actions={
                             <div className="flex flex-col items-end gap-1">
@@ -102,7 +102,7 @@ const PurchasesTable: React.FC<PurchasesTableProps> = ({ data, isLoading, onView
                             header: 'إجراءات',
                             accessor: (row: any) => (
                                 <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button title="عرض التفاصيل" onClick={() => onView(row.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Eye size={18} /></button>
+                                    <button title="عرض التفاصيل" onClick={() => { onView(row.id); }} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Eye size={18} /></button>
                                     <button title="طباعة الفاتورة" className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"><Printer size={18} /></button>
                                     <button title="القيد المحاسبي" className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"><FileText size={18} /></button>
                                     <button title="تعديل" className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"><Edit size={18} /></button>

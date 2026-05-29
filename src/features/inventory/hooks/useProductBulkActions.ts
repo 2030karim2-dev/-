@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Product } from '../types';
+import type { Product } from '../types';
 import { formatCurrency } from '../../../core/utils';
 import { useFeedbackStore } from '../../../features/feedback/store';
 
@@ -37,7 +37,7 @@ export const useProductBulkActions = (products: Product[]) => {
         window.open(`https://wa.me/?text=${text}`, '_blank');
     };
 
-    const clearSelection = () => setSelectedRowIds(new Set());
+    const clearSelection = () => { setSelectedRowIds(new Set()); };
 
     return {
         selectedRowIds,

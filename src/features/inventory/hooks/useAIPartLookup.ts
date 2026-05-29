@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { aiPartLookupApi, AIPartLookupResult } from '../api/aiPartLookupApi';
+import { aiPartLookupApi, type AIPartLookupResult } from '../api/aiPartLookupApi';
 import { useFeedbackStore } from '../../feedback/store';
 
 /**
@@ -41,7 +41,7 @@ export const useAIPartLookup = (partNumber?: string | null) => {
 
         // Active search (user-triggered)
         search: searchMutation.mutateAsync,
-        searchResult: searchMutation.data as AIPartLookupResult | undefined,
+        searchResult: searchMutation.data,
         isSearching: searchMutation.isPending,
         searchError: searchMutation.error,
     };

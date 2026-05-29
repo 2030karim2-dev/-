@@ -52,7 +52,7 @@ const PurchasesPage: React.FC = () => {
   const consumePrefill = useAIPrefillStore((s: any) => s.consumePrefill);
   React.useEffect(() => {
     const aiData = consumePrefill(['create_purchase_invoice', 'create_return_purchase']);
-    if (aiData && aiData.entities) {
+    if (aiData?.entities) {
       const entities = aiData.entities;
       if (entities.partyName) {
         setSupplier({ id: `ai_temp_${Date.now()}`, name: entities.partyName });
@@ -149,14 +149,14 @@ const PurchasesPage: React.FC = () => {
         <span className="hidden md:inline">{isRepairing ? 'جاري التصحيح...' : 'تصحيح القيود'}</span>
       </button>
       <button
-        onClick={() => setIsAuditOpen(true)}
+        onClick={() => { setIsAuditOpen(true); }}
         className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors font-bold"
       >
         <ShieldCheck size={20} />
         <span className="hidden md:inline">فحص النظام</span>
       </button>
       <button
-        onClick={() => setIsPaymentModalOpen(true)}
+        onClick={() => { setIsPaymentModalOpen(true); }}
         className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white rounded-lg active:scale-95 shadow-lg shadow-purple-500/20 text-[10px] font-bold uppercase tracking-widest">
         <Wallet size={14} />
         سند صرف
@@ -180,7 +180,7 @@ const PurchasesPage: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'create':
-        return <CreatePurchaseModal onSuccess={() => setActiveTab('list')} />;
+        return <CreatePurchaseModal onSuccess={() => { setActiveTab('list'); }} />;
       case 'smart_import':
         return <SmartImportView mode="invoice" onConfirm={handleSmartImportConfirm} />;
       case 'list':
@@ -188,7 +188,7 @@ const PurchasesPage: React.FC = () => {
       case 'returns':
         return <PurchaseReturnsView searchTerm={searchTerm} onViewDetails={setViewInvoiceId} />;
       case 'quotations':
-        return <PurchaseQuotationsTab onConvertToPurchase={() => setActiveTab('create')} />;
+        return <PurchaseQuotationsTab onConvertToPurchase={() => { setActiveTab('create'); }} />;
       case 'analytics':
         return <PurchasesAnalytics />;
       default:
@@ -205,7 +205,7 @@ const PurchasesPage: React.FC = () => {
         actions={headerActions}
         tabs={TABS}
         activeTab={activeTab}
-        onTabChange={(id) => setActiveTab(id as any)}
+        onTabChange={(id) => { setActiveTab(id as any); }}
         searchPlaceholder={t('search_by_invoice_or_supplier')}
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
@@ -237,10 +237,10 @@ const PurchasesPage: React.FC = () => {
       <Suspense fallback={null}>
         <PurchaseDetailsModal
           invoiceId={viewInvoiceId}
-          onClose={() => setViewInvoiceId(null)}
+          onClose={() => { setViewInvoiceId(null); }}
         />
-        <CreatePaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} />
-        {isAuditOpen && <AuditModal onClose={() => setIsAuditOpen(false)} />}
+        <CreatePaymentModal isOpen={isPaymentModalOpen} onClose={() => { setIsPaymentModalOpen(false); }} />
+        {isAuditOpen && <AuditModal onClose={() => { setIsAuditOpen(false); }} />}
       </Suspense>
     </div>
   );

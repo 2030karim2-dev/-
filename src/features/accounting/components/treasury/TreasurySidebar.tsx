@@ -184,7 +184,7 @@ const TreasurySidebar: React.FC<Props> = ({ onSelectAccount, selectedAccountId }
         const newCode = (highestCode + 1).toString();
 
         createAccount({ ...data, type: 'asset', code: newCode }, {
-            onSuccess: () => setIsModalOpen(false)
+            onSuccess: () => { setIsModalOpen(false); }
         });
     };
 
@@ -211,21 +211,21 @@ const TreasurySidebar: React.FC<Props> = ({ onSelectAccount, selectedAccountId }
             </div>
 
             <div className="p-2 border-t dark:border-slate-800 bg-gray-50 dark:bg-slate-950/50 space-y-1 shrink-0">
-                <Button onClick={() => setIsModalOpen(true)} variant="secondary" size="sm" className="w-full" leftIcon={<Plus size={12} />}>
+                <Button onClick={() => { setIsModalOpen(true); }} variant="secondary" size="sm" className="w-full" leftIcon={<Plus size={12} />}>
                     إضافة صندوق / بنك
                 </Button>
                 {!hasSubCashboxes && (
-                    <Button onClick={() => seedSubCashboxes()} isLoading={isSeedingSubCashboxes} variant="outline" size="sm" className="w-full text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:border-emerald-900 dark:hover:bg-emerald-900/40" leftIcon={<Wallet size={12} />}>
+                    <Button onClick={() => { seedSubCashboxes(); }} isLoading={isSeedingSubCashboxes} variant="outline" size="sm" className="w-full text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:border-emerald-900 dark:hover:bg-emerald-900/40" leftIcon={<Wallet size={12} />}>
                         تقسيم الكاش (عملات متعددة)
                     </Button>
                 )}
                 {needsMigration && (
-                    <Button onClick={() => migrateCashboxBalances()} isLoading={isMigratingCashbox} variant="outline" size="sm" className="w-full text-blue-600 border-blue-200 hover:bg-blue-50 dark:border-blue-900 dark:hover:bg-blue-900/40" leftIcon={<Landmark size={12} />}>
+                    <Button onClick={() => { migrateCashboxBalances(); }} isLoading={isMigratingCashbox} variant="outline" size="sm" className="w-full text-blue-600 border-blue-200 hover:bg-blue-50 dark:border-blue-900 dark:hover:bg-blue-900/40" leftIcon={<Landmark size={12} />}>
                         تسوية رصيد الكاش القديم للسعودي
                     </Button>
                 )}
                 {!hasExchangeAccounts && (
-                    <Button onClick={() => seedYemeniExchanges()} isLoading={isSeedingExchanges} variant="outline" size="sm" className="w-full" leftIcon={<Globe size={12} />}>
+                    <Button onClick={() => { seedYemeniExchanges(); }} isLoading={isSeedingExchanges} variant="outline" size="sm" className="w-full" leftIcon={<Globe size={12} />}>
                         إضافة حسابات الصرافة اليمنية
                     </Button>
                 )}
@@ -233,7 +233,7 @@ const TreasurySidebar: React.FC<Props> = ({ onSelectAccount, selectedAccountId }
 
             <AddAccountModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => { setIsModalOpen(false); }}
                 onSubmit={handleCreate}
                 isSubmitting={isCreating}
                 accounts={accounts}

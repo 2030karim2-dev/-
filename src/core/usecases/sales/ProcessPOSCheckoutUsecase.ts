@@ -1,6 +1,6 @@
 
 import { salesService } from '../../../features/sales/service';
-import { CreateInvoiceDTO } from '../../../features/sales/types';
+import type { CreateInvoiceDTO } from '../../../features/sales/types';
 
 /**
  * Usecase: معالجة عملية البيع الكاملة من نقطة البيع

@@ -3,7 +3,7 @@
  * Handles CRUD operations for sales quotations
  */
 import { supabase } from '../../../lib/supabaseClient';
-import { CreateQuotationDTO } from '../types/quotation';
+import type { CreateQuotationDTO } from '../types/quotation';
 
 // DB row types
 interface QuotationRow {

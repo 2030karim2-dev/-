@@ -56,7 +56,7 @@ const NotificationSettings: React.FC = () => {
              actions={
                 <ToggleSwitch 
                     checked={prefs[item.id as keyof typeof prefs]}
-                    onChange={(checked) => setPrefs({...prefs, [item.id as keyof typeof prefs]: checked})}
+                    onChange={(checked) => { setPrefs({...prefs, [item.id as keyof typeof prefs]: checked}); }}
                 />
              }
            />
